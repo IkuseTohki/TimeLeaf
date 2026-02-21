@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Models.Interfaces;
+using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
 
 namespace TimeLeaf.Tests.ViewModels;
@@ -12,6 +13,8 @@ namespace TimeLeaf.Tests.ViewModels;
 public class MainViewModelTests
 {
     private Mock<IProjectRepository> _repositoryMock = null!;
+    private LoadProjectsUseCase _loadUseCase = null!;
+    private SaveProjectsUseCase _saveUseCase = null!;
 
     [TestInitialize]
     public void Setup()
@@ -19,6 +22,9 @@ public class MainViewModelTests
         _repositoryMock = new Mock<IProjectRepository>();
         _repositoryMock.Setup(r => r.LoadAllAsync())
                        .ReturnsAsync(new List<Project>());
+
+        _loadUseCase = new LoadProjectsUseCase(_repositoryMock.Object);
+        _saveUseCase = new SaveProjectsUseCase(_repositoryMock.Object);
     }
 
     /// <summary>
@@ -28,7 +34,7 @@ public class MainViewModelTests
     public void Constructor_ShouldSetOverviewViewModelAsInitialPage()
     {
         // Act
-        var viewModel = new MainViewModel(_repositoryMock.Object);
+        var viewModel = new MainViewModel(_loadUseCase, _saveUseCase);
 
         // Assert
         Assert.IsInstanceOfType(viewModel.CurrentViewModel, typeof(OverviewViewModel));
@@ -41,7 +47,7 @@ public class MainViewModelTests
     public void Constructor_ShouldLoadProjectsFromRepository()
     {
         // Act
-        var viewModel = new MainViewModel(_repositoryMock.Object);
+        var viewModel = new MainViewModel(_loadUseCase, _saveUseCase);
 
         // Assert
         _repositoryMock.Verify(r => r.LoadAllAsync(), Times.Once);
@@ -54,15 +60,13 @@ public class MainViewModelTests
     public async System.Threading.Tasks.Task AddProject_ShouldTriggerSave()
     {
         // Arrange
-        var viewModel = new MainViewModel(_repositoryMock.Object);
+        var viewModel = new MainViewModel(_loadUseCase, _saveUseCase);
         var project = new Project { Name = "New Project" };
 
         // Act
         viewModel.Projects.Add(project);
 
-        // イベントハンドラの実行（非同期）を待機するため、少し待つ必要がある場合がある。
-        // ここでは Moq の Verify を用いて、少なくとも1回（初期化以外で）呼ばれたか確認する。
-        // 初期化で1回、追加で1回呼ばれるはず。
+        // 非同期実行待ち
         await System.Threading.Tasks.Task.Delay(100);
 
         // Assert
@@ -76,7 +80,7 @@ public class MainViewModelTests
     public void NavigateToProject_ShouldSetProjectWorkspaceViewModel()
     {
         // Arrange
-        var viewModel = new MainViewModel(_repositoryMock.Object);
+        var viewModel = new MainViewModel(_loadUseCase, _saveUseCase);
         var project = new Project { Name = "Test Project" };
 
         // Act

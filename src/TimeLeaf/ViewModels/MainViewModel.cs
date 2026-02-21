@@ -1,9 +1,8 @@
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TimeLeaf.Models.Entities;
-using TimeLeaf.Models.Interfaces;
+using TimeLeaf.UseCases;
 
 namespace TimeLeaf.ViewModels;
 
@@ -12,7 +11,8 @@ namespace TimeLeaf.ViewModels;
 /// </summary>
 public partial class MainViewModel : ObservableObject
 {
-    private readonly IProjectRepository _repository;
+    private readonly LoadProjectsUseCase _loadUseCase;
+    private readonly SaveProjectsUseCase _saveUseCase;
 
     [ObservableProperty]
     private ObservableObject _currentViewModel;
@@ -25,10 +25,12 @@ public partial class MainViewModel : ObservableObject
     /// <summary>
     /// コンストラクタ。
     /// </summary>
-    /// <param name="repository">プロジェクトリポジトリ。</param>
-    public MainViewModel(IProjectRepository repository)
+    /// <param name="loadUseCase">プロジェクト読み込みユースケース。</param>
+    /// <param name="saveUseCase">プロジェクト保存ユースケース。</param>
+    public MainViewModel(LoadProjectsUseCase loadUseCase, SaveProjectsUseCase saveUseCase)
     {
-        _repository = repository;
+        _loadUseCase = loadUseCase;
+        _saveUseCase = saveUseCase;
         _currentViewModel = new OverviewViewModel(Projects);
 
         // 変更を監視して自動保存
@@ -50,12 +52,12 @@ public partial class MainViewModel : ObservableObject
 
     private async System.Threading.Tasks.Task SaveAsync()
     {
-        await _repository.SaveAllAsync(Projects);
+        await _saveUseCase.ExecuteAsync(Projects);
     }
 
     private async System.Threading.Tasks.Task InitializeAsync()
     {
-        var projects = await _repository.LoadAllAsync();
+        var projects = await _loadUseCase.ExecuteAsync();
         foreach (var project in projects)
         {
             project.Tasks.CollectionChanged += async (s, e) => await SaveAsync();
