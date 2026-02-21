@@ -18,7 +18,7 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
     /// <summary>
     /// 表示対象となるタスクのリスト。
     /// </summary>
-    public ObservableCollection<Task> Tasks { get; } = new();
+    public ObservableCollection<Task> Tasks => _project.Tasks;
 
     /// <summary>
     /// コンストラクタ。
@@ -27,11 +27,6 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
     public ProjectWorkspaceViewModel(Project project)
     {
         _project = project;
-        // 初期タスクがある場合はリストに反映する
-        foreach (var task in _project.Tasks)
-        {
-            Tasks.Add(task);
-        }
     }
 
     /// <summary>
@@ -43,7 +38,6 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
         if (string.IsNullOrWhiteSpace(NewTaskName)) return;
 
         var task = new Task { Name = NewTaskName };
-        _project.Tasks.Add(task);
         Tasks.Add(task);
 
         NewTaskName = string.Empty;

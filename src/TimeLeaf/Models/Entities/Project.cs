@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace TimeLeaf.Models.Entities;
 
@@ -15,5 +16,5 @@ public class Project
     /// <summary>
     /// プロジェクトに紐づくタスクのリスト。
     /// </summary>
-    public List<Task> Tasks { get; } = new();
+    public ObservableCollection<Task> Tasks { get; set; } = new();
 }

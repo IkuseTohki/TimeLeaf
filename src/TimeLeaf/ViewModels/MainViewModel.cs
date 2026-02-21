@@ -1,7 +1,9 @@
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TimeLeaf.Models.Entities;
+using TimeLeaf.Models.Interfaces;
 
 namespace TimeLeaf.ViewModels;
 
@@ -10,6 +12,8 @@ namespace TimeLeaf.ViewModels;
 /// </summary>
 public partial class MainViewModel : ObservableObject
 {
+    private readonly IProjectRepository _repository;
+
     [ObservableProperty]
     private ObservableObject _currentViewModel;
 
@@ -19,11 +23,44 @@ public partial class MainViewModel : ObservableObject
     public ObservableCollection<Project> Projects { get; } = new();
 
     /// <summary>
-    /// コンストラクタ。初期画面をプロジェクトオーバービューに設定する。
+    /// コンストラクタ。
     /// </summary>
-    public MainViewModel()
+    /// <param name="repository">プロジェクトリポジトリ。</param>
+    public MainViewModel(IProjectRepository repository)
     {
+        _repository = repository;
         _currentViewModel = new OverviewViewModel(Projects);
+
+        // 変更を監視して自動保存
+        Projects.CollectionChanged += async (s, e) =>
+        {
+            if (e.NewItems != null)
+            {
+                foreach (Project item in e.NewItems)
+                {
+                    item.Tasks.CollectionChanged += async (ts, te) => await SaveAsync();
+                }
+            }
+            await SaveAsync();
+        };
+
+        // 非同期ロードを開始
+        _ = InitializeAsync();
+    }
+
+    private async System.Threading.Tasks.Task SaveAsync()
+    {
+        await _repository.SaveAllAsync(Projects);
+    }
+
+    private async System.Threading.Tasks.Task InitializeAsync()
+    {
+        var projects = await _repository.LoadAllAsync();
+        foreach (var project in projects)
+        {
+            project.Tasks.CollectionChanged += async (s, e) => await SaveAsync();
+            Projects.Add(project);
+        }
     }
 
     /// <summary>
