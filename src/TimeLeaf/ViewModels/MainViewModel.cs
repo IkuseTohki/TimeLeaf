@@ -1,7 +1,12 @@
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TimeLeaf.Models.Entities;
+using TimeLeaf.Models.Interfaces;
 using TimeLeaf.UseCases;
 
 namespace TimeLeaf.ViewModels;
@@ -12,7 +17,8 @@ namespace TimeLeaf.ViewModels;
 public partial class MainViewModel : ObservableObject
 {
     private readonly LoadProjectsUseCase _loadUseCase;
-    private readonly SaveProjectsUseCase _saveUseCase;
+    private readonly SaveProjectUseCase _saveSingleUseCase;
+    private readonly IProjectRepository _repository; // イベント購読のために保持
 
     [ObservableProperty]
     private ObservableObject _currentViewModel;
@@ -26,33 +32,65 @@ public partial class MainViewModel : ObservableObject
     /// コンストラクタ。
     /// </summary>
     /// <param name="loadUseCase">プロジェクト読み込みユースケース。</param>
-    /// <param name="saveUseCase">プロジェクト保存ユースケース。</param>
-    public MainViewModel(LoadProjectsUseCase loadUseCase, SaveProjectsUseCase saveUseCase)
+    /// <param name="saveSingleUseCase">単一プロジェクト保存ユースケース。</param>
+    /// <param name="repository">イベント購読用リポジトリ（DIより注入）。</param>
+    public MainViewModel(LoadProjectsUseCase loadUseCase, SaveProjectUseCase saveSingleUseCase, IProjectRepository repository)
     {
         _loadUseCase = loadUseCase;
-        _saveUseCase = saveUseCase;
+        _saveSingleUseCase = saveSingleUseCase;
+        _repository = repository;
         _currentViewModel = new OverviewViewModel(Projects);
 
-        // 変更を監視して自動保存
+        // 外部変更（同期）の監視
+        _repository.ProjectChanged += OnProjectChanged;
+
+        // 内部変更の監視と自動保存
         Projects.CollectionChanged += async (s, e) =>
         {
             if (e.NewItems != null)
             {
                 foreach (Project item in e.NewItems)
                 {
-                    item.Tasks.CollectionChanged += async (ts, te) => await SaveAsync();
+                    item.Tasks.CollectionChanged += async (ts, te) => await _saveSingleUseCase.ExecuteAsync(item);
+                    await _saveSingleUseCase.ExecuteAsync(item);
                 }
             }
-            await SaveAsync();
         };
 
-        // 非同期ロードを開始
         _ = InitializeAsync();
     }
 
-    private async System.Threading.Tasks.Task SaveAsync()
+    private void OnProjectChanged(Guid projectId)
     {
-        await _saveUseCase.ExecuteAsync(Projects);
+        // 更新処理の本体
+        async System.Threading.Tasks.Task UpdateAction()
+        {
+            var updated = await _repository.LoadAsync(projectId);
+            if (updated == null) return;
+
+            var existing = Projects.FirstOrDefault(p => p.Id == projectId);
+            if (existing != null)
+            {
+                existing.Name = updated.Name;
+                existing.Tasks.Clear();
+                foreach (var t in updated.Tasks) existing.Tasks.Add(t);
+            }
+            else
+            {
+                Projects.Add(updated);
+            }
+        }
+
+        // Dispatcher を介して実行（UIスレッドを担保）
+        if (Application.Current?.Dispatcher != null)
+        {
+            Application.Current.Dispatcher.InvokeAsync(UpdateAction);
+        }
+        else
+        {
+            // テスト環境など Dispatcher がない場合は直接実行
+            _ = UpdateAction();
+        }
     }
 
     private async System.Threading.Tasks.Task InitializeAsync()
@@ -60,15 +98,11 @@ public partial class MainViewModel : ObservableObject
         var projects = await _loadUseCase.ExecuteAsync();
         foreach (var project in projects)
         {
-            project.Tasks.CollectionChanged += async (s, e) => await SaveAsync();
+            project.Tasks.CollectionChanged += async (s, e) => await _saveSingleUseCase.ExecuteAsync(project);
             Projects.Add(project);
         }
     }
 
-    /// <summary>
-    /// 指定されたプロジェクトのワークスペース画面に遷移するコマンド。
-    /// </summary>
-    /// <param name="project">対象プロジェクト。</param>
     [RelayCommand]
     private void NavigateToProject(Project project)
     {
@@ -76,9 +110,6 @@ public partial class MainViewModel : ObservableObject
         CurrentViewModel = new ProjectWorkspaceViewModel(project);
     }
 
-    /// <summary>
-    /// トップ画面に戻るコマンド。
-    /// </summary>
     [RelayCommand]
     private void NavigateBack()
     {

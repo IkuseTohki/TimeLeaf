@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -8,6 +9,11 @@ namespace TimeLeaf.Models.Entities;
 /// </summary>
 public class Project
 {
+    /// <summary>
+    /// プロジェクトを一意に識別するID。
+    /// </summary>
+    public Guid Id { get; set; } = Guid.NewGuid();
+
     /// <summary>
     /// プロジェクト名。
     /// </summary>

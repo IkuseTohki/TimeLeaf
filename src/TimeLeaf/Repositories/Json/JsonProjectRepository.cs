@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using TimeLeaf.Models.Entities;
@@ -18,6 +20,8 @@ public class JsonProjectRepository : IProjectRepository
         WriteIndented = true
     };
 
+    public event Action<Guid>? ProjectChanged;
+
     public JsonProjectRepository(string filePath)
     {
         _filePath = filePath;
@@ -35,9 +39,22 @@ public class JsonProjectRepository : IProjectRepository
         return projects ?? new List<Project>();
     }
 
+    public async System.Threading.Tasks.Task<Project?> LoadAsync(Guid projectId)
+    {
+        var projects = await LoadAllAsync();
+        return projects.FirstOrDefault(p => p.Id == projectId);
+    }
+
     public async System.Threading.Tasks.Task SaveAllAsync(IEnumerable<Project> projects)
     {
         using var stream = File.Create(_filePath);
         await JsonSerializer.SerializeAsync(stream, projects, _options);
+    }
+
+    public System.Threading.Tasks.Task SaveAsync(Project project)
+    {
+        // 単一ファイル版では個別保存は非効率だが、互換性のために実装
+        // ここでは全件保存を呼び出す
+        return SaveAllAsync(new[] { project });
     }
 }

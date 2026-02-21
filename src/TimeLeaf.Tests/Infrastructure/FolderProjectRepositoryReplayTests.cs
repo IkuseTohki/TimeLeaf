@@ -1,0 +1,76 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
+using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using TimeLeaf.Models.Entities;
+using TimeLeaf.Models.Interfaces;
+using TimeLeaf.Repositories.FileSystem;
+
+namespace TimeLeaf.Tests.Infrastructure;
+
+[TestClass]
+public class FolderProjectRepositoryReplayTests
+{
+    private string _tempDir = null!;
+    private Mock<ICurrentUserService> _userServiceMock = null!;
+
+    [TestInitialize]
+    public void Setup()
+    {
+        _tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        Directory.CreateDirectory(_tempDir);
+        _userServiceMock = new Mock<ICurrentUserService>();
+        _userServiceMock.Setup(u => u.GetCurrentUserId()).Returns("test-user");
+    }
+
+    [TestCleanup]
+    public void Cleanup()
+    {
+        if (Directory.Exists(_tempDir))
+        {
+            Directory.Delete(_tempDir, true);
+        }
+    }
+
+    /// <summary>
+    /// テスト観点: 複数の履歴ファイルがある場合、タイムスタンプが最新のものが最終的な状態として採用される(LWW)ことを確認する。
+    /// </summary>
+    [TestMethod]
+    public async System.Threading.Tasks.Task LoadAllAsync_ShouldApplyReplayWithLWW()
+    {
+        // Arrange
+        var projectId = Guid.NewGuid();
+        var projectDir = Path.Combine(_tempDir, $"{projectId}_InitialName");
+        var changesDir = Path.Combine(projectDir, "changes");
+        Directory.CreateDirectory(changesDir);
+
+        var baseTime = new DateTime(2026, 2, 21, 10, 0, 0);
+
+        // 0. .project メタデータの作成
+        var metaFile = Path.Combine(projectDir, ".project");
+        await File.WriteAllTextAsync(metaFile,
+            JsonSerializer.Serialize(new { ProjectId = projectId, CreatedAt = baseTime, SchemaVersion = 1 }));
+        // 1. 古い変更 (Name = "Old Name")
+        var oldFile = CommitFileName.Generate(baseTime, "user1", Guid.NewGuid(), "ProjectBasic");
+        await File.WriteAllTextAsync(Path.Combine(changesDir, oldFile),
+            JsonSerializer.Serialize(new { Name = "Old Name" }));
+
+        // 2. 新しい変更 (Name = "New Name")
+        var newFile = CommitFileName.Generate(baseTime.AddSeconds(1), "user1", Guid.NewGuid(), "ProjectBasic");
+        await File.WriteAllTextAsync(Path.Combine(changesDir, newFile),
+            JsonSerializer.Serialize(new { Name = "New Name" }));
+        var repository = new FolderProjectRepository(_tempDir, _userServiceMock.Object);
+
+        // Act
+        var projects = (await repository.LoadAllAsync()).ToList();
+
+        // Assert
+        Assert.HasCount(1, projects);
+        Assert.AreEqual(projectId, projects[0].Id);
+        Assert.AreEqual("New Name", projects[0].Name, "最新のファイルの内容が反映されていること");
+    }
+}

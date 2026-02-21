@@ -1,0 +1,73 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
+using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using TimeLeaf.Models.Entities;
+using TimeLeaf.Models.Interfaces;
+using TimeLeaf.Repositories.FileSystem;
+
+namespace TimeLeaf.Tests.Infrastructure;
+
+[TestClass]
+public class FolderProjectRepositoryTests
+{
+    private string _tempDir = null!;
+    private Mock<ICurrentUserService> _userServiceMock = null!;
+
+    [TestInitialize]
+    public void Setup()
+    {
+        _tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        _userServiceMock = new Mock<ICurrentUserService>();
+        _userServiceMock.Setup(u => u.GetCurrentUserId()).Returns("test-user");
+    }
+
+    [TestCleanup]
+    public void Cleanup()
+    {
+        if (Directory.Exists(_tempDir))
+        {
+            Directory.Delete(_tempDir, true);
+        }
+    }
+
+    /// <summary>
+    /// テスト観点: プロジェクトを保存した際、仕様書通りのフォルダ構造とファイルが生成されることを確認する。
+    /// </summary>
+    [TestMethod]
+    public async System.Threading.Tasks.Task SaveAllAsync_ShouldCreateCorrectFolderStructure()
+    {
+        // Arrange
+        var repository = new FolderProjectRepository(_tempDir, _userServiceMock.Object);
+        var project = new Project { Name = "StructureTest" };
+        var projects = new List<Project> { project };
+
+        // Act
+        await repository.SaveAllAsync(projects);
+
+        // Assert
+        // 1. プロジェクトフォルダの存在確認
+        var expectedProjectDir = Directory.GetDirectories(_tempDir).FirstOrDefault(d => d.Contains(project.Id.ToString()));
+        Assert.IsNotNull(expectedProjectDir, "プロジェクトIDを含むディレクトリが作成されること");
+
+        // 2. changes フォルダの存在確認
+        var changesDir = Path.Combine(expectedProjectDir, "changes");
+        Assert.IsTrue(Directory.Exists(changesDir), "changes フォルダが作成されること");
+
+        // 3. 履歴ファイルの存在確認
+        var files = Directory.GetFiles(changesDir);
+        Assert.IsNotEmpty(files, "履歴ファイル(JSON)が出力されること");
+
+        var commitFile = CommitFileName.Parse(Path.GetFileName(files[0]));
+        Assert.AreEqual("test-user", commitFile.UserId);
+        Assert.AreEqual("ProjectBasic", commitFile.Category);
+
+        // 4. 内容の確認
+        var json = File.ReadAllText(files[0]);
+        Assert.Contains("StructureTest", json, "プロジェクト名がJSONに含まれていること");
+    }
+}

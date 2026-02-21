@@ -3,7 +3,8 @@ using System.IO;
 using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using TimeLeaf.Models.Interfaces;
-using TimeLeaf.Repositories.Json;
+using TimeLeaf.Repositories.FileSystem;
+using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
 using TimeLeaf.Views;
@@ -27,12 +28,17 @@ public partial class App : Application
     private void ConfigureServices(IServiceCollection services)
     {
         // 外部依存の設定
-        var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "projects.json");
-        services.AddSingleton<IProjectRepository>(new JsonProjectRepository(filePath));
+        // 仕様に基づき、プロジェクトごとのフォルダを管理するルートディレクトリを指定
+        var storagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "storage");
+
+        services.AddSingleton<ICurrentUserService, WindowsCurrentUserService>();
+        services.AddSingleton<IProjectRepository>(sp =>
+            new FolderProjectRepository(storagePath, sp.GetRequiredService<ICurrentUserService>()));
 
         // ユースケースの登録
         services.AddTransient<LoadProjectsUseCase>();
         services.AddTransient<SaveProjectsUseCase>();
+        services.AddTransient<SaveProjectUseCase>();
 
         // ViewModel の登録
         services.AddTransient<MainViewModel>();

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -14,7 +15,7 @@ public class MainViewModelTests
 {
     private Mock<IProjectRepository> _repositoryMock = null!;
     private LoadProjectsUseCase _loadUseCase = null!;
-    private SaveProjectsUseCase _saveUseCase = null!;
+    private SaveProjectUseCase _saveSingleUseCase = null!;
 
     [TestInitialize]
     public void Setup()
@@ -24,7 +25,7 @@ public class MainViewModelTests
                        .ReturnsAsync(new List<Project>());
 
         _loadUseCase = new LoadProjectsUseCase(_repositoryMock.Object);
-        _saveUseCase = new SaveProjectsUseCase(_repositoryMock.Object);
+        _saveSingleUseCase = new SaveProjectUseCase(_repositoryMock.Object);
     }
 
     /// <summary>
@@ -34,7 +35,7 @@ public class MainViewModelTests
     public void Constructor_ShouldSetOverviewViewModelAsInitialPage()
     {
         // Act
-        var viewModel = new MainViewModel(_loadUseCase, _saveUseCase);
+        var viewModel = new MainViewModel(_loadUseCase, _saveSingleUseCase, _repositoryMock.Object);
 
         // Assert
         Assert.IsInstanceOfType(viewModel.CurrentViewModel, typeof(OverviewViewModel));
@@ -47,20 +48,20 @@ public class MainViewModelTests
     public void Constructor_ShouldLoadProjectsFromRepository()
     {
         // Act
-        var viewModel = new MainViewModel(_loadUseCase, _saveUseCase);
+        var viewModel = new MainViewModel(_loadUseCase, _saveSingleUseCase, _repositoryMock.Object);
 
         // Assert
         _repositoryMock.Verify(r => r.LoadAllAsync(), Times.Once);
     }
 
     /// <summary>
-    /// テスト観点: プロジェクトが追加された際、リポジトリへの保存が実行されることを確認する。
+    /// テスト観点: プロジェクトが追加された際、そのプロジェクトの保存が実行されることを確認する。
     /// </summary>
     [TestMethod]
-    public async System.Threading.Tasks.Task AddProject_ShouldTriggerSave()
+    public async System.Threading.Tasks.Task AddProject_ShouldTriggerSaveForThatProject()
     {
         // Arrange
-        var viewModel = new MainViewModel(_loadUseCase, _saveUseCase);
+        var viewModel = new MainViewModel(_loadUseCase, _saveSingleUseCase, _repositoryMock.Object);
         var project = new Project { Name = "New Project" };
 
         // Act
@@ -70,7 +71,35 @@ public class MainViewModelTests
         await System.Threading.Tasks.Task.Delay(100);
 
         // Assert
-        _repositoryMock.Verify(r => r.SaveAllAsync(It.IsAny<IEnumerable<Project>>()), Times.Once);
+        _repositoryMock.Verify(r => r.SaveAsync(project), Times.Once);
+    }
+
+    /// <summary>
+    /// テスト観点: リポジトリの ProjectChanged イベントが発生した際、対象プロジェクトが再ロードされることを確認する。
+    /// </summary>
+    [TestMethod]
+    public async System.Threading.Tasks.Task ProjectChangedEvent_ShouldTriggerReload()
+    {
+        // Arrange
+        var project = new Project { Name = "Old Name" };
+        var viewModel = new MainViewModel(_loadUseCase, _saveSingleUseCase, _repositoryMock.Object);
+        viewModel.Projects.Add(project);
+
+        // ロードされる新しい状態を準備
+        var updatedProject = new Project { Id = project.Id, Name = "Updated Name" };
+        _repositoryMock.Setup(r => r.LoadAsync(project.Id)).ReturnsAsync(updatedProject);
+
+        // Act
+        // イベントを発火させる
+        _repositoryMock.Raise(r => r.ProjectChanged += null, project.Id);
+
+        // 非同期処理（Dispatcher.Invoke相当）の完了を待機
+        // 単体テスト環境では Dispatcher がないので直列実行されるが、InvokeAsync 対策で待機
+        await System.Threading.Tasks.Task.Delay(200);
+
+        // Assert
+        var currentProject = viewModel.Projects.First(p => p.Id == project.Id);
+        Assert.AreEqual("Updated Name", currentProject.Name, "プロジェクト名が更新されていること");
     }
 
     /// <summary>
@@ -80,7 +109,7 @@ public class MainViewModelTests
     public void NavigateToProject_ShouldSetProjectWorkspaceViewModel()
     {
         // Arrange
-        var viewModel = new MainViewModel(_loadUseCase, _saveUseCase);
+        var viewModel = new MainViewModel(_loadUseCase, _saveSingleUseCase, _repositoryMock.Object);
         var project = new Project { Name = "Test Project" };
 
         // Act
