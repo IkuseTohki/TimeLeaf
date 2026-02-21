@@ -1,7 +1,10 @@
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TimeLeaf.Models.Entities;
+using TimeLeaf.Models.Enums;
 
 namespace TimeLeaf.ViewModels;
 
@@ -10,11 +13,20 @@ namespace TimeLeaf.ViewModels;
 /// </summary>
 public partial class OverviewViewModel : ObservableObject
 {
+    public IEnumerable<ProjectStatus> ProjectStatusValues => Enum.GetValues<ProjectStatus>();
+    public IEnumerable<ProjectHealth> ProjectHealthValues => Enum.GetValues<ProjectHealth>();
+
     [ObservableProperty]
     private string _newProjectName = string.Empty;
 
     [ObservableProperty]
     private string _newProjectDescription = string.Empty;
+
+    [ObservableProperty]
+    private ProjectStatus _newProjectStatus = ProjectStatus.Initial;
+
+    [ObservableProperty]
+    private ProjectHealth _newProjectHealth = ProjectHealth.Healthy;
 
     /// <summary>
     /// 表示対象となるプロジェクトのリスト。
@@ -41,11 +53,15 @@ public partial class OverviewViewModel : ObservableObject
         var project = new Project
         {
             Name = NewProjectName,
-            Description = NewProjectDescription
+            Description = NewProjectDescription,
+            Status = NewProjectStatus,
+            HealthStatus = NewProjectHealth
         };
         Projects.Add(project);
 
         NewProjectName = string.Empty;
         NewProjectDescription = string.Empty;
+        NewProjectStatus = ProjectStatus.Initial;
+        NewProjectHealth = ProjectHealth.Healthy;
     }
 }

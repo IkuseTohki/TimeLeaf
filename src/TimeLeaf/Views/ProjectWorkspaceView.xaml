@@ -36,6 +36,14 @@
                          VerticalContentAlignment="Center"
                          Tag="タスク名"
                          Text="{Binding NewTaskName, UpdateSourceTrigger=PropertyChanged}" />
+                <ComboBox Width="120"
+                          Margin="10,0,0,0"
+                          ItemsSource="{Binding TaskStatusValues}"
+                          SelectedItem="{Binding NewTaskStatus}" />
+                <ComboBox Width="100"
+                          Margin="10,0,0,0"
+                          ItemsSource="{Binding TaskPriorityValues}"
+                          SelectedItem="{Binding NewTaskPriority}" />
                 <Button Margin="10,0,0,0"
                         Padding="15,0"
                         Command="{Binding AddTaskCommand}"
@@ -58,7 +66,25 @@
                                 BorderBrush="#EEE"
                                 BorderThickness="0,0,0,1">
                             <StackPanel>
-                                <TextBlock FontSize="16" Text="{Binding Name}" />
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock FontSize="16" Text="{Binding Name}" />
+                                    <Border Margin="10,0,0,0"
+                                            Padding="4,1"
+                                            Background="#F5F5F5"
+                                            CornerRadius="2">
+                                        <TextBlock FontSize="10"
+                                                   Foreground="#666"
+                                                   Text="{Binding Status}" />
+                                    </Border>
+                                    <Border Margin="5,0,0,0"
+                                            Padding="4,1"
+                                            Background="#FFF3E0"
+                                            CornerRadius="2">
+                                        <TextBlock FontSize="10"
+                                                   Foreground="#E65100"
+                                                   Text="{Binding Priority}" />
+                                    </Border>
+                                </StackPanel>
                                 <TextBlock Margin="0,2,0,0"
                                            FontSize="12"
                                            Foreground="#666"

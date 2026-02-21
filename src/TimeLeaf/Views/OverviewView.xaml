@@ -23,6 +23,14 @@
                          VerticalContentAlignment="Center"
                          Tag="プロジェクト名"
                          Text="{Binding NewProjectName, UpdateSourceTrigger=PropertyChanged}" />
+                <ComboBox Width="120"
+                          Margin="10,0,0,0"
+                          ItemsSource="{Binding ProjectStatusValues}"
+                          SelectedItem="{Binding NewProjectStatus}" />
+                <ComboBox Width="100"
+                          Margin="10,0,0,0"
+                          ItemsSource="{Binding ProjectHealthValues}"
+                          SelectedItem="{Binding NewProjectHealth}" />
                 <Button Margin="10,0,0,0"
                         Padding="15,0"
                         Command="{Binding AddProjectCommand}"
@@ -57,9 +65,29 @@
                                         DockPanel.Dock="Right" />
 
                                 <StackPanel VerticalAlignment="Center">
-                                    <TextBlock FontSize="16"
-                                               FontWeight="SemiBold"
-                                               Text="{Binding Name}" />
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock FontSize="16"
+                                                   FontWeight="SemiBold"
+                                                   Text="{Binding Name}" />
+                                        <Border Margin="10,0,0,0"
+                                                Padding="5,1"
+                                                VerticalAlignment="Center"
+                                                Background="#E1F5FE"
+                                                CornerRadius="4">
+                                            <TextBlock FontSize="10"
+                                                       Foreground="#0277BD"
+                                                       Text="{Binding Status}" />
+                                        </Border>
+                                        <Border Margin="5,0,0,0"
+                                                Padding="5,1"
+                                                VerticalAlignment="Center"
+                                                Background="#E8F5E9"
+                                                CornerRadius="4">
+                                            <TextBlock FontSize="10"
+                                                       Foreground="#2E7D32"
+                                                       Text="{Binding HealthStatus}" />
+                                        </Border>
+                                    </StackPanel>
                                     <TextBlock Margin="0,2,0,0"
                                                FontSize="12"
                                                Foreground="#666"

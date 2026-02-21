@@ -1,7 +1,10 @@
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TimeLeaf.Models.Entities;
+using TimeLeaf.Models.Enums;
 
 namespace TimeLeaf.ViewModels;
 
@@ -12,11 +15,20 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
 {
     private readonly Project _project;
 
+    public IEnumerable<TimeLeaf.Models.Enums.TaskStatus> TaskStatusValues => Enum.GetValues<TimeLeaf.Models.Enums.TaskStatus>();
+    public IEnumerable<TaskPriority> TaskPriorityValues => Enum.GetValues<TaskPriority>();
+
     [ObservableProperty]
     private string _newTaskName = string.Empty;
 
     [ObservableProperty]
     private string _newTaskDescription = string.Empty;
+
+    [ObservableProperty]
+    private TimeLeaf.Models.Enums.TaskStatus _newTaskStatus = TimeLeaf.Models.Enums.TaskStatus.NotStarted;
+
+    [ObservableProperty]
+    private TaskPriority _newTaskPriority = TaskPriority.Medium;
 
     /// <summary>
     /// 表示対象となるタスクのリスト。
@@ -43,11 +55,15 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
         var task = new Task
         {
             Name = NewTaskName,
-            Description = NewTaskDescription
+            Description = NewTaskDescription,
+            Status = NewTaskStatus,
+            Priority = NewTaskPriority
         };
         Tasks.Add(task);
 
         NewTaskName = string.Empty;
         NewTaskDescription = string.Empty;
+        NewTaskStatus = TimeLeaf.Models.Enums.TaskStatus.NotStarted;
+        NewTaskPriority = TaskPriority.Medium;
     }
 }

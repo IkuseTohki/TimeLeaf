@@ -1,4 +1,5 @@
 using System;
+using TimeLeaf.Models.Enums;
 
 namespace TimeLeaf.Models.Entities;
 
@@ -21,4 +22,14 @@ public class Task
     /// タスクの詳細説明。
     /// </summary>
     public string Description { get; set; } = string.Empty;
+
+    /// <summary>
+    /// タスクの進捗状態。
+    /// </summary>
+    public TaskStatus Status { get; set; } = TaskStatus.NotStarted;
+
+    /// <summary>
+    /// タスクの優先度。
+    /// </summary>
+    public TaskPriority Priority { get; set; } = TaskPriority.Medium;
 }

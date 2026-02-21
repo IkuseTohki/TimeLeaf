@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using TimeLeaf.Models.Enums;
 
 namespace TimeLeaf.Models.Entities;
 
@@ -23,6 +24,16 @@ public class Project
     /// プロジェクトの概要説明。
     /// </summary>
     public string Description { get; set; } = string.Empty;
+
+    /// <summary>
+    /// プロジェクトの状態。
+    /// </summary>
+    public ProjectStatus Status { get; set; } = ProjectStatus.Initial;
+
+    /// <summary>
+    /// プロジェクトの健全性ステータス。
+    /// </summary>
+    public ProjectHealth HealthStatus { get; set; } = ProjectHealth.Healthy;
 
     /// <summary>
     /// プロジェクトに紐づくタスクのリスト。

@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using TimeLeaf.Models.Entities;
+using TimeLeaf.Models.Enums;
 using TimeLeaf.Models.Interfaces;
 
 namespace TimeLeaf.Repositories.FileSystem;
@@ -17,7 +19,12 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
 {
     private readonly string _baseDirectory;
     private readonly ICurrentUserService _userService;
-    private static readonly JsonSerializerOptions _options = new() { PropertyNameCaseInsensitive = true, WriteIndented = true };
+    private static readonly JsonSerializerOptions _options = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        WriteIndented = true,
+        Converters = { new JsonStringEnumConverter() } // Enum を文字列で保存
+    };
 
     private readonly ConcurrentDictionary<string, string> _lastSavedContent = new();
     private readonly FileSystemWatcher _watcher;
@@ -139,6 +146,8 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                         {
                             project.Name = basic.Name;
                             project.Description = basic.Description;
+                            project.Status = basic.Status;
+                            project.HealthStatus = basic.HealthStatus;
                         }
                         break;
 
@@ -149,13 +158,21 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                             project.Tasks.Clear();
                             foreach (var t in tasks)
                             {
-                                project.Tasks.Add(new Models.Entities.Task { Id = t.Id, Name = t.Name, Description = t.Description });
+                                project.Tasks.Add(new Models.Entities.Task
+                                {
+                                    Id = t.Id,
+                                    Name = t.Name,
+                                    Description = t.Description,
+                                    Status = t.Status,
+                                    Priority = t.Priority
+                                });
                             }
                         }
                         break;
                 }
             }
-            catch (IOException) {
+            catch (IOException)
+            {
                 /* ファイルが他プロセスで使用中の場合は一旦スキップ（リトライは将来課題） */
             }
         }
@@ -181,12 +198,12 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
 
         var changesDir = Path.Combine(projectDir, "changes");
 
-        // ProjectBasic Snapshot (Id を含まない)
-        var basicSnapshot = new ProjectBasicDto(project.Name);
+        // 1. ProjectBasic Snapshot
+        var basicSnapshot = new ProjectBasicDto(project.Name, project.Description, project.Status, project.HealthStatus);
         await TrySaveCategoryAsync(project.Id, changesDir, "ProjectBasic", basicSnapshot);
 
-        // ProjectTasks Snapshot (識別のための TaskId は保持)
-        var tasksSnapshot = project.Tasks.Select(t => new TaskDto(t.Id, t.Name)).ToList();
+        // 2. ProjectTasks Snapshot
+        var tasksSnapshot = project.Tasks.Select(t => new TaskDto(t.Id, t.Name, t.Description, t.Status, t.Priority)).ToList();
         await TrySaveCategoryAsync(project.Id, changesDir, "ProjectTasks", tasksSnapshot);
     }
 
@@ -212,7 +229,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         _watcher.Dispose();
     }
 
-    private record ProjectBasicDto(string Name, string Description);
-    private record TaskDto(Guid Id, string Name, string Description);
+    private record ProjectBasicDto(string Name, string Description, ProjectStatus Status, ProjectHealth HealthStatus);
+    private record TaskDto(Guid Id, string Name, string Description, TimeLeaf.Models.Enums.TaskStatus Status, TaskPriority Priority);
     private record ProjectMetadataDto(Guid ProjectId, DateTime CreatedAt, string CreatedBy, int SchemaVersion);
 }
