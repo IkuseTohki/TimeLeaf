@@ -16,6 +16,15 @@ public class InMemoryProjectRepository : IProjectRepository
 
     public event Action<Guid>? ProjectChanged;
 
+    /// <summary>
+    /// テスト用に、外部からのプロジェクト変更を通知します。
+    /// </summary>
+    /// <param name="projectId">変更があったプロジェクトID。</param>
+    public void NotifyProjectChanged(Guid projectId)
+    {
+        ProjectChanged?.Invoke(projectId);
+    }
+
     public System.Threading.Tasks.Task<IEnumerable<Project>> LoadAllAsync()
     {
         return System.Threading.Tasks.Task.FromResult(_projects.AsEnumerable());

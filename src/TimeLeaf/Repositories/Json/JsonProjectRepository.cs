@@ -20,7 +20,9 @@ public class JsonProjectRepository : IProjectRepository
         WriteIndented = true
     };
 
+#pragma warning disable CS0067
     public event Action<Guid>? ProjectChanged;
+#pragma warning restore CS0067
 
     public JsonProjectRepository(string filePath)
     {

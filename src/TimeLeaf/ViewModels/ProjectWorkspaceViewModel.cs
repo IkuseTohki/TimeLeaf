@@ -15,6 +15,9 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
     [ObservableProperty]
     private string _newTaskName = string.Empty;
 
+    [ObservableProperty]
+    private string _newTaskDescription = string.Empty;
+
     /// <summary>
     /// 表示対象となるタスクのリスト。
     /// </summary>
@@ -37,9 +40,14 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
     {
         if (string.IsNullOrWhiteSpace(NewTaskName)) return;
 
-        var task = new Task { Name = NewTaskName };
+        var task = new Task
+        {
+            Name = NewTaskName,
+            Description = NewTaskDescription
+        };
         Tasks.Add(task);
 
         NewTaskName = string.Empty;
+        NewTaskDescription = string.Empty;
     }
 }

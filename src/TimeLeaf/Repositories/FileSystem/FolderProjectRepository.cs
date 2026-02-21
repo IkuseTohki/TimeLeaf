@@ -135,7 +135,11 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                 {
                     case "ProjectBasic":
                         var basic = JsonSerializer.Deserialize<ProjectBasicDto>(json, _options);
-                        if (basic != null) project.Name = basic.Name;
+                        if (basic != null)
+                        {
+                            project.Name = basic.Name;
+                            project.Description = basic.Description;
+                        }
                         break;
 
                     case "ProjectTasks":
@@ -143,7 +147,10 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                         if (tasks != null)
                         {
                             project.Tasks.Clear();
-                            foreach (var t in tasks) project.Tasks.Add(new Models.Entities.Task { Id = t.Id, Name = t.Name });
+                            foreach (var t in tasks)
+                            {
+                                project.Tasks.Add(new Models.Entities.Task { Id = t.Id, Name = t.Name, Description = t.Description });
+                            }
                         }
                         break;
                 }
@@ -205,7 +212,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         _watcher.Dispose();
     }
 
-    private record ProjectBasicDto(string Name);
-    private record TaskDto(Guid Id, string Name);
+    private record ProjectBasicDto(string Name, string Description);
+    private record TaskDto(Guid Id, string Name, string Description);
     private record ProjectMetadataDto(Guid ProjectId, DateTime CreatedAt, string CreatedBy, int SchemaVersion);
 }

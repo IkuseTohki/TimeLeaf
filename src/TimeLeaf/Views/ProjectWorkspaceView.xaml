@@ -28,18 +28,25 @@
         </StackPanel>
 
         <!-- 入力エリア -->
-        <StackPanel Grid.Row="1"
-                    Margin="0,0,0,20"
-                    Orientation="Horizontal">
-            <TextBox Width="300"
-                     Height="32"
-                     Padding="5,0"
-                     VerticalContentAlignment="Center"
-                     Text="{Binding NewTaskName, UpdateSourceTrigger=PropertyChanged}" />
-            <Button Margin="10,0,0,0"
-                    Padding="15,0"
-                    Command="{Binding AddTaskCommand}"
-                    Content="タスク追加" />
+        <StackPanel Grid.Row="1" Margin="0,0,0,20">
+            <StackPanel Orientation="Horizontal">
+                <TextBox Width="300"
+                         Height="32"
+                         Padding="5,0"
+                         VerticalContentAlignment="Center"
+                         Tag="タスク名"
+                         Text="{Binding NewTaskName, UpdateSourceTrigger=PropertyChanged}" />
+                <Button Margin="10,0,0,0"
+                        Padding="15,0"
+                        Command="{Binding AddTaskCommand}"
+                        Content="タスク追加" />
+            </StackPanel>
+            <TextBox Height="40"
+                     Margin="0,10,0,0"
+                     AcceptsReturn="True"
+                     Tag="説明"
+                     Text="{Binding NewTaskDescription, UpdateSourceTrigger=PropertyChanged}"
+                     TextWrapping="Wrap" />
         </StackPanel>
 
         <!-- 表示エリア -->
@@ -50,7 +57,14 @@
                         <Border Padding="10"
                                 BorderBrush="#EEE"
                                 BorderThickness="0,0,0,1">
-                            <TextBlock FontSize="16" Text="{Binding Name}" />
+                            <StackPanel>
+                                <TextBlock FontSize="16" Text="{Binding Name}" />
+                                <TextBlock Margin="0,2,0,0"
+                                           FontSize="12"
+                                           Foreground="#666"
+                                           Text="{Binding Description}"
+                                           Visibility="{Binding Description, Converter={StaticResource StringToVisibilityConverter}}" />
+                            </StackPanel>
                         </Border>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>

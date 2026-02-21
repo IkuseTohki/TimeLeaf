@@ -19,14 +19,19 @@ public class OverviewViewModelTests
         var projects = new ObservableCollection<Project>();
         var viewModel = new OverviewViewModel(projects);
         var projectName = "Test Project";
+        var projectDesc = "Test Description";
         viewModel.NewProjectName = projectName;
+        viewModel.NewProjectDescription = projectDesc;
 
         // Act
         viewModel.AddProjectCommand.Execute(null);
 
         // Assert
         Assert.HasCount(1, viewModel.Projects);
-        Assert.AreEqual(projectName, viewModel.Projects.First().Name);
-        Assert.AreEqual(string.Empty, viewModel.NewProjectName, "追加後は入力欄がクリアされること");
+        var added = viewModel.Projects.First();
+        Assert.AreEqual(projectName, added.Name);
+        Assert.AreEqual(projectDesc, added.Description);
+        Assert.AreEqual(string.Empty, viewModel.NewProjectName);
+        Assert.AreEqual(string.Empty, viewModel.NewProjectDescription);
     }
 }

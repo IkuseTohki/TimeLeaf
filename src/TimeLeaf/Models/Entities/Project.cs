@@ -20,6 +20,11 @@ public class Project
     public string Name { get; set; } = string.Empty;
 
     /// <summary>
+    /// プロジェクトの概要説明。
+    /// </summary>
+    public string Description { get; set; } = string.Empty;
+
+    /// <summary>
     /// プロジェクトに紐づくタスクのリスト。
     /// </summary>
     public ObservableCollection<Task> Tasks { get; set; } = new();

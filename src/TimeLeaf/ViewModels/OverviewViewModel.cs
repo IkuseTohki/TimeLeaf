@@ -13,6 +13,9 @@ public partial class OverviewViewModel : ObservableObject
     [ObservableProperty]
     private string _newProjectName = string.Empty;
 
+    [ObservableProperty]
+    private string _newProjectDescription = string.Empty;
+
     /// <summary>
     /// 表示対象となるプロジェクトのリスト。
     /// </summary>
@@ -35,9 +38,14 @@ public partial class OverviewViewModel : ObservableObject
     {
         if (string.IsNullOrWhiteSpace(NewProjectName)) return;
 
-        var project = new Project { Name = NewProjectName };
+        var project = new Project
+        {
+            Name = NewProjectName,
+            Description = NewProjectDescription
+        };
         Projects.Add(project);
 
         NewProjectName = string.Empty;
+        NewProjectDescription = string.Empty;
     }
 }

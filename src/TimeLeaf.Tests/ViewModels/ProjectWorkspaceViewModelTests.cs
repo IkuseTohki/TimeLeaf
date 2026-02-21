@@ -18,14 +18,19 @@ public class ProjectWorkspaceViewModelTests
         var project = new Project { Name = "Test Project" };
         var viewModel = new ProjectWorkspaceViewModel(project);
         var taskName = "New Task";
+        var taskDesc = "New Description";
         viewModel.NewTaskName = taskName;
+        viewModel.NewTaskDescription = taskDesc;
 
         // Act
         viewModel.AddTaskCommand.Execute(null);
 
         // Assert
         Assert.HasCount(1, viewModel.Tasks);
-        Assert.AreEqual(taskName, viewModel.Tasks.First().Name);
-        Assert.AreEqual(string.Empty, viewModel.NewTaskName, "追加後は入力欄がクリアされること");
+        var added = viewModel.Tasks.First();
+        Assert.AreEqual(taskName, added.Name);
+        Assert.AreEqual(taskDesc, added.Description);
+        Assert.AreEqual(string.Empty, viewModel.NewTaskName);
+        Assert.AreEqual(string.Empty, viewModel.NewTaskDescription);
     }
 }

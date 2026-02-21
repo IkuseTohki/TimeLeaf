@@ -73,4 +73,35 @@ public class FolderProjectRepositoryReplayTests
         Assert.AreEqual(projectId, projects[0].Id);
         Assert.AreEqual("New Name", projects[0].Name, "最新のファイルの内容が反映されていること");
     }
+
+    /// <summary>
+    /// テスト観点: Description プロパティが Replay によって正しく復元されることを確認する。
+    /// </summary>
+    [TestMethod]
+    public async System.Threading.Tasks.Task LoadAllAsync_ShouldReplayDescription()
+    {
+        // Arrange
+        var projectId = Guid.NewGuid();
+        var projectDir = Path.Combine(_tempDir, $"{projectId}_DescTest");
+        var changesDir = Path.Combine(projectDir, "changes");
+        Directory.CreateDirectory(changesDir);
+
+        var baseTime = DateTime.Now;
+        var metaFile = Path.Combine(projectDir, ".project");
+        await File.WriteAllTextAsync(metaFile,
+            JsonSerializer.Serialize(new { ProjectId = projectId, CreatedAt = baseTime, SchemaVersion = 1 }));
+
+        var commitFile = CommitFileName.Generate(baseTime.AddSeconds(1), "user1", Guid.NewGuid(), "ProjectBasic");
+        await File.WriteAllTextAsync(Path.Combine(changesDir, commitFile),
+            JsonSerializer.Serialize(new { Name = "Desc Test Project", Description = "Test Description" }));
+
+        var repository = new FolderProjectRepository(_tempDir, _userServiceMock.Object);
+
+        // Act
+        var projects = (await repository.LoadAllAsync()).ToList();
+
+        // Assert
+        Assert.HasCount(1, projects);
+        Assert.AreEqual("Test Description", projects[0].Description);
+    }
 }

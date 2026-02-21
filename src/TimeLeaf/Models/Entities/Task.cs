@@ -16,4 +16,9 @@ public class Task
     /// タスク名。
     /// </summary>
     public string Name { get; set; } = string.Empty;
+
+    /// <summary>
+    /// タスクの詳細説明。
+    /// </summary>
+    public string Description { get; set; } = string.Empty;
 }

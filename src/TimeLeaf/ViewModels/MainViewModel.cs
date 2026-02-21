@@ -20,6 +20,8 @@ public partial class MainViewModel : ObservableObject
     private readonly SaveProjectUseCase _saveSingleUseCase;
     private readonly IProjectRepository _repository; // イベント購読のために保持
 
+    private bool _isSyncing = false;
+
     [ObservableProperty]
     private ObservableObject _currentViewModel;
 
@@ -47,11 +49,16 @@ public partial class MainViewModel : ObservableObject
         // 内部変更の監視と自動保存
         Projects.CollectionChanged += async (s, e) =>
         {
+            if (_isSyncing) return;
+
             if (e.NewItems != null)
             {
                 foreach (Project item in e.NewItems)
                 {
-                    item.Tasks.CollectionChanged += async (ts, te) => await _saveSingleUseCase.ExecuteAsync(item);
+                    item.Tasks.CollectionChanged += async (ts, te) =>
+                    {
+                        if (!_isSyncing) await _saveSingleUseCase.ExecuteAsync(item);
+                    };
                     await _saveSingleUseCase.ExecuteAsync(item);
                 }
             }
@@ -65,19 +72,28 @@ public partial class MainViewModel : ObservableObject
         // 更新処理の本体
         async System.Threading.Tasks.Task UpdateAction()
         {
-            var updated = await _repository.LoadAsync(projectId);
-            if (updated == null) return;
+            _isSyncing = true;
+            try
+            {
+                var updated = await _repository.LoadAsync(projectId);
+                if (updated == null) return;
 
-            var existing = Projects.FirstOrDefault(p => p.Id == projectId);
-            if (existing != null)
-            {
-                existing.Name = updated.Name;
-                existing.Tasks.Clear();
-                foreach (var t in updated.Tasks) existing.Tasks.Add(t);
+                var existing = Projects.FirstOrDefault(p => p.Id == projectId);
+                if (existing != null)
+                {
+                    existing.Name = updated.Name;
+                    existing.Description = updated.Description;
+                    existing.Tasks.Clear();
+                    foreach (var t in updated.Tasks) existing.Tasks.Add(t);
+                }
+                else
+                {
+                    Projects.Add(updated);
+                }
             }
-            else
+            finally
             {
-                Projects.Add(updated);
+                _isSyncing = false;
             }
         }
 
@@ -95,11 +111,22 @@ public partial class MainViewModel : ObservableObject
 
     private async System.Threading.Tasks.Task InitializeAsync()
     {
-        var projects = await _loadUseCase.ExecuteAsync();
-        foreach (var project in projects)
+        _isSyncing = true;
+        try
         {
-            project.Tasks.CollectionChanged += async (s, e) => await _saveSingleUseCase.ExecuteAsync(project);
-            Projects.Add(project);
+            var projects = await _loadUseCase.ExecuteAsync();
+            foreach (var project in projects)
+            {
+                project.Tasks.CollectionChanged += async (s, e) =>
+                {
+                    if (!_isSyncing) await _saveSingleUseCase.ExecuteAsync(project);
+                };
+                Projects.Add(project);
+            }
+        }
+        finally
+        {
+            _isSyncing = false;
         }
     }
 
