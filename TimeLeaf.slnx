@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="src\TimeLeaf\TimeLeaf.csproj" />
+  <Project Path="src\TimeLeaf.Tests\TimeLeaf.Tests.csproj" />
+</Solution>
