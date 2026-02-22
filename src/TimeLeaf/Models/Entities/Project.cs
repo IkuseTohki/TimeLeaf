@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using TimeLeaf.Models.Enums;
 
 namespace TimeLeaf.Models.Entities;
@@ -38,5 +39,15 @@ public class Project
     /// <summary>
     /// プロジェクトに紐づくタスクのリスト。
     /// </summary>
-    public ObservableCollection<Task> Tasks { get; set; } = new();
+    public ObservableCollection<ProjectTask> Tasks { get; set; } = new();
+
+    /// <summary>
+    /// プロジェクト全体の合計見積工数。
+    /// </summary>
+    public double TotalEstimatedCost => Tasks.Sum(t => t.EstimatedCost);
+
+    /// <summary>
+    /// プロジェクト全体の合計実績工数。
+    /// </summary>
+    public double TotalActualCost => Tasks.Sum(t => t.ActualCost);
 }

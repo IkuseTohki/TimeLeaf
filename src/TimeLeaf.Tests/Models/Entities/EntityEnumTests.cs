@@ -23,14 +23,14 @@ public class EntityEnumTests
     }
 
     /// <summary>
-    /// テスト観点: Task エンティティに状態(Status)と優先度(Priority)が追加され、
+    /// テスト観点: ProjectTask エンティティに状態(Status)と優先度(Priority)が追加され、
     /// デフォルト値が適切であることを確認する。
     /// </summary>
     [TestMethod]
-    public void Task_ShouldHaveStatusAndPriority()
+    public void ProjectTask_ShouldHaveStatusAndPriority()
     {
         // Arrange & Act
-        var task = new Task();
+        var task = new ProjectTask();
 
         // Assert
         Assert.AreEqual(TaskStatus.NotStarted, task.Status);

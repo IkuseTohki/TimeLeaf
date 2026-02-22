@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Interfaces;
@@ -13,6 +14,7 @@ public class StorageMonitoringTests
 {
     private string _tempDir = null!;
     private Mock<ICurrentUserService> _userServiceMock = null!;
+    private Mock<ILogger<FolderProjectRepository>> _loggerMock = null!;
 
     [TestInitialize]
     public void Setup()
@@ -21,6 +23,7 @@ public class StorageMonitoringTests
         Directory.CreateDirectory(_tempDir);
         _userServiceMock = new Mock<ICurrentUserService>();
         _userServiceMock.Setup(u => u.GetCurrentUserId()).Returns("watcher-test");
+        _loggerMock = new Mock<ILogger<FolderProjectRepository>>();
     }
 
     [TestCleanup]
@@ -36,7 +39,7 @@ public class StorageMonitoringTests
     public async System.Threading.Tasks.Task FileWatcher_ShouldTriggerEvent_OnNewFile()
     {
         // Arrange
-        var repository = new FolderProjectRepository(_tempDir, _userServiceMock.Object);
+        var repository = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object);
         var projectId = Guid.NewGuid();
         var projectDir = Path.Combine(_tempDir, $"{projectId}_TestProject");
         var changesDir = Path.Combine(projectDir, "changes");

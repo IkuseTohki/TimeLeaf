@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
@@ -16,6 +17,7 @@ public class SurgicalSavingTests
 {
     private string _tempDir = null!;
     private Mock<ICurrentUserService> _userServiceMock = null!;
+    private Mock<ILogger<FolderProjectRepository>> _loggerMock = null!;
 
     [TestInitialize]
     public void Setup()
@@ -23,6 +25,7 @@ public class SurgicalSavingTests
         _tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         _userServiceMock = new Mock<ICurrentUserService>();
         _userServiceMock.Setup(u => u.GetCurrentUserId()).Returns("test-user");
+        _loggerMock = new Mock<ILogger<FolderProjectRepository>>();
     }
 
     [TestCleanup]
@@ -38,7 +41,7 @@ public class SurgicalSavingTests
     public async System.Threading.Tasks.Task SaveProjectAsync_ShouldOnlyAffectTargetProject()
     {
         // Arrange
-        var repo = new FolderProjectRepository(_tempDir, _userServiceMock.Object);
+        var repo = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object); // ロガーモックを渡す
         var projectA = new Project { Name = "ProjectA" };
         var projectB = new Project { Name = "ProjectB" };
 
@@ -62,7 +65,7 @@ public class SurgicalSavingTests
     public async System.Threading.Tasks.Task SaveProjectAsync_ShouldNotCreateFile_IfContentIsSame()
     {
         // Arrange
-        var repo = new FolderProjectRepository(_tempDir, _userServiceMock.Object);
+        var repo = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object); // ロガーモックを渡す
         var project = new Project { Name = "SameName" };
 
         // 1回目の保存

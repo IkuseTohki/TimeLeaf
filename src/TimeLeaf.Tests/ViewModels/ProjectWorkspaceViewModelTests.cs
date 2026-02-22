@@ -1,5 +1,7 @@
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.ViewModels;
 
@@ -16,7 +18,8 @@ public class ProjectWorkspaceViewModelTests
     {
         // Arrange
         var project = new Project { Name = "Test Project" };
-        var viewModel = new ProjectWorkspaceViewModel(project);
+        var loggerMock = new Mock<ILogger<ProjectWorkspaceViewModel>>();
+        var viewModel = new ProjectWorkspaceViewModel(project, loggerMock.Object);
         var taskName = "New Task";
         var taskDesc = "New Description";
         viewModel.NewTaskName = taskName;

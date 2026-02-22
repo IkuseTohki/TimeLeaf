@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
@@ -17,6 +18,7 @@ public class FolderProjectRepositoryReplayTests
 {
     private string _tempDir = null!;
     private Mock<ICurrentUserService> _userServiceMock = null!;
+    private Mock<ILogger<FolderProjectRepository>> _loggerMock = null!;
 
     [TestInitialize]
     public void Setup()
@@ -25,6 +27,7 @@ public class FolderProjectRepositoryReplayTests
         Directory.CreateDirectory(_tempDir);
         _userServiceMock = new Mock<ICurrentUserService>();
         _userServiceMock.Setup(u => u.GetCurrentUserId()).Returns("test-user");
+        _loggerMock = new Mock<ILogger<FolderProjectRepository>>();
     }
 
     [TestCleanup]
@@ -63,7 +66,7 @@ public class FolderProjectRepositoryReplayTests
         var newFile = CommitFileName.Generate(baseTime.AddSeconds(1), "user1", Guid.NewGuid(), "ProjectBasic");
         await File.WriteAllTextAsync(Path.Combine(changesDir, newFile),
             JsonSerializer.Serialize(new { Name = "New Name" }));
-        var repository = new FolderProjectRepository(_tempDir, _userServiceMock.Object);
+        var repository = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object); // ロガーモックを渡す
 
         // Act
         var projects = (await repository.LoadAllAsync()).ToList();
@@ -95,7 +98,7 @@ public class FolderProjectRepositoryReplayTests
         await File.WriteAllTextAsync(Path.Combine(changesDir, commitFile),
             JsonSerializer.Serialize(new { Name = "Desc Test Project", Description = "Test Description" }));
 
-        var repository = new FolderProjectRepository(_tempDir, _userServiceMock.Object);
+        var repository = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object); // ロガーモックを渡す
 
         // Act
         var projects = (await repository.LoadAllAsync()).ToList();

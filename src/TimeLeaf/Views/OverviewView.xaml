@@ -88,6 +88,15 @@
                                                        Text="{Binding HealthStatus}" />
                                         </Border>
                                     </StackPanel>
+                                    <StackPanel Margin="0,4,0,0" Orientation="Horizontal">
+                                        <TextBlock FontSize="11"
+                                                   Foreground="#888"
+                                                   Text="{Binding DisplayTotalEstimatedCost}" />
+                                        <TextBlock Margin="15,0,0,0"
+                                                   FontSize="11"
+                                                   Foreground="#888"
+                                                   Text="{Binding DisplayTotalActualCost}" />
+                                    </StackPanel>
                                     <TextBlock Margin="0,2,0,0"
                                                FontSize="12"
                                                Foreground="#666"

@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
@@ -16,6 +17,7 @@ public class ProjectMetadataTests
 {
     private string _tempDir = null!;
     private Mock<ICurrentUserService> _userServiceMock = null!;
+    private Mock<ILogger<FolderProjectRepository>> _loggerMock = null!;
 
     [TestInitialize]
     public void Setup()
@@ -23,6 +25,7 @@ public class ProjectMetadataTests
         _tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         _userServiceMock = new Mock<ICurrentUserService>();
         _userServiceMock.Setup(u => u.GetCurrentUserId()).Returns("meta-user");
+        _loggerMock = new Mock<ILogger<FolderProjectRepository>>();
     }
 
     [TestCleanup]
@@ -38,7 +41,7 @@ public class ProjectMetadataTests
     public async System.Threading.Tasks.Task SaveAsync_ShouldCreateImmutableMetadataFile()
     {
         // Arrange
-        var repo = new FolderProjectRepository(_tempDir, _userServiceMock.Object);
+        var repo = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object); // ロガーモックを渡す
         var project = new Project { Name = "MetaTest" };
 
         // Act
@@ -75,7 +78,7 @@ public class ProjectMetadataTests
     public async System.Threading.Tasks.Task LoadAllAsync_ShouldSortByCreatedAt()
     {
         // Arrange
-        var repo = new FolderProjectRepository(_tempDir, _userServiceMock.Object);
+        var repo = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object); // ロガーモックを渡す
 
         // 1つ目のプロジェクト作成
         var p1 = new Project { Name = "First" };

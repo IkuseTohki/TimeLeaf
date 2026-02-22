@@ -6,7 +6,7 @@ namespace TimeLeaf.Models.Entities;
 /// <summary>
 /// タスクを表すエンティティ。
 /// </summary>
-public class Task
+public class ProjectTask
 {
     /// <summary>
     /// タスクを一意に識別するID。

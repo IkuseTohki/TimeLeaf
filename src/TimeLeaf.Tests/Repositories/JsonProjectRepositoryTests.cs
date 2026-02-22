@@ -61,8 +61,8 @@ public class JsonProjectRepositoryTests
         // Arrange
         var repository = new JsonProjectRepository(_tempFilePath);
         var project = new Project { Name = "Project with Tasks" };
-        project.Tasks.Add(new TimeLeaf.Models.Entities.Task { Name = "Task 1" });
-        project.Tasks.Add(new TimeLeaf.Models.Entities.Task { Name = "Task 2" });
+        project.Tasks.Add(new ProjectTask { Name = "Task 1" });
+        project.Tasks.Add(new ProjectTask { Name = "Task 2" });
 
         var originalProjects = new List<Project> { project };
 

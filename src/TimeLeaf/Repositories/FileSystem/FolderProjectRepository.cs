@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Models.Enums;
 using TimeLeaf.Models.Interfaces;
@@ -19,6 +20,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
 {
     private readonly string _baseDirectory;
     private readonly ICurrentUserService _userService;
+    private readonly ILogger<FolderProjectRepository> _logger;
     private static readonly JsonSerializerOptions _options = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -31,13 +33,17 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
 
     public event Action<Guid>? ProjectChanged;
 
-    public FolderProjectRepository(string baseDirectory, ICurrentUserService userService)
+    public FolderProjectRepository(string baseDirectory, ICurrentUserService userService, ILogger<FolderProjectRepository> logger)
     {
         _baseDirectory = baseDirectory;
         _userService = userService;
+        _logger = logger;
+
+        _logger.LogInformation("FolderProjectRepository initializing with base directory: {BaseDirectory}", _baseDirectory);
 
         if (!Directory.Exists(_baseDirectory))
         {
+            _logger.LogInformation("Base directory {BaseDirectory} does not exist. Creating it.", _baseDirectory);
             Directory.CreateDirectory(_baseDirectory);
         }
 
@@ -50,10 +56,12 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         };
         _watcher.Created += OnFileCreated;
         _watcher.EnableRaisingEvents = true;
+        _logger.LogDebug("FileSystemWatcher initialized for {BaseDirectory}", _baseDirectory);
     }
 
     private void OnFileCreated(object sender, FileSystemEventArgs e)
     {
+        _logger.LogInformation("File created/changed event detected: {FullPath}", e.FullPath);
         // パス例: storage/{Guid}_{Name}/changes/{Timestamp}_{User}_{Guid}_{Category}.json
         // ルートディレクトリからの相対パスを取得して解析
         var relativePath = Path.GetRelativePath(_baseDirectory, e.FullPath);
@@ -67,8 +75,17 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
 
             if (Guid.TryParse(idPart, out var projectId))
             {
+                _logger.LogDebug("Project ID {ProjectId} extracted from path. Invoking ProjectChanged event.", projectId);
                 System.Threading.Tasks.Task.Run(() => ProjectChanged?.Invoke(projectId));
             }
+            else
+            {
+                _logger.LogWarning("Could not parse Project ID from directory name: {ProjectDirName}", projectDirName);
+            }
+        }
+        else
+        {
+            _logger.LogWarning("Invalid file path format for project change detection: {FullPath}", e.FullPath);
         }
     }
 
@@ -77,25 +94,49 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
     /// </summary>
     public async System.Threading.Tasks.Task<IEnumerable<Project>> LoadAllAsync()
     {
-        if (!Directory.Exists(_baseDirectory)) return new List<Project>();
+        _logger.LogInformation("Loading all projects from {BaseDirectory}", _baseDirectory);
+        if (!Directory.Exists(_baseDirectory))
+        {
+            _logger.LogWarning("Base directory {BaseDirectory} does not exist. Returning empty list.", _baseDirectory);
+            return new List<Project>();
+        }
 
         var projectDirs = Directory.GetDirectories(_baseDirectory);
+        _logger.LogDebug("Found {ProjectDirCount} project directories.", projectDirs.Length);
+
         var projectTasks = projectDirs.Select(async dir =>
         {
             // .project ファイルが存在する場合のみプロジェクトとして認識
             var metaPath = Path.Combine(dir, ".project");
-            if (!File.Exists(metaPath)) return null;
+            if (!File.Exists(metaPath))
+            {
+                _logger.LogDebug(".project file not found in {Directory}. Skipping.", dir);
+                return null;
+            }
 
-            var metaJson = await File.ReadAllTextAsync(metaPath);
-            var meta = JsonSerializer.Deserialize<ProjectMetadataDto>(metaJson, _options);
-            if (meta == null) return null;
-
-            // .project から判明している ID を渡して Replay を開始
-            var project = await ReplayProjectAsync(dir, meta.ProjectId);
-            return project != null ? new { Project = project, CreatedAt = meta.CreatedAt } : null;
+            try
+            {
+                var metaJson = await File.ReadAllTextAsync(metaPath);
+                var meta = JsonSerializer.Deserialize<ProjectMetadataDto>(metaJson, _options);
+                if (meta == null)
+                {
+                    _logger.LogWarning("Could not deserialize .project metadata from {MetaPath}. Skipping.", metaPath);
+                    return null;
+                }
+                _logger.LogDebug("Loading project {ProjectId} from {Directory}", meta.ProjectId, dir);
+                // .project から判明している ID を渡して Replay を開始
+                var project = await ReplayProjectAsync(dir, meta.ProjectId);
+                return project != null ? new { Project = project, CreatedAt = meta.CreatedAt } : null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error loading project metadata from {MetaPath}. Skipping.", metaPath);
+                return null;
+            }
         });
 
         var results = await System.Threading.Tasks.Task.WhenAll(projectTasks);
+        _logger.LogInformation("Finished loading all projects. Found {LoadedProjectCount} valid projects.", results.Count(r => r != null));
 
         return results
             .Where(r => r != null)
@@ -109,23 +150,36 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
     /// </summary>
     public async System.Threading.Tasks.Task<Project?> LoadAsync(Guid projectId)
     {
+        _logger.LogInformation("Loading single project: {ProjectId}", projectId);
         var projectDirs = Directory.GetDirectories(_baseDirectory);
         var targetDir = projectDirs.FirstOrDefault(d => Path.GetFileName(d).StartsWith(projectId.ToString()));
 
-        if (targetDir == null) return null;
+        if (targetDir == null)
+        {
+            _logger.LogWarning("Project directory for {ProjectId} not found.", projectId);
+            return null;
+        }
+        _logger.LogDebug("Found project directory {TargetDir} for {ProjectId}.", targetDir, projectId);
         return await ReplayProjectAsync(targetDir, projectId);
     }
 
     private async Task<Project?> ReplayProjectAsync(string projectDirPath, Guid projectId)
     {
+        _logger.LogInformation("Replaying project history for {ProjectId} from {ProjectDirPath}", projectId, projectDirPath);
         var changesDir = Path.Combine(projectDirPath, "changes");
-        if (!Directory.Exists(changesDir)) return new Project { Id = projectId };
+        if (!Directory.Exists(changesDir))
+        {
+            _logger.LogWarning("Changes directory {ChangesDir} not found for {ProjectId}. Returning new Project.", changesDir, projectId);
+            return new Project { Id = projectId };
+        }
 
         var files = Directory.GetFiles(changesDir, "*.json")
             .Select(f => new { Path = f, Meta = CommitFileName.Parse(Path.GetFileName(f)) })
             .OrderBy(x => x.Meta.Timestamp)
             .ThenBy(x => x.Meta.Guid)
             .ToList();
+
+        _logger.LogDebug("Found {ChangeFileCount} change files for project {ProjectId}.", files.Count, projectId);
 
         // 履歴がなくても、IDが分かっていればプロジェクトとして成立させる
         var project = new Project { Id = projectId };
@@ -134,6 +188,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         {
             try
             {
+                _logger.LogDebug("Processing change file: {FileName} (Category: {Category})", Path.GetFileName(file.Path), file.Meta.Category);
                 var json = await File.ReadAllTextAsync(file.Path);
                 var cacheKey = GetCacheKey(projectId, file.Meta.Category);
                 _lastSavedContent[cacheKey] = json;
@@ -148,17 +203,22 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                             project.Description = basic.Description;
                             project.Status = basic.Status;
                             project.HealthStatus = basic.HealthStatus;
+                            _logger.LogTrace("Replayed ProjectBasic for {ProjectId}. Name: {Name}", projectId, project.Name);
+                        }
+                        else
+                        {
+                            _logger.LogWarning("Could not deserialize ProjectBasic from {FileName}", Path.GetFileName(file.Path));
                         }
                         break;
 
                     case "ProjectTasks":
-                        var tasks = JsonSerializer.Deserialize<List<TaskDto>>(json, _options);
+                        var tasks = JsonSerializer.Deserialize<List<ProjectTaskDto>>(json, _options);
                         if (tasks != null)
                         {
                             project.Tasks.Clear();
                             foreach (var t in tasks)
                             {
-                                project.Tasks.Add(new Models.Entities.Task
+                                project.Tasks.Add(new ProjectTask
                                 {
                                     Id = t.Id,
                                     Name = t.Name,
@@ -170,13 +230,26 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                                     ActualCost = t.ActualCost
                                 });
                             }
+                            _logger.LogTrace("Replayed {TaskCount} tasks for ProjectTasks for {ProjectId}.", tasks.Count, projectId);
+                        }
+                        else
+                        {
+                            _logger.LogWarning("Could not deserialize ProjectTasks from {FileName}", Path.GetFileName(file.Path));
                         }
                         break;
                 }
             }
-            catch (IOException)
+            catch (IOException ioEx)
             {
-                /* ファイルが他プロセスで使用中の場合は一旦スキップ（リトライは将来課題） */
+                _logger.LogWarning(ioEx, "IOException while processing file {FileName} for project {ProjectId}. Skipping.", Path.GetFileName(file.Path), projectId);
+            }
+            catch (JsonException jsonEx)
+            {
+                _logger.LogError(jsonEx, "JsonException while deserializing file {FileName} for project {ProjectId}. Content: {JsonContent}", Path.GetFileName(file.Path), projectId, await File.ReadAllTextAsync(file.Path));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error while processing file {FileName} for project {ProjectId}.", Path.GetFileName(file.Path), projectId);
             }
         }
         return project;
@@ -184,55 +257,90 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
 
     public async System.Threading.Tasks.Task SaveAllAsync(IEnumerable<Project> projects)
     {
+        _logger.LogInformation("Saving {ProjectCount} projects.", projects.Count());
         foreach (var project in projects) await SaveAsync(project);
     }
 
     public async System.Threading.Tasks.Task SaveAsync(Project project)
     {
-        var projectDir = Path.Combine(_baseDirectory, $"{project.Id}_{project.Name}");
-        if (!Directory.Exists(projectDir)) Directory.CreateDirectory(projectDir);
-
-        var metaFilePath = Path.Combine(projectDir, ".project");
-        if (!File.Exists(metaFilePath))
+        _logger.LogInformation("Saving project: {ProjectName} ({ProjectId})", project.Name, project.Id);
+        try
         {
-            var metadata = new ProjectMetadataDto(project.Id, DateTime.Now, _userService.GetCurrentUserId(), 1);
-            await File.WriteAllTextAsync(metaFilePath, JsonSerializer.Serialize(metadata, _options));
+            var projectDir = Path.Combine(_baseDirectory, $"{project.Id}_{project.Name}");
+            if (!Directory.Exists(projectDir))
+            {
+                _logger.LogDebug("Project directory {ProjectDir} does not exist. Creating it.", projectDir);
+                Directory.CreateDirectory(projectDir);
+            }
+
+            var metaFilePath = Path.Combine(projectDir, ".project");
+            if (!File.Exists(metaFilePath))
+            {
+                var metadata = new ProjectMetadataDto(project.Id, DateTime.Now, _userService.GetCurrentUserId(), 1);
+                await File.WriteAllTextAsync(metaFilePath, JsonSerializer.Serialize(metadata, _options));
+                _logger.LogDebug(".project metadata created for {ProjectId}.", project.Id);
+            }
+
+            var changesDir = Path.Combine(projectDir, "changes");
+
+            // 1. ProjectBasic Snapshot
+            var basicSnapshot = new ProjectBasicDto(project.Name, project.Description, project.Status, project.HealthStatus);
+            await TrySaveCategoryAsync(project.Id, changesDir, "ProjectBasic", basicSnapshot);
+
+            // 2. ProjectTasks Snapshot
+            var tasksSnapshot = project.Tasks.Select(t => new ProjectTaskDto(t.Id, t.Name, t.Description, t.Status, t.Priority, t.Deadline, t.EstimatedCost, t.ActualCost)).ToList();
+            await TrySaveCategoryAsync(project.Id, changesDir, "ProjectTasks", tasksSnapshot);
+            _logger.LogInformation("Project {ProjectId} saved successfully.", project.Id);
         }
-
-        var changesDir = Path.Combine(projectDir, "changes");
-
-        // 1. ProjectBasic Snapshot
-        var basicSnapshot = new ProjectBasicDto(project.Name, project.Description, project.Status, project.HealthStatus);
-        await TrySaveCategoryAsync(project.Id, changesDir, "ProjectBasic", basicSnapshot);
-
-        // 2. ProjectTasks Snapshot
-        var tasksSnapshot = project.Tasks.Select(t => new TaskDto(t.Id, t.Name, t.Description, t.Status, t.Priority, t.Deadline, t.EstimatedCost, t.ActualCost)).ToList();
-        await TrySaveCategoryAsync(project.Id, changesDir, "ProjectTasks", tasksSnapshot);
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to save project {ProjectName} ({ProjectId})", project.Name, project.Id);
+            throw; // 再スローして上位で捕捉されるようにする
+        }
     }
 
     private async System.Threading.Tasks.Task TrySaveCategoryAsync(Guid projectId, string changesDir, string category, object data)
     {
+        _logger.LogDebug("Attempting to save category {Category} for project {ProjectId}.", category, projectId);
         var json = JsonSerializer.Serialize(data, _options);
         var cacheKey = GetCacheKey(projectId, category);
 
-        if (_lastSavedContent.TryGetValue(cacheKey, out var lastJson) && lastJson == json) return;
+        if (_lastSavedContent.TryGetValue(cacheKey, out var lastJson) && lastJson == json)
+        {
+            _logger.LogTrace("Category {Category} for project {ProjectId} has no changes. Skipping save.", category, projectId);
+            return;
+        }
 
-        if (!Directory.Exists(changesDir)) Directory.CreateDirectory(changesDir);
+        if (!Directory.Exists(changesDir))
+        {
+            _logger.LogDebug("Changes directory {ChangesDir} does not exist. Creating it.", changesDir);
+            Directory.CreateDirectory(changesDir);
+        }
 
         var fileName = CommitFileName.Generate(DateTime.Now, _userService.GetCurrentUserId(), Guid.NewGuid(), category);
-        await File.WriteAllTextAsync(Path.Combine(changesDir, fileName), json);
-
-        _lastSavedContent[cacheKey] = json;
+        var fullPath = Path.Combine(changesDir, fileName);
+        try
+        {
+            await File.WriteAllTextAsync(fullPath, json);
+            _lastSavedContent[cacheKey] = json;
+            _logger.LogDebug("Category {Category} for project {ProjectId} saved to {FileName}.", category, projectId, fileName);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error saving category {Category} for project {ProjectId} to {FileName}.", category, projectId, fileName);
+            throw;
+        }
     }
 
     private string GetCacheKey(Guid projectId, string category) => $"{projectId}_{category}";
 
     public void Dispose()
     {
+        _logger.LogInformation("FolderProjectRepository disposing.");
         _watcher.Dispose();
     }
 
     private record ProjectBasicDto(string Name, string Description, ProjectStatus Status, ProjectHealth HealthStatus);
-    private record TaskDto(Guid Id, string Name, string Description, TimeLeaf.Models.Enums.TaskStatus Status, TaskPriority Priority, DateTime? Deadline, double EstimatedCost, double ActualCost);
+    private record ProjectTaskDto(Guid Id, string Name, string Description, TimeLeaf.Models.Enums.TaskStatus Status, TaskPriority Priority, DateTime? Deadline, double EstimatedCost, double ActualCost);
     private record ProjectMetadataDto(Guid ProjectId, DateTime CreatedAt, string CreatedBy, int SchemaVersion);
 }

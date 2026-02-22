@@ -5,7 +5,7 @@ using TimeLeaf.Models.Entities;
 namespace TimeLeaf.Tests.Models.Entities;
 
 [TestClass]
-public class TaskTests
+public class ProjectTaskTests
 {
     /// <summary>
     /// テスト観点: Description プロパティが正常に読み書きできることを確認する。
@@ -14,7 +14,7 @@ public class TaskTests
     public void Description_ShouldBeReadAndWrite()
     {
         // Arrange
-        var task = new Task();
+        var task = new ProjectTask();
         var description = "This is a test task description.";
 
         // Act
@@ -31,7 +31,7 @@ public class TaskTests
     public void CostProperties_ShouldBeReadAndWrite()
     {
         // Arrange
-        var task = new Task();
+        var task = new ProjectTask();
         var deadline = new DateTime(2026, 3, 31);
         var expectedEstimatedCost = 12.5;
         var expectedActualCost = 10.0;

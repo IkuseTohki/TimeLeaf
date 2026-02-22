@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
@@ -17,6 +18,7 @@ public class FolderProjectRepositoryTests
 {
     private string _tempDir = null!;
     private Mock<ICurrentUserService> _userServiceMock = null!;
+    private Mock<ILogger<FolderProjectRepository>> _loggerMock = null!;
 
     [TestInitialize]
     public void Setup()
@@ -24,6 +26,7 @@ public class FolderProjectRepositoryTests
         _tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         _userServiceMock = new Mock<ICurrentUserService>();
         _userServiceMock.Setup(u => u.GetCurrentUserId()).Returns("test-user");
+        _loggerMock = new Mock<ILogger<FolderProjectRepository>>();
     }
 
     [TestCleanup]
@@ -42,7 +45,7 @@ public class FolderProjectRepositoryTests
     public async System.Threading.Tasks.Task SaveAllAsync_ShouldCreateCorrectFolderStructure()
     {
         // Arrange
-        var repository = new FolderProjectRepository(_tempDir, _userServiceMock.Object);
+        var repository = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object); // ロガーモックを渡す
         var project = new Project { Name = "StructureTest" };
         var projects = new List<Project> { project };
 
@@ -78,11 +81,11 @@ public class FolderProjectRepositoryTests
     public async System.Threading.Tasks.Task SaveAndLoad_ShouldPreserveTaskCostProperties()
     {
         // Arrange
-        var repository = new FolderProjectRepository(_tempDir, _userServiceMock.Object);
+        var repository = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object); // ロガーモックを渡す
         var projectId = Guid.NewGuid();
         var project = new Project { Id = projectId, Name = "CostTest" };
         var deadline = new DateTime(2026, 12, 31, 23, 59, 0);
-        var task = new TimeLeaf.Models.Entities.Task
+        var task = new ProjectTask
         {
             Name = "CostTask",
             Deadline = deadline,
