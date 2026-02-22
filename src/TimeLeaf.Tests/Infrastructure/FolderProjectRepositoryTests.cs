@@ -70,4 +70,38 @@ public class FolderProjectRepositoryTests
         var json = File.ReadAllText(files[0]);
         Assert.Contains("StructureTest", json, "プロジェクト名がJSONに含まれていること");
     }
+
+    /// <summary>
+    /// テスト観点: タスクの新しい属性 (Deadline, EstimatedCost, ActualCost) が正しく保存・復元されることを確認する。
+    /// </summary>
+    [TestMethod]
+    public async System.Threading.Tasks.Task SaveAndLoad_ShouldPreserveTaskCostProperties()
+    {
+        // Arrange
+        var repository = new FolderProjectRepository(_tempDir, _userServiceMock.Object);
+        var projectId = Guid.NewGuid();
+        var project = new Project { Id = projectId, Name = "CostTest" };
+        var deadline = new DateTime(2026, 12, 31, 23, 59, 0);
+        var task = new TimeLeaf.Models.Entities.Task
+        {
+            Name = "CostTask",
+            Deadline = deadline,
+            EstimatedCost = 10.5,
+            ActualCost = 8.25
+        };
+        project.Tasks.Add(task);
+
+        // Act
+        await repository.SaveAsync(project);
+        var loadedProject = await repository.LoadAsync(projectId);
+
+        // Assert
+        Assert.IsNotNull(loadedProject);
+        var loadedTask = loadedProject.Tasks.FirstOrDefault(t => t.Id == task.Id);
+        Assert.IsNotNull(loadedTask, "保存されたタスクがロードされること");
+        Assert.AreEqual(task.Name, loadedTask.Name);
+        Assert.AreEqual(deadline, loadedTask.Deadline, "Deadline が正しく復元されること");
+        Assert.AreEqual(10.5, loadedTask.EstimatedCost, "EstimatedCost が正しく復元されること");
+        Assert.AreEqual(8.25, loadedTask.ActualCost, "ActualCost が正しく復元されること");
+    }
 }

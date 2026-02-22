@@ -32,4 +32,19 @@ public class Task
     /// タスクの優先度。
     /// </summary>
     public TaskPriority Priority { get; set; } = TaskPriority.Medium;
+
+    /// <summary>
+    /// 期限 (Due Date)。
+    /// </summary>
+    public DateTime? Deadline { get; set; }
+
+    /// <summary>
+    /// 見積工数。
+    /// </summary>
+    public double EstimatedCost { get; set; }
+
+    /// <summary>
+    /// 実績工数。
+    /// </summary>
+    public double ActualCost { get; set; }
 }

@@ -49,6 +49,26 @@
                         Command="{Binding AddTaskCommand}"
                         Content="タスク追加" />
             </StackPanel>
+            <StackPanel Margin="0,10,0,0" Orientation="Horizontal">
+                <TextBlock VerticalAlignment="Center" Text="期限: " />
+                <DatePicker Width="120"
+                            Margin="5,0,0,0"
+                            SelectedDate="{Binding NewTaskDeadline}" />
+                <TextBlock Margin="20,0,0,0"
+                           VerticalAlignment="Center"
+                           Text="見積: " />
+                <TextBox Width="60"
+                         Margin="5,0,0,0"
+                         VerticalContentAlignment="Center"
+                         Text="{Binding NewTaskEstimatedCost, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock Margin="20,0,0,0"
+                           VerticalAlignment="Center"
+                           Text="実績: " />
+                <TextBox Width="60"
+                         Margin="5,0,0,0"
+                         VerticalContentAlignment="Center"
+                         Text="{Binding NewTaskActualCost, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
             <TextBox Height="40"
                      Margin="0,10,0,0"
                      AcceptsReturn="True"
@@ -85,7 +105,25 @@
                                                    Text="{Binding Priority}" />
                                     </Border>
                                 </StackPanel>
-                                <TextBlock Margin="0,2,0,0"
+                                <StackPanel Margin="0,4,0,0" Orientation="Horizontal">
+                                    <TextBlock FontSize="11" Foreground="#888">
+                                        <Run Text="期限: " />
+                                        <Run Text="{Binding Deadline, StringFormat={}{0:yyyy/MM/dd}, TargetNullValue=-}" />
+                                    </TextBlock>
+                                    <TextBlock Margin="15,0,0,0"
+                                               FontSize="11"
+                                               Foreground="#888">
+                                        <Run Text="見積: " />
+                                        <Run Text="{Binding EstimatedCost}" />
+                                    </TextBlock>
+                                    <TextBlock Margin="15,0,0,0"
+                                               FontSize="11"
+                                               Foreground="#888">
+                                        <Run Text="実績: " />
+                                        <Run Text="{Binding ActualCost}" />
+                                    </TextBlock>
+                                </StackPanel>
+                                <TextBlock Margin="0,4,0,0"
                                            FontSize="12"
                                            Foreground="#666"
                                            Text="{Binding Description}"

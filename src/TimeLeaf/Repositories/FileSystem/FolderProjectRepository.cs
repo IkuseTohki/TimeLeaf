@@ -164,7 +164,10 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                                     Name = t.Name,
                                     Description = t.Description,
                                     Status = t.Status,
-                                    Priority = t.Priority
+                                    Priority = t.Priority,
+                                    Deadline = t.Deadline,
+                                    EstimatedCost = t.EstimatedCost,
+                                    ActualCost = t.ActualCost
                                 });
                             }
                         }
@@ -203,7 +206,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         await TrySaveCategoryAsync(project.Id, changesDir, "ProjectBasic", basicSnapshot);
 
         // 2. ProjectTasks Snapshot
-        var tasksSnapshot = project.Tasks.Select(t => new TaskDto(t.Id, t.Name, t.Description, t.Status, t.Priority)).ToList();
+        var tasksSnapshot = project.Tasks.Select(t => new TaskDto(t.Id, t.Name, t.Description, t.Status, t.Priority, t.Deadline, t.EstimatedCost, t.ActualCost)).ToList();
         await TrySaveCategoryAsync(project.Id, changesDir, "ProjectTasks", tasksSnapshot);
     }
 
@@ -230,6 +233,6 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
     }
 
     private record ProjectBasicDto(string Name, string Description, ProjectStatus Status, ProjectHealth HealthStatus);
-    private record TaskDto(Guid Id, string Name, string Description, TimeLeaf.Models.Enums.TaskStatus Status, TaskPriority Priority);
+    private record TaskDto(Guid Id, string Name, string Description, TimeLeaf.Models.Enums.TaskStatus Status, TaskPriority Priority, DateTime? Deadline, double EstimatedCost, double ActualCost);
     private record ProjectMetadataDto(Guid ProjectId, DateTime CreatedAt, string CreatedBy, int SchemaVersion);
 }

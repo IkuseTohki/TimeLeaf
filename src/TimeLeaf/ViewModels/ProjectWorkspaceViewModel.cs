@@ -30,6 +30,15 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
     [ObservableProperty]
     private TaskPriority _newTaskPriority = TaskPriority.Medium;
 
+    [ObservableProperty]
+    private DateTime? _newTaskDeadline;
+
+    [ObservableProperty]
+    private double _newTaskEstimatedCost;
+
+    [ObservableProperty]
+    private double _newTaskActualCost;
+
     /// <summary>
     /// 表示対象となるタスクのリスト。
     /// </summary>
@@ -57,7 +66,10 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
             Name = NewTaskName,
             Description = NewTaskDescription,
             Status = NewTaskStatus,
-            Priority = NewTaskPriority
+            Priority = NewTaskPriority,
+            Deadline = NewTaskDeadline,
+            EstimatedCost = NewTaskEstimatedCost,
+            ActualCost = NewTaskActualCost
         };
         Tasks.Add(task);
 
@@ -65,5 +77,8 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
         NewTaskDescription = string.Empty;
         NewTaskStatus = TimeLeaf.Models.Enums.TaskStatus.NotStarted;
         NewTaskPriority = TaskPriority.Medium;
+        NewTaskDeadline = null;
+        NewTaskEstimatedCost = 0;
+        NewTaskActualCost = 0;
     }
 }
