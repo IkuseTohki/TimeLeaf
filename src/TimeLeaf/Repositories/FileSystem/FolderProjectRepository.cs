@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Encodings.Web;
+using System.Text.Unicode;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using TimeLeaf.Models.Entities;
@@ -25,6 +27,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
     {
         PropertyNameCaseInsensitive = true,
         WriteIndented = true,
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping, // 日本語をエスケープせずに保存
         Converters = { new JsonStringEnumConverter() } // Enum を文字列で保存
     };
 
@@ -192,6 +195,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
 
         // 履歴がなくても、IDが分かっていればプロジェクトとして成立させる
         var project = new Project { Id = projectId };
+        var allCommentDtos = new List<CommentDto>();
 
         foreach (var file in files)
         {
@@ -200,7 +204,12 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                 _logger.LogDebug("Processing change file: {FileName} (Category: {Category})", Path.GetFileName(file.Path), file.Meta.Category);
                 var json = await File.ReadAllTextAsync(file.Path);
                 var cacheKey = GetCacheKey(projectId, file.Meta.Category);
-                _lastSavedContent[cacheKey] = json;
+
+                // コメント以外は最新の状態を保持するためにキャッシュを更新
+                if (file.Meta.Category != "Comment")
+                {
+                    _lastSavedContent[cacheKey] = json;
+                }
 
                 switch (file.Meta.Category)
                 {
@@ -232,10 +241,13 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                         var tasks = JsonSerializer.Deserialize<List<ProjectTaskDto>>(json, _options);
                         if (tasks != null)
                         {
+                            // 既存のコメントを退避（スナップショットにはコメントが含まれないため、Replay済みのものを保持する）
+                            var commentMap = project.Tasks.ToDictionary(t => t.Id, t => t.Comments);
+
                             project.Tasks.Clear();
                             foreach (var t in tasks)
                             {
-                                project.Tasks.Add(new ProjectTask
+                                var newTask = new ProjectTask
                                 {
                                     Id = t.Id,
                                     Name = t.Name,
@@ -250,13 +262,29 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                                     ActualCost = t.ActualCost,
                                     Assignee = t.Assignee ?? string.Empty,
                                     Dependencies = t.Dependencies ?? new()
-                                });
+                                };
+
+                                if (commentMap.TryGetValue(newTask.Id, out var existingComments))
+                                {
+                                    foreach (var c in existingComments) newTask.Comments.Add(c);
+                                }
+
+                                project.Tasks.Add(newTask);
                             }
                             _logger.LogTrace("Replayed {TaskCount} tasks for ProjectTasks for {ProjectId}.", tasks.Count, projectId);
                         }
                         else
                         {
                             _logger.LogWarning("Could not deserialize ProjectTasks from {FileName}", Path.GetFileName(file.Path));
+                        }
+                        break;
+
+                    case "Comment":
+                        var commentDto = JsonSerializer.Deserialize<CommentDto>(json, _options);
+                        if (commentDto != null)
+                        {
+                            allCommentDtos.Add(commentDto);
+                            _lastSavedContent[GetCacheKey(projectId, $"Comment_{commentDto.Id}")] = json;
                         }
                         break;
                 }
@@ -274,6 +302,32 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                 _logger.LogError(ex, "Unexpected error while processing file {FileName} for project {ProjectId}.", Path.GetFileName(file.Path), projectId);
             }
         }
+
+        // コメントをタスクに紐付け（すべてのタスクスナップショット適用後に実行）
+        foreach (var dto in allCommentDtos)
+        {
+            var targetTask = project.Tasks.FirstOrDefault(t => t.Id == dto.TaskId);
+            if (targetTask != null)
+            {
+                if (!targetTask.Comments.Any(c => c.Id == dto.Id))
+                {
+                    targetTask.Comments.Add(new Comment
+                    {
+                        Id = dto.Id,
+                        TaskId = dto.TaskId,
+                        AuthorId = dto.AuthorId,
+                        CreatedAt = dto.CreatedAt,
+                        Content = dto.Content,
+                        AttachmentLinks = dto.AttachmentLinks ?? new()
+                    });
+                }
+            }
+            else
+            {
+                _logger.LogWarning("Comment {CommentId} refers to missing task {TaskId} in project {ProjectId}. Skipping.", dto.Id, dto.TaskId, projectId);
+            }
+        }
+
         return project;
     }
 
@@ -330,12 +384,60 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                 t.Assignee,
                 t.Dependencies)).ToList();
             await TrySaveCategoryAsync(project.Id, changesDir, "ProjectTasks", tasksSnapshot);
+
+            // 3. Comments (Incremental)
+            foreach (var t in project.Tasks)
+            {
+                foreach (var c in t.Comments)
+                {
+                    await TrySaveCommentAsync(project.Id, changesDir, c);
+                }
+            }
+
             _logger.LogInformation("Project {ProjectId} saved successfully.", project.Id);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to save project {ProjectName} ({ProjectId})", project.Name, project.Id);
             throw; // 再スローして上位で捕捉されるようにする
+        }
+    }
+
+    private async System.Threading.Tasks.Task TrySaveCommentAsync(Guid projectId, string changesDir, Comment comment)
+    {
+        var category = "Comment";
+        var cacheKey = GetCacheKey(projectId, $"{category}_{comment.Id}");
+
+        if (_lastSavedContent.ContainsKey(cacheKey))
+        {
+            _logger.LogTrace("Comment {CommentId} already saved or replayed. Skipping.", comment.Id);
+            return; // 既に保存済み（またはReplay済み）ならスキップ
+        }
+
+        _logger.LogDebug("Saving new incremental comment {CommentId} for task {TaskId}.", comment.Id, comment.TaskId);
+
+        if (!Directory.Exists(changesDir))
+        {
+            Directory.CreateDirectory(changesDir);
+        }
+
+        var commentDto = new CommentDto(comment.Id, comment.TaskId, comment.AuthorId, comment.CreatedAt, comment.Content, comment.AttachmentLinks);
+        var json = JsonSerializer.Serialize(commentDto, _options);
+        var fileName = CommitFileName.Generate(comment.CreatedAt, _userService.GetCurrentUserId(), comment.Id, category);
+        var fullPath = Path.Combine(changesDir, fileName);
+
+        _justWrittenFiles.TryAdd(fileName, 0);
+
+        try
+        {
+            await File.WriteAllTextAsync(fullPath, json);
+            _lastSavedContent[cacheKey] = json;
+            _logger.LogDebug("Incremental Comment {CommentId} for task {TaskId} saved to {FileName}.", comment.Id, comment.TaskId, fileName);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error saving incremental comment {CommentId} to {FileName}.", comment.Id, fileName);
+            throw;
         }
     }
 
@@ -383,6 +485,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
     }
 
     private record MilestoneDto(DateTime Date, string Label);
+    private record CommentDto(Guid Id, Guid TaskId, string AuthorId, DateTime CreatedAt, string Content, List<string> AttachmentLinks);
     private record ProjectBasicDto(string Name, string Description, ProjectStatus Status, ProjectHealth HealthStatus, List<MilestoneDto> Milestones);
     private record ProjectTaskDto(
         Guid Id,

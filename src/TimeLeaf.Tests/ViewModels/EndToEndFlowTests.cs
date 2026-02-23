@@ -32,6 +32,8 @@ public class EndToEndFlowTests
             .Returns(new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
         _serviceProviderMock.Setup(sp => sp.GetService(typeof(ILogger<OverviewViewModel>)))
             .Returns(new Mock<ILogger<OverviewViewModel>>().Object);
+        _serviceProviderMock.Setup(sp => sp.GetService(typeof(ICurrentUserService)))
+            .Returns(new Mock<ICurrentUserService>().Object);
     }
 
     /// <summary>

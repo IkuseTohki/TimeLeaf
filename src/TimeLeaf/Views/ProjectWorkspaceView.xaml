@@ -154,84 +154,174 @@
         </StackPanel>
 
         <!-- 表示エリア -->
-        <ScrollViewer Grid.Row="3">
-            <ItemsControl ItemsSource="{Binding Tasks}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Border Padding="10"
-                                BorderBrush="#EEE"
-                                BorderThickness="0,0,0,1">
-                            <StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontSize="16" Text="{Binding Name}" />
-                                    <Border Margin="10,0,0,0"
-                                            Padding="4,1"
-                                            Background="#F5F5F5"
-                                            CornerRadius="2">
-                                        <TextBlock FontSize="10"
-                                                   Foreground="#666"
-                                                   Text="{Binding Status}" />
-                                    </Border>
-                                    <Border Margin="5,0,0,0"
-                                            Padding="4,1"
-                                            Background="#FFF3E0"
-                                            CornerRadius="2">
-                                        <TextBlock FontSize="10"
-                                                   Foreground="#E65100"
-                                                   Text="{Binding Priority}" />
-                                    </Border>
-                                    <TextBlock Margin="15,0,0,0"
-                                               VerticalAlignment="Center"
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <ScrollViewer Grid.Column="0">
+                <ListBox HorizontalContentAlignment="Stretch"
+                         BorderThickness="0"
+                         ItemsSource="{Binding Tasks}"
+                         SelectedItem="{Binding SelectedTask}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border Padding="10"
+                                    BorderBrush="#EEE"
+                                    BorderThickness="0,0,0,1">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock FontSize="16" Text="{Binding Name}" />
+                                        <Border Margin="10,0,0,0"
+                                                Padding="4,1"
+                                                Background="#F5F5F5"
+                                                CornerRadius="2">
+                                            <TextBlock FontSize="10"
+                                                       Foreground="#666"
+                                                       Text="{Binding Status}" />
+                                        </Border>
+                                        <Border Margin="5,0,0,0"
+                                                Padding="4,1"
+                                                Background="#FFF3E0"
+                                                CornerRadius="2">
+                                            <TextBlock FontSize="10"
+                                                       Foreground="#E65100"
+                                                       Text="{Binding Priority}" />
+                                        </Border>
+                                        <TextBlock Margin="15,0,0,0"
+                                                   VerticalAlignment="Center"
+                                                   FontSize="12"
+                                                   Foreground="#444"
+                                                   Text="{Binding Assignee}" />
+                                    </StackPanel>
+                                    <StackPanel Margin="0,4,0,0" Orientation="Horizontal">
+                                        <TextBlock FontSize="11" Foreground="#888">
+                                            <Run Text="予定: " />
+                                            <Run Text="{Binding ScheduledStartDate, StringFormat={}{0:yyyy/MM/dd}, TargetNullValue=-}" />
+                                        </TextBlock>
+                                        <TextBlock Margin="15,0,0,0"
+                                                   FontSize="11"
+                                                   Foreground="#888">
+                                            <Run Text="期限: " />
+                                            <Run Text="{Binding Deadline, StringFormat={}{0:yyyy/MM/dd}, TargetNullValue=-}" />
+                                        </TextBlock>
+                                        <TextBlock Margin="15,0,0,0"
+                                                   FontSize="11"
+                                                   Foreground="#888">
+                                            <Run Text="開始: " />
+                                            <Run Text="{Binding ActualStartDate, StringFormat={}{0:yyyy/MM/dd}, TargetNullValue=-}" />
+                                        </TextBlock>
+                                        <TextBlock Margin="15,0,0,0"
+                                                   FontSize="11"
+                                                   Foreground="#888">
+                                            <Run Text="終了: " />
+                                            <Run Text="{Binding ActualEndDate, StringFormat={}{0:yyyy/MM/dd}, TargetNullValue=-}" />
+                                        </TextBlock>
+                                        <TextBlock Margin="15,0,0,0"
+                                                   FontSize="11"
+                                                   Foreground="#888">
+                                            <Run Text="見積: " />
+                                            <Run Text="{Binding EstimatedCost}" />
+                                        </TextBlock>
+                                        <TextBlock Margin="15,0,0,0"
+                                                   FontSize="11"
+                                                   Foreground="#888">
+                                            <Run Text="実績: " />
+                                            <Run Text="{Binding ActualCost}" />
+                                        </TextBlock>
+                                    </StackPanel>
+                                    <TextBlock Margin="0,4,0,0"
                                                FontSize="12"
-                                               Foreground="#444"
-                                               Text="{Binding Assignee}" />
+                                               Foreground="#666"
+                                               Text="{Binding Description}"
+                                               Visibility="{Binding Description, Converter={StaticResource StringToVisibilityConverter}}" />
                                 </StackPanel>
-                                <StackPanel Margin="0,4,0,0" Orientation="Horizontal">
-                                    <TextBlock FontSize="11" Foreground="#888">
-                                        <Run Text="予定: " />
-                                        <Run Text="{Binding ScheduledStartDate, StringFormat={}{0:yyyy/MM/dd}, TargetNullValue=-}" />
-                                    </TextBlock>
-                                    <TextBlock Margin="15,0,0,0"
-                                               FontSize="11"
-                                               Foreground="#888">
-                                        <Run Text="期限: " />
-                                        <Run Text="{Binding Deadline, StringFormat={}{0:yyyy/MM/dd}, TargetNullValue=-}" />
-                                    </TextBlock>
-                                    <TextBlock Margin="15,0,0,0"
-                                               FontSize="11"
-                                               Foreground="#888">
-                                        <Run Text="開始: " />
-                                        <Run Text="{Binding ActualStartDate, StringFormat={}{0:yyyy/MM/dd}, TargetNullValue=-}" />
-                                    </TextBlock>
-                                    <TextBlock Margin="15,0,0,0"
-                                               FontSize="11"
-                                               Foreground="#888">
-                                        <Run Text="終了: " />
-                                        <Run Text="{Binding ActualEndDate, StringFormat={}{0:yyyy/MM/dd}, TargetNullValue=-}" />
-                                    </TextBlock>
-                                    <TextBlock Margin="15,0,0,0"
-                                               FontSize="11"
-                                               Foreground="#888">
-                                        <Run Text="見積: " />
-                                        <Run Text="{Binding EstimatedCost}" />
-                                    </TextBlock>
-                                    <TextBlock Margin="15,0,0,0"
-                                               FontSize="11"
-                                               Foreground="#888">
-                                        <Run Text="実績: " />
-                                        <Run Text="{Binding ActualCost}" />
-                                    </TextBlock>
-                                </StackPanel>
-                                <TextBlock Margin="0,4,0,0"
-                                           FontSize="12"
-                                           Foreground="#666"
-                                           Text="{Binding Description}"
-                                           Visibility="{Binding Description, Converter={StaticResource StringToVisibilityConverter}}" />
-                            </StackPanel>
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </ScrollViewer>
+
+            <!-- タスク詳細・コメントパネル -->
+            <Border Grid.Column="1"
+                    Width="350"
+                    Margin="20,0,0,0"
+                    Padding="15"
+                    Background="#F9F9F9"
+                    BorderBrush="#DDD"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    Visibility="{Binding SelectedTask, Converter={StaticResource NullToVisibilityConverter}}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock FontWeight="Bold" Text="タスク詳細" />
+                    <Button HorizontalAlignment="Right"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Command="{Binding ClearSelectionCommand}"
+                            Content="✕" />
+
+                    <StackPanel Grid.Row="1" Margin="0,10">
+                        <TextBlock FontSize="18"
+                                   FontWeight="Bold"
+                                   Text="{Binding SelectedTask.Name}" />
+                        <TextBlock Margin="0,5"
+                                   FontStyle="Italic"
+                                   Foreground="#666"
+                                   Text="{Binding SelectedTask.Description}"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+
+                    <!-- コメントリスト -->
+                    <ScrollViewer Grid.Row="2" Margin="0,10">
+                        <ItemsControl ItemsSource="{Binding SelectedTask.Model.Comments}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Margin="0,0,0,10"
+                                            Padding="10"
+                                            Background="White"
+                                            BorderBrush="#EEE"
+                                            BorderThickness="1"
+                                            CornerRadius="4">
+                                        <StackPanel>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock FontWeight="Bold" Text="{Binding AuthorId}" />
+                                                <TextBlock Margin="10,0,0,0"
+                                                           FontSize="10"
+                                                           Foreground="#888"
+                                                           Text="{Binding CreatedAt, StringFormat={}{0:MM/dd HH:mm}}" />
+                                            </StackPanel>
+                                            <TextBlock Margin="0,5,0,0"
+                                                       Text="{Binding Content}"
+                                                       TextWrapping="Wrap" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                    <!-- コメント入力 -->
+                    <StackPanel Grid.Row="3" Margin="0,10,0,0">
+                        <TextBox Height="60"
+                                 AcceptsReturn="True"
+                                 Tag="コメントを入力..."
+                                 Text="{Binding NewCommentContent, UpdateSourceTrigger=PropertyChanged}"
+                                 TextWrapping="Wrap" />
+                        <Button Margin="0,5,0,0"
+                                Padding="10,5"
+                                Command="{Binding AddCommentCommand}"
+                                Content="コメント投稿" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
     </Grid>
 </UserControl>

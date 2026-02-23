@@ -42,6 +42,8 @@ public class MainViewModelTests
             .Returns(new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
         _serviceProviderMock.Setup(sp => sp.GetService(typeof(ILogger<OverviewViewModel>)))
             .Returns(new Mock<ILogger<OverviewViewModel>>().Object);
+        _serviceProviderMock.Setup(sp => sp.GetService(typeof(ICurrentUserService)))
+            .Returns(new Mock<ICurrentUserService>().Object);
 
 
         _addProjectUseCaseMock.Setup(x => x.ExecuteAsync(

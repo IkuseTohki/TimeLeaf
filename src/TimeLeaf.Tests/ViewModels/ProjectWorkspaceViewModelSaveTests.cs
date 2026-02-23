@@ -22,6 +22,7 @@ public class ProjectWorkspaceViewModelSaveTests
     private Mock<ILogger<MainViewModel>> _mainLoggerMock = null!;
     private Mock<ILogger<OverviewViewModel>> _overviewLoggerMock = null!;
     private Mock<ILogger<ProjectWorkspaceViewModel>> _workspaceLoggerMock = null!;
+    private Mock<ICurrentUserService> _userServiceMock = null!;
 
     [TestInitialize]
     public void Setup()
@@ -30,12 +31,15 @@ public class ProjectWorkspaceViewModelSaveTests
         _mainLoggerMock = new Mock<ILogger<MainViewModel>>();
         _overviewLoggerMock = new Mock<ILogger<OverviewViewModel>>();
         _workspaceLoggerMock = new Mock<ILogger<ProjectWorkspaceViewModel>>();
+        _userServiceMock = new Mock<ICurrentUserService>();
         _serviceProviderMock = new Mock<IServiceProvider>();
 
         _serviceProviderMock.Setup(sp => sp.GetService(typeof(ILogger<ProjectWorkspaceViewModel>)))
             .Returns(_workspaceLoggerMock.Object);
         _serviceProviderMock.Setup(sp => sp.GetService(typeof(ILogger<OverviewViewModel>)))
             .Returns(_overviewLoggerMock.Object);
+        _serviceProviderMock.Setup(sp => sp.GetService(typeof(ICurrentUserService)))
+            .Returns(_userServiceMock.Object);
     }
 
     /// <summary>
@@ -61,7 +65,7 @@ public class ProjectWorkspaceViewModelSaveTests
         var projectViewModel = mainViewModel.Projects.First(p => p.Id == projectId);
 
         // MainViewModel から WorkspaceViewModel へ遷移したと仮定
-        var workspaceViewModel = new ProjectWorkspaceViewModel(projectViewModel, _workspaceLoggerMock.Object);
+        var workspaceViewModel = new ProjectWorkspaceViewModel(projectViewModel, _userServiceMock.Object, _workspaceLoggerMock.Object);
 
         // Act
         workspaceViewModel.NewTaskName = "New Task to Save";

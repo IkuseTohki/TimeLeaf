@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Models.Enums;
+using TimeLeaf.Models.Interfaces;
 
 namespace TimeLeaf.ViewModels;
 
@@ -14,7 +17,8 @@ namespace TimeLeaf.ViewModels;
 /// </summary>
 public partial class ProjectWorkspaceViewModel : ObservableObject
 {
-    private readonly ProjectViewModel _projectViewModel; // ProjectViewModel に変更
+    private readonly ProjectViewModel _projectViewModel;
+    private readonly ICurrentUserService _userService;
     private readonly ILogger<ProjectWorkspaceViewModel> _logger;
 
     public IEnumerable<TimeLeaf.Models.Enums.TaskStatus> TaskStatusValues => (TimeLeaf.Models.Enums.TaskStatus[])Enum.GetValues(typeof(TimeLeaf.Models.Enums.TaskStatus));
@@ -59,6 +63,12 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
     [ObservableProperty]
     private string _newMilestoneLabel = string.Empty;
 
+    [ObservableProperty]
+    private ProjectTaskViewModel? _selectedTask;
+
+    [ObservableProperty]
+    private string _newCommentContent = string.Empty;
+
     /// <summary>
     /// 管理対象プロジェクトの名称。
     /// </summary>
@@ -67,7 +77,7 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
     /// <summary>
     /// 表示対象となるタスクのリスト。
     /// </summary>
-    public ObservableCollection<ProjectTaskViewModel> Tasks => _projectViewModel.Tasks; // ProjectViewModel の Tasks プロパティを参照
+    public ObservableCollection<ProjectTaskViewModel> Tasks => _projectViewModel.Tasks;
 
     /// <summary>
     /// プロジェクトのマイルストーン。
@@ -78,12 +88,84 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
     /// コンストラクタ。
     /// </summary>
     /// <param name="projectViewModel">管理対象となるプロジェクトのViewModel。</param>
+    /// <param name="userService">ユーザーサービス。</param>
     /// <param name="logger">ロガー。</param>
-    public ProjectWorkspaceViewModel(ProjectViewModel projectViewModel, ILogger<ProjectWorkspaceViewModel> logger)
+    public ProjectWorkspaceViewModel(ProjectViewModel projectViewModel, ICurrentUserService userService, ILogger<ProjectWorkspaceViewModel> logger)
     {
         _projectViewModel = projectViewModel ?? throw new ArgumentNullException(nameof(projectViewModel));
+        _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         _logger = logger;
+
+        // タスクリストの変更（再ロード等）を監視して、選択状態を維持する
+        Tasks.CollectionChanged += OnTasksCollectionChanged;
+
         _logger.LogInformation("ProjectWorkspaceViewModel initialized for project {ProjectId}.", _projectViewModel.Id);
+    }
+
+    private Guid? _lastSelectedTaskId;
+
+    partial void OnSelectedTaskChanged(ProjectTaskViewModel? value)
+    {
+        if (value != null)
+        {
+            _lastSelectedTaskId = value.Id;
+        }
+        AddCommentCommand.NotifyCanExecuteChanged();
+    }
+
+    private void OnTasksCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        // リロード等によって選択が外れた場合、IDを元に再選択を試みる
+        if (SelectedTask == null && _lastSelectedTaskId.HasValue)
+        {
+            var matchingTask = Tasks.FirstOrDefault(t => t.Id == _lastSelectedTaskId.Value);
+            if (matchingTask != null)
+            {
+                _logger.LogDebug("Restoring selection for task {TaskId} after collection change.", _lastSelectedTaskId);
+                SelectedTask = matchingTask;
+            }
+        }
+    }
+
+    /// <summary>
+    /// 選択中のタスクにコメントを追加するコマンド。
+    /// </summary>
+    [RelayCommand(CanExecute = nameof(CanAddComment))]
+    private void AddComment()
+    {
+        if (SelectedTask == null || string.IsNullOrWhiteSpace(NewCommentContent)) return;
+
+        _logger.LogInformation("Adding comment to task {TaskId}.", SelectedTask.Id);
+
+        try
+        {
+            var comment = new Comment
+            {
+                TaskId = SelectedTask.Id,
+                AuthorId = _userService.GetCurrentUserId(),
+                Content = NewCommentContent,
+                CreatedAt = DateTime.Now
+            };
+
+            SelectedTask.Model.Comments.Add(comment);
+            _logger.LogInformation("Comment added to task {TaskId}.", SelectedTask.Id);
+
+            NewCommentContent = string.Empty;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to add comment to task {TaskId}.", SelectedTask.Id);
+        }
+    }
+
+    private bool CanAddComment() => SelectedTask != null && !string.IsNullOrWhiteSpace(NewCommentContent);
+
+    [RelayCommand]
+    private void ClearSelection() => SelectedTask = null;
+
+    partial void OnNewCommentContentChanged(string value)
+    {
+        AddCommentCommand.NotifyCanExecuteChanged();
     }
 
     /// <summary>

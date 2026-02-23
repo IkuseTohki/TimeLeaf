@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -114,9 +115,6 @@ public partial class MainViewModel : ObservableObject
         // タスクリストの変更
         projectViewModel.Tasks.CollectionChanged += async (s, e) =>
         {
-            if (_isSyncing) return;
-            _logger.LogTrace("Tasks collection changed. Triggering save.");
-
             if (e.NewItems != null)
             {
                 foreach (var newItem in e.NewItems)
@@ -127,6 +125,10 @@ public partial class MainViewModel : ObservableObject
                     }
                 }
             }
+
+            if (_isSyncing) return;
+            _logger.LogTrace("Tasks collection changed. Triggering save.");
+
             // 削除されたアイテムのイベント購読解除は、ViewModelが破棄されるか、
             // より厳密な管理が必要な場合に検討する。現状はLWWに基づき保存を優先。
 
@@ -156,13 +158,23 @@ public partial class MainViewModel : ObservableObject
             _logger.LogTrace("Task property changed: {PropertyName}. Triggering save.", e.PropertyName);
             await AutoSaveProjectAsync(projectViewModel);
         };
+
+        // コメントリストの変更を監視
+        taskViewModel.Model.Comments.CollectionChanged += async (s, e) =>
+        {
+            if (_isSyncing) return;
+            _logger.LogTrace("Comments collection changed for task {TaskId}. Triggering save.", taskViewModel.Id);
+            await AutoSaveProjectAsync(projectViewModel);
+        };
     }
 
     private async System.Threading.Tasks.Task AutoSaveProjectAsync(ProjectViewModel projectViewModel)
     {
+        _logger.LogInformation("Auto-save triggered for project {ProjectId} ({ProjectName})", projectViewModel.Id, projectViewModel.Name);
         try
         {
             await _saveSingleUseCase.ExecuteAsync(projectViewModel.Model);
+            _logger.LogInformation("Auto-save completed for project {ProjectId}", projectViewModel.Id);
         }
         catch (Exception ex)
         {
@@ -257,7 +269,10 @@ public partial class MainViewModel : ObservableObject
     {
         if (projectViewModel == null) return;
         _logger.LogInformation("Navigating to project {ProjectId}", projectViewModel.Id);
-        CurrentViewModel = new ProjectWorkspaceViewModel(projectViewModel, _serviceProvider.GetRequiredService<ILogger<ProjectWorkspaceViewModel>>()); // ViewModel を渡す
+        CurrentViewModel = new ProjectWorkspaceViewModel(
+            projectViewModel,
+            _serviceProvider.GetRequiredService<ICurrentUserService>(),
+            _serviceProvider.GetRequiredService<ILogger<ProjectWorkspaceViewModel>>()); // ViewModel を渡す
     }
 
     [RelayCommand]

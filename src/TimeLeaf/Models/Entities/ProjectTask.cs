@@ -73,4 +73,9 @@ public class ProjectTask
     /// 依存タスクのIDリスト。
     /// </summary>
     public List<Guid> Dependencies { get; set; } = new();
+
+    /// <summary>
+    /// タスクに関するコメントのリスト。
+    /// </summary>
+    public System.Collections.ObjectModel.ObservableCollection<Comment> Comments { get; set; } = new();
 }

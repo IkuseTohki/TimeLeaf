@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
+using TimeLeaf.Models.Interfaces;
 using TimeLeaf.ViewModels;
 
 namespace TimeLeaf.Tests.ViewModels;
@@ -19,8 +20,9 @@ public class ProjectWorkspaceViewModelTests
         // Arrange
         var project = new Project { Name = "Test Project" };
         var projectViewModel = new ProjectViewModel(project);
+        var userServiceMock = new Mock<ICurrentUserService>();
         var loggerMock = new Mock<ILogger<ProjectWorkspaceViewModel>>();
-        var viewModel = new ProjectWorkspaceViewModel(projectViewModel, loggerMock.Object);
+        var viewModel = new ProjectWorkspaceViewModel(projectViewModel, userServiceMock.Object, loggerMock.Object);
         var taskName = "New Task";
         var taskDesc = "New Description";
         viewModel.NewTaskName = taskName;
