@@ -65,7 +65,7 @@ public class ViewModelModelSyncTests
         project.Tasks.Add(newTask);
 
         // Assert
-        Assert.HasCount(1, viewModel.Tasks);
+        Assert.AreEqual(1, viewModel.Tasks.Count);
         Assert.AreEqual(newTask.Id, viewModel.Tasks.First().Id);
     }
 
@@ -86,6 +86,6 @@ public class ViewModelModelSyncTests
         project.Tasks.Remove(task);
 
         // Assert
-        Assert.IsEmpty(viewModel.Tasks);
+        Assert.AreEqual(0, viewModel.Tasks.Count);
     }
 }

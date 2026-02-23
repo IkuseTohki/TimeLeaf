@@ -26,7 +26,7 @@ public class ProjectSnapshotTests
         var json = JsonSerializer.Serialize(snapshot);
 
         // Assert
-        Assert.Contains("\"Name\":\"Snapshot Test Project\"", json, "JSONにプロジェクト名が含まれていること");
-        Assert.Contains("\"Id\":\"11111111-1111-1111-1111-111111111111\"", json, "JSONにIDが含まれていること");
+        StringAssert.Contains(json, "\"Name\":\"Snapshot Test Project\"", "JSONにプロジェクト名が含まれていること");
+        StringAssert.Contains(json, "\"Id\":\"11111111-1111-1111-1111-111111111111\"", "JSONにIDが含まれていること");
     }
 }

@@ -45,7 +45,7 @@ public partial class App : Application
 
         // 外部依存の設定
         // 仕様に基づき、プロジェクトごとのフォルダを管理するルートディレクトリを指定
-        var storagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "storage");
+        var storagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory ?? string.Empty, "storage");
 
         services.AddSingleton<ICurrentUserService, WindowsCurrentUserService>();
         services.AddSingleton<IProjectRepository>(sp =>

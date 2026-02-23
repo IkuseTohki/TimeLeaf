@@ -67,8 +67,8 @@ public class CommitFileNameTests
         var sorted = list.OrderBy(x => x).ToList();
 
         // Assert
-        Assert.Contains("100000_100", sorted[0]);
-        Assert.Contains("100000_150", sorted[1]);
-        Assert.Contains("100000_200", sorted[2]);
+        StringAssert.Contains(sorted[0], "100000_100");
+        StringAssert.Contains(sorted[1], "100000_150");
+        StringAssert.Contains(sorted[2], "100000_200");
     }
 }

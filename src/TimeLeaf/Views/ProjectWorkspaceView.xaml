@@ -12,6 +12,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -23,12 +24,62 @@
             <TextBlock Margin="20,0,0,0"
                        VerticalAlignment="Center"
                        FontSize="20"
-                       FontWeight="Bold"
-                       Text="タスク管理" />
+                       FontWeight="Bold">
+                <Run Text="Leaf Chronicles －" />
+                <Run Text="{Binding ProjectName, Mode=OneWay}" />
+                <Run Text="－" />
+            </TextBlock>
         </StackPanel>
 
+        <!-- マイルストーンエリア -->
+        <Border Grid.Row="1"
+                Margin="0,0,0,20"
+                Padding="15,10"
+                Background="#FAFAFA"
+                BorderBrush="#DDD"
+                BorderThickness="1"
+                CornerRadius="4">
+            <StackPanel>
+                <TextBlock FontWeight="Bold" Text="マイルストーン" />
+                <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
+                    <DatePicker Width="120" SelectedDate="{Binding NewMilestoneDate}" />
+                    <TextBox Width="200"
+                             Margin="10,0,0,0"
+                             VerticalContentAlignment="Center"
+                             Tag="ラベル"
+                             Text="{Binding NewMilestoneLabel, UpdateSourceTrigger=PropertyChanged}" />
+                    <Button Margin="10,0,0,0"
+                            Padding="10,0"
+                            Command="{Binding AddMilestoneCommand}"
+                            Content="追加" />
+                </StackPanel>
+                <ItemsControl Margin="0,10,0,0" ItemsSource="{Binding Milestones}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Margin="0,0,10,5"
+                                    Padding="8,4"
+                                    Background="White"
+                                    BorderBrush="#DDD"
+                                    BorderThickness="1"
+                                    CornerRadius="2">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock FontWeight="Bold" Text="{Binding Date, StringFormat={}{0:yyyy/MM/dd}}" />
+                                    <TextBlock Margin="8,0,0,0" Text="{Binding Label}" />
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </Border>
+
         <!-- 入力エリア -->
-        <StackPanel Grid.Row="1" Margin="0,0,0,20">
+        <StackPanel Grid.Row="2" Margin="0,0,0,20">
             <StackPanel Orientation="Horizontal">
                 <TextBox Width="200"
                          Height="32"
@@ -57,13 +108,31 @@
                         Content="タスク追加" />
             </StackPanel>
             <StackPanel Margin="0,10,0,0" Orientation="Horizontal">
-                <TextBlock VerticalAlignment="Center" Text="期限: " />
+                <TextBlock VerticalAlignment="Center" Text="予定: " />
+                <DatePicker Width="120"
+                            Margin="5,0,0,0"
+                            SelectedDate="{Binding NewTaskScheduledStartDate}" />
+                <TextBlock Margin="20,0,0,0"
+                           VerticalAlignment="Center"
+                           Text="期限: " />
                 <DatePicker Width="120"
                             Margin="5,0,0,0"
                             SelectedDate="{Binding NewTaskDeadline}" />
                 <TextBlock Margin="20,0,0,0"
                            VerticalAlignment="Center"
-                           Text="見積: " />
+                           Text="開始: " />
+                <DatePicker Width="120"
+                            Margin="5,0,0,0"
+                            SelectedDate="{Binding NewTaskActualStartDate}" />
+                <TextBlock Margin="20,0,0,0"
+                           VerticalAlignment="Center"
+                           Text="終了: " />
+                <DatePicker Width="120"
+                            Margin="5,0,0,0"
+                            SelectedDate="{Binding NewTaskActualEndDate}" />
+            </StackPanel>
+            <StackPanel Margin="0,10,0,0" Orientation="Horizontal">
+                <TextBlock VerticalAlignment="Center" Text="見積: " />
                 <TextBox Width="60"
                          Margin="5,0,0,0"
                          VerticalContentAlignment="Center"
@@ -85,7 +154,7 @@
         </StackPanel>
 
         <!-- 表示エリア -->
-        <ScrollViewer Grid.Row="2">
+        <ScrollViewer Grid.Row="3">
             <ItemsControl ItemsSource="{Binding Tasks}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
@@ -119,8 +188,26 @@
                                 </StackPanel>
                                 <StackPanel Margin="0,4,0,0" Orientation="Horizontal">
                                     <TextBlock FontSize="11" Foreground="#888">
+                                        <Run Text="予定: " />
+                                        <Run Text="{Binding ScheduledStartDate, StringFormat={}{0:yyyy/MM/dd}, TargetNullValue=-}" />
+                                    </TextBlock>
+                                    <TextBlock Margin="15,0,0,0"
+                                               FontSize="11"
+                                               Foreground="#888">
                                         <Run Text="期限: " />
                                         <Run Text="{Binding Deadline, StringFormat={}{0:yyyy/MM/dd}, TargetNullValue=-}" />
+                                    </TextBlock>
+                                    <TextBlock Margin="15,0,0,0"
+                                               FontSize="11"
+                                               Foreground="#888">
+                                        <Run Text="開始: " />
+                                        <Run Text="{Binding ActualStartDate, StringFormat={}{0:yyyy/MM/dd}, TargetNullValue=-}" />
+                                    </TextBlock>
+                                    <TextBlock Margin="15,0,0,0"
+                                               FontSize="11"
+                                               Foreground="#888">
+                                        <Run Text="終了: " />
+                                        <Run Text="{Binding ActualEndDate, StringFormat={}{0:yyyy/MM/dd}, TargetNullValue=-}" />
                                     </TextBlock>
                                     <TextBlock Margin="15,0,0,0"
                                                FontSize="11"

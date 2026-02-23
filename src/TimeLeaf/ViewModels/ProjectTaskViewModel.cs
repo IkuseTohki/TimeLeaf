@@ -43,10 +43,28 @@ public partial class ProjectTaskViewModel : ObservableObject
         set => SetProperty(_projectTask.Priority, value, _projectTask, (model, val) => model.Priority = val);
     }
 
+    public DateTime? ScheduledStartDate
+    {
+        get => _projectTask.ScheduledStartDate;
+        set => SetProperty(_projectTask.ScheduledStartDate, value, _projectTask, (model, val) => model.ScheduledStartDate = val);
+    }
+
     public DateTime? Deadline
     {
         get => _projectTask.Deadline;
         set => SetProperty(_projectTask.Deadline, value, _projectTask, (model, val) => model.Deadline = val);
+    }
+
+    public DateTime? ActualStartDate
+    {
+        get => _projectTask.ActualStartDate;
+        set => SetProperty(_projectTask.ActualStartDate, value, _projectTask, (model, val) => model.ActualStartDate = val);
+    }
+
+    public DateTime? ActualEndDate
+    {
+        get => _projectTask.ActualEndDate;
+        set => SetProperty(_projectTask.ActualEndDate, value, _projectTask, (model, val) => model.ActualEndDate = val);
     }
 
     public double EstimatedCost

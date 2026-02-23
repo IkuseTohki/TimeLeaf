@@ -212,6 +212,14 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                             project.Description = basic.Description;
                             project.Status = basic.Status;
                             project.HealthStatus = basic.HealthStatus;
+                            project.Milestones.Clear();
+                            if (basic.Milestones != null)
+                            {
+                                foreach (var m in basic.Milestones)
+                                {
+                                    project.Milestones.Add(new Milestone { Date = m.Date, Label = m.Label });
+                                }
+                            }
                             _logger.LogTrace("Replayed ProjectBasic for {ProjectId}. Name: {Name}", projectId, project.Name);
                         }
                         else
@@ -234,7 +242,10 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                                     Description = t.Description,
                                     Status = t.Status,
                                     Priority = t.Priority,
+                                    ScheduledStartDate = t.ScheduledStartDate,
                                     Deadline = t.Deadline,
+                                    ActualStartDate = t.ActualStartDate,
+                                    ActualEndDate = t.ActualEndDate,
                                     EstimatedCost = t.EstimatedCost,
                                     ActualCost = t.ActualCost,
                                     Assignee = t.Assignee ?? string.Empty,
@@ -295,7 +306,12 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
             var changesDir = Path.Combine(projectDir, "changes");
 
             // 1. ProjectBasic Snapshot
-            var basicSnapshot = new ProjectBasicDto(project.Name, project.Description, project.Status, project.HealthStatus);
+            var basicSnapshot = new ProjectBasicDto(
+                project.Name,
+                project.Description,
+                project.Status,
+                project.HealthStatus,
+                project.Milestones.Select(m => new MilestoneDto(m.Date, m.Label)).ToList());
             await TrySaveCategoryAsync(project.Id, changesDir, "ProjectBasic", basicSnapshot);
 
             // 2. ProjectTasks Snapshot
@@ -305,7 +321,10 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                 t.Description,
                 t.Status,
                 t.Priority,
+                t.ScheduledStartDate,
                 t.Deadline,
+                t.ActualStartDate,
+                t.ActualEndDate,
                 t.EstimatedCost,
                 t.ActualCost,
                 t.Assignee,
@@ -363,14 +382,18 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         _watcher.Dispose();
     }
 
-    private record ProjectBasicDto(string Name, string Description, ProjectStatus Status, ProjectHealth HealthStatus);
+    private record MilestoneDto(DateTime Date, string Label);
+    private record ProjectBasicDto(string Name, string Description, ProjectStatus Status, ProjectHealth HealthStatus, List<MilestoneDto> Milestones);
     private record ProjectTaskDto(
         Guid Id,
         string Name,
         string Description,
         TimeLeaf.Models.Enums.TaskStatus Status,
         TaskPriority Priority,
+        DateTime? ScheduledStartDate,
         DateTime? Deadline,
+        DateTime? ActualStartDate,
+        DateTime? ActualEndDate,
         double EstimatedCost,
         double ActualCost,
         string Assignee,

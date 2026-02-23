@@ -3,6 +3,9 @@ using TimeLeaf.Models.Entities;
 
 namespace TimeLeaf.Tests.Models.Entities;
 
+using System;
+using System.Linq;
+
 [TestClass]
 public class ProjectTests
 {
@@ -51,5 +54,25 @@ public class ProjectTests
         // Act & Assert
         Assert.AreEqual(0.0, project.TotalEstimatedCost);
         Assert.AreEqual(0.0, project.TotalActualCost);
+    }
+
+    /// <summary>
+    /// テスト観点: Project エンティティにマイルストーンを追加し、正しく保持できることを確認する。
+    /// </summary>
+    [TestMethod]
+    public void Milestones_ShouldBeReadAndWrite()
+    {
+        // Arrange
+        var project = new Project();
+        var milestoneDate = new DateTime(2026, 12, 31);
+        var milestoneLabel = "Release v1.0";
+
+        // Act
+        project.Milestones.Add(new Milestone { Date = milestoneDate, Label = milestoneLabel });
+
+        // Assert
+        Assert.AreEqual(1, project.Milestones.Count, "マイルストーンが1つ追加されていること");
+        Assert.AreEqual(milestoneDate, project.Milestones.First().Date, "日付が正しく保持されていること");
+        Assert.AreEqual(milestoneLabel, project.Milestones.First().Label, "ラベルが正しく保持されていること");
     }
 }

@@ -65,9 +65,12 @@ public partial class MainViewModel : ObservableObject
         {
             if (e.NewItems != null)
             {
-                foreach (ProjectViewModel itemViewModel in e.NewItems)
+                foreach (var newItem in e.NewItems)
                 {
-                    WireProjectViewModelEvents(itemViewModel);
+                    if (newItem is ProjectViewModel itemViewModel)
+                    {
+                        WireProjectViewModelEvents(itemViewModel);
+                    }
                 }
             }
         };
@@ -116,14 +119,25 @@ public partial class MainViewModel : ObservableObject
 
             if (e.NewItems != null)
             {
-                foreach (ProjectTaskViewModel taskViewModel in e.NewItems)
+                foreach (var newItem in e.NewItems)
                 {
-                    WireProjectTaskViewModelEvents(projectViewModel, taskViewModel);
+                    if (newItem is ProjectTaskViewModel taskViewModel)
+                    {
+                        WireProjectTaskViewModelEvents(projectViewModel, taskViewModel);
+                    }
                 }
             }
             // 削除されたアイテムのイベント購読解除は、ViewModelが破棄されるか、
             // より厳密な管理が必要な場合に検討する。現状はLWWに基づき保存を優先。
 
+            await AutoSaveProjectAsync(projectViewModel);
+        };
+
+        // マイルストーンリストの変更
+        projectViewModel.Milestones.CollectionChanged += async (s, e) =>
+        {
+            if (_isSyncing) return;
+            _logger.LogTrace("Milestones collection changed. Triggering save.");
             await AutoSaveProjectAsync(projectViewModel);
         };
 

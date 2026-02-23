@@ -47,7 +47,7 @@ public class JsonProjectRepositoryTests
         var loadedProjects = (await repository.LoadAllAsync()).ToList();
 
         // Assert
-        Assert.HasCount(2, loadedProjects);
+        Assert.AreEqual(2, loadedProjects.Count);
         Assert.AreEqual("Project 1", loadedProjects[0].Name);
         Assert.AreEqual("Project 2", loadedProjects[1].Name);
     }
@@ -71,8 +71,8 @@ public class JsonProjectRepositoryTests
         var loadedProjects = (await repository.LoadAllAsync()).ToList();
 
         // Assert
-        Assert.HasCount(1, loadedProjects);
-        Assert.HasCount(2, loadedProjects[0].Tasks);
+        Assert.AreEqual(1, loadedProjects.Count);
+        Assert.AreEqual(2, loadedProjects[0].Tasks.Count);
         Assert.AreEqual("Task 1", loadedProjects[0].Tasks[0].Name);
         Assert.AreEqual("Task 2", loadedProjects[0].Tasks[1].Name);
     }

@@ -41,7 +41,7 @@ public class OverviewViewModelTests
         await viewModel.AddProjectCommand.ExecuteAsync(null);
 
         // Assert
-        Assert.HasCount(1, viewModel.Projects);
+        Assert.AreEqual(1, viewModel.Projects.Count);
         var added = viewModel.Projects.First();
         Assert.AreEqual(projectName, added.Name);
         Assert.AreEqual(projectDesc, added.Description);

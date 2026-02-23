@@ -30,7 +30,7 @@ public class ProjectWorkspaceViewModelTests
         viewModel.AddTaskCommand.Execute(null);
 
         // Assert
-        Assert.HasCount(1, viewModel.Tasks);
+        Assert.AreEqual(1, viewModel.Tasks.Count);
         var added = viewModel.Tasks.First();
         Assert.AreEqual(taskName, added.Name);
         Assert.AreEqual(taskDesc, added.Description);

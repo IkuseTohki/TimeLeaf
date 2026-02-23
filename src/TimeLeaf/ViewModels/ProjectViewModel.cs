@@ -47,6 +47,11 @@ public partial class ProjectViewModel : ObservableObject
     }
 
     /// <summary>
+    /// プロジェクトのマイルストーン。
+    /// </summary>
+    public ObservableCollection<Milestone> Milestones => _project.Milestones;
+
+    /// <summary>
     /// プロジェクトに紐づくタスクのリスト。
     /// このリストの変更は、合計工数プロパティの変更を通知する。
     /// </summary>
@@ -109,22 +114,28 @@ public partial class ProjectViewModel : ObservableObject
 
         if (e.NewItems != null)
         {
-            foreach (ProjectTask newItem in e.NewItems)
+            foreach (var item in e.NewItems)
             {
-                var newPtvm = new ProjectTaskViewModel(newItem);
-                Tasks.Add(newPtvm);
-                newPtvm.PropertyChanged += OnProjectTaskViewModelPropertyChanged; // プロパティ変更を購読
+                if (item is ProjectTask newItem)
+                {
+                    var newPtvm = new ProjectTaskViewModel(newItem);
+                    Tasks.Add(newPtvm);
+                    newPtvm.PropertyChanged += OnProjectTaskViewModelPropertyChanged; // プロパティ変更を購読
+                }
             }
         }
         if (e.OldItems != null)
         {
-            foreach (ProjectTask oldItem in e.OldItems)
+            foreach (var item in e.OldItems)
             {
-                var existing = Tasks.FirstOrDefault(ptvm => ptvm.Id == oldItem.Id);
-                if (existing != null)
+                if (item is ProjectTask oldItem)
                 {
-                    existing.PropertyChanged -= OnProjectTaskViewModelPropertyChanged; // 購読解除
-                    Tasks.Remove(existing);
+                    var existing = Tasks.FirstOrDefault(ptvm => ptvm.Id == oldItem.Id);
+                    if (existing != null)
+                    {
+                        existing.PropertyChanged -= OnProjectTaskViewModelPropertyChanged; // 購読解除
+                        Tasks.Remove(existing);
+                    }
                 }
             }
         }

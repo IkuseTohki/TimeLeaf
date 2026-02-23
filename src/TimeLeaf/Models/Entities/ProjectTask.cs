@@ -35,9 +35,24 @@ public class ProjectTask
     public TaskPriority Priority { get; set; } = TaskPriority.Medium;
 
     /// <summary>
+    /// 開始予定日。
+    /// </summary>
+    public DateTime? ScheduledStartDate { get; set; }
+
+    /// <summary>
     /// 期限 (Due Date)。
     /// </summary>
     public DateTime? Deadline { get; set; }
+
+    /// <summary>
+    /// 実際の作業開始日。
+    /// </summary>
+    public DateTime? ActualStartDate { get; set; }
+
+    /// <summary>
+    /// 実際の作業完了日。
+    /// </summary>
+    public DateTime? ActualEndDate { get; set; }
 
     /// <summary>
     /// 見積工数。

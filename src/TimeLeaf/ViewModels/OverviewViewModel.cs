@@ -18,8 +18,8 @@ public partial class OverviewViewModel : ObservableObject
     private readonly IAddProjectUseCase _addProjectUseCase;
     private readonly ILogger<OverviewViewModel> _logger;
 
-    public IEnumerable<ProjectStatus> ProjectStatusValues => Enum.GetValues<ProjectStatus>();
-    public IEnumerable<ProjectHealth> ProjectHealthValues => Enum.GetValues<ProjectHealth>();
+    public IEnumerable<ProjectStatus> ProjectStatusValues => (ProjectStatus[])Enum.GetValues(typeof(ProjectStatus));
+    public IEnumerable<ProjectHealth> ProjectHealthValues => (ProjectHealth[])Enum.GetValues(typeof(ProjectHealth));
 
     [ObservableProperty]
     private string _newProjectName = string.Empty;

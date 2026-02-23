@@ -201,4 +201,47 @@ public class ProjectViewModelTests
         Assert.AreEqual(0, receivedEstimatedCostEvents, "タスクの個別のコスト変更ではTotalEstimatedCostのPropertyChangedイベントは発火しないこと (Red)");
         Assert.AreEqual(0, receivedActualCostEvents, "タスクの個別のコスト変更ではTotalActualCostのPropertyChangedイベントは発火しないこと (Red)");
     }
+
+    /// <summary>
+    /// テスト観点: タスクを追加した際に、ViewModelのTasksコレクションに重複して追加されないことを確認する。
+    /// </summary>
+    [TestMethod]
+    public void AddTask_ShouldAddOnlyOneViewModel()
+    {
+        // Arrange
+        var project = new Project { Name = "Test Project" };
+        var projectViewModel = new ProjectViewModel(project);
+
+        // Act
+        // Model への直接追加が ViewModel への同期を引き起こす
+        project.Tasks.Add(new ProjectTask { Name = "New Task" });
+
+        // Assert
+        Assert.AreEqual(1, project.Tasks.Count, "Modelのタスク数が1であること");
+        Assert.AreEqual(1, projectViewModel.Tasks.Count, "ProjectViewModelのタスク数が1であること");
+    }
+
+    /// <summary>
+    /// テスト観点: Model.Tasks.Clear() (Resetアクション) が発生した際に、
+    /// ViewModelのTasksコレクションも正しくクリアされることを確認する。
+    /// </summary>
+    [TestMethod]
+    public void ModelClear_ShouldClearViewModelTasks()
+    {
+        // Arrange
+        var project = new Project { Name = "Test Project" };
+        var projectViewModel = new ProjectViewModel(project);
+        project.Tasks.Add(new ProjectTask { Name = "Existing Task" });
+
+        // この時点で ViewModel.Tasks には1つ入っているはず
+        Assert.AreEqual(1, projectViewModel.Tasks.Count, "初期状態でVMのタスクが1つであること");
+
+        // Act
+        // Clear() は NotifyCollectionChangedAction.Reset を発生させる
+        project.Tasks.Clear();
+
+        // Assert
+        Assert.AreEqual(0, project.Tasks.Count, "Modelのタスクがクリアされていること");
+        Assert.AreEqual(0, projectViewModel.Tasks.Count, "Model.Clear() 後に ViewModel のタスクもクリアされていること");
+    }
 }

@@ -36,7 +36,7 @@ public class LoadProjectsUseCaseTests
 
         // Assert
         Assert.IsNotNull(result);
-        Assert.HasCount(1, result);
+        Assert.AreEqual(1, result.Count());
         Assert.AreEqual("P1", result.First().Name);
         _repositoryMock.Verify(r => r.LoadAllAsync(), Times.Once);
     }

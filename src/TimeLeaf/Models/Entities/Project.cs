@@ -37,6 +37,11 @@ public class Project
     public ProjectHealth HealthStatus { get; set; } = ProjectHealth.Healthy;
 
     /// <summary>
+    /// プロジェクトのマイルストーン。
+    /// </summary>
+    public ObservableCollection<Milestone> Milestones { get; set; } = new();
+
+    /// <summary>
     /// プロジェクトに紐づくタスクのリスト。
     /// </summary>
     public ObservableCollection<ProjectTask> Tasks { get; set; } = new();

@@ -59,7 +59,7 @@ public class ProjectMetadataTests
 
         // ミリ秒が含まれているかチェック (例: 2026-02-21T10:00:00.123Z)
         Assert.IsNotNull(createdAtStr);
-        Assert.Contains(".", createdAtStr, "作成日時にミリ秒が含まれていること");
+        StringAssert.Contains(createdAtStr, ".", "作成日時にミリ秒が含まれていること");
 
         // 不変性の検証: 内容を変えて再保存しても .project は変わらないこと
         var firstMetaContent = metaJson;
@@ -94,7 +94,7 @@ public class ProjectMetadataTests
         var result = (await repo.LoadAllAsync()).ToList();
 
         // Assert
-        Assert.HasCount(2, result);
+        Assert.AreEqual(2, result.Count());
         Assert.AreEqual("First", result[0].Name, "作成日が古いプロジェクトが先頭に来ること");
         Assert.AreEqual("Second", result[1].Name);
     }

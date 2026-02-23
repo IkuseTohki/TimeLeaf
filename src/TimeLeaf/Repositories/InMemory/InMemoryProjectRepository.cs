@@ -32,7 +32,7 @@ public class InMemoryProjectRepository : IProjectRepository
 
     public System.Threading.Tasks.Task<Project?> LoadAsync(Guid projectId)
     {
-        return System.Threading.Tasks.Task.FromResult(_projects.FirstOrDefault(p => p.Id == projectId));
+        return System.Threading.Tasks.Task.FromResult<Project?>(_projects.FirstOrDefault(p => p.Id == projectId));
     }
 
     public System.Threading.Tasks.Task SaveAllAsync(IEnumerable<Project> projects)

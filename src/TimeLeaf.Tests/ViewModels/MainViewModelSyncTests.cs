@@ -60,7 +60,7 @@ public class MainViewModelSyncTests
         // Assert
         var project = viewModel.Projects.First(pvm => pvm.Id == projectId); // ViewModel を検索
 
-        Assert.HasCount(1, project.Model.Tasks, "同期によってタスクが1件に更新されていること");
+        Assert.AreEqual(1, project.Model.Tasks.Count, "同期によってタスクが1件に更新されていること");
         Assert.AreEqual("Task from Sync", project.Model.Tasks.First().Name, "同期された最新のタスク名が反映されていること");
     }
 }

@@ -63,7 +63,7 @@ public class FolderProjectRepositoryTests
 
         // 3. 履歴ファイルの存在確認
         var files = Directory.GetFiles(changesDir);
-        Assert.IsNotEmpty(files, "履歴ファイル(JSON)が出力されること");
+        Assert.IsTrue(files.Any(), "履歴ファイル(JSON)が出力されること");
 
         var commitFile = CommitFileName.Parse(Path.GetFileName(files[0]));
         Assert.AreEqual("test-user", commitFile.UserId);
@@ -71,7 +71,7 @@ public class FolderProjectRepositoryTests
 
         // 4. 内容の確認
         var json = File.ReadAllText(files[0]);
-        Assert.Contains("StructureTest", json, "プロジェクト名がJSONに含まれていること");
+        StringAssert.Contains(json, "StructureTest", "プロジェクト名がJSONに含まれていること");
     }
 
     /// <summary>
@@ -137,7 +137,68 @@ public class FolderProjectRepositoryTests
         var loadedTask = loadedProject.Tasks.FirstOrDefault(t => t.Id == mainTask.Id);
         Assert.IsNotNull(loadedTask, "保存されたタスクがロードされること");
         Assert.AreEqual("user123", loadedTask.Assignee, "Assignee が正しく復元されること");
-        Assert.HasCount(1, loadedTask.Dependencies, "Dependencies の要素数が正しいこと");
+        Assert.AreEqual(1, loadedTask.Dependencies.Count, "Dependencies の要素数が正しいこと");
         Assert.AreEqual(depTaskId, loadedTask.Dependencies[0], "Dependencies の内容が正しいこと");
+    }
+
+    /// <summary>
+    /// テスト観点: プロジェクトにマイルストーンを追加して保存し、再度ロードした際にマイルストーンが正しく復元されることを確認する。
+    /// </summary>
+    [TestMethod]
+    public async System.Threading.Tasks.Task SaveAndLoad_ShouldPreserveMilestones()
+    {
+        // Arrange
+        var repository = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object);
+        var projectId = Guid.NewGuid();
+        var project = new Project { Id = projectId, Name = "MilestoneTest" };
+        var mDate = new DateTime(2026, 10, 10);
+        var mLabel = "Final Release";
+        project.Milestones.Add(new Milestone { Date = mDate, Label = mLabel });
+
+        // Act
+        await repository.SaveAsync(project);
+        var loadedProject = await repository.LoadAsync(projectId);
+
+        // Assert
+        Assert.IsNotNull(loadedProject);
+        Assert.AreEqual(1, loadedProject.Milestones.Count, "ロードされたマイルストーンが1つであること");
+        Assert.AreEqual(mDate, loadedProject.Milestones.First().Date, "マイルストーンの日付が一致すること");
+        Assert.AreEqual(mLabel, loadedProject.Milestones.First().Label, "マイルストーンのラベルが一致すること");
+    }
+
+    /// <summary>
+    /// テスト観点: タスクのスケジュール属性（予定開始、実績開始、実績終了）が正しく保存・復元されることを確認する。
+    /// </summary>
+    [TestMethod]
+    public async System.Threading.Tasks.Task SaveAndLoad_ShouldPreserveTaskScheduleProperties()
+    {
+        // Arrange
+        var repository = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object);
+        var projectId = Guid.NewGuid();
+        var project = new Project { Id = projectId, Name = "ScheduleTest" };
+        var sDate = new DateTime(2026, 4, 1);
+        var asDate = new DateTime(2026, 4, 2);
+        var aeDate = new DateTime(2026, 4, 10);
+
+        var task = new ProjectTask
+        {
+            Name = "ScheduleTask",
+            ScheduledStartDate = sDate,
+            ActualStartDate = asDate,
+            ActualEndDate = aeDate
+        };
+        project.Tasks.Add(task);
+
+        // Act
+        await repository.SaveAsync(project);
+        var loadedProject = await repository.LoadAsync(projectId);
+
+        // Assert
+        Assert.IsNotNull(loadedProject);
+        var loadedTask = loadedProject.Tasks.FirstOrDefault(t => t.Id == task.Id);
+        Assert.IsNotNull(loadedTask);
+        Assert.AreEqual(sDate, loadedTask.ScheduledStartDate, "ScheduledStartDate が正しく復元されること");
+        Assert.AreEqual(asDate, loadedTask.ActualStartDate, "ActualStartDate が正しく復元されること");
+        Assert.AreEqual(aeDate, loadedTask.ActualEndDate, "ActualEndDate が正しく復元されること");
     }
 }
