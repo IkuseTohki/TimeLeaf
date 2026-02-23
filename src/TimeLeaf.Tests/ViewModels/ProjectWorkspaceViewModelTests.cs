@@ -18,8 +18,9 @@ public class ProjectWorkspaceViewModelTests
     {
         // Arrange
         var project = new Project { Name = "Test Project" };
+        var projectViewModel = new ProjectViewModel(project);
         var loggerMock = new Mock<ILogger<ProjectWorkspaceViewModel>>();
-        var viewModel = new ProjectWorkspaceViewModel(project, loggerMock.Object);
+        var viewModel = new ProjectWorkspaceViewModel(projectViewModel, loggerMock.Object);
         var taskName = "New Task";
         var taskDesc = "New Description";
         viewModel.NewTaskName = taskName;

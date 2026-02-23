@@ -77,4 +77,33 @@ public class ProjectTaskViewModelTests
         Assert.AreEqual(newCost, projectTask.EstimatedCost, "基になるProjectTaskエンティティのEstimatedCostが更新されること");
         Assert.AreEqual(1, receivedEvents, "EstimatedCostプロパティの変更時にPropertyChangedイベントが発火すること");
     }
+
+    /// <summary>
+    /// テスト観点: Assignee プロパティを変更した際に、基になる ProjectTask エンティティの Assignee が更新され、
+    /// かつ PropertyChanged イベントが発火することを確認する。
+    /// </summary>
+    [TestMethod]
+    public void Assignee_ShouldUpdateModelAndRaisePropertyChanged()
+    {
+        // Arrange
+        var projectTask = new ProjectTask { Assignee = "old-user" };
+        var viewModel = new ProjectTaskViewModel(projectTask);
+        var newUser = "new-user";
+
+        var receivedEvents = 0;
+        viewModel.PropertyChanged += (sender, e) =>
+        {
+            if (e.PropertyName == nameof(ProjectTaskViewModel.Assignee))
+            {
+                receivedEvents++;
+            }
+        };
+
+        // Act
+        viewModel.Assignee = newUser;
+
+        // Assert
+        Assert.AreEqual(newUser, projectTask.Assignee, "基になるProjectTaskエンティティのAssigneeが更新されること");
+        Assert.AreEqual(1, receivedEvents, "Assigneeプロパティの変更時にPropertyChangedイベントが発火すること");
+    }
 }

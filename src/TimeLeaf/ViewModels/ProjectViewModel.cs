@@ -96,6 +96,17 @@ public partial class ProjectViewModel : ObservableObject
 
     private void OnProjectTasksCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
+        if (e.Action == NotifyCollectionChangedAction.Reset)
+        {
+            // Resetアクション（Clear()など）が発生した場合、VM側のコレクションもクリアする
+            foreach (var ptvm in Tasks)
+            {
+                ptvm.PropertyChanged -= OnProjectTaskViewModelPropertyChanged;
+            }
+            Tasks.Clear();
+            return;
+        }
+
         if (e.NewItems != null)
         {
             foreach (ProjectTask newItem in e.NewItems)

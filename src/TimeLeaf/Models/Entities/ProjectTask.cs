@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using TimeLeaf.Models.Enums;
 
 namespace TimeLeaf.Models.Entities;
@@ -47,4 +48,14 @@ public class ProjectTask
     /// 実績工数。
     /// </summary>
     public double ActualCost { get; set; }
+
+    /// <summary>
+    /// 作業担当者。
+    /// </summary>
+    public string Assignee { get; set; } = string.Empty;
+
+    /// <summary>
+    /// 依存タスクのIDリスト。
+    /// </summary>
+    public List<Guid> Dependencies { get; set; } = new();
 }

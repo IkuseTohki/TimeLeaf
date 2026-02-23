@@ -61,48 +61,99 @@ public partial class MainViewModel : ObservableObject
         _repository.ProjectChanged += OnProjectChanged;
 
         // 内部変更の監視と自動保存
-        Projects.CollectionChanged += async (s, e) =>
+        Projects.CollectionChanged += (s, e) =>
         {
-            if (_isSyncing) return;
-
-            try
+            if (e.NewItems != null)
             {
-                if (e.NewItems != null)
+                foreach (ProjectViewModel itemViewModel in e.NewItems)
                 {
-                    foreach (ProjectViewModel itemViewModel in e.NewItems) // 型を ProjectViewModel に変更
-                    {
-                        _logger.LogDebug("New project detected in collection: {ProjectId}", itemViewModel.Id);
-                        // ProjectViewModel内のTasksコレクションの変更を購読
-                        itemViewModel.Tasks.CollectionChanged += async (ts, te) =>
-                        {
-                            if (!_isSyncing)
-                            {
-                                try
-                                {
-                                    // 個々のタスクの変更時にプロジェクト全体を保存する
-                                    await _saveSingleUseCase.ExecuteAsync(itemViewModel.Model);
-                                }
-                                catch (Exception ex)
-                                {
-                                    _logger.LogError(ex, "Failed to auto-save project {ProjectId} during task change", itemViewModel.Id);
-                                }
-                            }
-                        };
-                        // AddProjectUseCaseが保存を行うため、Projects.Addに起因する自動保存は不要になった
-                        // (ただし、既存タスクの変更時に自動保存は必要なので、Tasks.CollectionChangedの購読は残す)
-                        // await _saveSingleUseCase.ExecuteAsync(itemViewModel.Model); // AddProjectUseCaseが保存を行うため削除
-                    }
+                    WireProjectViewModelEvents(itemViewModel);
                 }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in Projects.CollectionChanged handler");
             }
         };
 
         _ = InitializeAsync();
 
         _logger.LogInformation("MainViewModel Initializing Complete");
+    }
+
+    /// <summary>
+    /// ProjectViewModel の変更（プロパティ、タスクリスト、タスクのプロパティ）を監視し、
+    /// 自動保存を実行するようにイベントを購読します。
+    /// </summary>
+    private void WireProjectViewModelEvents(ProjectViewModel projectViewModel)
+    {
+        _logger.LogDebug("Wiring events for project {ProjectId}", projectViewModel.Id);
+
+        // 保存をスキップする計算済みプロパティのリスト
+        var ignoredProperties = new HashSet<string>
+        {
+            nameof(ProjectViewModel.TotalEstimatedCost),
+            nameof(ProjectViewModel.TotalActualCost),
+            nameof(ProjectViewModel.DisplayTotalEstimatedCost),
+            nameof(ProjectViewModel.DisplayTotalActualCost)
+        };
+
+        // プロジェクト自体のプロパティ変更
+        projectViewModel.PropertyChanged += async (s, e) =>
+        {
+            if (_isSyncing || e.PropertyName == null) return;
+            if (ignoredProperties.Contains(e.PropertyName))
+            {
+                _logger.LogTrace("Skipping save for calculated project property: {PropertyName}", e.PropertyName);
+                return;
+            }
+
+            _logger.LogTrace("Project property changed: {PropertyName}. Triggering save.", e.PropertyName);
+            await AutoSaveProjectAsync(projectViewModel);
+        };
+
+        // タスクリストの変更
+        projectViewModel.Tasks.CollectionChanged += async (s, e) =>
+        {
+            if (_isSyncing) return;
+            _logger.LogTrace("Tasks collection changed. Triggering save.");
+
+            if (e.NewItems != null)
+            {
+                foreach (ProjectTaskViewModel taskViewModel in e.NewItems)
+                {
+                    WireProjectTaskViewModelEvents(projectViewModel, taskViewModel);
+                }
+            }
+            // 削除されたアイテムのイベント購読解除は、ViewModelが破棄されるか、
+            // より厳密な管理が必要な場合に検討する。現状はLWWに基づき保存を優先。
+
+            await AutoSaveProjectAsync(projectViewModel);
+        };
+
+        // 初期タスクのイベント購読
+        foreach (var taskViewModel in projectViewModel.Tasks)
+        {
+            WireProjectTaskViewModelEvents(projectViewModel, taskViewModel);
+        }
+    }
+
+    private void WireProjectTaskViewModelEvents(ProjectViewModel projectViewModel, ProjectTaskViewModel taskViewModel)
+    {
+        taskViewModel.PropertyChanged += async (s, e) =>
+        {
+            if (_isSyncing) return;
+            _logger.LogTrace("Task property changed: {PropertyName}. Triggering save.", e.PropertyName);
+            await AutoSaveProjectAsync(projectViewModel);
+        };
+    }
+
+    private async System.Threading.Tasks.Task AutoSaveProjectAsync(ProjectViewModel projectViewModel)
+    {
+        try
+        {
+            await _saveSingleUseCase.ExecuteAsync(projectViewModel.Model);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to auto-save project {ProjectId}", projectViewModel.Id);
+        }
     }
 
     private void OnProjectChanged(Guid projectId)
@@ -127,19 +178,19 @@ public partial class MainViewModel : ObservableObject
                     existingViewModel.HealthStatus = updatedProjectEntity.HealthStatus;
 
                     // Tasksコレクションの同期
+                    // Model.Tasks の Clear() により VM.Tasks も同期してクリアされるため、
+                    // VM.Tasks.Clear() の直接呼び出しは不要。
                     existingViewModel.Model.Tasks.Clear();
-                    existingViewModel.Tasks.Clear();
                     foreach (var t in updatedProjectEntity.Tasks)
                     {
                         existingViewModel.Model.Tasks.Add(t);
-                        existingViewModel.Tasks.Add(new ProjectTaskViewModel(t));
                     }
                 }
                 else
                 {
                     _logger.LogDebug("Adding new project {ProjectId} ViewModel from sync.", projectId);
                     var newProjectViewModel = new ProjectViewModel(updatedProjectEntity);
-                    Projects.Add(newProjectViewModel);
+                    Projects.Add(newProjectViewModel); // Projects.CollectionChanged によって WireProjectViewModelEvents が呼ばれる
                 }
             }
             catch (Exception ex)
@@ -173,22 +224,7 @@ public partial class MainViewModel : ObservableObject
             foreach (var projectEntity in projectEntities)
             {
                 var projectViewModel = new ProjectViewModel(projectEntity);
-                projectViewModel.Tasks.CollectionChanged += async (s, e) => // ProjectViewModelのTasksを購読
-                {
-                    if (!_isSyncing)
-                    {
-                        try
-                        {
-                            // 個々のタスクの変更時にプロジェクト全体を保存する
-                            await _saveSingleUseCase.ExecuteAsync(projectViewModel.Model);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError(ex, "Failed to auto-save project {ProjectId} during task change", projectViewModel.Id);
-                        }
-                    }
-                };
-                Projects.Add(projectViewModel);
+                Projects.Add(projectViewModel); // Projects.CollectionChanged によって WireProjectViewModelEvents が呼ばれる
             }
         }
         catch (Exception ex)
@@ -207,7 +243,7 @@ public partial class MainViewModel : ObservableObject
     {
         if (projectViewModel == null) return;
         _logger.LogInformation("Navigating to project {ProjectId}", projectViewModel.Id);
-        CurrentViewModel = new ProjectWorkspaceViewModel(projectViewModel.Model, _serviceProvider.GetRequiredService<ILogger<ProjectWorkspaceViewModel>>()); // Model を渡す
+        CurrentViewModel = new ProjectWorkspaceViewModel(projectViewModel, _serviceProvider.GetRequiredService<ILogger<ProjectWorkspaceViewModel>>()); // ViewModel を渡す
     }
 
     [RelayCommand]

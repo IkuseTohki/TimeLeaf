@@ -29,6 +29,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
     };
 
     private readonly ConcurrentDictionary<string, string> _lastSavedContent = new();
+    private readonly ConcurrentDictionary<string, byte> _justWrittenFiles = new();
     private readonly FileSystemWatcher _watcher;
 
     public event Action<Guid>? ProjectChanged;
@@ -55,13 +56,21 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
             NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite
         };
         _watcher.Created += OnFileCreated;
+        _watcher.Changed += OnFileCreated;
         _watcher.EnableRaisingEvents = true;
         _logger.LogDebug("FileSystemWatcher initialized for {BaseDirectory}", _baseDirectory);
     }
 
     private void OnFileCreated(object sender, FileSystemEventArgs e)
     {
-        _logger.LogInformation("File created/changed event detected: {FullPath}", e.FullPath);
+        var fileName = Path.GetFileName(e.FullPath);
+        if (_justWrittenFiles.TryRemove(fileName, out _))
+        {
+            _logger.LogDebug("Ignoring file change event for our own write: {FileName}", fileName);
+            return;
+        }
+
+        _logger.LogInformation("File created/changed event detected: {FullPath} (ChangeType: {ChangeType})", e.FullPath, e.ChangeType);
         // パス例: storage/{Guid}_{Name}/changes/{Timestamp}_{User}_{Guid}_{Category}.json
         // ルートディレクトリからの相対パスを取得して解析
         var relativePath = Path.GetRelativePath(_baseDirectory, e.FullPath);
@@ -227,7 +236,9 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                                     Priority = t.Priority,
                                     Deadline = t.Deadline,
                                     EstimatedCost = t.EstimatedCost,
-                                    ActualCost = t.ActualCost
+                                    ActualCost = t.ActualCost,
+                                    Assignee = t.Assignee ?? string.Empty,
+                                    Dependencies = t.Dependencies ?? new()
                                 });
                             }
                             _logger.LogTrace("Replayed {TaskCount} tasks for ProjectTasks for {ProjectId}.", tasks.Count, projectId);
@@ -288,7 +299,17 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
             await TrySaveCategoryAsync(project.Id, changesDir, "ProjectBasic", basicSnapshot);
 
             // 2. ProjectTasks Snapshot
-            var tasksSnapshot = project.Tasks.Select(t => new ProjectTaskDto(t.Id, t.Name, t.Description, t.Status, t.Priority, t.Deadline, t.EstimatedCost, t.ActualCost)).ToList();
+            var tasksSnapshot = project.Tasks.Select(t => new ProjectTaskDto(
+                t.Id,
+                t.Name,
+                t.Description,
+                t.Status,
+                t.Priority,
+                t.Deadline,
+                t.EstimatedCost,
+                t.ActualCost,
+                t.Assignee,
+                t.Dependencies)).ToList();
             await TrySaveCategoryAsync(project.Id, changesDir, "ProjectTasks", tasksSnapshot);
             _logger.LogInformation("Project {ProjectId} saved successfully.", project.Id);
         }
@@ -319,6 +340,8 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
 
         var fileName = CommitFileName.Generate(DateTime.Now, _userService.GetCurrentUserId(), Guid.NewGuid(), category);
         var fullPath = Path.Combine(changesDir, fileName);
+        _justWrittenFiles.TryAdd(fileName, 0); // 自前での書き込みであることをマーク
+
         try
         {
             await File.WriteAllTextAsync(fullPath, json);
@@ -341,6 +364,16 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
     }
 
     private record ProjectBasicDto(string Name, string Description, ProjectStatus Status, ProjectHealth HealthStatus);
-    private record ProjectTaskDto(Guid Id, string Name, string Description, TimeLeaf.Models.Enums.TaskStatus Status, TaskPriority Priority, DateTime? Deadline, double EstimatedCost, double ActualCost);
+    private record ProjectTaskDto(
+        Guid Id,
+        string Name,
+        string Description,
+        TimeLeaf.Models.Enums.TaskStatus Status,
+        TaskPriority Priority,
+        DateTime? Deadline,
+        double EstimatedCost,
+        double ActualCost,
+        string Assignee,
+        List<Guid> Dependencies);
     private record ProjectMetadataDto(Guid ProjectId, DateTime CreatedAt, string CreatedBy, int SchemaVersion);
 }

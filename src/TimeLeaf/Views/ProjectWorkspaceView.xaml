@@ -30,12 +30,19 @@
         <!-- 入力エリア -->
         <StackPanel Grid.Row="1" Margin="0,0,0,20">
             <StackPanel Orientation="Horizontal">
-                <TextBox Width="300"
+                <TextBox Width="200"
                          Height="32"
                          Padding="5,0"
                          VerticalContentAlignment="Center"
                          Tag="タスク名"
                          Text="{Binding NewTaskName, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBox Width="100"
+                         Height="32"
+                         Margin="10,0,0,0"
+                         Padding="5,0"
+                         VerticalContentAlignment="Center"
+                         Tag="担当者"
+                         Text="{Binding NewTaskAssignee, UpdateSourceTrigger=PropertyChanged}" />
                 <ComboBox Width="120"
                           Margin="10,0,0,0"
                           ItemsSource="{Binding TaskStatusValues}"
@@ -104,6 +111,11 @@
                                                    Foreground="#E65100"
                                                    Text="{Binding Priority}" />
                                     </Border>
+                                    <TextBlock Margin="15,0,0,0"
+                                               VerticalAlignment="Center"
+                                               FontSize="12"
+                                               Foreground="#444"
+                                               Text="{Binding Assignee}" />
                                 </StackPanel>
                                 <StackPanel Margin="0,4,0,0" Orientation="Horizontal">
                                     <TextBlock FontSize="11" Foreground="#888">

@@ -107,4 +107,37 @@ public class FolderProjectRepositoryTests
         Assert.AreEqual(10.5, loadedTask.EstimatedCost, "EstimatedCost が正しく復元されること");
         Assert.AreEqual(8.25, loadedTask.ActualCost, "ActualCost が正しく復元されること");
     }
+
+    /// <summary>
+    /// テスト観点: タスクのアサイン情報 (Assignee) と依存関係 (Dependencies) が正しく保存・復元されることを確認する。
+    /// </summary>
+    [TestMethod]
+    public async System.Threading.Tasks.Task SaveAndLoad_ShouldPreserveTaskAssignmentAndDependencies()
+    {
+        // Arrange
+        var repository = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object);
+        var projectId = Guid.NewGuid();
+        var project = new Project { Id = projectId, Name = "RelationTest" };
+
+        var depTaskId = Guid.NewGuid();
+        var mainTask = new ProjectTask
+        {
+            Name = "MainTask",
+            Assignee = "user123"
+        };
+        mainTask.Dependencies.Add(depTaskId);
+        project.Tasks.Add(mainTask);
+
+        // Act
+        await repository.SaveAsync(project);
+        var loadedProject = await repository.LoadAsync(projectId);
+
+        // Assert
+        Assert.IsNotNull(loadedProject);
+        var loadedTask = loadedProject.Tasks.FirstOrDefault(t => t.Id == mainTask.Id);
+        Assert.IsNotNull(loadedTask, "保存されたタスクがロードされること");
+        Assert.AreEqual("user123", loadedTask.Assignee, "Assignee が正しく復元されること");
+        Assert.HasCount(1, loadedTask.Dependencies, "Dependencies の要素数が正しいこと");
+        Assert.AreEqual(depTaskId, loadedTask.Dependencies[0], "Dependencies の内容が正しいこと");
+    }
 }

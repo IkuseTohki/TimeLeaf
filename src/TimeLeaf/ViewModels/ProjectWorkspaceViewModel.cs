@@ -41,6 +41,9 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
     [ObservableProperty]
     private double _newTaskActualCost;
 
+    [ObservableProperty]
+    private string _newTaskAssignee = string.Empty;
+
     /// <summary>
     /// 表示対象となるタスクのリスト。
     /// </summary>
@@ -49,11 +52,11 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
     /// <summary>
     /// コンストラクタ。
     /// </summary>
-    /// <param name="project">管理対象となるプロジェクト。</param>
+    /// <param name="projectViewModel">管理対象となるプロジェクトのViewModel。</param>
     /// <param name="logger">ロガー。</param>
-    public ProjectWorkspaceViewModel(Project project, ILogger<ProjectWorkspaceViewModel> logger) // Projectエンティティを受け取る
+    public ProjectWorkspaceViewModel(ProjectViewModel projectViewModel, ILogger<ProjectWorkspaceViewModel> logger)
     {
-        _projectViewModel = new ProjectViewModel(project); // ViewModelでラップ
+        _projectViewModel = projectViewModel ?? throw new ArgumentNullException(nameof(projectViewModel));
         _logger = logger;
         _logger.LogInformation("ProjectWorkspaceViewModel initialized for project {ProjectId}.", _projectViewModel.Id);
     }
@@ -81,11 +84,11 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
                 Priority = NewTaskPriority,
                 Deadline = NewTaskDeadline,
                 EstimatedCost = NewTaskEstimatedCost,
-                ActualCost = NewTaskActualCost
+                ActualCost = NewTaskActualCost,
+                Assignee = NewTaskAssignee
             };
-            var taskViewModel = new ProjectTaskViewModel(taskEntity); // ViewModelでラップ
-            Tasks.Add(taskViewModel); // ProjectTaskViewModel をコレクションに追加
-            _logger.LogInformation("Task '{TaskName}' (ID: {TaskId}) added to project {ProjectId}.", taskViewModel.Name, taskViewModel.Id, _projectViewModel.Id);
+            _projectViewModel.Model.Tasks.Add(taskEntity); // Modelのコレクションに追加
+            _logger.LogInformation("Task '{TaskName}' (ID: {TaskId}) added to project {ProjectId}.", taskEntity.Name, taskEntity.Id, _projectViewModel.Id);
 
             NewTaskName = string.Empty;
             NewTaskDescription = string.Empty;
@@ -94,6 +97,7 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
             NewTaskDeadline = null;
             NewTaskEstimatedCost = 0;
             NewTaskActualCost = 0;
+            NewTaskAssignee = string.Empty;
         }
         catch (Exception ex)
         {

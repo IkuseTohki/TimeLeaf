@@ -61,6 +61,17 @@ public partial class ProjectTaskViewModel : ObservableObject
         set => SetProperty(_projectTask.ActualCost, value, _projectTask, (model, val) => model.ActualCost = val);
     }
 
+    public string Assignee
+    {
+        get => _projectTask.Assignee;
+        set => SetProperty(_projectTask.Assignee, value, _projectTask, (model, val) => model.Assignee = val);
+    }
+
+    /// <summary>
+    /// 依存タスクのIDリスト。
+    /// </summary>
+    public System.Collections.Generic.List<Guid> Dependencies => _projectTask.Dependencies;
+
     /// <summary>
     /// コンストラクタ。
     /// </summary>
