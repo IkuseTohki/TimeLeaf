@@ -20,10 +20,57 @@ public class ProjectTests
         var description = "This is a test project description.";
 
         // Act
-        project.Description = description;
+        project.UpdateDescription(description);
 
         // Assert
         Assert.AreEqual(description, project.Description);
+    }
+
+    /// <summary>
+    /// テスト観点: タスクを追加した際、プロジェクトのタスクリストに追加され、
+    /// かつ最終更新日時 (UpdatedAt) が更新されることを確認する。
+    /// </summary>
+    [TestMethod]
+    public void AddTask_ShouldUpdateTasksAndUpdatedAt()
+    {
+        // Arrange
+        var project = new Project();
+        project.UpdateName("Domain Test");
+        var initialUpdateAt = project.UpdatedAt;
+        var task = new ProjectTask { Name = "New Task", EstimatedCost = 5.0 };
+
+        // 実行時間を稼ぐために少し待機
+        System.Threading.Thread.Sleep(10);
+
+        // Act
+        project.AddTask(task);
+
+        // Assert
+        Assert.AreEqual(1, project.Tasks.Count, "タスクが追加されていること");
+        Assert.IsTrue(project.UpdatedAt > initialUpdateAt, "タスク追加により最終更新日時が更新されていること");
+        Assert.AreEqual(5.0, project.TotalEstimatedCost, "合計見積工数が正しく計算されていること");
+    }
+
+    /// <summary>
+    /// テスト観点: プロジェクトの基本情報を更新した際、
+    /// 最終更新日時 (UpdatedAt) が更新されることを確認する。
+    /// </summary>
+    [TestMethod]
+    public void UpdateBasicInfo_ShouldRefreshUpdatedAt()
+    {
+        // Arrange
+        var project = new Project();
+        project.UpdateName("Initial Name");
+        var initialUpdateAt = project.UpdatedAt;
+
+        System.Threading.Thread.Sleep(10);
+
+        // Act
+        project.UpdateName("Updated Name");
+
+        // Assert
+        Assert.AreEqual("Updated Name", project.Name);
+        Assert.IsTrue(project.UpdatedAt > initialUpdateAt, "名前更新により最終更新日時が更新されていること");
     }
 
     /// <summary>
@@ -34,8 +81,8 @@ public class ProjectTests
     {
         // Arrange
         var project = new Project();
-        project.Tasks.Add(new ProjectTask { Name = "T1", EstimatedCost = 10, ActualCost = 5 });
-        project.Tasks.Add(new ProjectTask { Name = "T2", EstimatedCost = 20, ActualCost = 15 });
+        project.AddTask(new ProjectTask { Name = "T1", EstimatedCost = 10, ActualCost = 5 });
+        project.AddTask(new ProjectTask { Name = "T2", EstimatedCost = 20, ActualCost = 15 });
 
         // Act & Assert
         Assert.AreEqual(30.0, project.TotalEstimatedCost, "合計見積工数が正しく算出されること");
@@ -68,7 +115,7 @@ public class ProjectTests
         var milestoneLabel = "Release v1.0";
 
         // Act
-        project.Milestones.Add(new Milestone { Date = milestoneDate, Label = milestoneLabel });
+        project.AddMilestone(new Milestone { Date = milestoneDate, Label = milestoneLabel });
 
         // Assert
         Assert.AreEqual(1, project.Milestones.Count, "マイルストーンが1つ追加されていること");

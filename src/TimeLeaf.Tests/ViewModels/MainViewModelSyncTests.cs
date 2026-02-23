@@ -49,7 +49,8 @@ public class MainViewModelSyncTests
             .Returns(_serviceProviderMock.Object);
 
         var projectId = Guid.NewGuid();
-        var initialProject = new Project { Id = projectId, Name = "Initial" };
+        var initialProject = new Project { Id = projectId };
+        initialProject.UpdateName("Initial");
         // initialProject.Tasks.Add(new ProjectTask { Name = "Task 1" }); // 初期ロードではタスクを持たない
 
         repositoryMock.Setup(r => r.LoadAllAsync()).ReturnsAsync(new List<Project> { initialProject });
@@ -58,8 +59,9 @@ public class MainViewModelSyncTests
         await System.Threading.Tasks.Task.Delay(100); // InitializeAsync の完了を待つ
 
         // ロードされる「最新」の状態を準備（別のタスクがある状態）
-        var updatedProject = new Project { Id = projectId, Name = "Updated" };
-        updatedProject.Tasks.Add(new ProjectTask { Name = "Task from Sync" }); // 同期で追加されるタスク
+        var updatedProject = new Project { Id = projectId };
+        updatedProject.UpdateName("Updated");
+        updatedProject.AddTask(new ProjectTask { Name = "Task from Sync" }); // 同期で追加されるタスク
         repositoryMock.Setup(r => r.LoadAsync(projectId)).ReturnsAsync(updatedProject);
 
         // Act

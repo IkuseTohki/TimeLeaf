@@ -147,8 +147,12 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
                 CreatedAt = DateTime.Now
             };
 
-            SelectedTask.Model.Comments.Add(comment);
+            SelectedTask.Model.AddComment(comment);
             _logger.LogInformation("Comment added to task {TaskId}.", SelectedTask.Id);
+
+            // コメント追加に伴う最終更新日時の通知を強制する（自動保存トリガー）
+            _projectViewModel.Model.RefreshUpdatedAt();
+            _projectViewModel.SyncFromModel(); // これにより UpdatedAt の通知も飛ぶ
 
             NewCommentContent = string.Empty;
         }
@@ -183,12 +187,14 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
 
         try
         {
-            _projectViewModel.Milestones.Add(new Milestone
+            _projectViewModel.Model.AddMilestone(new Milestone
             {
                 Date = NewMilestoneDate,
                 Label = NewMilestoneLabel
             });
             _logger.LogInformation("Milestone '{MilestoneLabel}' added to project {ProjectId}.", NewMilestoneLabel, _projectViewModel.Id);
+
+            _projectViewModel.SyncFromModel(); // UIに反映
 
             NewMilestoneLabel = string.Empty;
             NewMilestoneDate = DateTime.Today;
@@ -228,8 +234,10 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
                 ActualCost = NewTaskActualCost,
                 Assignee = NewTaskAssignee
             };
-            _projectViewModel.Model.Tasks.Add(taskEntity); // Modelのコレクションに追加
+            _projectViewModel.Model.AddTask(taskEntity); // ドメインメソッドを使用
             _logger.LogInformation("Task '{TaskName}' (ID: {TaskId}) added to project {ProjectId}.", taskEntity.Name, taskEntity.Id, _projectViewModel.Id);
+
+            _projectViewModel.SyncFromModel(); // UIに反映
 
             NewTaskName = string.Empty;
             NewTaskDescription = string.Empty;

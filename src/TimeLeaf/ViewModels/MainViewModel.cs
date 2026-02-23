@@ -82,89 +82,24 @@ public partial class MainViewModel : ObservableObject
     }
 
     /// <summary>
-    /// ProjectViewModel の変更（プロパティ、タスクリスト、タスクのプロパティ）を監視し、
+    /// ProjectViewModel の変更を監視し、ドメインルール（UpdatedAtの更新）に基づいて
     /// 自動保存を実行するようにイベントを購読します。
     /// </summary>
     private void WireProjectViewModelEvents(ProjectViewModel projectViewModel)
     {
         _logger.LogDebug("Wiring events for project {ProjectId}", projectViewModel.Id);
 
-        // 保存をスキップする計算済みプロパティのリスト
-        var ignoredProperties = new HashSet<string>
+        projectViewModel.PropertyChanged += async (sender, e) =>
         {
-            nameof(ProjectViewModel.TotalEstimatedCost),
-            nameof(ProjectViewModel.TotalActualCost),
-            nameof(ProjectViewModel.DisplayTotalEstimatedCost),
-            nameof(ProjectViewModel.DisplayTotalActualCost)
-        };
+            if (_isSyncing) return;
 
-        // プロジェクト自体のプロパティ変更
-        projectViewModel.PropertyChanged += async (s, e) =>
-        {
-            if (_isSyncing || e.PropertyName == null) return;
-            if (ignoredProperties.Contains(e.PropertyName))
+            // UpdatedAt が変更された = ドメイン層で何らかの重要な変更があったとみなす
+            // ドメインエンティティのビジネスメソッドはすべてこれを更新するため、
+            // これ一つを監視するだけで整合性を保った自動保存が可能。
+            if (e.PropertyName == nameof(ProjectViewModel.UpdatedAt))
             {
-                _logger.LogTrace("Skipping save for calculated project property: {PropertyName}", e.PropertyName);
-                return;
+                await AutoSaveProjectAsync(projectViewModel);
             }
-
-            _logger.LogTrace("Project property changed: {PropertyName}. Triggering save.", e.PropertyName);
-            await AutoSaveProjectAsync(projectViewModel);
-        };
-
-        // タスクリストの変更
-        projectViewModel.Tasks.CollectionChanged += async (s, e) =>
-        {
-            if (e.NewItems != null)
-            {
-                foreach (var newItem in e.NewItems)
-                {
-                    if (newItem is ProjectTaskViewModel taskViewModel)
-                    {
-                        WireProjectTaskViewModelEvents(projectViewModel, taskViewModel);
-                    }
-                }
-            }
-
-            if (_isSyncing) return;
-            _logger.LogTrace("Tasks collection changed. Triggering save.");
-
-            // 削除されたアイテムのイベント購読解除は、ViewModelが破棄されるか、
-            // より厳密な管理が必要な場合に検討する。現状はLWWに基づき保存を優先。
-
-            await AutoSaveProjectAsync(projectViewModel);
-        };
-
-        // マイルストーンリストの変更
-        projectViewModel.Milestones.CollectionChanged += async (s, e) =>
-        {
-            if (_isSyncing) return;
-            _logger.LogTrace("Milestones collection changed. Triggering save.");
-            await AutoSaveProjectAsync(projectViewModel);
-        };
-
-        // 初期タスクのイベント購読
-        foreach (var taskViewModel in projectViewModel.Tasks)
-        {
-            WireProjectTaskViewModelEvents(projectViewModel, taskViewModel);
-        }
-    }
-
-    private void WireProjectTaskViewModelEvents(ProjectViewModel projectViewModel, ProjectTaskViewModel taskViewModel)
-    {
-        taskViewModel.PropertyChanged += async (s, e) =>
-        {
-            if (_isSyncing) return;
-            _logger.LogTrace("Task property changed: {PropertyName}. Triggering save.", e.PropertyName);
-            await AutoSaveProjectAsync(projectViewModel);
-        };
-
-        // コメントリストの変更を監視
-        taskViewModel.Model.Comments.CollectionChanged += async (s, e) =>
-        {
-            if (_isSyncing) return;
-            _logger.LogTrace("Comments collection changed for task {TaskId}. Triggering save.", taskViewModel.Id);
-            await AutoSaveProjectAsync(projectViewModel);
         };
     }
 
@@ -201,18 +136,20 @@ public partial class MainViewModel : ObservableObject
                     try
                     {
                         _logger.LogDebug("Updating existing project {ProjectId} ViewModel.", projectId);
-                        existingViewModel.Name = updatedProjectEntity.Name; // ViewModel経由で更新
-                        existingViewModel.Description = updatedProjectEntity.Description;
-                        existingViewModel.Status = updatedProjectEntity.Status;
-                        existingViewModel.HealthStatus = updatedProjectEntity.HealthStatus;
-                        existingViewModel.UpdatedAt = updatedProjectEntity.UpdatedAt;
+                        existingViewModel.Model.UpdateName(updatedProjectEntity.Name);
+                        existingViewModel.Model.UpdateDescription(updatedProjectEntity.Description);
+                        existingViewModel.Model.UpdateStatus(updatedProjectEntity.Status);
+                        existingViewModel.Model.UpdateHealth(updatedProjectEntity.HealthStatus);
+                        existingViewModel.Model.UpdatedAt = updatedProjectEntity.UpdatedAt;
 
-                        // Tasksコレクションの同期
-                        existingViewModel.Model.Tasks.Clear();
+                        // Tasksの同期
+                        existingViewModel.Model.ClearTasks();
                         foreach (var t in updatedProjectEntity.Tasks)
                         {
-                            existingViewModel.Model.Tasks.Add(t);
+                            existingViewModel.Model.AddTask(t);
                         }
+
+                        existingViewModel.SyncFromModel(); // まとめて通知
                     }
                     finally
                     {
@@ -223,7 +160,8 @@ public partial class MainViewModel : ObservableObject
                 {
                     _logger.LogDebug("Adding new project {ProjectId} ViewModel from sync.", projectId);
                     var newProjectViewModel = new ProjectViewModel(updatedProjectEntity);
-                    Projects.Add(newProjectViewModel); // Projects.CollectionChanged によって WireProjectViewModelEvents が呼ばれる
+                    WireProjectViewModelEvents(newProjectViewModel); // イベント購読を追加
+                    Projects.Add(newProjectViewModel);
                 }
             }
             catch (Exception ex)

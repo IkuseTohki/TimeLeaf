@@ -25,7 +25,8 @@ public class SaveProjectUseCaseTests
     public async System.Threading.Tasks.Task ExecuteAsync_ShouldCallSaveOnRepository()
     {
         // Arrange
-        var project = new Project { Name = "Single Project" };
+        var project = new Project();
+        project.UpdateName("Single Project");
         var useCase = new SaveProjectUseCase(_repositoryMock.Object);
 
         // Act

@@ -15,11 +15,10 @@ public class ProjectSnapshotTests
     public void ProjectBasicSnapshot_ShouldSerializeCorrectly()
     {
         // Arrange
-        var project = new Project
-        {
-            Id = Guid.Parse("11111111-1111-1111-1111-111111111111"),
-            Name = "Snapshot Test Project"
-        };
+        var project = new Project();
+        // IDはコンストラクタで生成されるが、テスト用にリフレクション等で上書きするか、
+        // あるいは現在のIDを使用して検証する
+        project.UpdateName("Snapshot Test Project");
 
         // Act
         var snapshot = new { project.Id, project.Name };
@@ -27,6 +26,6 @@ public class ProjectSnapshotTests
 
         // Assert
         StringAssert.Contains(json, "\"Name\":\"Snapshot Test Project\"", "JSONにプロジェクト名が含まれていること");
-        StringAssert.Contains(json, "\"Id\":\"11111111-1111-1111-1111-111111111111\"", "JSONにIDが含まれていること");
+        StringAssert.Contains(json, project.Id.ToString(), "JSONにIDが含まれていること");
     }
 }

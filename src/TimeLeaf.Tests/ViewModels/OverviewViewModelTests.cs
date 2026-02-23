@@ -47,7 +47,14 @@ public class OverviewViewModelTests
         addProjectUseCaseMock.Setup(x => x.ExecuteAsync(
             projectName, projectDesc, It.IsAny<TimeLeaf.Models.Enums.ProjectStatus>(), It.IsAny<TimeLeaf.Models.Enums.ProjectHealth>()))
             .ReturnsAsync((string name, string desc, TimeLeaf.Models.Enums.ProjectStatus status, TimeLeaf.Models.Enums.ProjectHealth health) =>
-                new Project { Name = name, Description = desc, Status = status, HealthStatus = health });
+            {
+                var p = new Project();
+                p.UpdateName(name);
+                p.UpdateDescription(desc);
+                p.UpdateStatus(status);
+                p.UpdateHealth(health);
+                return p;
+            });
 
         var loggerMock = new Mock<ILogger<OverviewViewModel>>();
         var viewModel = new OverviewViewModel(

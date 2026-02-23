@@ -34,9 +34,12 @@ public partial class ProjectViewModel : ObservableObject
         get => _project.Name;
         set
         {
-            if (SetProperty(_project.Name, value, _project, (model, val) => model.Name = val))
+            if (_project.Name != value)
             {
-                RefreshUpdatedAt();
+                _project.UpdateName(value);
+                OnPropertyChanged(nameof(Name));
+                OnPropertyChanged(nameof(UpdatedAt));
+                OnPropertyChanged(nameof(DisplayLastUpdated));
             }
         }
     }
@@ -46,9 +49,12 @@ public partial class ProjectViewModel : ObservableObject
         get => _project.Description;
         set
         {
-            if (SetProperty(_project.Description, value, _project, (model, val) => model.Description = val))
+            if (_project.Description != value)
             {
-                RefreshUpdatedAt();
+                _project.UpdateDescription(value);
+                OnPropertyChanged(nameof(Description));
+                OnPropertyChanged(nameof(UpdatedAt));
+                OnPropertyChanged(nameof(DisplayLastUpdated));
             }
         }
     }
@@ -58,9 +64,12 @@ public partial class ProjectViewModel : ObservableObject
         get => _project.Status;
         set
         {
-            if (SetProperty(_project.Status, value, _project, (model, val) => model.Status = val))
+            if (_project.Status != value)
             {
-                RefreshUpdatedAt();
+                _project.UpdateStatus(value);
+                OnPropertyChanged(nameof(Status));
+                OnPropertyChanged(nameof(UpdatedAt));
+                OnPropertyChanged(nameof(DisplayLastUpdated));
             }
         }
     }
@@ -70,9 +79,12 @@ public partial class ProjectViewModel : ObservableObject
         get => _project.HealthStatus;
         set
         {
-            if (SetProperty(_project.HealthStatus, value, _project, (model, val) => model.HealthStatus = val))
+            if (_project.HealthStatus != value)
             {
-                RefreshUpdatedAt();
+                _project.UpdateHealth(value);
+                OnPropertyChanged(nameof(HealthStatus));
+                OnPropertyChanged(nameof(UpdatedAt));
+                OnPropertyChanged(nameof(DisplayLastUpdated));
             }
         }
     }
@@ -114,13 +126,13 @@ public partial class ProjectViewModel : ObservableObject
     }
 
     /// <summary>
-    /// プロジェクトのマイルストーン。
+    /// プロジェクトのマイルストーン（UI用）。
+    /// TODO: マイルストーンの追加・削除もドメインメソッド経由に変更し、このコレクションを同期させる。
     /// </summary>
-    public ObservableCollection<Milestone> Milestones => _project.Milestones;
+    public ObservableCollection<Milestone> Milestones { get; } = new();
 
     /// <summary>
-    /// プロジェクトに紐づくタスクのリスト。
-    /// このリストの変更は、合計工数プロパティの変更を通知する。
+    /// プロジェクトに紐づくタスクのリスト（UI用）。
     /// </summary>
     public ObservableCollection<ProjectTaskViewModel> Tasks { get; } = new();
 
@@ -153,88 +165,80 @@ public partial class ProjectViewModel : ObservableObject
     {
         _project = project ?? throw new ArgumentNullException(nameof(project));
 
-        // ProjectTaskをProjectTaskViewModelでラップしてTasksコレクションに追加
-        foreach (var task in _project.Tasks)
-        {
-            var taskVm = new ProjectTaskViewModel(task);
-            Tasks.Add(taskVm);
-            taskVm.PropertyChanged += OnProjectTaskViewModelPropertyChanged; // イベント購読を追加
-        }
-
-        // ProjectエンティティのTasksコレクションの変更を購読し、UIのTasksコレクションを同期する
-        _project.Tasks.CollectionChanged += OnProjectTasksCollectionChanged;
-
-        // Tasksコレクションの変更を購読し、合計工数の変更を通知する
-        Tasks.CollectionChanged += OnTasksCollectionChanged;
+        // 初期データのロード
+        SyncFromModel();
     }
 
-    private void OnProjectTasksCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    /// <summary>
+    /// モデルの状態をUIコレクションに同期します。
+    /// </summary>
+    public void SyncFromModel()
     {
-        if (e.Action == NotifyCollectionChangedAction.Reset)
+        IsSyncing = true;
+        try
         {
-            // Resetアクション（Clear()など）が発生した場合、VM側のコレクションもクリアする
-            foreach (var ptvm in Tasks)
-            {
-                ptvm.PropertyChanged -= OnProjectTaskViewModelPropertyChanged;
-            }
+            // タスクの同期
+            foreach (var t in Tasks) t.PropertyChanged -= OnProjectTaskViewModelPropertyChanged;
             Tasks.Clear();
-            return;
-        }
+            foreach (var task in _project.Tasks)
+            {
+                var taskVm = new ProjectTaskViewModel(task);
+                Tasks.Add(taskVm);
+                taskVm.PropertyChanged += OnProjectTaskViewModelPropertyChanged;
+            }
 
-        if (e.NewItems != null)
-        {
-            foreach (var item in e.NewItems)
+            // マイルストーンの同期
+            Milestones.Clear();
+            foreach (var m in _project.Milestones)
             {
-                if (item is ProjectTask newItem)
-                {
-                    var newPtvm = new ProjectTaskViewModel(newItem);
-                    Tasks.Add(newPtvm);
-                    newPtvm.PropertyChanged += OnProjectTaskViewModelPropertyChanged; // プロパティ変更を購読
-                }
+                Milestones.Add(m);
             }
+
+            NotifyAllProperties();
         }
-        if (e.OldItems != null)
+        finally
         {
-            foreach (var item in e.OldItems)
-            {
-                if (item is ProjectTask oldItem)
-                {
-                    var existing = Tasks.FirstOrDefault(ptvm => ptvm.Id == oldItem.Id);
-                    if (existing != null)
-                    {
-                        existing.PropertyChanged -= OnProjectTaskViewModelPropertyChanged; // 購読解除
-                        Tasks.Remove(existing);
-                    }
-                }
-            }
+            IsSyncing = false;
         }
+    }
+
+    private void NotifyAllProperties()
+    {
+        OnPropertyChanged(nameof(Name));
+        OnPropertyChanged(nameof(Description));
+        OnPropertyChanged(nameof(Status));
+        OnPropertyChanged(nameof(HealthStatus));
+        OnPropertyChanged(nameof(UpdatedAt));
+        OnPropertyChanged(nameof(DisplayLastUpdated));
+        OnPropertyChanged(nameof(TotalEstimatedCost));
+        OnPropertyChanged(nameof(TotalActualCost));
+        OnPropertyChanged(nameof(DisplayTotalEstimatedCost));
+        OnPropertyChanged(nameof(DisplayTotalActualCost));
     }
 
     private void OnProjectTaskViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        // 個々のタスクのコストプロパティが変更された場合に、合計工数の変更を通知する
+        // 個々のタスクのプロパティ（コスト、担当者、ステータス等）が変更された場合に、
+        // プロジェクト全体の最終更新日時を更新し、通知を行う。
+        // これにより MainViewModel の自動保存がトリガーされる。
+        _project.RefreshUpdatedAt();
+        OnPropertyChanged(nameof(UpdatedAt));
+        OnPropertyChanged(nameof(DisplayLastUpdated));
+
         if (e.PropertyName == nameof(ProjectTaskViewModel.EstimatedCost) ||
             e.PropertyName == nameof(ProjectTaskViewModel.ActualCost))
         {
-            OnPropertyChanged(nameof(TotalEstimatedCost));
-            OnPropertyChanged(nameof(TotalActualCost));
-            OnPropertyChanged(nameof(DisplayTotalEstimatedCost)); // 追加
-            OnPropertyChanged(nameof(DisplayTotalActualCost));   // 追加
-            RefreshUpdatedAt();
+            NotifyTotalCosts();
         }
     }
 
-    private void OnTasksCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    private void NotifyTotalCosts()
     {
-        // タスクの追加・削除があった場合、合計工数プロパティの変更をUIに通知する
         OnPropertyChanged(nameof(TotalEstimatedCost));
         OnPropertyChanged(nameof(TotalActualCost));
-        OnPropertyChanged(nameof(DisplayTotalEstimatedCost)); // 追加
-        OnPropertyChanged(nameof(DisplayTotalActualCost));   // 追加
-        RefreshUpdatedAt();
+        OnPropertyChanged(nameof(DisplayTotalEstimatedCost));
+        OnPropertyChanged(nameof(DisplayTotalActualCost));
+        OnPropertyChanged(nameof(UpdatedAt));
+        OnPropertyChanged(nameof(DisplayLastUpdated));
     }
-
-    // TODO: Tasks内の個々のタスクプロパティ変更（例: EstimatedCostの変更）も購読し、
-    //       合計工数プロパティの変更を通知する必要があるが、これは次フェーズで実装する。
-    //       現在のところ、タスクの追加・削除のみで合計を再計算・通知する。
 }

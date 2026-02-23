@@ -33,7 +33,12 @@ public class MainViewModelTests
         _repositoryMock.Setup(r => r.LoadAllAsync())
                        .ReturnsAsync(new List<Project>());
         _repositoryMock.Setup(r => r.LoadAsync(It.IsAny<Guid>()))
-                       .ReturnsAsync((Guid id) => new Project { Id = id, Name = "Loaded Project" });
+                       .ReturnsAsync((Guid id) =>
+                       {
+                           var p = new Project { Id = id };
+                           p.UpdateName("Loaded Project");
+                           return p;
+                       });
 
         _loadUseCase = new LoadProjectsUseCase(_repositoryMock.Object);
         _saveSingleUseCase = new SaveProjectUseCase(_repositoryMock.Object);
@@ -59,7 +64,14 @@ public class MainViewModelTests
         _addProjectUseCaseMock.Setup(x => x.ExecuteAsync(
             It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TimeLeaf.Models.Enums.ProjectStatus>(), It.IsAny<TimeLeaf.Models.Enums.ProjectHealth>()))
             .ReturnsAsync((string name, string desc, TimeLeaf.Models.Enums.ProjectStatus status, TimeLeaf.Models.Enums.ProjectHealth health) =>
-            new Project { Name = name, Description = desc, Status = status, HealthStatus = health });
+            {
+                var p = new Project();
+                p.UpdateName(name);
+                p.UpdateDescription(desc);
+                p.UpdateStatus(status);
+                p.UpdateHealth(health);
+                return p;
+            });
     }
 
     /// <summary>
@@ -117,12 +129,14 @@ public class MainViewModelTests
     public async System.Threading.Tasks.Task ProjectChangedEvent_ShouldTriggerReload()
     {
         // Arrange
-        var project = new Project { Id = Guid.NewGuid(), Name = "Old Name" };
+        var project = new Project { Id = Guid.NewGuid() };
+        project.UpdateName("Old Name");
         _repositoryMock.Setup(r => r.LoadAllAsync()).ReturnsAsync(new List<Project> { project });
         var viewModel = new MainViewModel(_loadUseCase, _saveSingleUseCase, _repositoryMock.Object, _addProjectUseCaseMock.Object, _loggerMock.Object, _serviceProviderMock.Object); // serviceProvider を渡す
 
         // ロードされる新しい状態を準備
-        var updatedProject = new Project { Id = project.Id, Name = "Updated Name" };
+        var updatedProject = new Project { Id = project.Id };
+        updatedProject.UpdateName("Updated Name");
         _repositoryMock.Setup(r => r.LoadAsync(project.Id)).ReturnsAsync(updatedProject);
 
         // Act
@@ -143,7 +157,9 @@ public class MainViewModelTests
     {
         // Arrange
         var viewModel = new MainViewModel(_loadUseCase, _saveSingleUseCase, _repositoryMock.Object, _addProjectUseCaseMock.Object, _loggerMock.Object, _serviceProviderMock.Object); // serviceProvider を渡す
-        var projectViewModel = new ProjectViewModel(new Project { Name = "Test Project" });
+        var project = new Project();
+        project.UpdateName("Test Project");
+        var projectViewModel = new ProjectViewModel(project);
 
         // Act
         viewModel.NavigateToProjectCommand.Execute(projectViewModel);
@@ -160,7 +176,9 @@ public class MainViewModelTests
     {
         // Arrange
         var viewModel = new MainViewModel(_loadUseCase, _saveSingleUseCase, _repositoryMock.Object, _addProjectUseCaseMock.Object, _loggerMock.Object, _serviceProviderMock.Object); // serviceProvider を渡す
-        viewModel.NavigateToProjectCommand.Execute(new ProjectViewModel(new Project { Name = "Some Project" }));
+        var p = new Project();
+        p.UpdateName("Some Project");
+        viewModel.NavigateToProjectCommand.Execute(new ProjectViewModel(p));
 
         // Act
         viewModel.NavigateBackCommand.Execute(null);

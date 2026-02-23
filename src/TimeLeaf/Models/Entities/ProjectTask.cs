@@ -9,6 +9,8 @@ namespace TimeLeaf.Models.Entities;
 /// </summary>
 public class ProjectTask
 {
+    private readonly List<Comment> _comments = new();
+
     /// <summary>
     /// タスクを一意に識別するID。
     /// </summary>
@@ -75,7 +77,54 @@ public class ProjectTask
     public List<Guid> Dependencies { get; set; } = new();
 
     /// <summary>
-    /// タスクに関するコメントのリスト。
+    /// タスクに関するコメントのリスト（読み取り専用）。
     /// </summary>
-    public System.Collections.ObjectModel.ObservableCollection<Comment> Comments { get; set; } = new();
+    public IReadOnlyList<Comment> Comments => _comments;
+
+    /// <summary>
+    /// デフォルトコンストラクタ。
+    /// </summary>
+    public ProjectTask() { }
+
+    /// <summary>
+    /// JSON デシリアライズ用コンストラクタ。
+    /// </summary>
+    [System.Text.Json.Serialization.JsonConstructor]
+    public ProjectTask(Guid Id, string Name, string Description, TaskStatus Status, TaskPriority Priority,
+        DateTime? ScheduledStartDate, DateTime? Deadline, DateTime? ActualStartDate, DateTime? ActualEndDate,
+        double EstimatedCost, double ActualCost, string Assignee, List<Guid>? Dependencies, List<Comment>? Comments)
+    {
+        this.Id = Id;
+        this.Name = Name;
+        this.Description = Description;
+        this.Status = Status;
+        this.Priority = Priority;
+        this.ScheduledStartDate = ScheduledStartDate;
+        this.Deadline = Deadline;
+        this.ActualStartDate = ActualStartDate;
+        this.ActualEndDate = ActualEndDate;
+        this.EstimatedCost = EstimatedCost;
+        this.ActualCost = ActualCost;
+        this.Assignee = Assignee;
+        this.Dependencies = Dependencies ?? new();
+        if (Comments != null) _comments.AddRange(Comments);
+    }
+
+    /// <summary>
+    /// コメントを追加します。
+    /// </summary>
+    public void AddComment(Comment comment)
+    {
+        if (comment == null) throw new ArgumentNullException(nameof(comment));
+        _comments.Add(comment);
+    }
+
+    /// <summary>
+    /// 既存のコメントを一括で追加します（再ロード時等に使用）。
+    /// </summary>
+    public void LoadComments(IEnumerable<Comment> comments)
+    {
+        _comments.Clear();
+        _comments.AddRange(comments);
+    }
 }

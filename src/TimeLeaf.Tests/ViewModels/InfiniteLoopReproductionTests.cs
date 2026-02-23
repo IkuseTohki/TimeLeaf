@@ -54,7 +54,8 @@ public class InfiniteLoopReproductionTests
     {
         // 1. Arrange
         var projectId = Guid.NewGuid();
-        var projectEntity = new Project { Id = projectId, Name = "Test Project", UpdatedAt = DateTime.Now };
+        var projectEntity = new Project { Id = projectId, UpdatedAt = DateTime.Now };
+        projectEntity.UpdateName("Test Project");
         _repositoryMock.Setup(r => r.LoadAllAsync()).ReturnsAsync(new List<Project> { projectEntity });
         _repositoryMock.Setup(r => r.LoadAsync(projectId)).ReturnsAsync(projectEntity);
 
@@ -80,8 +81,9 @@ public class InfiniteLoopReproductionTests
 
         // 3. Simulate Synced Reload (ProjectChanged event)
         // 実際のリポジトリではこのタイミングで replayed されたエンティティが返る
-        var replayedProject = new Project { Id = projectId, Name = "Test Project", UpdatedAt = projectEntity.UpdatedAt };
-        foreach (var t in projectEntity.Tasks) replayedProject.Tasks.Add(t);
+        var replayedProject = new Project { Id = projectId, UpdatedAt = projectEntity.UpdatedAt };
+        replayedProject.UpdateName("Test Project");
+        foreach (var t in projectEntity.Tasks) replayedProject.AddTask(t);
         _repositoryMock.Setup(r => r.LoadAsync(projectId)).ReturnsAsync(replayedProject);
 
         // 保存回数をリセットして、再ロードによって保存が走らないか監視
@@ -105,7 +107,8 @@ public class InfiniteLoopReproductionTests
     {
         // 1. Arrange
         var projectId = Guid.NewGuid();
-        var projectEntity = new Project { Id = projectId, Name = "Loop Test" };
+        var projectEntity = new Project { Id = projectId };
+        projectEntity.UpdateName("Loop Test");
         _repositoryMock.Setup(r => r.LoadAllAsync()).ReturnsAsync(new List<Project> { projectEntity });
         _repositoryMock.Setup(r => r.LoadAsync(projectId)).ReturnsAsync(projectEntity);
 

@@ -36,11 +36,11 @@ public class JsonProjectRepositoryTests
     {
         // Arrange
         var repository = new JsonProjectRepository(_tempFilePath);
-        var originalProjects = new List<Project>
-        {
-            new Project { Name = "Project 1" },
-            new Project { Name = "Project 2" }
-        };
+        var p1 = new Project();
+        p1.UpdateName("Project 1");
+        var p2 = new Project();
+        p2.UpdateName("Project 2");
+        var originalProjects = new List<Project> { p1, p2 };
 
         // Act
         await repository.SaveAllAsync(originalProjects);
@@ -60,9 +60,10 @@ public class JsonProjectRepositoryTests
     {
         // Arrange
         var repository = new JsonProjectRepository(_tempFilePath);
-        var project = new Project { Name = "Project with Tasks" };
-        project.Tasks.Add(new ProjectTask { Name = "Task 1" });
-        project.Tasks.Add(new ProjectTask { Name = "Task 2" });
+        var project = new Project();
+        project.UpdateName("Project with Tasks");
+        project.AddTask(new ProjectTask { Name = "Task 1" });
+        project.AddTask(new ProjectTask { Name = "Task 2" });
 
         var originalProjects = new List<Project> { project };
 

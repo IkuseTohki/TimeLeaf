@@ -19,13 +19,11 @@ public class AddProjectUseCase : IAddProjectUseCase
 
     public async Task<Project> ExecuteAsync(string name, string description, ProjectStatus status, ProjectHealth health)
     {
-        var project = new Project
-        {
-            Name = name,
-            Description = description,
-            Status = status,
-            HealthStatus = health
-        };
+        var project = new Project();
+        project.UpdateName(name);
+        project.UpdateDescription(description);
+        project.UpdateStatus(status);
+        project.UpdateHealth(health);
 
         await _repository.SaveAsync(project);
         return project;

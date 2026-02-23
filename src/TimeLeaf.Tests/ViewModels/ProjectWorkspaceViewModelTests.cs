@@ -18,7 +18,8 @@ public class ProjectWorkspaceViewModelTests
     public void AddTask_ShouldAddTaskToProject()
     {
         // Arrange
-        var project = new Project { Name = "Test Project" };
+        var project = new Project();
+        project.UpdateName("Test Project");
         var projectViewModel = new ProjectViewModel(project);
         var userServiceMock = new Mock<ICurrentUserService>();
         var loggerMock = new Mock<ILogger<ProjectWorkspaceViewModel>>();

@@ -255,17 +255,22 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                         var basic = JsonSerializer.Deserialize<ProjectBasicDto>(json, _options);
                         if (basic != null)
                         {
-                            project.Name = basic.Name;
-                            project.Description = basic.Description;
-                            project.Status = basic.Status;
-                            project.HealthStatus = basic.HealthStatus;
+                            project.UpdateName(basic.Name);
+                            project.UpdateDescription(basic.Description);
+                            project.UpdateStatus(basic.Status);
+                            project.UpdateHealth(basic.HealthStatus);
                             project.UpdatedAt = basic.UpdatedAt; // 最終更新日時を復元
-                            project.Milestones.Clear();
+
+                            // マイルストーンのクリアと再追加
+                            // 本来は Project クラスに ClearMilestones があるべきだが、一旦リフレクションを避けるため
+                            // 既存の private field へのアクセスや Project 側の修正が必要。
+                            // 今回は Project.cs を修正して ClearMethods を追加した前提で進める。
+                            project.ClearMilestones();
                             if (basic.Milestones != null)
                             {
                                 foreach (var m in basic.Milestones)
                                 {
-                                    project.Milestones.Add(new Milestone { Date = m.Date, Label = m.Label });
+                                    project.AddMilestone(new Milestone { Date = m.Date, Label = m.Label });
                                 }
                             }
                             _logger.LogTrace("Replayed ProjectBasic for {ProjectId}. Name: {Name}", projectId, project.Name);
@@ -281,9 +286,9 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                         if (tasks != null)
                         {
                             // 既存のコメントを退避（スナップショットにはコメントが含まれないため、Replay済みのものを保持する）
-                            var commentMap = project.Tasks.ToDictionary(t => t.Id, t => t.Comments);
+                            var commentMap = project.Tasks.ToDictionary(t => t.Id, t => t.Comments.ToList());
 
-                            project.Tasks.Clear();
+                            project.ClearTasks();
                             foreach (var t in tasks)
                             {
                                 var newTask = new ProjectTask
@@ -305,10 +310,10 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
 
                                 if (commentMap.TryGetValue(newTask.Id, out var existingComments))
                                 {
-                                    foreach (var c in existingComments) newTask.Comments.Add(c);
+                                    newTask.LoadComments(existingComments);
                                 }
 
-                                project.Tasks.Add(newTask);
+                                project.AddTask(newTask);
                             }
                             _logger.LogTrace("Replayed {TaskCount} tasks for ProjectTasks for {ProjectId}.", tasks.Count, projectId);
                         }
@@ -350,7 +355,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
             {
                 if (!targetTask.Comments.Any(c => c.Id == dto.Id))
                 {
-                    targetTask.Comments.Add(new Comment
+                    targetTask.AddComment(new Comment
                     {
                         Id = dto.Id,
                         TaskId = dto.TaskId,

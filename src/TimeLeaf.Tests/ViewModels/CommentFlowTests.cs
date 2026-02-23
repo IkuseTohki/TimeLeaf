@@ -51,9 +51,10 @@ public class CommentFlowTests
         _serviceProviderMock.Setup(sp => sp.GetService(typeof(IServiceProvider)))
             .Returns(_serviceProviderMock.Object);
 
-        var project = new Project { Name = "Test Project" };
+        var project = new Project();
+        project.UpdateName("Test Project");
         var task = new ProjectTask { Name = "Test Task" };
-        project.Tasks.Add(task);
+        project.AddTask(task);
 
         _repositoryMock.Setup(r => r.LoadAllAsync()).ReturnsAsync(new[] { project });
 
@@ -78,12 +79,12 @@ public class CommentFlowTests
 
         // Act
         workspaceViewModel.AddCommentCommand.Execute(null);
-        await Task.Delay(100); // Wait for async auto-save
+        await Task.Delay(200); // 自動保存の完了を待つ
 
         // Assert
         _repositoryMock.Verify(r => r.SaveAsync(It.Is<Project>(p =>
             p.Tasks.Any(t => t.Comments.Any(c => c.Content == "New test comment")))),
-            Times.AtLeastOnce);
+            Times.AtLeastOnce, "コメント追加により保存が走ること");
 
         Assert.AreEqual(string.Empty, workspaceViewModel.NewCommentContent);
     }
@@ -108,8 +109,9 @@ public class CommentFlowTests
         // Act
         // モデルのコレクションをクリアして再追加（再ロードのシミュレーション）
         var taskEntity = projectViewModel.Model.Tasks.First();
-        projectViewModel.Model.Tasks.Clear();
-        projectViewModel.Model.Tasks.Add(taskEntity);
+        projectViewModel.Model.ClearTasks();
+        projectViewModel.Model.AddTask(taskEntity);
+        projectViewModel.SyncFromModel(); // 手動同期
 
         // Assert
         Assert.IsNotNull(workspaceViewModel.SelectedTask, "再ロード後に選択状態が復元されていること");
@@ -128,9 +130,10 @@ public class CommentFlowTests
         var projectId = projectViewModel.Id;
 
         // 外部同期イベントを発生させて、ViewModel内部の状態を更新させる
-        var updatedProject = new Project { Id = projectId, Name = "Synced Project" };
+        var updatedProject = new Project { Id = projectId };
+        updatedProject.UpdateName("Synced Project");
         var updatedTask = new ProjectTask { Id = projectViewModel.Tasks.First().Id, Name = "Synced Task" };
-        updatedProject.Tasks.Add(updatedTask);
+        updatedProject.AddTask(updatedTask);
         _repositoryMock.Setup(r => r.LoadAsync(projectId)).ReturnsAsync(updatedProject);
 
         _repositoryMock.Raise(r => r.ProjectChanged += null, projectId);

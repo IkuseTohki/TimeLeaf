@@ -46,9 +46,10 @@ public class CommentStorageTests
     {
         // Arrange
         var repository = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object);
-        var project = new Project { Name = "CommentTestProject" };
+        var project = new Project();
+        project.UpdateName("CommentTestProject");
         var task = new ProjectTask { Name = "Task with Comment" };
-        project.Tasks.Add(task);
+        project.AddTask(task);
 
         var comment = new Comment
         {
@@ -57,7 +58,7 @@ public class CommentStorageTests
             Content = "First Comment",
             CreatedAt = new DateTime(2026, 2, 23, 10, 0, 0)
         };
-        task.Comments.Add(comment);
+        task.AddComment(comment);
 
         // Act
         await repository.SaveAsync(project);
@@ -86,14 +87,15 @@ public class CommentStorageTests
     {
         // Arrange
         var repository = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object);
-        var project = new Project { Name = "MultiCommentProject" };
+        var project = new Project();
+        project.UpdateName("MultiCommentProject");
         var task = new ProjectTask { Name = "Task" };
-        project.Tasks.Add(task);
+        project.AddTask(task);
 
         var c1 = new Comment { TaskId = task.Id, Content = "C1", CreatedAt = DateTime.Now.AddMinutes(-5) };
         var c2 = new Comment { TaskId = task.Id, Content = "C2", CreatedAt = DateTime.Now };
-        task.Comments.Add(c1);
-        task.Comments.Add(c2);
+        task.AddComment(c1);
+        task.AddComment(c2);
 
         // Act
         await repository.SaveAsync(project);

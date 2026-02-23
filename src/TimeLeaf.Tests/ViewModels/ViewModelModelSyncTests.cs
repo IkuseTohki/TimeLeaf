@@ -17,7 +17,9 @@ public class ViewModelModelSyncTests
     public void ProjectViewModel_UpdateProperty_ShouldUpdateModel()
     {
         // Arrange
-        var project = new Project { Name = "Old Name", Description = "Old Desc" };
+        var project = new Project();
+        project.UpdateName("Old Name");
+        project.UpdateDescription("Old Desc");
         var viewModel = new ProjectViewModel(project);
 
         // Act
@@ -50,19 +52,21 @@ public class ViewModelModelSyncTests
     }
 
     /// <summary>
-    /// テスト観点: Project エンティティの Tasks コレクションにタスクを追加した際、
+    /// テスト観点: Project エンティティにタスクを追加し同期した際、
     /// ProjectViewModel の Tasks コレクションにも ViewModel が追加されることを確認する。
     /// </summary>
     [TestMethod]
     public void ProjectModel_AddTask_ShouldReflectInViewModel()
     {
         // Arrange
-        var project = new Project { Name = "Test Project" };
+        var project = new Project();
+        project.UpdateName("Test Project");
         var viewModel = new ProjectViewModel(project);
         var newTask = new ProjectTask { Name = "New Task" };
 
         // Act
-        project.Tasks.Add(newTask);
+        project.AddTask(newTask);
+        viewModel.SyncFromModel(); // 同期メソッドを呼ぶ
 
         // Assert
         Assert.AreEqual(1, viewModel.Tasks.Count);
@@ -70,20 +74,22 @@ public class ViewModelModelSyncTests
     }
 
     /// <summary>
-    /// テスト観点: Project エンティティの Tasks コレクションからタスクを削除した際、
+    /// テスト観点: Project エンティティからタスクを削除し同期した際、
     /// ProjectViewModel の Tasks コレクションからも ViewModel が削除されることを確認する。
     /// </summary>
     [TestMethod]
     public void ProjectModel_RemoveTask_ShouldReflectInViewModel()
     {
         // Arrange
-        var project = new Project { Name = "Test Project" };
+        var project = new Project();
+        project.UpdateName("Test Project");
         var task = new ProjectTask { Name = "Task 1" };
-        project.Tasks.Add(task);
+        project.AddTask(task);
         var viewModel = new ProjectViewModel(project);
 
         // Act
-        project.Tasks.Remove(task);
+        project.RemoveTask(task.Id);
+        viewModel.SyncFromModel(); // 同期メソッドを呼ぶ
 
         // Assert
         Assert.AreEqual(0, viewModel.Tasks.Count);

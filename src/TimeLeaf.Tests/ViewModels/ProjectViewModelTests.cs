@@ -28,7 +28,8 @@ public class ProjectViewModelTests
     public void Name_ShouldUpdateModelAndRaisePropertyChanged()
     {
         // Arrange
-        var project = new Project { Name = "Old Name" };
+        var project = new Project();
+        project.UpdateName("Old Name");
         var viewModel = new ProjectViewModel(project);
         var newName = "New Name";
 
@@ -57,7 +58,8 @@ public class ProjectViewModelTests
     public void Description_ShouldUpdateModelAndRaisePropertyChanged()
     {
         // Arrange
-        var project = new Project { Description = "Old Description" };
+        var project = new Project();
+        project.UpdateDescription("Old Description");
         var viewModel = new ProjectViewModel(project);
         var newDescription = "New Description";
 
@@ -105,7 +107,8 @@ public class ProjectViewModelTests
         };
 
         // Act
-        viewModel.Tasks.Add(newTaskViewModel);
+        project.AddTask(newTaskViewModel.Model);
+        viewModel.SyncFromModel(); // 手動同期が必要になった
 
         // Assert
         Assert.AreEqual(1, receivedEstimatedCostEvents, "タスク追加時にTotalEstimatedCostのPropertyChangedイベントが発火すること");
@@ -140,7 +143,8 @@ public class ProjectViewModelTests
         };
 
         // Act
-        viewModel.Tasks.Remove(existingTaskViewModel); // ProjectTaskViewModel を直接削除
+        project.RemoveTask(existingTaskViewModel.Id); // IDで削除
+        viewModel.SyncFromModel(); // 手動同期
 
         // Assert
         Assert.AreEqual(1, receivedEstimatedCostEvents, "タスク削除時にTotalEstimatedCostのPropertyChangedイベントが発火すること");
@@ -173,8 +177,8 @@ public class ProjectViewModelTests
         var project = new Project();
         var task1 = new ProjectTask { EstimatedCost = 10, ActualCost = 5 };
         var task2 = new ProjectTask { EstimatedCost = 20, ActualCost = 10 };
-        project.Tasks.Add(task1);
-        project.Tasks.Add(task2);
+        project.AddTask(task1);
+        project.AddTask(task2);
 
         var viewModel = new ProjectViewModel(project);
         var taskViewModel1 = viewModel.Tasks.First(t => t.Id == task1.Id); // ViewModel から ProjectTaskViewModel を取得
@@ -197,7 +201,8 @@ public class ProjectViewModelTests
         taskViewModel1.EstimatedCost = 15; // ViewModel を介してコストを変更
         taskViewModel1.ActualCost = 8;     // ViewModel を介してコストを変更
 
-        // Assert (Greenフェーズ: 実装が完了したため、イベントが発火することを検証する)
+        // Assert
+        // EstimatedCost で 1回、ActualCost で 1回、合計 2回ずつ発火するはず
         Assert.AreEqual(2, receivedEstimatedCostEvents, "タスクの個別のコスト変更によりTotalEstimatedCostのPropertyChangedイベントが発火すること");
         Assert.AreEqual(2, receivedActualCostEvents, "タスクの個別のコスト変更によりTotalActualCostのPropertyChangedイベントが発火すること");
     }
@@ -209,12 +214,14 @@ public class ProjectViewModelTests
     public void AddTask_ShouldAddOnlyOneViewModel()
     {
         // Arrange
-        var project = new Project { Name = "Test Project" };
+        var project = new Project();
+        project.UpdateName("Test Project");
         var projectViewModel = new ProjectViewModel(project);
 
         // Act
-        // Model への直接追加が ViewModel への同期を引き起こす
-        project.Tasks.Add(new ProjectTask { Name = "New Task" });
+        // Model への直接追加後、ViewModel を同期する
+        project.AddTask(new ProjectTask { Name = "New Task" });
+        projectViewModel.SyncFromModel();
 
         // Assert
         Assert.AreEqual(1, project.Tasks.Count, "Modelのタスク数が1であること");
@@ -229,16 +236,18 @@ public class ProjectViewModelTests
     public void ModelClear_ShouldClearViewModelTasks()
     {
         // Arrange
-        var project = new Project { Name = "Test Project" };
+        var project = new Project();
+        project.UpdateName("Test Project");
         var projectViewModel = new ProjectViewModel(project);
-        project.Tasks.Add(new ProjectTask { Name = "Existing Task" });
+        project.AddTask(new ProjectTask { Name = "Existing Task" });
+        projectViewModel.SyncFromModel();
 
         // この時点で ViewModel.Tasks には1つ入っているはず
         Assert.AreEqual(1, projectViewModel.Tasks.Count, "初期状態でVMのタスクが1つであること");
 
         // Act
-        // Clear() は NotifyCollectionChangedAction.Reset を発生させる
-        project.Tasks.Clear();
+        project.ClearTasks();
+        projectViewModel.SyncFromModel();
 
         // Assert
         Assert.AreEqual(0, project.Tasks.Count, "Modelのタスクがクリアされていること");

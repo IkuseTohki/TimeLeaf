@@ -46,7 +46,8 @@ public class FolderProjectRepositoryTests
     {
         // Arrange
         var repository = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object); // ロガーモックを渡す
-        var project = new Project { Name = "StructureTest" };
+        var project = new Project();
+        project.UpdateName("StructureTest");
         var projects = new List<Project> { project };
 
         // Act
@@ -83,7 +84,8 @@ public class FolderProjectRepositoryTests
         // Arrange
         var repository = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object); // ロガーモックを渡す
         var projectId = Guid.NewGuid();
-        var project = new Project { Id = projectId, Name = "CostTest" };
+        var project = new Project { Id = projectId };
+        project.UpdateName("CostTest");
         var deadline = new DateTime(2026, 12, 31, 23, 59, 0);
         var task = new ProjectTask
         {
@@ -92,7 +94,7 @@ public class FolderProjectRepositoryTests
             EstimatedCost = 10.5,
             ActualCost = 8.25
         };
-        project.Tasks.Add(task);
+        project.AddTask(task);
 
         // Act
         await repository.SaveAsync(project);
@@ -117,7 +119,8 @@ public class FolderProjectRepositoryTests
         // Arrange
         var repository = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object);
         var projectId = Guid.NewGuid();
-        var project = new Project { Id = projectId, Name = "RelationTest" };
+        var project = new Project { Id = projectId };
+        project.UpdateName("RelationTest");
 
         var depTaskId = Guid.NewGuid();
         var mainTask = new ProjectTask
@@ -126,7 +129,7 @@ public class FolderProjectRepositoryTests
             Assignee = "user123"
         };
         mainTask.Dependencies.Add(depTaskId);
-        project.Tasks.Add(mainTask);
+        project.AddTask(mainTask);
 
         // Act
         await repository.SaveAsync(project);
@@ -150,10 +153,11 @@ public class FolderProjectRepositoryTests
         // Arrange
         var repository = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object);
         var projectId = Guid.NewGuid();
-        var project = new Project { Id = projectId, Name = "MilestoneTest" };
+        var project = new Project { Id = projectId };
+        project.UpdateName("MilestoneTest");
         var mDate = new DateTime(2026, 10, 10);
         var mLabel = "Final Release";
-        project.Milestones.Add(new Milestone { Date = mDate, Label = mLabel });
+        project.AddMilestone(new Milestone { Date = mDate, Label = mLabel });
 
         // Act
         await repository.SaveAsync(project);
@@ -175,7 +179,8 @@ public class FolderProjectRepositoryTests
         // Arrange
         var repository = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object);
         var projectId = Guid.NewGuid();
-        var project = new Project { Id = projectId, Name = "ScheduleTest" };
+        var project = new Project { Id = projectId };
+        project.UpdateName("ScheduleTest");
         var sDate = new DateTime(2026, 4, 1);
         var asDate = new DateTime(2026, 4, 2);
         var aeDate = new DateTime(2026, 4, 10);
@@ -187,7 +192,7 @@ public class FolderProjectRepositoryTests
             ActualStartDate = asDate,
             ActualEndDate = aeDate
         };
-        project.Tasks.Add(task);
+        project.AddTask(task);
 
         // Act
         await repository.SaveAsync(project);
@@ -220,12 +225,14 @@ public class FolderProjectRepositoryTests
         var project = new Project
         {
             Id = projectId,
-            Name = "TimeTest",
             CreatedAt = createdAt,
             UpdatedAt = updatedAt
         };
-
         // Act
+        // RefreshUpdatedAt を回避して固定値をセットするために、リフレクション等は使わず
+        // 構築済みのエンティティをそのまま保存する（セッターがない場合はコンストラクタインジェクション等を検討すべきだが
+        // 現状はテストのために RefreshUpdatedAt を呼ばない手段を講じる）
+
         await repository.SaveAsync(project);
         var loadedProject = await repository.LoadAsync(projectId);
 

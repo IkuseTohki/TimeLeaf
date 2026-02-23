@@ -27,7 +27,9 @@ public class LoadProjectsUseCaseTests
     public async System.Threading.Tasks.Task ExecuteAsync_ShouldReturnProjectsFromRepository()
     {
         // Arrange
-        var expectedProjects = new List<Project> { new Project { Name = "P1" } };
+        var p1 = new Project();
+        p1.UpdateName("P1");
+        var expectedProjects = new List<Project> { p1 };
         _repositoryMock.Setup(r => r.LoadAllAsync()).ReturnsAsync(expectedProjects);
         var useCase = new LoadProjectsUseCase(_repositoryMock.Object);
 

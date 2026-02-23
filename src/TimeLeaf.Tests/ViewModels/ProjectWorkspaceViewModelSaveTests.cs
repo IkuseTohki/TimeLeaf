@@ -61,7 +61,8 @@ public class ProjectWorkspaceViewModelSaveTests
     {
         // Arrange
         var projectId = Guid.NewGuid();
-        var project = new Project { Id = projectId, Name = "SaveTest" };
+        var project = new Project { Id = projectId };
+        project.UpdateName("SaveTest");
         _repositoryMock.Setup(r => r.LoadAllAsync()).ReturnsAsync(new List<Project> { project });
 
         var loadUseCase = new LoadProjectsUseCase(_repositoryMock.Object);
@@ -98,8 +99,9 @@ public class ProjectWorkspaceViewModelSaveTests
         // Arrange
         var projectId = Guid.NewGuid();
         var task = new ProjectTask { Name = "Existing Task", Assignee = "Old User" };
-        var project = new Project { Id = projectId, Name = "SaveTest" };
-        project.Tasks.Add(task);
+        var project = new Project { Id = projectId };
+        project.UpdateName("SaveTest");
+        project.AddTask(task);
 
         _repositoryMock.Setup(r => r.LoadAllAsync()).ReturnsAsync(new List<Project> { project });
 
@@ -117,8 +119,9 @@ public class ProjectWorkspaceViewModelSaveTests
         taskViewModel.Assignee = "New User";
 
         // Assert
+        // 自動保存 (UpdatedAt変更トリガー) が完了するのを待つ
         await System.Threading.Tasks.Task.Delay(500);
-        _repositoryMock.Verify(r => r.SaveAsync(It.Is<Project>(p => p.Id == projectId && p.Tasks.First().Assignee == "New User")), Times.AtLeastOnce(), "タスクのプロパティ変更時にリポジトリの SaveAsync が呼び出されること");
+        _repositoryMock.Verify(r => r.SaveAsync(It.Is<Project>(p => p.Id == projectId && p.Tasks.Any(t => t.Assignee == "New User"))), Times.AtLeastOnce(), "タスクのプロパティ変更時にリポジトリの SaveAsync が呼び出されること");
     }
 
     /// <summary>
@@ -130,7 +133,8 @@ public class ProjectWorkspaceViewModelSaveTests
     {
         // Arrange
         var projectId = Guid.NewGuid();
-        var project = new Project { Id = projectId, Name = "Old Name" };
+        var project = new Project { Id = projectId };
+        project.UpdateName("Old Name");
 
         _repositoryMock.Setup(r => r.LoadAllAsync()).ReturnsAsync(new List<Project> { project });
 

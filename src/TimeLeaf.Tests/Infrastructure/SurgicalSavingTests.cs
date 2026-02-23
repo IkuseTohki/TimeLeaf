@@ -42,8 +42,10 @@ public class SurgicalSavingTests
     {
         // Arrange
         var repo = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object); // ロガーモックを渡す
-        var projectA = new Project { Name = "ProjectA" };
-        var projectB = new Project { Name = "ProjectB" };
+        var projectA = new Project();
+        projectA.UpdateName("ProjectA");
+        var projectB = new Project();
+        projectB.UpdateName("ProjectB");
 
         // Act
         // 拡張予定の個別保存メソッド（仮）を呼び出す想定
@@ -66,7 +68,8 @@ public class SurgicalSavingTests
     {
         // Arrange
         var repo = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object); // ロガーモックを渡す
-        var project = new Project { Name = "SameName" };
+        var project = new Project();
+        project.UpdateName("SameName");
 
         // 1回目の保存
         await repo.SaveAllAsync(new[] { project });

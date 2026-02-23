@@ -42,7 +42,8 @@ public class ProjectMetadataTests
     {
         // Arrange
         var repo = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object); // ロガーモックを渡す
-        var project = new Project { Name = "MetaTest" };
+        var project = new Project();
+        project.UpdateName("MetaTest");
 
         // Act
         await repo.SaveAsync(project);
@@ -63,7 +64,7 @@ public class ProjectMetadataTests
 
         // 不変性の検証: 内容を変えて再保存しても .project は変わらないこと
         var firstMetaContent = metaJson;
-        project.Name = "Changed Name";
+        project.UpdateName("Changed Name");
         await System.Threading.Tasks.Task.Delay(10); // 時間をずらす
         await repo.SaveAsync(project);
 
@@ -81,13 +82,15 @@ public class ProjectMetadataTests
         var repo = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object); // ロガーモックを渡す
 
         // 1つ目のプロジェクト作成
-        var p1 = new Project { Name = "First" };
+        var p1 = new Project();
+        p1.UpdateName("First");
         await repo.SaveAsync(p1);
 
         await System.Threading.Tasks.Task.Delay(100); // 作成日をずらす
 
         // 2つ目のプロジェクト作成
-        var p2 = new Project { Name = "Second" };
+        var p2 = new Project();
+        p2.UpdateName("Second");
         await repo.SaveAsync(p2);
 
         // Act
