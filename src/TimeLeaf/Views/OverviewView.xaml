@@ -5,106 +5,187 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:TimeLeaf.ViewModels"
              d:DataContext="{d:DesignInstance vm:OverviewViewModel}"
-             d:DesignHeight="450"
-             d:DesignWidth="800"
+             d:DesignHeight="600"
+             d:DesignWidth="1000"
              mc:Ignorable="d">
-    <Grid Margin="20">
+    <Grid Margin="40">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!-- 入力エリア -->
-        <StackPanel Margin="0,0,0,20">
-            <StackPanel Orientation="Horizontal">
-                <TextBox Width="300"
-                         Height="32"
-                         Padding="5,0"
-                         VerticalContentAlignment="Center"
-                         Tag="プロジェクト名"
-                         Text="{Binding NewProjectName, UpdateSourceTrigger=PropertyChanged}" />
-                <ComboBox Width="120"
-                          Margin="10,0,0,0"
-                          ItemsSource="{Binding ProjectStatusValues}"
-                          SelectedItem="{Binding NewProjectStatus}" />
-                <ComboBox Width="100"
-                          Margin="10,0,0,0"
-                          ItemsSource="{Binding ProjectHealthValues}"
-                          SelectedItem="{Binding NewProjectHealth}" />
-                <Button Margin="10,0,0,0"
-                        Padding="15,0"
-                        Command="{Binding AddProjectCommand}"
-                        Content="プロジェクト作成" />
-            </StackPanel>
-            <TextBox Height="60"
-                     Margin="0,10,0,0"
-                     AcceptsReturn="True"
-                     Tag="概要（オプション）"
-                     Text="{Binding NewProjectDescription, UpdateSourceTrigger=PropertyChanged}"
-                     TextWrapping="Wrap"
-                     VerticalScrollBarVisibility="Auto" />
-        </StackPanel>
+        <!-- ヘッダーエリア -->
+        <DockPanel Margin="0,0,0,40">
+            <TextBlock FontSize="28"
+                       FontWeight="Bold"
+                       Foreground="{DynamicResource TextPrimaryBrush}"
+                       Text="TimeLeaf Forest" />
 
-        <!-- 表示エリア -->
+            <Button HorizontalAlignment="Right"
+                    Command="{Binding AddProjectCommand}"
+                    Content="+ 新規プロジェクト"
+                    Style="{StaticResource PrimaryButtonStyle}" />
+        </DockPanel>
+
+        <!-- プロジェクトグリッド -->
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <ItemsControl ItemsSource="{Binding Projects}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Border Margin="0,0,0,5"
-                                Padding="15,10"
-                                Background="#F9F9F9"
-                                BorderBrush="#DDD"
-                                BorderThickness="1"
-                                CornerRadius="4">
-                            <DockPanel LastChildFill="True">
-                                <Button Width="80"
-                                        Height="30"
-                                        Command="{Binding DataContext.NavigateToProjectCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                        CommandParameter="{Binding}"
-                                        Content="開く"
-                                        DockPanel.Dock="Right" />
+                        <Button Margin="0,0,24,24"
+                                Command="{Binding DataContext.NavigateToProjectCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                CommandParameter="{Binding}"
+                                Style="{StaticResource ModernButtonStyle}">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Width="300"
+                                            Padding="24"
+                                            Background="{DynamicResource SurfaceBaseBrush}"
+                                            BorderBrush="{DynamicResource OutlineBaseBrush}"
+                                            BorderThickness="1"
+                                            CornerRadius="{DynamicResource ContainerCornerRadius}">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter Property="BorderBrush" Value="{DynamicResource BrandPrimaryBrush}" />
+                                                        <Setter Property="Background" Value="{DynamicResource SurfaceLayer1Brush}" />
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
 
-                                <StackPanel VerticalAlignment="Center">
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock FontSize="16"
-                                                   FontWeight="SemiBold"
-                                                   Text="{Binding Name}" />
-                                        <Border Margin="10,0,0,0"
-                                                Padding="5,1"
-                                                VerticalAlignment="Center"
-                                                Background="#E1F5FE"
-                                                CornerRadius="4">
-                                            <TextBlock FontSize="10"
-                                                       Foreground="#0277BD"
-                                                       Text="{Binding Status}" />
-                                        </Border>
-                                        <Border Margin="5,0,0,0"
-                                                Padding="5,1"
-                                                VerticalAlignment="Center"
-                                                Background="#E8F5E9"
-                                                CornerRadius="4">
-                                            <TextBlock FontSize="10"
-                                                       Foreground="#2E7D32"
-                                                       Text="{Binding HealthStatus}" />
-                                        </Border>
-                                    </StackPanel>
-                                    <StackPanel Margin="0,4,0,0" Orientation="Horizontal">
-                                        <TextBlock FontSize="11"
-                                                   Foreground="#888"
-                                                   Text="{Binding DisplayTotalEstimatedCost}" />
-                                        <TextBlock Margin="15,0,0,0"
-                                                   FontSize="11"
-                                                   Foreground="#888"
-                                                   Text="{Binding DisplayTotalActualCost}" />
-                                    </StackPanel>
-                                    <TextBlock Margin="0,2,0,0"
-                                               FontSize="12"
-                                               Foreground="#666"
-                                               Text="{Binding Description}"
-                                               Visibility="{Binding Description, Converter={StaticResource StringToVisibilityConverter}}" />
-                                </StackPanel>
-                            </DockPanel>
-                        </Border>
+                                        <StackPanel>
+                                            <!-- ヘッダー -->
+                                            <Grid Margin="0,0,0,16">
+                                                <StackPanel>
+                                                    <TextBlock FontSize="18"
+                                                               FontWeight="SemiBold"
+                                                               Text="{Binding Name}" />
+                                                    <TextBlock FontSize="11"
+                                                               Foreground="{DynamicResource TextSecondaryBrush}"
+                                                               Text="{Binding DisplayLastUpdated, StringFormat={}最終更新: {0}}" />
+                                                </StackPanel>
+                                                <Border Padding="8,2"
+                                                        HorizontalAlignment="Right"
+                                                        VerticalAlignment="Top"
+                                                        CornerRadius="10">
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding HealthStatus}" Value="Healthy">
+                                                                    <Setter Property="Background" Value="#E8F5E9" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding HealthStatus}" Value="Warning">
+                                                                    <Setter Property="Background" Value="#FFFDE7" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding HealthStatus}" Value="Delayed">
+                                                                    <Setter Property="Background" Value="#FFEBEE" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                    <TextBlock FontSize="10" FontWeight="Bold">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding HealthStatus}" Value="Healthy">
+                                                                        <Setter Property="Text" Value="順調" />
+                                                                        <Setter Property="Foreground" Value="#2E7D32" />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding HealthStatus}" Value="Warning">
+                                                                        <Setter Property="Text" Value="注意" />
+                                                                        <Setter Property="Foreground" Value="#F57F17" />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding HealthStatus}" Value="Delayed">
+                                                                        <Setter Property="Text" Value="遅延" />
+                                                                        <Setter Property="Foreground" Value="#C62828" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                </Border>
+                                            </Grid>
+
+                                            <!-- 樹木 (Sprout) -->
+                                            <Viewbox Height="100" Margin="0,10">
+                                                <Canvas Width="100" Height="100">
+                                                    <!-- Ground Line -->
+                                                    <Rectangle Canvas.Left="10"
+                                                               Canvas.Top="95"
+                                                               Width="80"
+                                                               Height="1"
+                                                               Fill="{DynamicResource OutlineBaseBrush}" />
+                                                    <!-- Trunk -->
+                                                    <Path Data="{StaticResource TreeSproutTrunkGeometry}" Fill="#5d4037" />
+                                                    <!-- Leaf -->
+                                                    <Path Data="{StaticResource TreeSproutLeafGeometry}">
+                                                        <Path.Style>
+                                                            <Style TargetType="Path">
+                                                                <Setter Property="Fill" Value="#27ae60" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding HealthStatus}" Value="Healthy">
+                                                                        <Setter Property="Fill" Value="#27ae60" />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding HealthStatus}" Value="Warning">
+                                                                        <Setter Property="Fill" Value="#f1c40f" />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding HealthStatus}" Value="Delayed">
+                                                                        <Setter Property="Fill" Value="#e67e22" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Path.Style>
+                                                    </Path>
+                                                </Canvas>
+                                            </Viewbox>
+
+                                            <!-- 進捗統計 -->
+                                            <Grid Margin="0,16,0,0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Grid.Column="0" HorizontalAlignment="Left">
+                                                    <TextBlock FontSize="10"
+                                                               Foreground="{DynamicResource TextSecondaryBrush}"
+                                                               Text="進捗" />
+                                                    <TextBlock FontSize="13"
+                                                               FontWeight="Bold"
+                                                               Text="65%" />
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="1" HorizontalAlignment="Center">
+                                                    <TextBlock HorizontalAlignment="Center"
+                                                               FontSize="10"
+                                                               Foreground="{DynamicResource TextSecondaryBrush}"
+                                                               Text="見積工数" />
+                                                    <TextBlock HorizontalAlignment="Center"
+                                                               FontSize="13"
+                                                               FontWeight="Bold"
+                                                               Text="{Binding TotalEstimatedCost, StringFormat={}{0}h}" />
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="2" HorizontalAlignment="Right">
+                                                    <TextBlock HorizontalAlignment="Right"
+                                                               FontSize="10"
+                                                               Foreground="{DynamicResource TextSecondaryBrush}"
+                                                               Text="期限" />
+                                                    <TextBlock FontSize="13"
+                                                               FontWeight="Bold"
+                                                               Text="2026/05/20" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

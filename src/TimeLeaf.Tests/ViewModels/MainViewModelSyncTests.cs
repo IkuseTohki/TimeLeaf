@@ -11,6 +11,8 @@ using TimeLeaf.Models.Interfaces;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
 
+using LeafKit.UI.Services;
+
 namespace TimeLeaf.Tests.ViewModels;
 
 [TestClass]
@@ -31,6 +33,7 @@ public class MainViewModelSyncTests
         var saveUseCase = new SaveProjectUseCase(repositoryMock.Object);
         var addProjectUseCaseMock = new Mock<IAddProjectUseCase>();
         var loggerMock = new Mock<ILogger<MainViewModel>>();
+        var dialogServiceMock = new Mock<IDialogService>();
         _serviceProviderMock = new Mock<IServiceProvider>();
 
         // ProjectWorkspaceViewModel と OverviewViewModel 用のロガーもモックする
@@ -38,6 +41,12 @@ public class MainViewModelSyncTests
             .Returns(new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
         _serviceProviderMock.Setup(sp => sp.GetService(typeof(ILogger<OverviewViewModel>)))
             .Returns(new Mock<ILogger<OverviewViewModel>>().Object);
+        _serviceProviderMock.Setup(sp => sp.GetService(typeof(IAddProjectUseCase)))
+            .Returns(addProjectUseCaseMock.Object);
+        _serviceProviderMock.Setup(sp => sp.GetService(typeof(IDialogService)))
+            .Returns(dialogServiceMock.Object);
+        _serviceProviderMock.Setup(sp => sp.GetService(typeof(IServiceProvider)))
+            .Returns(_serviceProviderMock.Object);
 
         var projectId = Guid.NewGuid();
         var initialProject = new Project { Id = projectId, Name = "Initial" };

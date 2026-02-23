@@ -201,4 +201,37 @@ public class FolderProjectRepositoryTests
         Assert.AreEqual(asDate, loadedTask.ActualStartDate, "ActualStartDate が正しく復元されること");
         Assert.AreEqual(aeDate, loadedTask.ActualEndDate, "ActualEndDate が正しく復元されること");
     }
+
+    /// <summary>
+    /// テスト観点: プロジェクトの作成日時 (CreatedAt) と最終更新日時 (UpdatedAt) が正しく保存・復元されることを確認する。
+    /// </summary>
+    [TestMethod]
+    public async System.Threading.Tasks.Task SaveAndLoad_ShouldPreserveTimeMetadata()
+    {
+        // Arrange
+        var repository = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object);
+        var projectId = Guid.NewGuid();
+
+        // ミリ秒未満の精度は JSON シリアライズで落ちる可能性があるため、
+        // 秒単位で固定した日時を使用してテストする（あるいはミリ秒込で比較）
+        var createdAt = new DateTime(2026, 2, 20, 10, 0, 0);
+        var updatedAt = new DateTime(2026, 2, 23, 15, 30, 45);
+
+        var project = new Project
+        {
+            Id = projectId,
+            Name = "TimeTest",
+            CreatedAt = createdAt,
+            UpdatedAt = updatedAt
+        };
+
+        // Act
+        await repository.SaveAsync(project);
+        var loadedProject = await repository.LoadAsync(projectId);
+
+        // Assert
+        Assert.IsNotNull(loadedProject);
+        Assert.AreEqual(createdAt, loadedProject.CreatedAt, "作成日時が一致すること");
+        Assert.AreEqual(updatedAt, loadedProject.UpdatedAt, "最終更新日時が一致すること");
+    }
 }

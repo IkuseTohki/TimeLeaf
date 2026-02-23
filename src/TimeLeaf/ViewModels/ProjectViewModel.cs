@@ -16,6 +16,13 @@ public partial class ProjectViewModel : ObservableObject
     private readonly Project _project;
 
     /// <summary>
+    /// 同期中（外部からの読み込み中）かどうかを示すフラグ。
+    /// この間は UpdatedAt の自動更新を停止します。
+    /// </summary>
+    [ObservableProperty]
+    private bool _isSyncing;
+
+    /// <summary>
     /// 基になるProjectエンティティ。
     /// </summary>
     public Project Model => _project;
@@ -25,25 +32,85 @@ public partial class ProjectViewModel : ObservableObject
     public string Name
     {
         get => _project.Name;
-        set => SetProperty(_project.Name, value, _project, (model, val) => model.Name = val);
+        set
+        {
+            if (SetProperty(_project.Name, value, _project, (model, val) => model.Name = val))
+            {
+                RefreshUpdatedAt();
+            }
+        }
     }
 
     public string Description
     {
         get => _project.Description;
-        set => SetProperty(_project.Description, value, _project, (model, val) => model.Description = val);
+        set
+        {
+            if (SetProperty(_project.Description, value, _project, (model, val) => model.Description = val))
+            {
+                RefreshUpdatedAt();
+            }
+        }
     }
 
     public TimeLeaf.Models.Enums.ProjectStatus Status
     {
         get => _project.Status;
-        set => SetProperty(_project.Status, value, _project, (model, val) => model.Status = val);
+        set
+        {
+            if (SetProperty(_project.Status, value, _project, (model, val) => model.Status = val))
+            {
+                RefreshUpdatedAt();
+            }
+        }
     }
 
     public TimeLeaf.Models.Enums.ProjectHealth HealthStatus
     {
         get => _project.HealthStatus;
-        set => SetProperty(_project.HealthStatus, value, _project, (model, val) => model.HealthStatus = val);
+        set
+        {
+            if (SetProperty(_project.HealthStatus, value, _project, (model, val) => model.HealthStatus = val))
+            {
+                RefreshUpdatedAt();
+            }
+        }
+    }
+
+    private void RefreshUpdatedAt()
+    {
+        if (IsSyncing) return;
+        UpdatedAt = DateTime.Now;
+    }
+
+    /// <summary>
+    /// 最終更新日時。
+    /// </summary>
+    public DateTime UpdatedAt
+    {
+        get => _project.UpdatedAt;
+        set
+        {
+            if (SetProperty(_project.UpdatedAt, value, _project, (model, val) => model.UpdatedAt = val))
+            {
+                OnPropertyChanged(nameof(DisplayLastUpdated));
+            }
+        }
+    }
+
+    /// <summary>
+    /// UI表示用の最終更新日時文字列。
+    /// </summary>
+    public string DisplayLastUpdated
+    {
+        get
+        {
+            var diff = DateTime.Now - UpdatedAt;
+            if (diff.TotalSeconds < 60) return "たった今";
+            if (diff.TotalMinutes < 60) return $"{(int)diff.TotalMinutes}分前";
+            if (diff.TotalHours < 24) return $"{(int)diff.TotalHours}時間前";
+            return UpdatedAt.ToString("yyyy/MM/dd HH:mm");
+        }
     }
 
     /// <summary>
@@ -89,7 +156,9 @@ public partial class ProjectViewModel : ObservableObject
         // ProjectTaskをProjectTaskViewModelでラップしてTasksコレクションに追加
         foreach (var task in _project.Tasks)
         {
-            Tasks.Add(new ProjectTaskViewModel(task));
+            var taskVm = new ProjectTaskViewModel(task);
+            Tasks.Add(taskVm);
+            taskVm.PropertyChanged += OnProjectTaskViewModelPropertyChanged; // イベント購読を追加
         }
 
         // ProjectエンティティのTasksコレクションの変更を購読し、UIのTasksコレクションを同期する
@@ -151,6 +220,7 @@ public partial class ProjectViewModel : ObservableObject
             OnPropertyChanged(nameof(TotalActualCost));
             OnPropertyChanged(nameof(DisplayTotalEstimatedCost)); // 追加
             OnPropertyChanged(nameof(DisplayTotalActualCost));   // 追加
+            RefreshUpdatedAt();
         }
     }
 
@@ -161,6 +231,7 @@ public partial class ProjectViewModel : ObservableObject
         OnPropertyChanged(nameof(TotalActualCost));
         OnPropertyChanged(nameof(DisplayTotalEstimatedCost)); // 追加
         OnPropertyChanged(nameof(DisplayTotalActualCost));   // 追加
+        RefreshUpdatedAt();
     }
 
     // TODO: Tasks内の個々のタスクプロパティ変更（例: EstimatedCostの変更）も購読し、

@@ -11,6 +11,8 @@ using TimeLeaf.Models.Interfaces;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
 
+using LeafKit.UI.Services;
+
 namespace TimeLeaf.Tests.ViewModels;
 
 [TestClass]
@@ -19,6 +21,7 @@ public class EndToEndFlowTests
     private Mock<IServiceProvider> _serviceProviderMock = null!;
     private Mock<IProjectRepository> _repositoryMock = null!;
     private Mock<ILogger<MainViewModel>> _mainLoggerMock = null!;
+    private Mock<IDialogService> _dialogServiceMock = null!;
 
     [TestInitialize]
     public void Setup()
@@ -27,6 +30,7 @@ public class EndToEndFlowTests
         _repositoryMock.Setup(r => r.LoadAllAsync()).ReturnsAsync(new List<Project>());
         _mainLoggerMock = new Mock<ILogger<MainViewModel>>();
         _serviceProviderMock = new Mock<IServiceProvider>();
+        _dialogServiceMock = new Mock<IDialogService>();
 
         _serviceProviderMock.Setup(sp => sp.GetService(typeof(ILogger<ProjectWorkspaceViewModel>)))
             .Returns(new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
@@ -34,6 +38,12 @@ public class EndToEndFlowTests
             .Returns(new Mock<ILogger<OverviewViewModel>>().Object);
         _serviceProviderMock.Setup(sp => sp.GetService(typeof(ICurrentUserService)))
             .Returns(new Mock<ICurrentUserService>().Object);
+        _serviceProviderMock.Setup(sp => sp.GetService(typeof(IAddProjectUseCase)))
+            .Returns(new AddProjectUseCase(_repositoryMock.Object));
+        _serviceProviderMock.Setup(sp => sp.GetService(typeof(IDialogService)))
+            .Returns(_dialogServiceMock.Object);
+        _serviceProviderMock.Setup(sp => sp.GetService(typeof(IServiceProvider)))
+            .Returns(_serviceProviderMock.Object);
     }
 
     /// <summary>
@@ -51,9 +61,13 @@ public class EndToEndFlowTests
         var mainVM = new MainViewModel(loadUseCase, saveUseCase, _repositoryMock.Object, addProjectUseCase, _mainLoggerMock.Object, _serviceProviderMock.Object);
         await System.Threading.Tasks.Task.Delay(100);
 
-        // 2. Add a new project (Overview -> UseCase -> MainVM.Projects)
+        // 2. Add a new project (Overview -> Dialog -> UseCase -> MainVM.Projects)
         var overviewVM = (OverviewViewModel)mainVM.CurrentViewModel;
-        overviewVM.NewProjectName = "E2E Project";
+
+        var addProjectVm = new AddProjectViewModel { Name = "E2E Project" };
+        _serviceProviderMock.Setup(sp => sp.GetService(typeof(AddProjectViewModel))).Returns(addProjectVm);
+        _dialogServiceMock.Setup(ds => ds.ShowDialogAsync(addProjectVm)).ReturnsAsync(true);
+
         await overviewVM.AddProjectCommand.ExecuteAsync(null);
 
         var projectVM = mainVM.Projects.First(p => p.Name == "E2E Project");

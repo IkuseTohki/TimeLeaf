@@ -54,7 +54,7 @@ public partial class MainViewModel : ObservableObject
         _addProjectUseCase = addProjectUseCase;
         _logger = logger;
         _serviceProvider = serviceProvider;
-        _currentViewModel = new OverviewViewModel(Projects, _addProjectUseCase, _serviceProvider.GetRequiredService<ILogger<OverviewViewModel>>());
+        _currentViewModel = ActivatorUtilities.CreateInstance<OverviewViewModel>(_serviceProvider, Projects);
 
         _logger.LogInformation("MainViewModel Initializing");
 
@@ -197,19 +197,26 @@ public partial class MainViewModel : ObservableObject
                 var existingViewModel = Projects.FirstOrDefault(pvm => pvm.Id == projectId); // ViewModelを検索
                 if (existingViewModel != null)
                 {
-                    _logger.LogDebug("Updating existing project {ProjectId} ViewModel.", projectId);
-                    existingViewModel.Name = updatedProjectEntity.Name; // ViewModel経由で更新
-                    existingViewModel.Description = updatedProjectEntity.Description;
-                    existingViewModel.Status = updatedProjectEntity.Status;
-                    existingViewModel.HealthStatus = updatedProjectEntity.HealthStatus;
-
-                    // Tasksコレクションの同期
-                    // Model.Tasks の Clear() により VM.Tasks も同期してクリアされるため、
-                    // VM.Tasks.Clear() の直接呼び出しは不要。
-                    existingViewModel.Model.Tasks.Clear();
-                    foreach (var t in updatedProjectEntity.Tasks)
+                    existingViewModel.IsSyncing = true;
+                    try
                     {
-                        existingViewModel.Model.Tasks.Add(t);
+                        _logger.LogDebug("Updating existing project {ProjectId} ViewModel.", projectId);
+                        existingViewModel.Name = updatedProjectEntity.Name; // ViewModel経由で更新
+                        existingViewModel.Description = updatedProjectEntity.Description;
+                        existingViewModel.Status = updatedProjectEntity.Status;
+                        existingViewModel.HealthStatus = updatedProjectEntity.HealthStatus;
+                        existingViewModel.UpdatedAt = updatedProjectEntity.UpdatedAt;
+
+                        // Tasksコレクションの同期
+                        existingViewModel.Model.Tasks.Clear();
+                        foreach (var t in updatedProjectEntity.Tasks)
+                        {
+                            existingViewModel.Model.Tasks.Add(t);
+                        }
+                    }
+                    finally
+                    {
+                        existingViewModel.IsSyncing = false;
                     }
                 }
                 else
@@ -250,7 +257,15 @@ public partial class MainViewModel : ObservableObject
             foreach (var projectEntity in projectEntities)
             {
                 var projectViewModel = new ProjectViewModel(projectEntity);
-                Projects.Add(projectViewModel); // Projects.CollectionChanged によって WireProjectViewModelEvents が呼ばれる
+                projectViewModel.IsSyncing = true;
+                try
+                {
+                    Projects.Add(projectViewModel); // Projects.CollectionChanged によって WireProjectViewModelEvents が呼ばれる
+                }
+                finally
+                {
+                    projectViewModel.IsSyncing = false;
+                }
             }
         }
         catch (Exception ex)
@@ -279,6 +294,6 @@ public partial class MainViewModel : ObservableObject
     private void NavigateBack()
     {
         _logger.LogInformation("Navigating back to Overview");
-        CurrentViewModel = new OverviewViewModel(Projects, _addProjectUseCase, _serviceProvider.GetRequiredService<ILogger<OverviewViewModel>>());
+        CurrentViewModel = ActivatorUtilities.CreateInstance<OverviewViewModel>(_serviceProvider, Projects);
     }
 }

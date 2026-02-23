@@ -197,9 +197,9 @@ public class ProjectViewModelTests
         taskViewModel1.EstimatedCost = 15; // ViewModel を介してコストを変更
         taskViewModel1.ActualCost = 8;     // ViewModel を介してコストを変更
 
-        // Assert (Redフェーズ: ここではまだイベントは発火しないことを想定。実装後にGreenにする)
-        Assert.AreEqual(0, receivedEstimatedCostEvents, "タスクの個別のコスト変更ではTotalEstimatedCostのPropertyChangedイベントは発火しないこと (Red)");
-        Assert.AreEqual(0, receivedActualCostEvents, "タスクの個別のコスト変更ではTotalActualCostのPropertyChangedイベントは発火しないこと (Red)");
+        // Assert (Greenフェーズ: 実装が完了したため、イベントが発火することを検証する)
+        Assert.AreEqual(2, receivedEstimatedCostEvents, "タスクの個別のコスト変更によりTotalEstimatedCostのPropertyChangedイベントが発火すること");
+        Assert.AreEqual(2, receivedActualCostEvents, "タスクの個別のコスト変更によりTotalActualCostのPropertyChangedイベントが発火すること");
     }
 
     /// <summary>
@@ -243,5 +243,52 @@ public class ProjectViewModelTests
         // Assert
         Assert.AreEqual(0, project.Tasks.Count, "Modelのタスクがクリアされていること");
         Assert.AreEqual(0, projectViewModel.Tasks.Count, "Model.Clear() 後に ViewModel のタスクもクリアされていること");
+    }
+
+    /// <summary>
+    /// テスト観点: DisplayLastUpdated プロパティが、現在時刻からの経過時間の境界値において
+    /// 適切な相対時間文字列を返すことを確認する。
+    /// </summary>
+    [TestMethod]
+    [DataRow(0, "たった今")]
+    [DataRow(59, "たった今")]
+    [DataRow(60, "1分前")]
+    [DataRow(119, "1分前")]
+    [DataRow(120, "2分前")]
+    [DataRow(3599, "59分前")]
+    [DataRow(3600, "1時間前")]
+    [DataRow(86399, "23時間前")]
+    public void DisplayLastUpdated_ShouldReturnRelativeTimeStrings_AtBoundaries(int secondsOffset, string expected)
+    {
+        // Arrange
+        // DateTime.Now の微細な Ticks による誤差を防ぐため、秒単位で丸める
+        var now = DateTime.Now;
+        var baseTime = new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
+        var project = new Project { UpdatedAt = baseTime.AddSeconds(-secondsOffset) };
+        var viewModel = new ProjectViewModel(project);
+
+        // Act
+        var actual = viewModel.DisplayLastUpdated;
+
+        // Assert
+        Assert.AreEqual(expected, actual, $"Offset {secondsOffset}s should result in '{expected}'");
+    }
+
+    /// <summary>
+    /// テスト観点: ちょうど24時間経過したタイミングで、相対表示から絶対日付表示に切り替わることを確認する。
+    /// </summary>
+    [TestMethod]
+    public void DisplayLastUpdated_ShouldSwitchToFullDate_At24HoursBoundary()
+    {
+        // Arrange
+        var targetDate = new DateTime(2026, 1, 1, 12, 34, 0);
+        var project = new Project { UpdatedAt = targetDate };
+        var viewModel = new ProjectViewModel(project);
+
+        // Act
+        var actual = viewModel.DisplayLastUpdated;
+
+        // Assert
+        Assert.AreEqual("2026/01/01 12:34", actual);
     }
 }

@@ -32,7 +32,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
     };
 
     private readonly ConcurrentDictionary<string, string> _lastSavedContent = new();
-    private readonly ConcurrentDictionary<string, byte> _justWrittenFiles = new();
+    private readonly ConcurrentDictionary<string, DateTime> _justWrittenFiles = new();
     private readonly FileSystemWatcher _watcher;
 
     public event Action<Guid>? ProjectChanged;
@@ -67,10 +67,19 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
     private void OnFileCreated(object sender, FileSystemEventArgs e)
     {
         var fileName = Path.GetFileName(e.FullPath);
-        if (_justWrittenFiles.TryRemove(fileName, out _))
+        if (_justWrittenFiles.TryGetValue(fileName, out var writeTime))
         {
-            _logger.LogDebug("Ignoring file change event for our own write: {FileName}", fileName);
-            return;
+            // 書き込みから1秒以内のイベントは無視する
+            if (DateTime.Now - writeTime < TimeSpan.FromSeconds(1))
+            {
+                _logger.LogDebug("Ignoring file change event for our own write (within 1s): {FileName}", fileName);
+                return;
+            }
+            else
+            {
+                // 1秒以上経過している場合はリストから削除して、外部変更として扱う
+                _justWrittenFiles.TryRemove(fileName, out _);
+            }
         }
 
         _logger.LogInformation("File created/changed event detected: {FullPath} (ChangeType: {ChangeType})", e.FullPath, e.ChangeType);
@@ -98,6 +107,22 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         else
         {
             _logger.LogWarning("Invalid file path format for project change detection: {FullPath}", e.FullPath);
+        }
+
+        // 定期的に古い無視リストを掃除する（簡易的）
+        if (_justWrittenFiles.Count > 100)
+        {
+            CleanupIgnoreList();
+        }
+    }
+
+    private void CleanupIgnoreList()
+    {
+        var now = DateTime.Now;
+        var toRemove = _justWrittenFiles.Where(kv => now - kv.Value > TimeSpan.FromSeconds(10)).Select(kv => kv.Key).ToList();
+        foreach (var key in toRemove)
+        {
+            _justWrittenFiles.TryRemove(key, out _);
         }
     }
 
@@ -137,7 +162,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                 }
                 _logger.LogDebug("Loading project {ProjectId} from {Directory}", meta.ProjectId, dir);
                 // .project から判明している ID を渡して Replay を開始
-                var project = await ReplayProjectAsync(dir, meta.ProjectId);
+                var project = await ReplayProjectAsync(dir, meta.ProjectId, meta.CreatedAt);
                 return project != null ? new { Project = project, CreatedAt = meta.CreatedAt } : null;
             }
             catch (Exception ex)
@@ -172,17 +197,30 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
             return null;
         }
         _logger.LogDebug("Found project directory {TargetDir} for {ProjectId}.", targetDir, projectId);
-        return await ReplayProjectAsync(targetDir, projectId);
+
+        var metaPath = Path.Combine(targetDir, ".project");
+        DateTime createdAt = DateTime.Now;
+        if (File.Exists(metaPath))
+        {
+            var metaJson = await File.ReadAllTextAsync(metaPath);
+            var meta = JsonSerializer.Deserialize<ProjectMetadataDto>(metaJson, _options);
+            if (meta != null)
+            {
+                createdAt = meta.CreatedAt;
+            }
+        }
+
+        return await ReplayProjectAsync(targetDir, projectId, createdAt);
     }
 
-    private async Task<Project?> ReplayProjectAsync(string projectDirPath, Guid projectId)
+    private async Task<Project?> ReplayProjectAsync(string projectDirPath, Guid projectId, DateTime createdAt)
     {
         _logger.LogInformation("Replaying project history for {ProjectId} from {ProjectDirPath}", projectId, projectDirPath);
         var changesDir = Path.Combine(projectDirPath, "changes");
         if (!Directory.Exists(changesDir))
         {
             _logger.LogWarning("Changes directory {ChangesDir} not found for {ProjectId}. Returning new Project.", changesDir, projectId);
-            return new Project { Id = projectId };
+            return new Project { Id = projectId, CreatedAt = createdAt };
         }
 
         var files = Directory.GetFiles(changesDir, "*.json")
@@ -194,7 +232,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         _logger.LogDebug("Found {ChangeFileCount} change files for project {ProjectId}.", files.Count, projectId);
 
         // 履歴がなくても、IDが分かっていればプロジェクトとして成立させる
-        var project = new Project { Id = projectId };
+        var project = new Project { Id = projectId, CreatedAt = createdAt };
         var allCommentDtos = new List<CommentDto>();
 
         foreach (var file in files)
@@ -221,6 +259,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                             project.Description = basic.Description;
                             project.Status = basic.Status;
                             project.HealthStatus = basic.HealthStatus;
+                            project.UpdatedAt = basic.UpdatedAt; // 最終更新日時を復元
                             project.Milestones.Clear();
                             if (basic.Milestones != null)
                             {
@@ -352,7 +391,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
             var metaFilePath = Path.Combine(projectDir, ".project");
             if (!File.Exists(metaFilePath))
             {
-                var metadata = new ProjectMetadataDto(project.Id, DateTime.Now, _userService.GetCurrentUserId(), 1);
+                var metadata = new ProjectMetadataDto(project.Id, project.CreatedAt, _userService.GetCurrentUserId(), 1);
                 await File.WriteAllTextAsync(metaFilePath, JsonSerializer.Serialize(metadata, _options));
                 _logger.LogDebug(".project metadata created for {ProjectId}.", project.Id);
             }
@@ -365,6 +404,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                 project.Description,
                 project.Status,
                 project.HealthStatus,
+                project.UpdatedAt, // 最終更新日時を保存
                 project.Milestones.Select(m => new MilestoneDto(m.Date, m.Label)).ToList());
             await TrySaveCategoryAsync(project.Id, changesDir, "ProjectBasic", basicSnapshot);
 
@@ -426,7 +466,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         var fileName = CommitFileName.Generate(comment.CreatedAt, _userService.GetCurrentUserId(), comment.Id, category);
         var fullPath = Path.Combine(changesDir, fileName);
 
-        _justWrittenFiles.TryAdd(fileName, 0);
+        _justWrittenFiles[fileName] = DateTime.Now;
 
         try
         {
@@ -461,7 +501,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
 
         var fileName = CommitFileName.Generate(DateTime.Now, _userService.GetCurrentUserId(), Guid.NewGuid(), category);
         var fullPath = Path.Combine(changesDir, fileName);
-        _justWrittenFiles.TryAdd(fileName, 0); // 自前での書き込みであることをマーク
+        _justWrittenFiles[fileName] = DateTime.Now; // 自前での書き込みであることをマーク
 
         try
         {
@@ -472,6 +512,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error saving category {Category} for project {ProjectId} to {FileName}.", category, projectId, fileName);
+            _justWrittenFiles.TryRemove(fileName, out _); // 失敗した場合はリストから削除
             throw;
         }
     }
@@ -486,7 +527,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
 
     private record MilestoneDto(DateTime Date, string Label);
     private record CommentDto(Guid Id, Guid TaskId, string AuthorId, DateTime CreatedAt, string Content, List<string> AttachmentLinks);
-    private record ProjectBasicDto(string Name, string Description, ProjectStatus Status, ProjectHealth HealthStatus, List<MilestoneDto> Milestones);
+    private record ProjectBasicDto(string Name, string Description, ProjectStatus Status, ProjectHealth HealthStatus, DateTime UpdatedAt, List<MilestoneDto> Milestones);
     private record ProjectTaskDto(
         Guid Id,
         string Name,

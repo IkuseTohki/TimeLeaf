@@ -12,6 +12,16 @@ namespace TimeLeaf.Models.Entities;
 public class Project
 {
     /// <summary>
+    /// プロジェクトの作成日時。
+    /// </summary>
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+    /// <summary>
+    /// プロジェクトの最終更新日時。
+    /// </summary>
+    public DateTime UpdatedAt { get; set; } = DateTime.Now;
+
+    /// <summary>
     /// プロジェクトを一意に識別するID。
     /// </summary>
     public Guid Id { get; set; } = Guid.NewGuid();

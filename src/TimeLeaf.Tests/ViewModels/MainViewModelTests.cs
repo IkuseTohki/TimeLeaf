@@ -11,6 +11,8 @@ using TimeLeaf.Models.Interfaces;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
 
+using LeafKit.UI.Services;
+
 namespace TimeLeaf.Tests.ViewModels;
 
 [TestClass]
@@ -22,6 +24,7 @@ public class MainViewModelTests
     private Mock<IAddProjectUseCase> _addProjectUseCaseMock = null!;
     private Mock<ILogger<MainViewModel>> _loggerMock = null!;
     private Mock<IServiceProvider> _serviceProviderMock = null!;
+    private Mock<IDialogService> _dialogServiceMock = null!;
 
     [TestInitialize]
     public void Setup()
@@ -37,6 +40,7 @@ public class MainViewModelTests
         _addProjectUseCaseMock = new Mock<IAddProjectUseCase>();
         _loggerMock = new Mock<ILogger<MainViewModel>>();
         _serviceProviderMock = new Mock<IServiceProvider>();
+        _dialogServiceMock = new Mock<IDialogService>();
 
         _serviceProviderMock.Setup(sp => sp.GetService(typeof(ILogger<ProjectWorkspaceViewModel>)))
             .Returns(new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
@@ -44,6 +48,12 @@ public class MainViewModelTests
             .Returns(new Mock<ILogger<OverviewViewModel>>().Object);
         _serviceProviderMock.Setup(sp => sp.GetService(typeof(ICurrentUserService)))
             .Returns(new Mock<ICurrentUserService>().Object);
+        _serviceProviderMock.Setup(sp => sp.GetService(typeof(IAddProjectUseCase)))
+            .Returns(_addProjectUseCaseMock.Object);
+        _serviceProviderMock.Setup(sp => sp.GetService(typeof(IDialogService)))
+            .Returns(_dialogServiceMock.Object);
+        _serviceProviderMock.Setup(sp => sp.GetService(typeof(IServiceProvider)))
+            .Returns(_serviceProviderMock.Object);
 
 
         _addProjectUseCaseMock.Setup(x => x.ExecuteAsync(

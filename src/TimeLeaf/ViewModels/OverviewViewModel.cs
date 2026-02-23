@@ -8,6 +8,9 @@ using TimeLeaf.Models.Entities;
 using TimeLeaf.Models.Enums;
 using TimeLeaf.UseCases;
 
+using Microsoft.Extensions.DependencyInjection;
+using LeafKit.UI.Services;
+
 namespace TimeLeaf.ViewModels;
 
 /// <summary>
@@ -16,22 +19,9 @@ namespace TimeLeaf.ViewModels;
 public partial class OverviewViewModel : ObservableObject
 {
     private readonly IAddProjectUseCase _addProjectUseCase;
+    private readonly IDialogService _dialogService;
+    private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<OverviewViewModel> _logger;
-
-    public IEnumerable<ProjectStatus> ProjectStatusValues => (ProjectStatus[])Enum.GetValues(typeof(ProjectStatus));
-    public IEnumerable<ProjectHealth> ProjectHealthValues => (ProjectHealth[])Enum.GetValues(typeof(ProjectHealth));
-
-    [ObservableProperty]
-    private string _newProjectName = string.Empty;
-
-    [ObservableProperty]
-    private string _newProjectDescription = string.Empty;
-
-    [ObservableProperty]
-    private ProjectStatus _newProjectStatus = ProjectStatus.Initial;
-
-    [ObservableProperty]
-    private ProjectHealth _newProjectHealth = ProjectHealth.Healthy;
 
     /// <summary>
     /// 表示対象となるプロジェクトのリスト。
@@ -43,52 +33,56 @@ public partial class OverviewViewModel : ObservableObject
     /// </summary>
     /// <param name="projects">共有プロジェクトリスト。</param>
     /// <param name="addProjectUseCase">プロジェクト追加ユースケース。</param>
+    /// <param name="dialogService">ダイアログサービス。</param>
+    /// <param name="serviceProvider">サービスプロバイダー。</param>
     /// <param name="logger">ロガー。</param>
-    public OverviewViewModel(ObservableCollection<ProjectViewModel> projects, IAddProjectUseCase addProjectUseCase, ILogger<OverviewViewModel> logger)
+    public OverviewViewModel(
+        ObservableCollection<ProjectViewModel> projects,
+        IAddProjectUseCase addProjectUseCase,
+        IDialogService dialogService,
+        IServiceProvider serviceProvider,
+        ILogger<OverviewViewModel> logger)
     {
         Projects = projects;
         _addProjectUseCase = addProjectUseCase;
+        _dialogService = dialogService;
+        _serviceProvider = serviceProvider;
         _logger = logger;
         _logger.LogInformation("OverviewViewModel initialized.");
     }
 
     /// <summary>
-    /// 新規プロジェクトを追加するコマンド。
+    /// プロジェクト作成ダイアログを表示し、新規プロジェクトを追加します。
     /// </summary>
     [RelayCommand]
     private async System.Threading.Tasks.Task AddProject()
     {
-        _logger.LogInformation("AddProject started for {NewProjectName}", NewProjectName);
-        if (string.IsNullOrWhiteSpace(NewProjectName))
-        {
-            _logger.LogWarning("AddProject aborted: NewProjectName is empty.");
-            return;
-        }
+        _logger.LogInformation("ShowAddProjectDialog started.");
 
         try
         {
-            _logger.LogDebug("Calling AddProjectUseCase with Name: {Name}, Description: {Description}, Status: {Status}, Health: {Health}",
-                NewProjectName, NewProjectDescription, NewProjectStatus, NewProjectHealth);
+            var addProjectVm = _serviceProvider.GetRequiredService<AddProjectViewModel>();
+            var result = await _dialogService.ShowDialogAsync(addProjectVm);
 
-            var projectEntity = await _addProjectUseCase.ExecuteAsync( // Projectエンティティとして受け取る
-                NewProjectName,
-                NewProjectDescription,
-                NewProjectStatus,
-                NewProjectHealth);
+            if (result)
+            {
+                _logger.LogDebug("Adding project: {Name}", addProjectVm.Name);
 
-            var projectViewModel = new ProjectViewModel(projectEntity); // ViewModelでラップ
-            Projects.Add(projectViewModel); // ViewModelをコレクションに追加
+                var projectEntity = await _addProjectUseCase.ExecuteAsync(
+                    addProjectVm.Name,
+                    addProjectVm.Description,
+                    addProjectVm.Status,
+                    addProjectVm.Health);
 
-            NewProjectName = string.Empty;
-            NewProjectDescription = string.Empty;
-            NewProjectStatus = ProjectStatus.Initial;
-            NewProjectHealth = ProjectHealth.Healthy;
+                var projectViewModel = new ProjectViewModel(projectEntity);
+                Projects.Add(projectViewModel);
 
-            _logger.LogInformation("AddProject completed successfully. Created project {ProjectId}", projectViewModel.Id);
+                _logger.LogInformation("AddProject completed successfully. Created project {ProjectId}", projectViewModel.Id);
+            }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to add project {ProjectName}.", NewProjectName);
+            _logger.LogError(ex, "Failed to add project.");
         }
     }
 }

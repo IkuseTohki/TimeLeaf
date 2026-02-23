@@ -2,9 +2,30 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:converters="clr-namespace:TimeLeaf.ViewModels.Converters"
-             xmlns:local="clr-namespace:TimeLeaf">
+             xmlns:local="clr-namespace:TimeLeaf"
+             xmlns:viewModels="clr-namespace:TimeLeaf.ViewModels"
+             xmlns:views="clr-namespace:TimeLeaf.Views">
     <Application.Resources>
-        <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
-        <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- LeafKit.UI Resources -->
+                <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/LightColors.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/ControlStyles.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/ComponentStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
+            <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+
+            <!-- Tree Assets (Sprout) -->
+            <Geometry x:Key="TreeSproutLeafGeometry">M 50,80 Q 60,50 80,40 Q 60,45 50,60 Q 40,45 20,40 Q 40,50 50,80 Z</Geometry>
+            <Geometry x:Key="TreeSproutTrunkGeometry">M 48,80 H 52 V 95 H 48 Z</Geometry>
+
+            <!-- DataTemplate for Dialog Contents -->
+            <DataTemplate DataType="{x:Type viewModels:AddProjectViewModel}">
+                <views:AddProjectView />
+            </DataTemplate>
+
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

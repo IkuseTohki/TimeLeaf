@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>PageLeaf Detailed Theme Palette</title>
+    <style>
+        :root { --light-bg: #FFFFFF; --dark-bg: #1E1E1E; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; display: flex; flex-direction: column; align-items: center; }
+        .theme-container { display: flex; gap: 40px; width: 100%; max-width: 1200px; }
+        .theme-section { flex: 1; background: var(--bg); color: var(--text); padding: 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .light { --bg: #FFFFFF; --text: #333333; --border: #E1E1E1; }
+        .dark { --bg: #1E1E1E; --text: #D4D4D4; --border: #3E3E42; }
+        
+        h1 { margin-bottom: 30px; }
+        h2 { border-bottom: 2px solid var(--border); padding-bottom: 8px; margin-top: 30px; font-size: 1.2em; }
+        h2:first-of-type { margin-top: 0; }
+        
+        .color-group { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .color-item { display: flex; align-items: center; gap: 10px; }
+        .swatch { width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--border); flex-shrink: 0; }
+        .info { font-size: 0.85em; }
+        .name { font-weight: bold; display: block; }
+        .hex { opacity: 0.7; font-family: monospace; }
+
+        .preview-box { border: 1px solid var(--border); padding: 15px; border-radius: 8px; margin-top: 10px; }
+        .md-h { font-weight: bold; color: var(--h-color); }
+        .md-code { background: var(--code-bg); color: var(--code-text); padding: 2px 4px; border-radius: 4px; font-family: monospace; }
+        .md-quote { border-left: 4px solid var(--quote-border); padding-left: 10px; color: var(--quote-text); font-style: italic; }
+        
+        /* Light MD Colors */
+        .light { 
+            --h-color: #007ACC; --code-bg: #F3F3F3; --code-text: #CE9178; 
+            --quote-border: #608B4E; --quote-text: #608B4E; --link: #569CD6; 
+        }
+        /* Dark MD Colors */
+        .dark { 
+            --h-color: #569CD6; --code-bg: #2D2D2D; --code-text: #CE9178; 
+            --quote-border: #487E3A; --quote-text: #6A9955; --link: #4FC1FF; 
+        }
+    </style>
+</head>
+<body>
+    <h1>PageLeaf テーマ配色仕様</h1>
+    <div class="theme-container">
+        
+        <!-- Light Theme -->
+        <div class="theme-section light">
+            <h2>基本・レイアウト</h2>
+            <div class="color-group">
+                <div class="color-item"><div class="swatch" style="background: #FFFFFF;"></div><div class="info"><span class="name">WindowBackground</span><span class="hex">#FFFFFF</span></div></div>
+                <div class="color-item"><div class="swatch" style="background: #F7F9FA;"></div><div class="info"><span class="name">PanelBackground</span><span class="hex">#F7F9FA</span></div></div>
+                <div class="color-item"><div class="swatch" style="background: #E1E1E1;"></div><div class="info"><span class="name">Border</span><span class="hex">#E1E1E1</span></div></div>
+                <div class="color-item"><div class="swatch" style="background: #333333;"></div><div class="info"><span class="name">PrimaryText</span><span class="hex">#333333</span></div></div>
+                <div class="color-item"><div class="swatch" style="background: #666666;"></div><div class="info"><span class="name">SecondaryText</span><span class="hex">#666666</span></div></div>
+            </div>
+
+            <h2>アクション・強調</h2>
+            <div class="color-group">
+                <div class="color-item"><div class="swatch" style="background: #0078D4;"></div><div class="info"><span class="name">PrimaryAction</span><span class="hex">#0078D4</span></div></div>
+                <div class="color-item"><div class="swatch" style="background: #0063B1;"></div><div class="info"><span class="name">PrimaryHover</span><span class="hex">#0063B1</span></div></div>
+                <div class="color-item"><div class="swatch" style="background: #005FB8;"></div><div class="info"><span class="name">SidebarSelectedText</span><span class="hex">#005FB8</span></div></div>
+                <div class="color-item"><div class="swatch" style="background: #0078D4;"></div><div class="info"><span class="name">SelectionBackground</span><span class="hex">#0078D4</span></div></div>
+            </div>
+
+            <h2>メニュー・システム</h2>
+            <div class="color-group">
+                <div class="color-item"><div class="swatch" style="background: #FFFFFF;"></div><div class="info"><span class="name">MenuBarBackground</span><span class="hex">#FFFFFF</span></div></div>
+                <div class="color-item"><div class="swatch" style="background: #333333;"></div><div class="info"><span class="name">MenuBarText</span><span class="hex">#333333</span></div></div>
+                <div class="color-item"><div class="swatch" style="background: #EAEAEA;"></div><div class="info"><span class="name">MenuHover</span><span class="hex">#EAEAEA</span></div></div>
+            </div>
+        </div>
+
+        <!-- Dark Theme -->
+        <div class="theme-section dark">
+            <h2>基本・レイアウト</h2>
+            <div class="color-group">
+                <div class="color-item"><div class="swatch" style="background: #1E1E1E;"></div><div class="info"><span class="name">WindowBackground</span><span class="hex">#1E1E1E</span></div></div>
+                <div class="color-item"><div class="swatch" style="background: #252526;"></div><div class="info"><span class="name">PanelBackground</span><span class="hex">#252526</span></div></div>
+                <div class="color-item"><div class="swatch" style="background: #3E3E42;"></div><div class="info"><span class="name">Border</span><span class="hex">#3E3E42</span></div></div>
+                <div class="color-item"><div class="swatch" style="background: #D4D4D4;"></div><div class="info"><span class="name">PrimaryText</span><span class="hex">#D4D4D4</span></div></div>
+                <div class="color-item"><div class="swatch" style="background: #9D9D9D;"></div><div class="info"><span class="name">SecondaryText</span><span class="hex">#9D9D9D</span></div></div>
+            </div>
+
+            <h2>アクション・強調</h2>
+            <div class="color-group">
+                <div class="color-item"><div class="swatch" style="background: #0091FF;"></div><div class="info"><span class="name">PrimaryAction</span><span class="hex">#0091FF</span></div></div>
+                <div class="color-item"><div class="swatch" style="background: #1C9FFF;"></div><div class="info"><span class="name">PrimaryHover</span><span class="hex">#1C9FFF</span></div></div>
+                <div class="color-item"><div class="swatch" style="background: #FFFFFF;"></div><div class="info"><span class="name">SidebarSelectedText</span><span class="hex">#FFFFFF</span></div></div>
+                <div class="color-item"><div class="swatch" style="background: #005FB8;"></div><div class="info"><span class="name">SelectionBackground</span><span class="hex">#005FB8</span></div></div>
+            </div>
+
+            <h2>メニュー・システム</h2>
+            <div class="color-group">
+                <div class="color-item"><div class="swatch" style="background: #1E1E1E;"></div><div class="info"><span class="name">MenuBarBackground</span><span class="hex">#1E1E1E</span></div></div>
+                <div class="color-item"><div class="swatch" style="background: #D4D4D4;"></div><div class="info"><span class="name">MenuBarText</span><span class="hex">#D4D4D4</span></div></div>
+                <div class="color-item"><div class="swatch" style="background: #3E3E42;"></div><div class="info"><span class="name">MenuHover</span><span class="hex">#3E3E42</span></div></div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

@@ -10,6 +10,7 @@ using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
 using TimeLeaf.Views;
+using LeafKit.UI.Services;
 
 namespace TimeLeaf;
 
@@ -51,6 +52,9 @@ public partial class App : Application
         services.AddSingleton<IProjectRepository>(sp =>
             new FolderProjectRepository(storagePath, sp.GetRequiredService<ICurrentUserService>(), sp.GetRequiredService<ILogger<FolderProjectRepository>>()));
 
+        // LeafKit.UI サービスの登録
+        services.AddSingleton<IDialogService, DialogService>();
+
         // ユースケースの登録
         services.AddTransient<LoadProjectsUseCase>();
         services.AddTransient<SaveProjectsUseCase>();
@@ -59,6 +63,8 @@ public partial class App : Application
 
         // ViewModel の登録
         services.AddTransient<MainViewModel>();
+        services.AddTransient<OverviewViewModel>();
+        services.AddTransient<AddProjectViewModel>();
 
         // View の登録
         services.AddTransient<MainWindow>();
