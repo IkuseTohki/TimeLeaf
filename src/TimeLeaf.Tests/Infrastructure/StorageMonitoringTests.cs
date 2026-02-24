@@ -4,7 +4,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using TimeLeaf.Models.Interfaces;
+using TimeLeaf.Repositories;
+using TimeLeaf.Services;
 using TimeLeaf.Repositories.FileSystem;
 
 namespace TimeLeaf.Tests.Infrastructure;
@@ -39,7 +40,7 @@ public class StorageMonitoringTests
     public async System.Threading.Tasks.Task FileWatcher_ShouldTriggerEvent_OnNewFile()
     {
         // Arrange
-        var repository = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object);
+        var repository = new FolderProjectRepository(_tempDir, _loggerMock.Object);
         var projectId = Guid.NewGuid();
         var projectDir = Path.Combine(_tempDir, $"{projectId}_TestProject");
         var changesDir = Path.Combine(projectDir, "changes");

@@ -8,7 +8,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
-using TimeLeaf.Models.Interfaces;
+using TimeLeaf.Repositories;
+using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
 
@@ -63,13 +64,20 @@ public class ProjectWorkspaceViewModelSaveTests
         var projectId = Guid.NewGuid();
         var project = new Project { Id = projectId };
         project.UpdateName("SaveTest");
-        _repositoryMock.Setup(r => r.LoadAllAsync()).ReturnsAsync(new List<Project> { project });
 
-        var loadUseCase = new LoadProjectsUseCase(_repositoryMock.Object);
-        var saveUseCase = new SaveProjectUseCase(_repositoryMock.Object);
+        var loadUseCaseMock = new Mock<ILoadProjectsUseCase>();
+        var saveUseCaseMock = new Mock<ISaveProjectUseCase>();
+        var findProjectUseCaseMock = new Mock<IFindProjectUseCase>();
+        var syncServiceMock = new Mock<IProjectSyncService>();
         var addProjectUseCaseMock = new Mock<IAddProjectUseCase>();
+        var viewModelFactoryMock = new Mock<IViewModelFactory>();
 
-        var mainViewModel = new MainViewModel(loadUseCase, saveUseCase, _repositoryMock.Object, addProjectUseCaseMock.Object, _mainLoggerMock.Object, _serviceProviderMock.Object);
+        loadUseCaseMock.Setup(r => r.ExecuteAsync()).ReturnsAsync(new List<Project> { project });
+
+        viewModelFactoryMock.Setup(x => x.CreateOverviewViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>()))
+            .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, addProjectUseCaseMock.Object, new Mock<LeafKit.UI.Services.IDialogService>().Object, _serviceProviderMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
+
+        var mainViewModel = new MainViewModel(loadUseCaseMock.Object, saveUseCaseMock.Object, findProjectUseCaseMock.Object, syncServiceMock.Object, addProjectUseCaseMock.Object, viewModelFactoryMock.Object, _mainLoggerMock.Object);
         await System.Threading.Tasks.Task.Delay(100); // InitializeAsync の完了を待つ
 
         // MainViewModel.Projects から該当の ViewModel を取得
@@ -86,7 +94,7 @@ public class ProjectWorkspaceViewModelSaveTests
         // 少し待って非同期の保存処理を待機
         await System.Threading.Tasks.Task.Delay(500);
 
-        _repositoryMock.Verify(r => r.SaveAsync(It.Is<Project>(p => p.Id == projectId && p.Tasks.Any(t => t.Name == "New Task to Save"))), Times.AtLeastOnce(), "タスク追加時にリポジトリの SaveAsync が呼び出されること");
+        saveUseCaseMock.Verify(r => r.ExecuteAsync(It.Is<Project>(p => p.Id == projectId && p.Tasks.Any(t => t.Name == "New Task to Save"))), Times.AtLeastOnce(), "タスク追加時にリポジトリの SaveAsync が呼び出されること");
     }
 
     /// <summary>
@@ -103,13 +111,19 @@ public class ProjectWorkspaceViewModelSaveTests
         project.UpdateName("SaveTest");
         project.AddTask(task);
 
-        _repositoryMock.Setup(r => r.LoadAllAsync()).ReturnsAsync(new List<Project> { project });
-
-        var loadUseCase = new LoadProjectsUseCase(_repositoryMock.Object);
-        var saveUseCase = new SaveProjectUseCase(_repositoryMock.Object);
+        var loadUseCaseMock = new Mock<ILoadProjectsUseCase>();
+        var saveUseCaseMock = new Mock<ISaveProjectUseCase>();
+        var findProjectUseCaseMock = new Mock<IFindProjectUseCase>();
+        var syncServiceMock = new Mock<IProjectSyncService>();
         var addProjectUseCaseMock = new Mock<IAddProjectUseCase>();
+        var viewModelFactoryMock = new Mock<IViewModelFactory>();
 
-        var mainViewModel = new MainViewModel(loadUseCase, saveUseCase, _repositoryMock.Object, addProjectUseCaseMock.Object, _mainLoggerMock.Object, _serviceProviderMock.Object);
+        loadUseCaseMock.Setup(r => r.ExecuteAsync()).ReturnsAsync(new List<Project> { project });
+
+        viewModelFactoryMock.Setup(x => x.CreateOverviewViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>()))
+            .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, addProjectUseCaseMock.Object, new Mock<LeafKit.UI.Services.IDialogService>().Object, _serviceProviderMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
+
+        var mainViewModel = new MainViewModel(loadUseCaseMock.Object, saveUseCaseMock.Object, findProjectUseCaseMock.Object, syncServiceMock.Object, addProjectUseCaseMock.Object, viewModelFactoryMock.Object, _mainLoggerMock.Object);
         await System.Threading.Tasks.Task.Delay(100);
 
         var projectViewModel = mainViewModel.Projects.First(p => p.Id == projectId);
@@ -121,7 +135,7 @@ public class ProjectWorkspaceViewModelSaveTests
         // Assert
         // 自動保存 (UpdatedAt変更トリガー) が完了するのを待つ
         await System.Threading.Tasks.Task.Delay(500);
-        _repositoryMock.Verify(r => r.SaveAsync(It.Is<Project>(p => p.Id == projectId && p.Tasks.Any(t => t.Assignee == "New User"))), Times.AtLeastOnce(), "タスクのプロパティ変更時にリポジトリの SaveAsync が呼び出されること");
+        saveUseCaseMock.Verify(r => r.ExecuteAsync(It.Is<Project>(p => p.Id == projectId && p.Tasks.Any(t => t.Assignee == "New User"))), Times.AtLeastOnce(), "タスクのプロパティ変更時にリポジトリの SaveAsync が呼び出されること");
     }
 
     /// <summary>
@@ -136,13 +150,19 @@ public class ProjectWorkspaceViewModelSaveTests
         var project = new Project { Id = projectId };
         project.UpdateName("Old Name");
 
-        _repositoryMock.Setup(r => r.LoadAllAsync()).ReturnsAsync(new List<Project> { project });
-
-        var loadUseCase = new LoadProjectsUseCase(_repositoryMock.Object);
-        var saveUseCase = new SaveProjectUseCase(_repositoryMock.Object);
+        var loadUseCaseMock = new Mock<ILoadProjectsUseCase>();
+        var saveUseCaseMock = new Mock<ISaveProjectUseCase>();
+        var findProjectUseCaseMock = new Mock<IFindProjectUseCase>();
+        var syncServiceMock = new Mock<IProjectSyncService>();
         var addProjectUseCaseMock = new Mock<IAddProjectUseCase>();
+        var viewModelFactoryMock = new Mock<IViewModelFactory>();
 
-        var mainViewModel = new MainViewModel(loadUseCase, saveUseCase, _repositoryMock.Object, addProjectUseCaseMock.Object, _mainLoggerMock.Object, _serviceProviderMock.Object);
+        loadUseCaseMock.Setup(r => r.ExecuteAsync()).ReturnsAsync(new List<Project> { project });
+
+        viewModelFactoryMock.Setup(x => x.CreateOverviewViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>()))
+            .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, addProjectUseCaseMock.Object, new Mock<LeafKit.UI.Services.IDialogService>().Object, _serviceProviderMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
+
+        var mainViewModel = new MainViewModel(loadUseCaseMock.Object, saveUseCaseMock.Object, findProjectUseCaseMock.Object, syncServiceMock.Object, addProjectUseCaseMock.Object, viewModelFactoryMock.Object, _mainLoggerMock.Object);
         await System.Threading.Tasks.Task.Delay(100);
 
         var projectViewModel = mainViewModel.Projects.First(p => p.Id == projectId);
@@ -152,6 +172,6 @@ public class ProjectWorkspaceViewModelSaveTests
 
         // Assert
         await System.Threading.Tasks.Task.Delay(500);
-        _repositoryMock.Verify(r => r.SaveAsync(It.Is<Project>(p => p.Id == projectId && p.Name == "New Name")), Times.AtLeastOnce(), "プロジェクトのプロパティ変更時にリポジトリの SaveAsync が呼び出されること");
+        saveUseCaseMock.Verify(r => r.ExecuteAsync(It.Is<Project>(p => p.Id == projectId && p.Name == "New Name")), Times.AtLeastOnce(), "プロジェクト�Eプロパティ変更時にリポジトリの SaveAsync が呼び出されること");
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,7 +8,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
-using TimeLeaf.Models.Interfaces;
+using TimeLeaf.Repositories;
+using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
 
@@ -28,10 +30,12 @@ public class MainViewModelSyncTests
     public async System.Threading.Tasks.Task SyncReload_ShouldNotTriggerRedundantSave()
     {
         // Arrange
-        var repositoryMock = new Mock<IProjectRepository>();
-        var loadUseCase = new LoadProjectsUseCase(repositoryMock.Object);
-        var saveUseCase = new SaveProjectUseCase(repositoryMock.Object);
+        var loadUseCaseMock = new Mock<ILoadProjectsUseCase>();
+        var saveUseCaseMock = new Mock<ISaveProjectUseCase>();
+        var findProjectUseCaseMock = new Mock<IFindProjectUseCase>();
+        var syncServiceMock = new Mock<IProjectSyncService>();
         var addProjectUseCaseMock = new Mock<IAddProjectUseCase>();
+        var viewModelFactoryMock = new Mock<IViewModelFactory>();
         var loggerMock = new Mock<ILogger<MainViewModel>>();
         var dialogServiceMock = new Mock<IDialogService>();
         _serviceProviderMock = new Mock<IServiceProvider>();
@@ -48,24 +52,27 @@ public class MainViewModelSyncTests
         _serviceProviderMock.Setup(sp => sp.GetService(typeof(IServiceProvider)))
             .Returns(_serviceProviderMock.Object);
 
+        // Factory mock setup
+        viewModelFactoryMock.Setup(x => x.CreateOverviewViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>()))
+            .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, addProjectUseCaseMock.Object, dialogServiceMock.Object, _serviceProviderMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
+
         var projectId = Guid.NewGuid();
         var initialProject = new Project { Id = projectId };
         initialProject.UpdateName("Initial");
-        // initialProject.Tasks.Add(new ProjectTask { Name = "Task 1" }); // 初期ロードではタスクを持たない
 
-        repositoryMock.Setup(r => r.LoadAllAsync()).ReturnsAsync(new List<Project> { initialProject });
+        loadUseCaseMock.Setup(r => r.ExecuteAsync()).ReturnsAsync(new List<Project> { initialProject });
 
-        var viewModel = new MainViewModel(loadUseCase, saveUseCase, repositoryMock.Object, addProjectUseCaseMock.Object, loggerMock.Object, _serviceProviderMock.Object);
+        var viewModel = new MainViewModel(loadUseCaseMock.Object, saveUseCaseMock.Object, findProjectUseCaseMock.Object, syncServiceMock.Object, addProjectUseCaseMock.Object, viewModelFactoryMock.Object, loggerMock.Object);
         await System.Threading.Tasks.Task.Delay(100); // InitializeAsync の完了を待つ
 
         // ロードされる「最新」の状態を準備（別のタスクがある状態）
         var updatedProject = new Project { Id = projectId };
         updatedProject.UpdateName("Updated");
         updatedProject.AddTask(new ProjectTask { Name = "Task from Sync" }); // 同期で追加されるタスク
-        repositoryMock.Setup(r => r.LoadAsync(projectId)).ReturnsAsync(updatedProject);
+        findProjectUseCaseMock.Setup(r => r.ExecuteAsync(projectId)).ReturnsAsync(updatedProject);
 
         // Act
-        repositoryMock.Raise(r => r.ProjectChanged += null, projectId);
+        syncServiceMock.Raise(r => r.ProjectChanged += null, projectId);
         await System.Threading.Tasks.Task.Delay(500); // OnProjectChanged 内の Dispatcher.InvokeAsync の完了をより長く待つ
 
         // Assert

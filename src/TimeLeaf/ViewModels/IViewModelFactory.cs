@@ -1,0 +1,15 @@
+using System.Collections.ObjectModel;
+using TimeLeaf.Models.Entities;
+
+namespace TimeLeaf.ViewModels;
+
+/// <summary>
+/// ViewModel を生成するためのファクトリインターフェース。
+/// プレゼンテーション層がフレームワーク（DIコンテナ等）に直接依存するのを防ぐ。
+/// </summary>
+public interface IViewModelFactory
+{
+    OverviewViewModel CreateOverviewViewModel(ObservableCollection<ProjectViewModel> projects);
+    ProjectWorkspaceViewModel CreateProjectWorkspaceViewModel(ProjectViewModel projectViewModel);
+    AddProjectViewModel CreateAddProjectViewModel();
+}

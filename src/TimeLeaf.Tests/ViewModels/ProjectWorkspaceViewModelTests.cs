@@ -3,7 +3,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
-using TimeLeaf.Models.Interfaces;
+using TimeLeaf.Repositories;
+using TimeLeaf.Services;
 using TimeLeaf.ViewModels;
 
 namespace TimeLeaf.Tests.ViewModels;

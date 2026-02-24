@@ -1,14 +1,14 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TimeLeaf.Models.Entities;
-using TimeLeaf.Models.Interfaces;
+using TimeLeaf.Repositories;
 
 namespace TimeLeaf.UseCases;
 
 /// <summary>
 /// 全てのプロジェクトを読み込むユースケース。
 /// </summary>
-public class LoadProjectsUseCase
+public class LoadProjectsUseCase : ILoadProjectsUseCase
 {
     private readonly IProjectRepository _repository;
 

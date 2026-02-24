@@ -9,7 +9,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TimeLeaf.Models.Entities;
-using TimeLeaf.Models.Interfaces;
+using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
 
@@ -20,12 +20,13 @@ namespace TimeLeaf.ViewModels;
 /// </summary>
 public partial class MainViewModel : ObservableObject
 {
-    private readonly LoadProjectsUseCase _loadUseCase;
-    private readonly SaveProjectUseCase _saveSingleUseCase;
-    private readonly IProjectRepository _repository;
+    private readonly ILoadProjectsUseCase _loadUseCase;
+    private readonly ISaveProjectUseCase _saveSingleUseCase;
+    private readonly IFindProjectUseCase _findProjectUseCase;
+    private readonly IProjectSyncService _syncService;
     private readonly IAddProjectUseCase _addProjectUseCase;
+    private readonly IViewModelFactory _viewModelFactory;
     private readonly ILogger<MainViewModel> _logger;
-    private readonly IServiceProvider _serviceProvider;
 
     private bool _isSyncing = false;
 
@@ -40,26 +41,29 @@ public partial class MainViewModel : ObservableObject
     /// <summary>
     /// コンストラクタ。
     /// </summary>
-    /// <param name="loadUseCase">プロジェクト読み込みユースケース。</param>
-    /// <param name="saveSingleUseCase">単一プロジェクト保存ユースケース。</param>
-    /// <param name="repository">イベント購読用リポジトリ（DIより注入）。</param>
-    /// <param name="addProjectUseCase">プロジェクト追加ユースケース。</param>
-    /// <param name="logger">ロガー。</param>
-    /// <param name="serviceProvider">サービスプロバイダー。</param>
-    public MainViewModel(LoadProjectsUseCase loadUseCase, SaveProjectUseCase saveSingleUseCase, IProjectRepository repository, IAddProjectUseCase addProjectUseCase, ILogger<MainViewModel> logger, IServiceProvider serviceProvider)
+    public MainViewModel(
+        ILoadProjectsUseCase loadUseCase,
+        ISaveProjectUseCase saveSingleUseCase,
+        IFindProjectUseCase findProjectUseCase,
+        IProjectSyncService syncService,
+        IAddProjectUseCase addProjectUseCase,
+        IViewModelFactory viewModelFactory,
+        ILogger<MainViewModel> logger)
     {
         _loadUseCase = loadUseCase;
         _saveSingleUseCase = saveSingleUseCase;
-        _repository = repository;
+        _findProjectUseCase = findProjectUseCase;
+        _syncService = syncService;
         _addProjectUseCase = addProjectUseCase;
+        _viewModelFactory = viewModelFactory;
         _logger = logger;
-        _serviceProvider = serviceProvider;
-        _currentViewModel = ActivatorUtilities.CreateInstance<OverviewViewModel>(_serviceProvider, Projects);
+
+        _currentViewModel = _viewModelFactory.CreateOverviewViewModel(Projects);
 
         _logger.LogInformation("MainViewModel Initializing");
 
-        // 外部変更（同期）の監視
-        _repository.ProjectChanged += OnProjectChanged;
+        // 外部変更（同期）の監視をサービス経由で行う
+        _syncService.ProjectChanged += OnProjectChanged;
 
         // 内部変更の監視と自動保存
         Projects.CollectionChanged += (s, e) =>
@@ -126,10 +130,10 @@ public partial class MainViewModel : ObservableObject
             _isSyncing = true;
             try
             {
-                var updatedProjectEntity = await _repository.LoadAsync(projectId);
+                var updatedProjectEntity = await _findProjectUseCase.ExecuteAsync(projectId);
                 if (updatedProjectEntity == null) return;
 
-                var existingViewModel = Projects.FirstOrDefault(pvm => pvm.Id == projectId); // ViewModelを検索
+                var existingViewModel = Projects.FirstOrDefault(pvm => pvm.Id == projectId);
                 if (existingViewModel != null)
                 {
                     existingViewModel.IsSyncing = true;
@@ -149,7 +153,7 @@ public partial class MainViewModel : ObservableObject
                             existingViewModel.Model.AddTask(t);
                         }
 
-                        existingViewModel.SyncFromModel(); // まとめて通知
+                        existingViewModel.SyncFromModel();
                     }
                     finally
                     {
@@ -160,7 +164,6 @@ public partial class MainViewModel : ObservableObject
                 {
                     _logger.LogDebug("Adding new project {ProjectId} ViewModel from sync.", projectId);
                     var newProjectViewModel = new ProjectViewModel(updatedProjectEntity);
-                    WireProjectViewModelEvents(newProjectViewModel); // イベント購読を追加
                     Projects.Add(newProjectViewModel);
                 }
             }
@@ -174,10 +177,12 @@ public partial class MainViewModel : ObservableObject
             }
         }
 
-        // Dispatcher を介して実行（UIスレッドを担保）
-        if (Application.Current?.Dispatcher != null)
+        // Application.Current.Dispatcher が利用可能な場合はそれを使用し、
+        // テスト環境などで利用不可な場合は直接実行する。
+        var dispatcher = Application.Current?.Dispatcher;
+        if (dispatcher != null && !dispatcher.CheckAccess())
         {
-            Application.Current.Dispatcher.InvokeAsync(UpdateAction);
+            dispatcher.InvokeAsync(UpdateAction);
         }
         else
         {
@@ -218,20 +223,17 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void NavigateToProject(ProjectViewModel projectViewModel) // 引数の型を ViewModel に変更
+    private void NavigateToProject(ProjectViewModel projectViewModel)
     {
         if (projectViewModel == null) return;
         _logger.LogInformation("Navigating to project {ProjectId}", projectViewModel.Id);
-        CurrentViewModel = new ProjectWorkspaceViewModel(
-            projectViewModel,
-            _serviceProvider.GetRequiredService<ICurrentUserService>(),
-            _serviceProvider.GetRequiredService<ILogger<ProjectWorkspaceViewModel>>()); // ViewModel を渡す
+        CurrentViewModel = _viewModelFactory.CreateProjectWorkspaceViewModel(projectViewModel);
     }
 
     [RelayCommand]
     private void NavigateBack()
     {
         _logger.LogInformation("Navigating back to Overview");
-        CurrentViewModel = ActivatorUtilities.CreateInstance<OverviewViewModel>(_serviceProvider, Projects);
+        CurrentViewModel = _viewModelFactory.CreateOverviewViewModel(Projects);
     }
 }

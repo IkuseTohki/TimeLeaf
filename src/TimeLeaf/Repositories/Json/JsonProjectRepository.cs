@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using TimeLeaf.Models.Entities;
-using TimeLeaf.Models.Interfaces;
+using TimeLeaf.Repositories;
 
 namespace TimeLeaf.Repositories.Json;
 
@@ -66,14 +66,14 @@ public class JsonProjectRepository : IProjectRepository
         return projects.FirstOrDefault(p => p.Id == projectId);
     }
 
-    public async System.Threading.Tasks.Task SaveAllAsync(IEnumerable<Project> projects)
+    public async System.Threading.Tasks.Task SaveAllAsync(IEnumerable<Project> projects, string userId)
     {
         var dtos = projects.Select(p => new ProjectFullDto(
             p.Id, p.Name, p.Description, p.Status, p.HealthStatus, p.CreatedAt, p.UpdatedAt,
             p.Tasks.Select(t => new ProjectTaskFullDto(
                 t.Id, t.Name, t.Description, t.Status, t.Priority,
                 t.ScheduledStartDate, t.Deadline, t.ActualStartDate, t.ActualEndDate,
-                t.EstimatedCost, t.ActualCost, t.Assignee, t.Dependencies,
+                t.EstimatedCost, t.ActualCost, t.Assignee, t.Dependencies.ToList(),
                 t.Comments.ToList())).ToList(),
             p.Milestones.Select(m => new MilestoneDto(m.Date, m.Label)).ToList()
         )).ToList();
@@ -82,9 +82,9 @@ public class JsonProjectRepository : IProjectRepository
         await JsonSerializer.SerializeAsync(stream, dtos, _options);
     }
 
-    public System.Threading.Tasks.Task SaveAsync(Project project)
+    public System.Threading.Tasks.Task SaveAsync(Project project, string userId)
     {
-        return SaveAllAsync(new[] { project });
+        return SaveAllAsync(new[] { project }, userId);
     }
 
     private record MilestoneDto(DateTime Date, string Label);

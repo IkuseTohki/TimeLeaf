@@ -7,7 +7,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
-using TimeLeaf.Models.Interfaces;
+using TimeLeaf.Repositories;
+using TimeLeaf.Services;
 using TimeLeaf.Repositories.FileSystem;
 
 namespace TimeLeaf.Tests.Infrastructure;
@@ -41,7 +42,7 @@ public class SurgicalSavingTests
     public async System.Threading.Tasks.Task SaveProjectAsync_ShouldOnlyAffectTargetProject()
     {
         // Arrange
-        var repo = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object); // ロガーモックを渡す
+        var repo = new FolderProjectRepository(_tempDir, _loggerMock.Object);
         var projectA = new Project();
         projectA.UpdateName("ProjectA");
         var projectB = new Project();
@@ -67,19 +68,19 @@ public class SurgicalSavingTests
     public async System.Threading.Tasks.Task SaveProjectAsync_ShouldNotCreateFile_IfContentIsSame()
     {
         // Arrange
-        var repo = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object); // ロガーモックを渡す
+        var repo = new FolderProjectRepository(_tempDir, _loggerMock.Object);
         var project = new Project();
         project.UpdateName("SameName");
 
         // 1回目の保存
-        await repo.SaveAllAsync(new[] { project });
+        await repo.SaveAllAsync(new[] { project }, "test-user");
         var projectDir = Directory.GetDirectories(_tempDir).First();
         var changesDir = Path.Combine(projectDir, "changes");
         var initialFileCount = Directory.GetFiles(changesDir).Length;
 
         // Act
         // 2回目の保存（内容は全く同じ）
-        await repo.SaveAllAsync(new[] { project });
+        await repo.SaveAllAsync(new[] { project }, "test-user");
 
         // Assert
         var currentFileCount = Directory.GetFiles(changesDir).Length;

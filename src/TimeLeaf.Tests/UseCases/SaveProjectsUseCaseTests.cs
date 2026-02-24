@@ -3,7 +3,8 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
-using TimeLeaf.Models.Interfaces;
+using TimeLeaf.Repositories;
+using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 
 namespace TimeLeaf.Tests.UseCases;
@@ -12,11 +13,14 @@ namespace TimeLeaf.Tests.UseCases;
 public class SaveProjectsUseCaseTests
 {
     private Mock<IProjectRepository> _repositoryMock = null!;
+    private Mock<ICurrentUserService> _userServiceMock = null!;
 
     [TestInitialize]
     public void Setup()
     {
         _repositoryMock = new Mock<IProjectRepository>();
+        _userServiceMock = new Mock<ICurrentUserService>();
+        _userServiceMock.Setup(u => u.GetCurrentUserId()).Returns("test-user");
     }
 
     /// <summary>
@@ -29,12 +33,12 @@ public class SaveProjectsUseCaseTests
         var p1 = new Project();
         p1.UpdateName("P1");
         var projects = new List<Project> { p1 };
-        var useCase = new SaveProjectsUseCase(_repositoryMock.Object);
+        var useCase = new SaveProjectsUseCase(_repositoryMock.Object, _userServiceMock.Object);
 
         // Act
         await useCase.ExecuteAsync(projects);
 
         // Assert
-        _repositoryMock.Verify(r => r.SaveAllAsync(projects), Times.Once);
+        _repositoryMock.Verify(r => r.SaveAllAsync(projects, "test-user"), Times.Once);
     }
 }

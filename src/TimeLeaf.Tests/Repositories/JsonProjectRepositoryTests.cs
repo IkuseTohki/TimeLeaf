@@ -43,7 +43,7 @@ public class JsonProjectRepositoryTests
         var originalProjects = new List<Project> { p1, p2 };
 
         // Act
-        await repository.SaveAllAsync(originalProjects);
+        await repository.SaveAllAsync(originalProjects, "test-user");
         var loadedProjects = (await repository.LoadAllAsync()).ToList();
 
         // Assert
@@ -68,7 +68,7 @@ public class JsonProjectRepositoryTests
         var originalProjects = new List<Project> { project };
 
         // Act
-        await repository.SaveAllAsync(originalProjects);
+        await repository.SaveAllAsync(originalProjects, "test-user");
         var loadedProjects = (await repository.LoadAllAsync()).ToList();
 
         // Assert

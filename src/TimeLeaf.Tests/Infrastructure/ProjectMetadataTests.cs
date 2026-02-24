@@ -7,7 +7,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
-using TimeLeaf.Models.Interfaces;
+using TimeLeaf.Repositories;
+using TimeLeaf.Services;
 using TimeLeaf.Repositories.FileSystem;
 
 namespace TimeLeaf.Tests.Infrastructure;
@@ -41,12 +42,12 @@ public class ProjectMetadataTests
     public async System.Threading.Tasks.Task SaveAsync_ShouldCreateImmutableMetadataFile()
     {
         // Arrange
-        var repo = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object); // ロガーモックを渡す
+        var repo = new FolderProjectRepository(_tempDir, _loggerMock.Object);
         var project = new Project();
         project.UpdateName("MetaTest");
 
         // Act
-        await repo.SaveAsync(project);
+        await repo.SaveAsync(project, "meta-user");
 
         // Assert
         var projectDir = Directory.GetDirectories(_tempDir).First();
@@ -66,7 +67,7 @@ public class ProjectMetadataTests
         var firstMetaContent = metaJson;
         project.UpdateName("Changed Name");
         await System.Threading.Tasks.Task.Delay(10); // 時間をずらす
-        await repo.SaveAsync(project);
+        await repo.SaveAsync(project, "meta-user");
 
         var secondMetaContent = await File.ReadAllTextAsync(metaFilePath);
         Assert.AreEqual(firstMetaContent, secondMetaContent, ".project ファイルの内容は不変であること");
@@ -79,19 +80,19 @@ public class ProjectMetadataTests
     public async System.Threading.Tasks.Task LoadAllAsync_ShouldSortByCreatedAt()
     {
         // Arrange
-        var repo = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object); // ロガーモックを渡す
+        var repo = new FolderProjectRepository(_tempDir, _loggerMock.Object);
 
         // 1つ目のプロジェクト作成
         var p1 = new Project();
         p1.UpdateName("First");
-        await repo.SaveAsync(p1);
+        await repo.SaveAsync(p1, "meta-user");
 
         await System.Threading.Tasks.Task.Delay(100); // 作成日をずらす
 
         // 2つ目のプロジェクト作成
         var p2 = new Project();
         p2.UpdateName("Second");
-        await repo.SaveAsync(p2);
+        await repo.SaveAsync(p2, "meta-user");
 
         // Act
         var result = (await repo.LoadAllAsync()).ToList();

@@ -10,16 +10,6 @@ namespace TimeLeaf.Tests.ViewModels;
 [TestClass]
 public class ProjectViewModelTests
 {
-    // [TestMethod]
-    // public void Constructor_ShouldThrowArgumentNullException_WhenProjectIsNull()
-    // {
-    //     // Arrange
-    //     Project project = null!;
-    //
-    //     // Act & Assert
-    //     Assert.ThrowsException<ArgumentNullException>(() => new ProjectViewModel(project), "nullプロジェクトでコンストラクタを呼び出した際にArgumentNullExceptionがスローされること");
-    // }
-
     /// <summary>
     /// テスト観点: Name プロパティを変更した際に、基になる Project エンティティの Name が更新され、
     /// かつ PropertyChanged イベントが発火することを確認する。
@@ -108,7 +98,7 @@ public class ProjectViewModelTests
 
         // Act
         project.AddTask(newTaskViewModel.Model);
-        viewModel.SyncFromModel(); // 手動同期が必要になった
+        viewModel.SyncFromModel();
 
         // Assert
         Assert.AreEqual(1, receivedEstimatedCostEvents, "タスク追加時にTotalEstimatedCostのPropertyChangedイベントが発火すること");
@@ -125,8 +115,9 @@ public class ProjectViewModelTests
         // Arrange
         var project = new Project();
         var existingTaskViewModel = new ProjectTaskViewModel(new ProjectTask { EstimatedCost = 10, ActualCost = 5 });
-        var viewModel = new ProjectViewModel(project); // ViewModel構築時、内部で ProjectTaskViewModel にラップされる
-        viewModel.Tasks.Add(existingTaskViewModel);
+        var viewModel = new ProjectViewModel(project);
+        project.AddTask(existingTaskViewModel.Model);
+        viewModel.SyncFromModel();
 
         var receivedEstimatedCostEvents = 0;
         var receivedActualCostEvents = 0;
@@ -143,8 +134,8 @@ public class ProjectViewModelTests
         };
 
         // Act
-        project.RemoveTask(existingTaskViewModel.Id); // IDで削除
-        viewModel.SyncFromModel(); // 手動同期
+        project.RemoveTask(existingTaskViewModel.Id);
+        viewModel.SyncFromModel();
 
         // Assert
         Assert.AreEqual(1, receivedEstimatedCostEvents, "タスク削除時にTotalEstimatedCostのPropertyChangedイベントが発火すること");
@@ -181,7 +172,7 @@ public class ProjectViewModelTests
         project.AddTask(task2);
 
         var viewModel = new ProjectViewModel(project);
-        var taskViewModel1 = viewModel.Tasks.First(t => t.Id == task1.Id); // ViewModel から ProjectTaskViewModel を取得
+        var taskViewModel1 = viewModel.Tasks.First(t => t.Id == task1.Id);
 
         var receivedEstimatedCostEvents = 0;
         var receivedActualCostEvents = 0;
@@ -198,8 +189,8 @@ public class ProjectViewModelTests
         };
 
         // Act
-        taskViewModel1.EstimatedCost = 15; // ViewModel を介してコストを変更
-        taskViewModel1.ActualCost = 8;     // ViewModel を介してコストを変更
+        taskViewModel1.EstimatedCost = 15;
+        taskViewModel1.ActualCost = 8;
 
         // Assert
         // EstimatedCost で 1回、ActualCost で 1回、合計 2回ずつ発火するはず

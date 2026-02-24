@@ -1,6 +1,7 @@
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Models.Enums;
-using TimeLeaf.Models.Interfaces;
+using TimeLeaf.Repositories;
+using TimeLeaf.Services;
 using System.Threading.Tasks;
 
 namespace TimeLeaf.UseCases;
@@ -11,10 +12,12 @@ namespace TimeLeaf.UseCases;
 public class AddProjectUseCase : IAddProjectUseCase
 {
     private readonly IProjectRepository _repository;
+    private readonly ICurrentUserService _userService;
 
-    public AddProjectUseCase(IProjectRepository repository)
+    public AddProjectUseCase(IProjectRepository repository, ICurrentUserService userService)
     {
         _repository = repository;
+        _userService = userService;
     }
 
     public async Task<Project> ExecuteAsync(string name, string description, ProjectStatus status, ProjectHealth health)
@@ -25,7 +28,8 @@ public class AddProjectUseCase : IAddProjectUseCase
         project.UpdateStatus(status);
         project.UpdateHealth(health);
 
-        await _repository.SaveAsync(project);
+        var userId = _userService.GetCurrentUserId();
+        await _repository.SaveAsync(project, userId);
         return project;
     }
 }

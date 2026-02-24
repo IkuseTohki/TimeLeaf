@@ -8,7 +8,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
-using TimeLeaf.Models.Interfaces;
+using TimeLeaf.Repositories;
+using TimeLeaf.Services;
 using TimeLeaf.Repositories.FileSystem;
 
 namespace TimeLeaf.Tests.Infrastructure;
@@ -45,13 +46,13 @@ public class FolderProjectRepositoryTests
     public async System.Threading.Tasks.Task SaveAllAsync_ShouldCreateCorrectFolderStructure()
     {
         // Arrange
-        var repository = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object); // ロガーモックを渡す
+        var repository = new FolderProjectRepository(_tempDir, _loggerMock.Object);
         var project = new Project();
         project.UpdateName("StructureTest");
         var projects = new List<Project> { project };
 
         // Act
-        await repository.SaveAllAsync(projects);
+        await repository.SaveAllAsync(projects, "test-user");
 
         // Assert
         // 1. プロジェクトフォルダの存在確認
@@ -82,7 +83,7 @@ public class FolderProjectRepositoryTests
     public async System.Threading.Tasks.Task SaveAndLoad_ShouldPreserveTaskCostProperties()
     {
         // Arrange
-        var repository = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object); // ロガーモックを渡す
+        var repository = new FolderProjectRepository(_tempDir, _loggerMock.Object);
         var projectId = Guid.NewGuid();
         var project = new Project { Id = projectId };
         project.UpdateName("CostTest");
@@ -97,7 +98,7 @@ public class FolderProjectRepositoryTests
         project.AddTask(task);
 
         // Act
-        await repository.SaveAsync(project);
+        await repository.SaveAsync(project, "test-user");
         var loadedProject = await repository.LoadAsync(projectId);
 
         // Assert
@@ -117,7 +118,7 @@ public class FolderProjectRepositoryTests
     public async System.Threading.Tasks.Task SaveAndLoad_ShouldPreserveTaskAssignmentAndDependencies()
     {
         // Arrange
-        var repository = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object);
+        var repository = new FolderProjectRepository(_tempDir, _loggerMock.Object);
         var projectId = Guid.NewGuid();
         var project = new Project { Id = projectId };
         project.UpdateName("RelationTest");
@@ -132,7 +133,7 @@ public class FolderProjectRepositoryTests
         project.AddTask(mainTask);
 
         // Act
-        await repository.SaveAsync(project);
+        await repository.SaveAsync(project, "test-user");
         var loadedProject = await repository.LoadAsync(projectId);
 
         // Assert
@@ -151,7 +152,7 @@ public class FolderProjectRepositoryTests
     public async System.Threading.Tasks.Task SaveAndLoad_ShouldPreserveMilestones()
     {
         // Arrange
-        var repository = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object);
+        var repository = new FolderProjectRepository(_tempDir, _loggerMock.Object);
         var projectId = Guid.NewGuid();
         var project = new Project { Id = projectId };
         project.UpdateName("MilestoneTest");
@@ -160,7 +161,7 @@ public class FolderProjectRepositoryTests
         project.AddMilestone(new Milestone { Date = mDate, Label = mLabel });
 
         // Act
-        await repository.SaveAsync(project);
+        await repository.SaveAsync(project, "test-user");
         var loadedProject = await repository.LoadAsync(projectId);
 
         // Assert
@@ -177,7 +178,7 @@ public class FolderProjectRepositoryTests
     public async System.Threading.Tasks.Task SaveAndLoad_ShouldPreserveTaskScheduleProperties()
     {
         // Arrange
-        var repository = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object);
+        var repository = new FolderProjectRepository(_tempDir, _loggerMock.Object);
         var projectId = Guid.NewGuid();
         var project = new Project { Id = projectId };
         project.UpdateName("ScheduleTest");
@@ -195,7 +196,7 @@ public class FolderProjectRepositoryTests
         project.AddTask(task);
 
         // Act
-        await repository.SaveAsync(project);
+        await repository.SaveAsync(project, "test-user");
         var loadedProject = await repository.LoadAsync(projectId);
 
         // Assert
@@ -214,7 +215,7 @@ public class FolderProjectRepositoryTests
     public async System.Threading.Tasks.Task SaveAndLoad_ShouldPreserveTimeMetadata()
     {
         // Arrange
-        var repository = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object);
+        var repository = new FolderProjectRepository(_tempDir, _loggerMock.Object);
         var projectId = Guid.NewGuid();
 
         // ミリ秒未満の精度は JSON シリアライズで落ちる可能性があるため、
@@ -233,7 +234,7 @@ public class FolderProjectRepositoryTests
         // 構築済みのエンティティをそのまま保存する（セッターがない場合はコンストラクタインジェクション等を検討すべきだが
         // 現状はテストのために RefreshUpdatedAt を呼ばない手段を講じる）
 
-        await repository.SaveAsync(project);
+        await repository.SaveAsync(project, "test-user");
         var loadedProject = await repository.LoadAsync(projectId);
 
         // Assert

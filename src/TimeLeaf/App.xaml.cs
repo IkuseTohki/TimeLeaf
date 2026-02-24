@@ -4,7 +4,7 @@ using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
-using TimeLeaf.Models.Interfaces;
+using TimeLeaf.Repositories;
 using TimeLeaf.Repositories.FileSystem;
 using TimeLeaf.Services;
 using TimeLeaf.UseCases;
@@ -50,21 +50,29 @@ public partial class App : Application
 
         services.AddSingleton<ICurrentUserService, WindowsCurrentUserService>();
         services.AddSingleton<IProjectRepository>(sp =>
-            new FolderProjectRepository(storagePath, sp.GetRequiredService<ICurrentUserService>(), sp.GetRequiredService<ILogger<FolderProjectRepository>>()));
+            new FolderProjectRepository(storagePath, sp.GetRequiredService<ILogger<FolderProjectRepository>>()));
 
         // LeafKit.UI サービスの登録
         services.AddSingleton<IDialogService, DialogService>();
 
+        // アプリケーションサービスの登録
+        services.AddSingleton<IProjectSyncService, ProjectSyncService>();
+        services.AddSingleton<IViewModelFactory, ViewModelFactory>();
+
         // ユースケースの登録
-        services.AddTransient<LoadProjectsUseCase>();
-        services.AddTransient<SaveProjectsUseCase>();
-        services.AddTransient<SaveProjectUseCase>();
+        services.AddTransient<ILoadProjectsUseCase, LoadProjectsUseCase>();
+        services.AddTransient<ISaveProjectsUseCase, SaveProjectsUseCase>();
+        services.AddTransient<ISaveProjectUseCase, SaveProjectUseCase>();
+        services.AddTransient<IFindProjectUseCase, FindProjectUseCase>();
         services.AddTransient<IAddProjectUseCase, AddProjectUseCase>();
 
         // ViewModel の登録
         services.AddTransient<MainViewModel>();
-        services.AddTransient<OverviewViewModel>();
         services.AddTransient<AddProjectViewModel>();
+        // Note: OverviewViewModel と ProjectWorkspaceViewModel はファクトリ経由で生成されるため、直接の Transient 登録は不要だが、
+        // ファクトリ内での GetRequiredService 用に登録しておく。
+        services.AddTransient<OverviewViewModel>();
+        services.AddTransient<ProjectWorkspaceViewModel>();
 
         // View の登録
         services.AddTransient<MainWindow>();

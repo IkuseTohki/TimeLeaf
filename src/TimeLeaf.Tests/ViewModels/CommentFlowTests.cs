@@ -7,7 +7,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
-using TimeLeaf.Models.Interfaces;
+using TimeLeaf.Repositories;
+using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
 
@@ -19,6 +20,7 @@ namespace TimeLeaf.Tests.ViewModels;
 public class CommentFlowTests
 {
     private Mock<IProjectRepository> _repositoryMock = null!;
+    private Mock<ISaveProjectUseCase> _saveUseCaseMock = null!;
     private Mock<ICurrentUserService> _userServiceMock = null!;
     private Mock<IServiceProvider> _serviceProviderMock = null!;
     private Mock<IDialogService> _dialogServiceMock = null!;
@@ -28,12 +30,15 @@ public class CommentFlowTests
     public async Task Setup()
     {
         _repositoryMock = new Mock<IProjectRepository>();
+        _saveUseCaseMock = new Mock<ISaveProjectUseCase>();
         _userServiceMock = new Mock<ICurrentUserService>();
         _userServiceMock.Setup(u => u.GetCurrentUserId()).Returns("test-user");
 
-        var loadUseCase = new LoadProjectsUseCase(_repositoryMock.Object);
-        var saveUseCase = new SaveProjectUseCase(_repositoryMock.Object);
+        var loadUseCaseMock = new Mock<ILoadProjectsUseCase>();
+        var findProjectUseCaseMock = new Mock<IFindProjectUseCase>();
+        var syncServiceMock = new Mock<IProjectSyncService>();
         var addProjectUseCaseMock = new Mock<IAddProjectUseCase>();
+        var viewModelFactoryMock = new Mock<IViewModelFactory>();
         var loggerMock = new Mock<ILogger<MainViewModel>>();
         _dialogServiceMock = new Mock<IDialogService>();
 
@@ -56,10 +61,25 @@ public class CommentFlowTests
         var task = new ProjectTask { Name = "Test Task" };
         project.AddTask(task);
 
-        _repositoryMock.Setup(r => r.LoadAllAsync()).ReturnsAsync(new[] { project });
+        loadUseCaseMock.Setup(r => r.ExecuteAsync()).ReturnsAsync(new[] { project });
 
-        _mainViewModel = new MainViewModel(loadUseCase, saveUseCase, _repositoryMock.Object, addProjectUseCaseMock.Object, loggerMock.Object, _serviceProviderMock.Object);
-        await Task.Delay(50); // Wait for initialize
+        // Factory mock setup
+        viewModelFactoryMock.Setup(x => x.CreateOverviewViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>()))
+            .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, addProjectUseCaseMock.Object, _dialogServiceMock.Object, _serviceProviderMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
+
+        viewModelFactoryMock.Setup(x => x.CreateProjectWorkspaceViewModel(It.IsAny<ProjectViewModel>()))
+            .Returns((ProjectViewModel pvm) => new ProjectWorkspaceViewModel(pvm, new Mock<ICurrentUserService>().Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object));
+
+        _mainViewModel = new MainViewModel(
+            loadUseCaseMock.Object,
+            _saveUseCaseMock.Object,
+            findProjectUseCaseMock.Object,
+            syncServiceMock.Object,
+            addProjectUseCaseMock.Object,
+            viewModelFactoryMock.Object,
+            loggerMock.Object);
+
+        await Task.Delay(500); // 確実に初期化！EnitializeAsync�E�を征E��
     }
 
     /// <summary>
@@ -70,7 +90,10 @@ public class CommentFlowTests
     public async Task AddComment_ShouldTriggerRepositorySave()
     {
         // Arrange
-        var projectViewModel = _mainViewModel.Projects.First();
+        await Task.Delay(500);
+        var projectViewModel = _mainViewModel.Projects.FirstOrDefault();
+        Assert.IsNotNull(projectViewModel, "初期ロードでプロジェクトが取得できていること");
+
         _mainViewModel.NavigateToProjectCommand.Execute(projectViewModel);
         var workspaceViewModel = (ProjectWorkspaceViewModel)_mainViewModel.CurrentViewModel;
 
@@ -82,7 +105,7 @@ public class CommentFlowTests
         await Task.Delay(200); // 自動保存の完了を待つ
 
         // Assert
-        _repositoryMock.Verify(r => r.SaveAsync(It.Is<Project>(p =>
+        _saveUseCaseMock.Verify(r => r.ExecuteAsync(It.Is<Project>(p =>
             p.Tasks.Any(t => t.Comments.Any(c => c.Content == "New test comment")))),
             Times.AtLeastOnce, "コメント追加により保存が走ること");
 
@@ -147,7 +170,7 @@ public class CommentFlowTests
         await Task.Delay(200); // 自動保存の完了を待つ
 
         // Assert
-        _repositoryMock.Verify(r => r.SaveAsync(It.Is<Project>(p =>
+        _saveUseCaseMock.Verify(r => r.ExecuteAsync(It.Is<Project>(p =>
             p.Tasks.Any(t => t.Assignee == "New Author After Sync"))),
             Times.AtLeastOnce, "同期後のタスクに対する変更も保存が実行されること");
     }

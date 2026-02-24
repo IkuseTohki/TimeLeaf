@@ -3,7 +3,8 @@ using Moq;
 using System.Threading.Tasks;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Models.Enums;
-using TimeLeaf.Models.Interfaces;
+using TimeLeaf.Repositories;
+using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 
 namespace TimeLeaf.Tests.UseCases;
@@ -20,7 +21,9 @@ public class AddProjectUseCaseTests
     {
         // Arrange
         var repositoryMock = new Mock<IProjectRepository>();
-        var useCase = new AddProjectUseCase(repositoryMock.Object);
+        var userServiceMock = new Mock<ICurrentUserService>();
+        userServiceMock.Setup(u => u.GetCurrentUserId()).Returns("test-user");
+        var useCase = new AddProjectUseCase(repositoryMock.Object, userServiceMock.Object);
 
         var name = "Test Project";
         var description = "Test Description";
@@ -37,7 +40,7 @@ public class AddProjectUseCaseTests
             p.Description == description &&
             p.Status == status &&
             p.HealthStatus == health
-        )), Times.Once);
+        ), "test-user"), Times.Once);
 
         // 2. 返されたプロジェクトのプロパティが正しいことを確認
         Assert.IsNotNull(createdProject);

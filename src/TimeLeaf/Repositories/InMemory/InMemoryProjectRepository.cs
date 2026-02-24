@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TimeLeaf.Models.Entities;
-using TimeLeaf.Models.Interfaces;
+using TimeLeaf.Repositories;
 
 namespace TimeLeaf.Repositories.InMemory;
 
@@ -35,14 +35,14 @@ public class InMemoryProjectRepository : IProjectRepository
         return System.Threading.Tasks.Task.FromResult<Project?>(_projects.FirstOrDefault(p => p.Id == projectId));
     }
 
-    public System.Threading.Tasks.Task SaveAllAsync(IEnumerable<Project> projects)
+    public System.Threading.Tasks.Task SaveAllAsync(IEnumerable<Project> projects, string userId)
     {
         _projects.Clear();
         _projects.AddRange(projects);
         return System.Threading.Tasks.Task.CompletedTask;
     }
 
-    public System.Threading.Tasks.Task SaveAsync(Project project)
+    public System.Threading.Tasks.Task SaveAsync(Project project, string userId)
     {
         var existing = _projects.FirstOrDefault(p => p.Id == project.Id);
         if (existing != null) _projects.Remove(existing);

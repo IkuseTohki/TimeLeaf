@@ -8,7 +8,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
-using TimeLeaf.Models.Interfaces;
+using TimeLeaf.Repositories;
+using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
 using LeafKit.UI.Services;
@@ -56,15 +57,28 @@ public class InfiniteLoopReproductionTests
         var projectId = Guid.NewGuid();
         var projectEntity = new Project { Id = projectId, UpdatedAt = DateTime.Now };
         projectEntity.UpdateName("Test Project");
-        _repositoryMock.Setup(r => r.LoadAllAsync()).ReturnsAsync(new List<Project> { projectEntity });
-        _repositoryMock.Setup(r => r.LoadAsync(projectId)).ReturnsAsync(projectEntity);
 
-        var loadUseCase = new LoadProjectsUseCase(_repositoryMock.Object);
-        var saveUseCase = new SaveProjectUseCase(_repositoryMock.Object);
+        var loadUseCaseMock = new Mock<ILoadProjectsUseCase>();
+        var saveUseCaseMock = new Mock<ISaveProjectUseCase>();
+        var findProjectUseCaseMock = new Mock<IFindProjectUseCase>();
+        var syncServiceMock = new Mock<IProjectSyncService>();
         var addProjectUseCaseMock = new Mock<IAddProjectUseCase>();
+        var viewModelFactoryMock = new Mock<IViewModelFactory>();
         var loggerMock = new Mock<ILogger<MainViewModel>>();
 
-        var mainVM = new MainViewModel(loadUseCase, saveUseCase, _repositoryMock.Object, addProjectUseCaseMock.Object, loggerMock.Object, _serviceProviderMock.Object);
+        loadUseCaseMock.Setup(r => r.ExecuteAsync()).ReturnsAsync(new List<Project> { projectEntity });
+
+        viewModelFactoryMock.Setup(x => x.CreateOverviewViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>()))
+            .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, addProjectUseCaseMock.Object, _dialogServiceMock.Object, _serviceProviderMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
+
+        var mainVM = new MainViewModel(
+            loadUseCaseMock.Object,
+            saveUseCaseMock.Object,
+            findProjectUseCaseMock.Object,
+            syncServiceMock.Object,
+            addProjectUseCaseMock.Object,
+            viewModelFactoryMock.Object,
+            loggerMock.Object);
         await Task.Delay(100); // Wait for initialize
 
         var projectVM = mainVM.Projects.First();
@@ -77,25 +91,25 @@ public class InfiniteLoopReproductionTests
         workspaceVM.AddTaskCommand.Execute(null);
 
         await Task.Delay(200); // SaveAsync の実行を待つ
-        _repositoryMock.Verify(r => r.SaveAsync(It.IsAny<Project>()), Times.AtLeastOnce, "タスク追加により保存が走ること");
+        saveUseCaseMock.Verify(r => r.ExecuteAsync(It.IsAny<Project>()), Times.AtLeastOnce, "タスク追加により保存が走ること");
 
         // 3. Simulate Synced Reload (ProjectChanged event)
         // 実際のリポジトリではこのタイミングで replayed されたエンティティが返る
         var replayedProject = new Project { Id = projectId, UpdatedAt = projectEntity.UpdatedAt };
         replayedProject.UpdateName("Test Project");
         foreach (var t in projectEntity.Tasks) replayedProject.AddTask(t);
-        _repositoryMock.Setup(r => r.LoadAsync(projectId)).ReturnsAsync(replayedProject);
+        findProjectUseCaseMock.Setup(r => r.ExecuteAsync(projectId)).ReturnsAsync(replayedProject);
 
         // 保存回数をリセットして、再ロードによって保存が走らないか監視
-        _repositoryMock.Invocations.Clear();
+        saveUseCaseMock.Invocations.Clear();
 
         // プロジェクト変更イベントを発火
-        _repositoryMock.Raise(r => r.ProjectChanged += null, projectId);
+        syncServiceMock.Raise(r => r.ProjectChanged += null, projectId);
 
         await Task.Delay(500); // OnProjectChanged (Dispatcher.InvokeAsync) の完了を待つ
 
         // 4. Assert
-        _repositoryMock.Verify(r => r.SaveAsync(It.IsAny<Project>()), Times.Never, "同期再ロードによって保存が走ってはいけない (無限ループの原因)");
+        saveUseCaseMock.Verify(r => r.ExecuteAsync(It.IsAny<Project>()), Times.Never, "同期再ロードによって保存が走ってはいけない (無限ループの原因)");
     }
 
     /// <summary>
@@ -109,15 +123,28 @@ public class InfiniteLoopReproductionTests
         var projectId = Guid.NewGuid();
         var projectEntity = new Project { Id = projectId };
         projectEntity.UpdateName("Loop Test");
-        _repositoryMock.Setup(r => r.LoadAllAsync()).ReturnsAsync(new List<Project> { projectEntity });
-        _repositoryMock.Setup(r => r.LoadAsync(projectId)).ReturnsAsync(projectEntity);
 
-        var loadUseCase = new LoadProjectsUseCase(_repositoryMock.Object);
-        var saveUseCase = new SaveProjectUseCase(_repositoryMock.Object);
+        var loadUseCaseMock = new Mock<ILoadProjectsUseCase>();
+        var saveUseCaseMock = new Mock<ISaveProjectUseCase>();
+        var findProjectUseCaseMock = new Mock<IFindProjectUseCase>();
+        var syncServiceMock = new Mock<IProjectSyncService>();
         var addProjectUseCaseMock = new Mock<IAddProjectUseCase>();
+        var viewModelFactoryMock = new Mock<IViewModelFactory>();
         var loggerMock = new Mock<ILogger<MainViewModel>>();
 
-        var mainVM = new MainViewModel(loadUseCase, saveUseCase, _repositoryMock.Object, addProjectUseCaseMock.Object, loggerMock.Object, _serviceProviderMock.Object);
+        loadUseCaseMock.Setup(r => r.ExecuteAsync()).ReturnsAsync(new List<Project> { projectEntity });
+
+        viewModelFactoryMock.Setup(x => x.CreateOverviewViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>()))
+            .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, addProjectUseCaseMock.Object, _dialogServiceMock.Object, _serviceProviderMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
+
+        var mainVM = new MainViewModel(
+            loadUseCaseMock.Object,
+            saveUseCaseMock.Object,
+            findProjectUseCaseMock.Object,
+            syncServiceMock.Object,
+            addProjectUseCaseMock.Object,
+            viewModelFactoryMock.Object,
+            loggerMock.Object);
         await Task.Delay(100);
 
         var projectVM = mainVM.Projects.First();
@@ -136,12 +163,12 @@ public class InfiniteLoopReproductionTests
         await Task.Delay(200);
 
         // 4. Simulate Sync (often happens after save)
-        _repositoryMock.Raise(r => r.ProjectChanged += null, projectId);
+        syncServiceMock.Raise(r => r.ProjectChanged += null, projectId);
         await Task.Delay(500);
 
         // 5. Assert
         // 保存回数が異常に多くないか（各操作につき数回程度なら許容、無限なら数百回になる）
-        var saveCount = _repositoryMock.Invocations.Count(i => i.Method.Name == "SaveAsync");
+        var saveCount = saveUseCaseMock.Invocations.Count(i => i.Method.Name == "ExecuteAsync");
         Assert.IsTrue(saveCount < 10, $"Save count is too high ({saveCount}), possible loop detected.");
     }
 }

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Models.Enums;
-using TimeLeaf.Models.Interfaces;
+using TimeLeaf.Repositories;
 
 namespace TimeLeaf.Repositories.FileSystem;
 
@@ -21,7 +21,6 @@ namespace TimeLeaf.Repositories.FileSystem;
 public class FolderProjectRepository : IProjectRepository, IDisposable
 {
     private readonly string _baseDirectory;
-    private readonly ICurrentUserService _userService;
     private readonly ILogger<FolderProjectRepository> _logger;
     private static readonly JsonSerializerOptions _options = new()
     {
@@ -37,10 +36,9 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
 
     public event Action<Guid>? ProjectChanged;
 
-    public FolderProjectRepository(string baseDirectory, ICurrentUserService userService, ILogger<FolderProjectRepository> logger)
+    public FolderProjectRepository(string baseDirectory, ILogger<FolderProjectRepository> logger)
     {
         _baseDirectory = baseDirectory;
-        _userService = userService;
         _logger = logger;
 
         _logger.LogInformation("FolderProjectRepository initializing with base directory: {BaseDirectory}", _baseDirectory);
@@ -375,13 +373,13 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         return project;
     }
 
-    public async System.Threading.Tasks.Task SaveAllAsync(IEnumerable<Project> projects)
+    public async System.Threading.Tasks.Task SaveAllAsync(IEnumerable<Project> projects, string userId)
     {
         _logger.LogInformation("Saving {ProjectCount} projects.", projects.Count());
-        foreach (var project in projects) await SaveAsync(project);
+        foreach (var project in projects) await SaveAsync(project, userId);
     }
 
-    public async System.Threading.Tasks.Task SaveAsync(Project project)
+    public async System.Threading.Tasks.Task SaveAsync(Project project, string userId)
     {
         _logger.LogInformation("Saving project: {ProjectName} ({ProjectId})", project.Name, project.Id);
         try
@@ -396,7 +394,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
             var metaFilePath = Path.Combine(projectDir, ".project");
             if (!File.Exists(metaFilePath))
             {
-                var metadata = new ProjectMetadataDto(project.Id, project.CreatedAt, _userService.GetCurrentUserId(), 1);
+                var metadata = new ProjectMetadataDto(project.Id, project.CreatedAt, userId, 1);
                 await File.WriteAllTextAsync(metaFilePath, JsonSerializer.Serialize(metadata, _options));
                 _logger.LogDebug(".project metadata created for {ProjectId}.", project.Id);
             }
@@ -411,7 +409,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                 project.HealthStatus,
                 project.UpdatedAt, // 最終更新日時を保存
                 project.Milestones.Select(m => new MilestoneDto(m.Date, m.Label)).ToList());
-            await TrySaveCategoryAsync(project.Id, changesDir, "ProjectBasic", basicSnapshot);
+            await TrySaveCategoryAsync(project.Id, changesDir, "ProjectBasic", basicSnapshot, userId);
 
             // 2. ProjectTasks Snapshot
             var tasksSnapshot = project.Tasks.Select(t => new ProjectTaskDto(
@@ -428,14 +426,14 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                 t.ActualCost,
                 t.Assignee,
                 t.Dependencies)).ToList();
-            await TrySaveCategoryAsync(project.Id, changesDir, "ProjectTasks", tasksSnapshot);
+            await TrySaveCategoryAsync(project.Id, changesDir, "ProjectTasks", tasksSnapshot, userId);
 
             // 3. Comments (Incremental)
             foreach (var t in project.Tasks)
             {
                 foreach (var c in t.Comments)
                 {
-                    await TrySaveCommentAsync(project.Id, changesDir, c);
+                    await TrySaveCommentAsync(project.Id, changesDir, c, userId);
                 }
             }
 
@@ -448,7 +446,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         }
     }
 
-    private async System.Threading.Tasks.Task TrySaveCommentAsync(Guid projectId, string changesDir, Comment comment)
+    private async System.Threading.Tasks.Task TrySaveCommentAsync(Guid projectId, string changesDir, Comment comment, string userId)
     {
         var category = "Comment";
         var cacheKey = GetCacheKey(projectId, $"{category}_{comment.Id}");
@@ -468,7 +466,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
 
         var commentDto = new CommentDto(comment.Id, comment.TaskId, comment.AuthorId, comment.CreatedAt, comment.Content, comment.AttachmentLinks);
         var json = JsonSerializer.Serialize(commentDto, _options);
-        var fileName = CommitFileName.Generate(comment.CreatedAt, _userService.GetCurrentUserId(), comment.Id, category);
+        var fileName = CommitFileName.Generate(comment.CreatedAt, userId, comment.Id, category);
         var fullPath = Path.Combine(changesDir, fileName);
 
         _justWrittenFiles[fileName] = DateTime.Now;
@@ -486,7 +484,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         }
     }
 
-    private async System.Threading.Tasks.Task TrySaveCategoryAsync(Guid projectId, string changesDir, string category, object data)
+    private async System.Threading.Tasks.Task TrySaveCategoryAsync(Guid projectId, string changesDir, string category, object data, string userId)
     {
         _logger.LogDebug("Attempting to save category {Category} for project {ProjectId}.", category, projectId);
         var json = JsonSerializer.Serialize(data, _options);
@@ -504,7 +502,8 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
             Directory.CreateDirectory(changesDir);
         }
 
-        var fileName = CommitFileName.Generate(DateTime.Now, _userService.GetCurrentUserId(), Guid.NewGuid(), category);
+        // 外部から渡された userId を使用してファイル名を生成
+        var fileName = CommitFileName.Generate(DateTime.Now, userId, Guid.NewGuid(), category);
         var fullPath = Path.Combine(changesDir, fileName);
         _justWrittenFiles[fileName] = DateTime.Now; // 自前での書き込みであることをマーク
 

@@ -7,7 +7,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
-using TimeLeaf.Models.Interfaces;
+using TimeLeaf.Repositories;
+using TimeLeaf.Services;
 using TimeLeaf.Repositories.FileSystem;
 
 namespace TimeLeaf.Tests.Infrastructure;
@@ -45,7 +46,7 @@ public class CommentStorageTests
     public async Task SaveAndLoad_ShouldPreserveComments()
     {
         // Arrange
-        var repository = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object);
+        var repository = new FolderProjectRepository(_tempDir, _loggerMock.Object);
         var project = new Project();
         project.UpdateName("CommentTestProject");
         var task = new ProjectTask { Name = "Task with Comment" };
@@ -61,7 +62,7 @@ public class CommentStorageTests
         task.AddComment(comment);
 
         // Act
-        await repository.SaveAsync(project);
+        await repository.SaveAsync(project, "user-A");
         var loadedProject = await repository.LoadAsync(project.Id);
 
         // Assert
@@ -86,7 +87,7 @@ public class CommentStorageTests
     public async Task SaveAndLoad_MultipleComments_ShouldIncrementalAccumulate()
     {
         // Arrange
-        var repository = new FolderProjectRepository(_tempDir, _userServiceMock.Object, _loggerMock.Object);
+        var repository = new FolderProjectRepository(_tempDir, _loggerMock.Object);
         var project = new Project();
         project.UpdateName("MultiCommentProject");
         var task = new ProjectTask { Name = "Task" };
@@ -98,7 +99,7 @@ public class CommentStorageTests
         task.AddComment(c2);
 
         // Act
-        await repository.SaveAsync(project);
+        await repository.SaveAsync(project, "user-A");
         var loadedProject = await repository.LoadAsync(project.Id);
 
         // Assert

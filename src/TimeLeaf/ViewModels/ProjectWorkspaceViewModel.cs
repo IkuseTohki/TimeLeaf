@@ -8,7 +8,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Models.Enums;
-using TimeLeaf.Models.Interfaces;
+using TimeLeaf.Services;
 
 namespace TimeLeaf.ViewModels;
 
