@@ -51,7 +51,7 @@ public class SurgicalSavingTests
         // Act
         // 拡張予定の個別保存メソッド（仮）を呼び出す想定
         // 現状の SaveAllAsync は全件保存してしまうため、このテストで不合格（Red）にする
-        await repo.SaveAllAsync(new[] { projectA });
+        await repo.SaveAllAsync(new[] { projectA }, "test-user");
 
         // Assert
         var projectAFolder = Path.Combine(_tempDir, $"{projectA.Id}_{projectA.Name}");
