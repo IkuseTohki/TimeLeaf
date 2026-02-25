@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
+using TimeLeaf.Models.Enums;
 using TimeLeaf.Repositories;
 using TimeLeaf.Services;
 using TimeLeaf.UseCases;
@@ -58,7 +59,8 @@ public class CommentFlowTests
 
         var project = new Project();
         project.UpdateName("Test Project");
-        var task = new ProjectTask { Name = "Test Task" };
+        var task = new ProjectTask();
+        task.UpdateName("Test Task");
         project.AddTask(task);
 
         loadUseCaseMock.Setup(r => r.ExecuteAsync()).ReturnsAsync(new[] { project });
@@ -68,7 +70,7 @@ public class CommentFlowTests
             .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, addProjectUseCaseMock.Object, _dialogServiceMock.Object, _serviceProviderMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
 
         viewModelFactoryMock.Setup(x => x.CreateProjectWorkspaceViewModel(It.IsAny<ProjectViewModel>()))
-            .Returns((ProjectViewModel pvm) => new ProjectWorkspaceViewModel(pvm, new Mock<ICurrentUserService>().Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object));
+            .Returns((ProjectViewModel pvm) => new ProjectWorkspaceViewModel(pvm, _userServiceMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object));
 
         _mainViewModel = new MainViewModel(
             loadUseCaseMock.Object,
@@ -155,7 +157,14 @@ public class CommentFlowTests
         // 外部同期イベントを発生させて、ViewModel内部の状態を更新させる
         var updatedProject = new Project { Id = projectId };
         updatedProject.UpdateName("Synced Project");
-        var updatedTask = new ProjectTask { Id = projectViewModel.Tasks.First().Id, Name = "Synced Task" };
+        var updatedTask = new ProjectTask(
+            projectViewModel.Tasks.First().Id,
+            "Synced Task",
+            "",
+            TimeLeaf.Models.Enums.TaskStatus.NotStarted,
+            TaskPriority.Medium,
+            null, null, null, null, 0, 0, "", null, null
+        );
         updatedProject.AddTask(updatedTask);
         _repositoryMock.Setup(r => r.LoadAsync(projectId)).ReturnsAsync(updatedProject);
 

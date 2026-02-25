@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
+using TimeLeaf.Models.Enums;
 using TimeLeaf.Repositories;
 using TimeLeaf.Services;
 using TimeLeaf.UseCases;
@@ -55,8 +56,8 @@ public class InfiniteLoopReproductionTests
     {
         // 1. Arrange
         var projectId = Guid.NewGuid();
-        var projectEntity = new Project { Id = projectId, UpdatedAt = DateTime.Now };
-        projectEntity.UpdateName("Test Project");
+        var now = DateTime.Now;
+        var projectEntity = new Project(projectId, "Test Project", "", ProjectStatus.Initial, ProjectHealth.Healthy, now, now, null, null);
 
         var loadUseCaseMock = new Mock<ILoadProjectsUseCase>();
         var saveUseCaseMock = new Mock<ISaveProjectUseCase>();
@@ -95,8 +96,7 @@ public class InfiniteLoopReproductionTests
 
         // 3. Simulate Synced Reload (ProjectChanged event)
         // 実際のリポジトリではこのタイミングで replayed されたエンティティが返る
-        var replayedProject = new Project { Id = projectId, UpdatedAt = projectEntity.UpdatedAt };
-        replayedProject.UpdateName("Test Project");
+        var replayedProject = new Project(projectId, "Test Project", "", ProjectStatus.Initial, ProjectHealth.Healthy, projectEntity.CreatedAt, projectEntity.UpdatedAt, null, null);
         foreach (var t in projectEntity.Tasks) replayedProject.AddTask(t);
         findProjectUseCaseMock.Setup(r => r.ExecuteAsync(projectId)).ReturnsAsync(replayedProject);
 

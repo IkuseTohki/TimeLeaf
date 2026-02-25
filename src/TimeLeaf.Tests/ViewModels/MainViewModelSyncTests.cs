@@ -68,7 +68,9 @@ public class MainViewModelSyncTests
         // ロードされる「最新」の状態を準備（別のタスクがある状態）
         var updatedProject = new Project { Id = projectId };
         updatedProject.UpdateName("Updated");
-        updatedProject.AddTask(new ProjectTask { Name = "Task from Sync" }); // 同期で追加されるタスク
+        var taskFromSync = new ProjectTask();
+        taskFromSync.UpdateName("Task from Sync");
+        updatedProject.AddTask(taskFromSync); // 同期で追加されるタスク
         findProjectUseCaseMock.Setup(r => r.ExecuteAsync(projectId)).ReturnsAsync(updatedProject);
 
         // Act

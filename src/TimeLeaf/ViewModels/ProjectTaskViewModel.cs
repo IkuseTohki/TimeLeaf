@@ -22,67 +22,147 @@ public partial class ProjectTaskViewModel : ObservableObject
     public string Name
     {
         get => _projectTask.Name;
-        set => SetProperty(_projectTask.Name, value, _projectTask, (model, val) => model.Name = val);
+        set
+        {
+            if (_projectTask.Name != value)
+            {
+                _projectTask.UpdateName(value);
+                OnPropertyChanged(nameof(Name));
+            }
+        }
     }
 
     public string Description
     {
         get => _projectTask.Description;
-        set => SetProperty(_projectTask.Description, value, _projectTask, (model, val) => model.Description = val);
+        set
+        {
+            if (_projectTask.Description != value)
+            {
+                _projectTask.UpdateDescription(value);
+                OnPropertyChanged(nameof(Description));
+            }
+        }
     }
 
     public TaskStatus Status
     {
         get => _projectTask.Status;
-        set => SetProperty(_projectTask.Status, value, _projectTask, (model, val) => model.Status = val);
+        set
+        {
+            if (_projectTask.Status != value)
+            {
+                _projectTask.UpdateStatus(value);
+                OnPropertyChanged(nameof(Status));
+                // ステータス変更により開始・終了日が自動設定される可能性があるため通知
+                OnPropertyChanged(nameof(ActualStartDate));
+                OnPropertyChanged(nameof(ActualEndDate));
+            }
+        }
     }
 
     public TaskPriority Priority
     {
         get => _projectTask.Priority;
-        set => SetProperty(_projectTask.Priority, value, _projectTask, (model, val) => model.Priority = val);
+        set
+        {
+            if (_projectTask.Priority != value)
+            {
+                _projectTask.UpdatePriority(value);
+                OnPropertyChanged(nameof(Priority));
+            }
+        }
     }
 
     public DateTime? ScheduledStartDate
     {
         get => _projectTask.ScheduledStartDate;
-        set => SetProperty(_projectTask.ScheduledStartDate, value, _projectTask, (model, val) => model.ScheduledStartDate = val);
+        set
+        {
+            if (_projectTask.ScheduledStartDate != value)
+            {
+                _projectTask.UpdateSchedule(value, _projectTask.Deadline);
+                OnPropertyChanged(nameof(ScheduledStartDate));
+            }
+        }
     }
 
     public DateTime? Deadline
     {
         get => _projectTask.Deadline;
-        set => SetProperty(_projectTask.Deadline, value, _projectTask, (model, val) => model.Deadline = val);
+        set
+        {
+            if (_projectTask.Deadline != value)
+            {
+                _projectTask.UpdateSchedule(_projectTask.ScheduledStartDate, value);
+                OnPropertyChanged(nameof(Deadline));
+            }
+        }
     }
 
     public DateTime? ActualStartDate
     {
         get => _projectTask.ActualStartDate;
-        set => SetProperty(_projectTask.ActualStartDate, value, _projectTask, (model, val) => model.ActualStartDate = val);
+        set
+        {
+            if (_projectTask.ActualStartDate != value)
+            {
+                _projectTask.UpdateActualDates(value, _projectTask.ActualEndDate);
+                OnPropertyChanged(nameof(ActualStartDate));
+            }
+        }
     }
 
     public DateTime? ActualEndDate
     {
         get => _projectTask.ActualEndDate;
-        set => SetProperty(_projectTask.ActualEndDate, value, _projectTask, (model, val) => model.ActualEndDate = val);
+        set
+        {
+            if (_projectTask.ActualEndDate != value)
+            {
+                _projectTask.UpdateActualDates(_projectTask.ActualStartDate, value);
+                OnPropertyChanged(nameof(ActualEndDate));
+            }
+        }
     }
 
     public double EstimatedCost
     {
         get => _projectTask.EstimatedCost;
-        set => SetProperty(_projectTask.EstimatedCost, value, _projectTask, (model, val) => model.EstimatedCost = val);
+        set
+        {
+            if (Math.Abs(_projectTask.EstimatedCost - value) > double.Epsilon)
+            {
+                _projectTask.UpdateEstimatedCost(value);
+                OnPropertyChanged(nameof(EstimatedCost));
+            }
+        }
     }
 
     public double ActualCost
     {
         get => _projectTask.ActualCost;
-        set => SetProperty(_projectTask.ActualCost, value, _projectTask, (model, val) => model.ActualCost = val);
+        set
+        {
+            if (Math.Abs(_projectTask.ActualCost - value) > double.Epsilon)
+            {
+                _projectTask.UpdateActualCost(value);
+                OnPropertyChanged(nameof(ActualCost));
+            }
+        }
     }
 
     public string Assignee
     {
         get => _projectTask.Assignee;
-        set => SetProperty(_projectTask.Assignee, value, _projectTask, (model, val) => model.Assignee = val);
+        set
+        {
+            if (_projectTask.Assignee != value)
+            {
+                _projectTask.AssignTo(value);
+                OnPropertyChanged(nameof(Assignee));
+            }
+        }
     }
 
     /// <summary>

@@ -144,7 +144,7 @@ public partial class MainViewModel : ObservableObject
                         existingViewModel.Model.UpdateDescription(updatedProjectEntity.Description);
                         existingViewModel.Model.UpdateStatus(updatedProjectEntity.Status);
                         existingViewModel.Model.UpdateHealth(updatedProjectEntity.HealthStatus);
-                        existingViewModel.Model.UpdatedAt = updatedProjectEntity.UpdatedAt;
+                        existingViewModel.Model.SetUpdatedAt(updatedProjectEntity.UpdatedAt);
 
                         // Tasksの同期
                         existingViewModel.Model.ClearTasks();

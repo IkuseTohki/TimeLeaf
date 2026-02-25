@@ -257,7 +257,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                             project.UpdateDescription(basic.Description);
                             project.UpdateStatus(basic.Status);
                             project.UpdateHealth(basic.HealthStatus);
-                            project.UpdatedAt = basic.UpdatedAt; // 最終更新日時を復元
+                            project.SetUpdatedAt(basic.UpdatedAt); // 最終更新日時を復元
 
                             // マイルストーンのクリアと再追加
                             // 本来は Project クラスに ClearMilestones があるべきだが、一旦リフレクションを避けるため
@@ -289,22 +289,22 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                             project.ClearTasks();
                             foreach (var t in tasks)
                             {
-                                var newTask = new ProjectTask
-                                {
-                                    Id = t.Id,
-                                    Name = t.Name,
-                                    Description = t.Description,
-                                    Status = t.Status,
-                                    Priority = t.Priority,
-                                    ScheduledStartDate = t.ScheduledStartDate,
-                                    Deadline = t.Deadline,
-                                    ActualStartDate = t.ActualStartDate,
-                                    ActualEndDate = t.ActualEndDate,
-                                    EstimatedCost = t.EstimatedCost,
-                                    ActualCost = t.ActualCost,
-                                    Assignee = t.Assignee ?? string.Empty,
-                                    Dependencies = t.Dependencies ?? new()
-                                };
+                                var newTask = new ProjectTask(
+                                    t.Id,
+                                    t.Name,
+                                    t.Description,
+                                    t.Status,
+                                    t.Priority,
+                                    t.ScheduledStartDate,
+                                    t.Deadline,
+                                    t.ActualStartDate,
+                                    t.ActualEndDate,
+                                    t.EstimatedCost,
+                                    t.ActualCost,
+                                    t.Assignee ?? string.Empty,
+                                    t.Dependencies ?? new(),
+                                    null // Comments will be loaded below
+                                );
 
                                 if (commentMap.TryGetValue(newTask.Id, out var existingComments))
                                 {
@@ -370,6 +370,15 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
             }
         }
 
+        // Replay 中の AddTask 等の呼び出しによって UpdatedAt が「今」に上書きされてしまうのを防ぐため、
+        // 最後に履歴ファイルの中で最も新しいタイムスタンプを正として再設定する。
+        if (files.Any())
+        {
+            var latestTimestamp = files.Last().Meta.Timestamp;
+            project.SetUpdatedAt(latestTimestamp);
+            _logger.LogDebug("Restored UpdatedAt to the latest commit timestamp: {Timestamp}", latestTimestamp);
+        }
+
         return project;
     }
 
@@ -409,7 +418,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                 project.HealthStatus,
                 project.UpdatedAt, // 最終更新日時を保存
                 project.Milestones.Select(m => new MilestoneDto(m.Date, m.Label)).ToList());
-            await TrySaveCategoryAsync(project.Id, changesDir, "ProjectBasic", basicSnapshot, userId);
+            await TrySaveCategoryAsync(project.Id, changesDir, "ProjectBasic", basicSnapshot, project.UpdatedAt, userId);
 
             // 2. ProjectTasks Snapshot
             var tasksSnapshot = project.Tasks.Select(t => new ProjectTaskDto(
@@ -426,7 +435,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                 t.ActualCost,
                 t.Assignee,
                 t.Dependencies)).ToList();
-            await TrySaveCategoryAsync(project.Id, changesDir, "ProjectTasks", tasksSnapshot, userId);
+            await TrySaveCategoryAsync(project.Id, changesDir, "ProjectTasks", tasksSnapshot, project.UpdatedAt, userId);
 
             // 3. Comments (Incremental)
             foreach (var t in project.Tasks)
@@ -484,7 +493,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         }
     }
 
-    private async System.Threading.Tasks.Task TrySaveCategoryAsync(Guid projectId, string changesDir, string category, object data, string userId)
+    private async System.Threading.Tasks.Task TrySaveCategoryAsync(Guid projectId, string changesDir, string category, object data, DateTime timestamp, string userId)
     {
         _logger.LogDebug("Attempting to save category {Category} for project {ProjectId}.", category, projectId);
         var json = JsonSerializer.Serialize(data, _options);
@@ -503,9 +512,9 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         }
 
         // 外部から渡された userId を使用してファイル名を生成
-        var fileName = CommitFileName.Generate(DateTime.Now, userId, Guid.NewGuid(), category);
+        var fileName = CommitFileName.Generate(timestamp, userId, Guid.NewGuid(), category);
         var fullPath = Path.Combine(changesDir, fileName);
-        _justWrittenFiles[fileName] = DateTime.Now; // 自前での書き込みであることをマーク
+        _justWrittenFiles[fileName] = DateTime.UtcNow; // 自前での書き込みであることをマーク
 
         try
         {

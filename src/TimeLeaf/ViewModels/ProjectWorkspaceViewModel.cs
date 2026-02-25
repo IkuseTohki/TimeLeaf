@@ -220,20 +220,17 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
 
         try
         {
-            var taskEntity = new ProjectTask // ProjectTaskエンティティを作成
-            {
-                Name = NewTaskName,
-                Description = NewTaskDescription,
-                Status = NewTaskStatus,
-                Priority = NewTaskPriority,
-                ScheduledStartDate = NewTaskScheduledStartDate,
-                Deadline = NewTaskDeadline,
-                ActualStartDate = NewTaskActualStartDate,
-                ActualEndDate = NewTaskActualEndDate,
-                EstimatedCost = NewTaskEstimatedCost,
-                ActualCost = NewTaskActualCost,
-                Assignee = NewTaskAssignee
-            };
+            var taskEntity = new ProjectTask(); // ProjectTaskエンティティを作成
+            taskEntity.UpdateName(NewTaskName);
+            taskEntity.UpdateDescription(NewTaskDescription);
+            taskEntity.UpdateStatus(NewTaskStatus);
+            taskEntity.UpdatePriority(NewTaskPriority);
+            taskEntity.UpdateSchedule(NewTaskScheduledStartDate, NewTaskDeadline);
+            taskEntity.UpdateActualDates(NewTaskActualStartDate, NewTaskActualEndDate);
+            taskEntity.UpdateEstimatedCost(NewTaskEstimatedCost);
+            taskEntity.UpdateActualCost(NewTaskActualCost);
+            taskEntity.AssignTo(NewTaskAssignee);
+
             _projectViewModel.Model.AddTask(taskEntity); // ドメインメソッドを使用
             _logger.LogInformation("Task '{TaskName}' (ID: {TaskId}) added to project {ProjectId}.", taskEntity.Name, taskEntity.Id, _projectViewModel.Id);
 

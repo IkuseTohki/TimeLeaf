@@ -37,7 +37,9 @@ public class ProjectTests
         var project = new Project();
         project.UpdateName("Domain Test");
         var initialUpdateAt = project.UpdatedAt;
-        var task = new ProjectTask { Name = "New Task", EstimatedCost = 5.0 };
+        var task = new ProjectTask();
+        task.UpdateName("New Task");
+        task.UpdateEstimatedCost(5.0);
 
         // 実行時間を稼ぐために少し待機
         System.Threading.Thread.Sleep(10);
@@ -81,8 +83,17 @@ public class ProjectTests
     {
         // Arrange
         var project = new Project();
-        project.AddTask(new ProjectTask { Name = "T1", EstimatedCost = 10, ActualCost = 5 });
-        project.AddTask(new ProjectTask { Name = "T2", EstimatedCost = 20, ActualCost = 15 });
+        var t1 = new ProjectTask();
+        t1.UpdateName("T1");
+        t1.UpdateEstimatedCost(10);
+        t1.UpdateActualCost(5);
+        project.AddTask(t1);
+
+        var t2 = new ProjectTask();
+        t2.UpdateName("T2");
+        t2.UpdateEstimatedCost(20);
+        t2.UpdateActualCost(15);
+        project.AddTask(t2);
 
         // Act & Assert
         Assert.AreEqual(30.0, project.TotalEstimatedCost, "合計見積工数が正しく算出されること");
@@ -115,7 +126,7 @@ public class ProjectTests
         var milestoneLabel = "Release v1.0";
 
         // Act
-        project.AddMilestone(new Milestone { Date = milestoneDate, Label = milestoneLabel });
+        project.AddMilestone(new Milestone(milestoneDate, milestoneLabel));
 
         // Assert
         Assert.AreEqual(1, project.Milestones.Count, "マイルストーンが1つ追加されていること");

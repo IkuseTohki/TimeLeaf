@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
+using TimeLeaf.Models.Enums;
 using TimeLeaf.Repositories;
 using TimeLeaf.Services;
 using TimeLeaf.Repositories.FileSystem;
@@ -67,12 +68,14 @@ public class FolderProjectRepositoryTests
         var files = Directory.GetFiles(changesDir);
         Assert.IsTrue(files.Any(), "履歴ファイル(JSON)が出力されること");
 
-        var commitFile = CommitFileName.Parse(Path.GetFileName(files[0]));
+        var basicFile = files.FirstOrDefault(f => f.Contains("ProjectBasic"));
+        Assert.IsNotNull(basicFile, "ProjectBasic ファイルが出力されていること");
+        var commitFile = CommitFileName.Parse(Path.GetFileName(basicFile));
         Assert.AreEqual("test-user", commitFile.UserId);
         Assert.AreEqual("ProjectBasic", commitFile.Category);
 
         // 4. 内容の確認
-        var json = File.ReadAllText(files[0]);
+        var json = File.ReadAllText(basicFile);
         StringAssert.Contains(json, "StructureTest", "プロジェクト名がJSONに含まれていること");
     }
 
@@ -88,13 +91,11 @@ public class FolderProjectRepositoryTests
         var project = new Project { Id = projectId };
         project.UpdateName("CostTest");
         var deadline = new DateTime(2026, 12, 31, 23, 59, 0);
-        var task = new ProjectTask
-        {
-            Name = "CostTask",
-            Deadline = deadline,
-            EstimatedCost = 10.5,
-            ActualCost = 8.25
-        };
+        var task = new ProjectTask();
+        task.UpdateName("CostTask");
+        task.UpdateSchedule(null, deadline);
+        task.UpdateEstimatedCost(10.5);
+        task.UpdateActualCost(8.25);
         project.AddTask(task);
 
         // Act
@@ -124,11 +125,9 @@ public class FolderProjectRepositoryTests
         project.UpdateName("RelationTest");
 
         var depTaskId = Guid.NewGuid();
-        var mainTask = new ProjectTask
-        {
-            Name = "MainTask",
-            Assignee = "user123"
-        };
+        var mainTask = new ProjectTask();
+        mainTask.UpdateName("MainTask");
+        mainTask.AssignTo("user123");
         mainTask.Dependencies.Add(depTaskId);
         project.AddTask(mainTask);
 
@@ -158,7 +157,7 @@ public class FolderProjectRepositoryTests
         project.UpdateName("MilestoneTest");
         var mDate = new DateTime(2026, 10, 10);
         var mLabel = "Final Release";
-        project.AddMilestone(new Milestone { Date = mDate, Label = mLabel });
+        project.AddMilestone(new Milestone(mDate, mLabel));
 
         // Act
         await repository.SaveAsync(project, "test-user");
@@ -186,13 +185,10 @@ public class FolderProjectRepositoryTests
         var asDate = new DateTime(2026, 4, 2);
         var aeDate = new DateTime(2026, 4, 10);
 
-        var task = new ProjectTask
-        {
-            Name = "ScheduleTask",
-            ScheduledStartDate = sDate,
-            ActualStartDate = asDate,
-            ActualEndDate = aeDate
-        };
+        var task = new ProjectTask();
+        task.UpdateName("ScheduleTask");
+        task.UpdateSchedule(sDate, null);
+        task.UpdateActualDates(asDate, aeDate);
         project.AddTask(task);
 
         // Act
@@ -223,17 +219,18 @@ public class FolderProjectRepositoryTests
         var createdAt = new DateTime(2026, 2, 20, 10, 0, 0);
         var updatedAt = new DateTime(2026, 2, 23, 15, 30, 45);
 
-        var project = new Project
-        {
-            Id = projectId,
-            CreatedAt = createdAt,
-            UpdatedAt = updatedAt
-        };
+        var project = new Project(
+            projectId,
+            "MetadataTest",
+            "",
+            ProjectStatus.Initial,
+            ProjectHealth.Healthy,
+            createdAt,
+            updatedAt,
+            null,
+            null
+        );
         // Act
-        // RefreshUpdatedAt を回避して固定値をセットするために、リフレクション等は使わず
-        // 構築済みのエンティティをそのまま保存する（セッターがない場合はコンストラクタインジェクション等を検討すべきだが
-        // 現状はテストのために RefreshUpdatedAt を呼ばない手段を講じる）
-
         await repository.SaveAsync(project, "test-user");
         var loadedProject = await repository.LoadAsync(projectId);
 

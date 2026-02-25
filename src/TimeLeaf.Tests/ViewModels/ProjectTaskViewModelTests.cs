@@ -28,7 +28,8 @@ public class ProjectTaskViewModelTests
     public void Name_ShouldUpdateModelAndRaisePropertyChanged()
     {
         // Arrange
-        var projectTask = new ProjectTask { Name = "Old Task Name" };
+        var projectTask = new ProjectTask();
+        projectTask.UpdateName("Old Task Name");
         var viewModel = new ProjectTaskViewModel(projectTask);
         var newName = "New Task Name";
 
@@ -57,7 +58,8 @@ public class ProjectTaskViewModelTests
     public void EstimatedCost_ShouldUpdateModelAndRaisePropertyChanged()
     {
         // Arrange
-        var projectTask = new ProjectTask { EstimatedCost = 10.0 };
+        var projectTask = new ProjectTask();
+        projectTask.UpdateEstimatedCost(10.0);
         var viewModel = new ProjectTaskViewModel(projectTask);
         var newCost = 15.5;
 
@@ -86,7 +88,8 @@ public class ProjectTaskViewModelTests
     public void Assignee_ShouldUpdateModelAndRaisePropertyChanged()
     {
         // Arrange
-        var projectTask = new ProjectTask { Assignee = "old-user" };
+        var projectTask = new ProjectTask();
+        projectTask.AssignTo("old-user");
         var viewModel = new ProjectTaskViewModel(projectTask);
         var newUser = "new-user";
 

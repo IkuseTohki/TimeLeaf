@@ -106,7 +106,9 @@ public class ProjectWorkspaceViewModelSaveTests
     {
         // Arrange
         var projectId = Guid.NewGuid();
-        var task = new ProjectTask { Name = "Existing Task", Assignee = "Old User" };
+        var task = new ProjectTask();
+        task.UpdateName("Existing Task");
+        task.AssignTo("Old User");
         var project = new Project { Id = projectId };
         project.UpdateName("SaveTest");
         project.AddTask(task);

@@ -92,7 +92,7 @@ public partial class ProjectViewModel : ObservableObject
     private void RefreshUpdatedAt()
     {
         if (IsSyncing) return;
-        UpdatedAt = DateTime.Now;
+        UpdatedAt = DateTime.UtcNow;
     }
 
     /// <summary>
@@ -103,8 +103,10 @@ public partial class ProjectViewModel : ObservableObject
         get => _project.UpdatedAt;
         set
         {
-            if (SetProperty(_project.UpdatedAt, value, _project, (model, val) => model.UpdatedAt = val))
+            if (_project.UpdatedAt != value)
             {
+                _project.SetUpdatedAt(value);
+                OnPropertyChanged(nameof(UpdatedAt));
                 OnPropertyChanged(nameof(DisplayLastUpdated));
             }
         }
@@ -117,11 +119,13 @@ public partial class ProjectViewModel : ObservableObject
     {
         get
         {
-            var diff = DateTime.Now - UpdatedAt;
+            var localUpdatedAt = UpdatedAt.ToLocalTime();
+            var diff = DateTime.Now - localUpdatedAt;
+            if (diff.TotalSeconds < 0) return localUpdatedAt.ToString("yyyy/MM/dd HH:mm");
             if (diff.TotalSeconds < 60) return "たった今";
             if (diff.TotalMinutes < 60) return $"{(int)diff.TotalMinutes}分前";
             if (diff.TotalHours < 24) return $"{(int)diff.TotalHours}時間前";
-            return UpdatedAt.ToString("yyyy/MM/dd HH:mm");
+            return localUpdatedAt.ToString("yyyy/MM/dd HH:mm");
         }
     }
 
@@ -218,6 +222,8 @@ public partial class ProjectViewModel : ObservableObject
 
     private void OnProjectTaskViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
+        if (IsSyncing) return;
+
         // 個々のタスクのプロパティ（コスト、担当者、ステータス等）が変更された場合に、
         // プロジェクト全体の最終更新日時を更新し、通知を行う。
         // これにより MainViewModel の自動保存がトリガーされる。

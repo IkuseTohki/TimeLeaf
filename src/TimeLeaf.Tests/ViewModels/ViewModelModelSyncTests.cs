@@ -39,7 +39,9 @@ public class ViewModelModelSyncTests
     public void ProjectTaskViewModel_UpdateProperty_ShouldUpdateModel()
     {
         // Arrange
-        var task = new ProjectTask { Name = "Old Task", Assignee = "Old User" };
+        var task = new ProjectTask();
+        task.UpdateName("Old Task");
+        task.AssignTo("Old User");
         var viewModel = new ProjectTaskViewModel(task);
 
         // Act
@@ -62,7 +64,8 @@ public class ViewModelModelSyncTests
         var project = new Project();
         project.UpdateName("Test Project");
         var viewModel = new ProjectViewModel(project);
-        var newTask = new ProjectTask { Name = "New Task" };
+        var newTask = new ProjectTask();
+        newTask.UpdateName("New Task");
 
         // Act
         project.AddTask(newTask);
@@ -83,7 +86,8 @@ public class ViewModelModelSyncTests
         // Arrange
         var project = new Project();
         project.UpdateName("Test Project");
-        var task = new ProjectTask { Name = "Task 1" };
+        var task = new ProjectTask();
+        task.UpdateName("Task 1");
         project.AddTask(task);
         var viewModel = new ProjectViewModel(project);
 

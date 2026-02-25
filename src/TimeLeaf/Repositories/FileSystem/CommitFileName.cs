@@ -34,7 +34,7 @@ public record CommitFileName(DateTime Timestamp, string UserId, Guid Guid, strin
 
         // タイムスタンプのパース (yyyyMMdd_HHmmss_fff)
         var timeStr = $"{parts[0]}_{parts[1]}_{parts[2]}";
-        var timestamp = DateTime.ParseExact(timeStr, TimeFormat, CultureInfo.InvariantCulture);
+        var timestamp = DateTime.ParseExact(timeStr, TimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal);
 
         var userId = parts[3];
         var guid = Guid.Parse(parts[4]);

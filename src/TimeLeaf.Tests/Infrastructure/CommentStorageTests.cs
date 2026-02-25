@@ -49,7 +49,8 @@ public class CommentStorageTests
         var repository = new FolderProjectRepository(_tempDir, _loggerMock.Object);
         var project = new Project();
         project.UpdateName("CommentTestProject");
-        var task = new ProjectTask { Name = "Task with Comment" };
+        var task = new ProjectTask();
+        task.UpdateName("Task with Comment");
         project.AddTask(task);
 
         var comment = new Comment
@@ -90,11 +91,12 @@ public class CommentStorageTests
         var repository = new FolderProjectRepository(_tempDir, _loggerMock.Object);
         var project = new Project();
         project.UpdateName("MultiCommentProject");
-        var task = new ProjectTask { Name = "Task" };
+        var task = new ProjectTask();
+        task.UpdateName("Task");
         project.AddTask(task);
 
-        var c1 = new Comment { TaskId = task.Id, Content = "C1", CreatedAt = DateTime.Now.AddMinutes(-5) };
-        var c2 = new Comment { TaskId = task.Id, Content = "C2", CreatedAt = DateTime.Now };
+        var c1 = new Comment { TaskId = task.Id, AuthorId = "user-A", Content = "C1", CreatedAt = DateTime.Now.AddMinutes(-5) };
+        var c2 = new Comment { TaskId = task.Id, AuthorId = "user-A", Content = "C2", CreatedAt = DateTime.Now };
         task.AddComment(c1);
         task.AddComment(c2);
 

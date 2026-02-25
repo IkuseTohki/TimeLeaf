@@ -80,7 +80,10 @@ public class ProjectViewModelTests
         // Arrange
         var project = new Project();
         var viewModel = new ProjectViewModel(project);
-        var newTaskViewModel = new ProjectTaskViewModel(new ProjectTask { EstimatedCost = 10, ActualCost = 5 });
+        var task = new ProjectTask();
+        task.UpdateEstimatedCost(10);
+        task.UpdateActualCost(5);
+        var newTaskViewModel = new ProjectTaskViewModel(task);
 
         var receivedEstimatedCostEvents = 0;
         var receivedActualCostEvents = 0;
@@ -114,7 +117,10 @@ public class ProjectViewModelTests
     {
         // Arrange
         var project = new Project();
-        var existingTaskViewModel = new ProjectTaskViewModel(new ProjectTask { EstimatedCost = 10, ActualCost = 5 });
+        var task = new ProjectTask();
+        task.UpdateEstimatedCost(10);
+        task.UpdateActualCost(5);
+        var existingTaskViewModel = new ProjectTaskViewModel(task);
         var viewModel = new ProjectViewModel(project);
         project.AddTask(existingTaskViewModel.Model);
         viewModel.SyncFromModel();
@@ -166,8 +172,12 @@ public class ProjectViewModelTests
     {
         // Arrange
         var project = new Project();
-        var task1 = new ProjectTask { EstimatedCost = 10, ActualCost = 5 };
-        var task2 = new ProjectTask { EstimatedCost = 20, ActualCost = 10 };
+        var task1 = new ProjectTask();
+        task1.UpdateEstimatedCost(10);
+        task1.UpdateActualCost(5);
+        var task2 = new ProjectTask();
+        task2.UpdateEstimatedCost(20);
+        task2.UpdateActualCost(10);
         project.AddTask(task1);
         project.AddTask(task2);
 
@@ -211,7 +221,9 @@ public class ProjectViewModelTests
 
         // Act
         // Model への直接追加後、ViewModel を同期する
-        project.AddTask(new ProjectTask { Name = "New Task" });
+        var newTask = new ProjectTask();
+        newTask.UpdateName("New Task");
+        project.AddTask(newTask);
         projectViewModel.SyncFromModel();
 
         // Assert
@@ -230,7 +242,9 @@ public class ProjectViewModelTests
         var project = new Project();
         project.UpdateName("Test Project");
         var projectViewModel = new ProjectViewModel(project);
-        project.AddTask(new ProjectTask { Name = "Existing Task" });
+        var task = new ProjectTask();
+        task.UpdateName("Existing Task");
+        project.AddTask(task);
         projectViewModel.SyncFromModel();
 
         // この時点で ViewModel.Tasks には1つ入っているはず
@@ -261,10 +275,11 @@ public class ProjectViewModelTests
     public void DisplayLastUpdated_ShouldReturnRelativeTimeStrings_AtBoundaries(int secondsOffset, string expected)
     {
         // Arrange
-        // DateTime.Now の微細な Ticks による誤差を防ぐため、秒単位で丸める
-        var now = DateTime.Now;
-        var baseTime = new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
-        var project = new Project { UpdatedAt = baseTime.AddSeconds(-secondsOffset) };
+        // DateTime.UtcNow の微細な Ticks による誤差を防ぐため、秒単位で丸める
+        var now = DateTime.UtcNow;
+        var baseTime = new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second, DateTimeKind.Utc);
+        var project = new Project();
+        project.SetUpdatedAt(baseTime.AddSeconds(-secondsOffset));
         var viewModel = new ProjectViewModel(project);
 
         // Act
@@ -281,14 +296,40 @@ public class ProjectViewModelTests
     public void DisplayLastUpdated_ShouldSwitchToFullDate_At24HoursBoundary()
     {
         // Arrange
-        var targetDate = new DateTime(2026, 1, 1, 12, 34, 0);
-        var project = new Project { UpdatedAt = targetDate };
+        var targetDate = new DateTime(2026, 1, 1, 12, 34, 0, DateTimeKind.Utc);
+        var project = new Project();
+        project.SetUpdatedAt(targetDate);
         var viewModel = new ProjectViewModel(project);
 
         // Act
         var actual = viewModel.DisplayLastUpdated;
 
         // Assert
-        Assert.AreEqual("2026/01/01 12:34", actual);
+        var expected = targetDate.ToLocalTime().ToString("yyyy/MM/dd HH:mm");
+        Assert.AreEqual(expected, actual);
+    }
+
+    /// <summary>
+    /// テスト観点: 更新日時が過去（例：1時間前）であるにもかかわらず、
+    /// DateTimeKind の混在やシリアライズの不備により「たった今」と誤表示されないことを確認する。
+    /// </summary>
+    [TestMethod]
+    public void DisplayLastUpdated_ShouldHandlePastTimeCorrectlly_RegardlessOfKind()
+    {
+        // Arrange
+        // 1時間前の時刻を作成 (UTC)
+        var oneHourAgo = DateTime.UtcNow.AddHours(-1);
+        
+        var project = new Project();
+        project.SetUpdatedAt(oneHourAgo);
+        var viewModel = new ProjectViewModel(project);
+
+        // Act
+        var actual = viewModel.DisplayLastUpdated;
+
+        // Assert
+        // 1時間前であれば「1時間前」または「60分前」と表示されるべきであり、「たった今」ではない
+        Assert.AreNotEqual("たった今", actual, "過去の日時（1時間前）に対して「たった今」と表示される不具合を再現");
+        Assert.IsTrue(actual.Contains("時間前") || actual.Contains("分前"), $"Actual was: {actual}");
     }
 }

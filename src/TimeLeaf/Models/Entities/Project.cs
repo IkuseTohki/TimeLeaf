@@ -17,17 +17,17 @@ public class Project
     /// <summary>
     /// プロジェクトの作成日時。
     /// </summary>
-    public DateTime CreatedAt { get; set; } = DateTime.Now;
+    public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
 
     /// <summary>
     /// プロジェクトの最終更新日時。
     /// </summary>
-    public DateTime UpdatedAt { get; set; } = DateTime.Now;
+    public DateTime UpdatedAt { get; private set; } = DateTime.UtcNow;
 
     /// <summary>
     /// プロジェクトを一意に識別するID。
     /// </summary>
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid Id { get; init; } = Guid.NewGuid();
 
     /// <summary>
     /// プロジェクト名。
@@ -185,6 +185,14 @@ public class Project
     /// </summary>
     public void RefreshUpdatedAt()
     {
-        UpdatedAt = DateTime.Now;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    /// <summary>
+    /// 最終更新日時を明示的に設定します（同期用）。
+    /// </summary>
+    public void SetUpdatedAt(DateTime updatedAt)
+    {
+        UpdatedAt = updatedAt;
     }
 }

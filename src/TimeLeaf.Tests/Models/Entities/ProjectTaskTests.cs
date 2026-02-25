@@ -18,7 +18,7 @@ public class ProjectTaskTests
         var description = "This is a test task description.";
 
         // Act
-        task.Description = description;
+        task.UpdateDescription(description);
 
         // Assert
         Assert.AreEqual(description, task.Description);
@@ -37,9 +37,9 @@ public class ProjectTaskTests
         var expectedActualCost = 10.0;
 
         // Act
-        task.Deadline = deadline;
-        task.EstimatedCost = expectedEstimatedCost;
-        task.ActualCost = expectedActualCost;
+        task.UpdateSchedule(null, deadline);
+        task.UpdateEstimatedCost(expectedEstimatedCost);
+        task.UpdateActualCost(expectedActualCost);
 
         // Assert
         Assert.AreEqual(deadline, task.Deadline);
@@ -58,7 +58,7 @@ public class ProjectTaskTests
         var assignee = "user1";
 
         // Act
-        task.Assignee = assignee;
+        task.AssignTo(assignee);
 
         // Assert
         Assert.AreEqual(assignee, task.Assignee);
@@ -75,6 +75,7 @@ public class ProjectTaskTests
         var dependencyId = Guid.NewGuid();
 
         // Act
+        // Dependencies は List<Guid> で init プロパティなので、中の操作は可能
         task.Dependencies.Add(dependencyId);
 
         // Assert
@@ -82,26 +83,57 @@ public class ProjectTaskTests
     }
 
     /// <summary>
-    /// テスト観点: ProjectTask に詳細スケジュール属性（予定開始、実績開始、実績終了）が追加され、
-    /// 正しく値を保持できることを確認する。
+    /// テスト観点: 予定開始日と期限を一括で更新できること。
     /// </summary>
     [TestMethod]
-    public void ScheduleProperties_ShouldBeReadAndWrite()
+    public void UpdateSchedule_ShouldSetProperties()
     {
         // Arrange
         var task = new ProjectTask();
-        var scheduledStart = new DateTime(2026, 3, 1);
-        var actualStart = new DateTime(2026, 3, 2);
-        var actualEnd = new DateTime(2026, 3, 5);
+        var start = DateTime.Today;
+        var deadline = DateTime.Today.AddDays(7);
 
         // Act
-        task.ScheduledStartDate = scheduledStart;
-        task.ActualStartDate = actualStart;
-        task.ActualEndDate = actualEnd;
+        task.UpdateSchedule(start, deadline);
 
         // Assert
-        Assert.AreEqual(scheduledStart, task.ScheduledStartDate, "ScheduledStartDate が正しく保持されること");
-        Assert.AreEqual(task.ActualStartDate, actualStart, "ActualStartDate が正しく保持されること");
-        Assert.AreEqual(task.ActualEndDate, actualEnd, "ActualEndDate が正しく保持されること");
+        Assert.AreEqual(start, task.ScheduledStartDate);
+        Assert.AreEqual(deadline, task.Deadline);
+    }
+
+    /// <summary>
+    /// テスト観点: ステータスを「着手中」に変更した際、開始日が未設定なら自動で設定されること。
+    /// </summary>
+    [TestMethod]
+    public void UpdateStatus_ToInProgress_ShouldSetActualStartDate()
+    {
+        // Arrange
+        var task = new ProjectTask();
+        task.UpdateStatus(TimeLeaf.Models.Enums.TaskStatus.NotStarted);
+
+        // Act
+        task.UpdateStatus(TimeLeaf.Models.Enums.TaskStatus.InProgress);
+
+        // Assert
+        Assert.AreEqual(TimeLeaf.Models.Enums.TaskStatus.InProgress, task.Status);
+        Assert.IsNotNull(task.ActualStartDate, "着手中になったら開始日が自動設定されるべき");
+    }
+
+    /// <summary>
+    /// テスト観点: 名前を空に更新しようとした場合、例外がスローされること。
+    /// </summary>
+    [TestMethod]
+    public void UpdateName_ShouldThrow_IfEmpty()
+    {
+        // Arrange
+        var task = new ProjectTask();
+
+        // Act & Assert
+        try
+        {
+            task.UpdateName("");
+            Assert.Fail("空の名前は例外をスローすべき");
+        }
+        catch (ArgumentException) { }
     }
 }
