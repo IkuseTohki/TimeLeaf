@@ -95,8 +95,8 @@ public class CommentStorageTests
         task.UpdateName("Task");
         project.AddTask(task);
 
-        var c1 = new Comment { TaskId = task.Id, AuthorId = "user-A", Content = "C1", CreatedAt = DateTime.Now.AddMinutes(-5) };
-        var c2 = new Comment { TaskId = task.Id, AuthorId = "user-A", Content = "C2", CreatedAt = DateTime.Now };
+        var c1 = new Comment { TaskId = task.Id, AuthorId = "user-A", Content = "C1", CreatedAt = DateTime.UtcNow.AddMinutes(-5) };
+        var c2 = new Comment { TaskId = task.Id, AuthorId = "user-A", Content = "C2", CreatedAt = DateTime.UtcNow };
         task.AddComment(c1);
         task.AddComment(c2);
 

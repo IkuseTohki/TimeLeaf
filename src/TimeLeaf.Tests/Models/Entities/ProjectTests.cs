@@ -27,52 +27,43 @@ public class ProjectTests
     }
 
     /// <summary>
-    /// テスト観点: タスクを追加した際、プロジェクトのタスクリストに追加され、
-    /// かつ最終更新日時 (UpdatedAt) が更新されることを確認する。
+    /// テスト観点: タスクを追加した際、プロジェクトのタスクリストに追加されることを確認する。
+    /// （新仕様により、メモリ上の操作のみでは UpdatedAt は更新されない）
     /// </summary>
     [TestMethod]
-    public void AddTask_ShouldUpdateTasksAndUpdatedAt()
+    public void AddTask_ShouldUpdateTasks()
     {
         // Arrange
         var project = new Project();
         project.UpdateName("Domain Test");
-        var initialUpdateAt = project.UpdatedAt;
         var task = new ProjectTask();
         task.UpdateName("New Task");
         task.UpdateEstimatedCost(5.0);
-
-        // 実行時間を稼ぐために少し待機
-        System.Threading.Thread.Sleep(10);
 
         // Act
         project.AddTask(task);
 
         // Assert
         Assert.AreEqual(1, project.Tasks.Count, "タスクが追加されていること");
-        Assert.IsTrue(project.UpdatedAt > initialUpdateAt, "タスク追加により最終更新日時が更新されていること");
         Assert.AreEqual(5.0, project.TotalEstimatedCost, "合計見積工数が正しく計算されていること");
     }
 
     /// <summary>
-    /// テスト観点: プロジェクトの基本情報を更新した際、
-    /// 最終更新日時 (UpdatedAt) が更新されることを確認する。
+    /// テスト観点: プロジェクトの基本情報を更新できることを確認する。
+    /// （新仕様により、メモリ上の操作のみでは UpdatedAt は更新されない）
     /// </summary>
     [TestMethod]
-    public void UpdateBasicInfo_ShouldRefreshUpdatedAt()
+    public void UpdateBasicInfo_ShouldUpdateProperties()
     {
         // Arrange
         var project = new Project();
         project.UpdateName("Initial Name");
-        var initialUpdateAt = project.UpdatedAt;
-
-        System.Threading.Thread.Sleep(10);
 
         // Act
         project.UpdateName("Updated Name");
 
         // Assert
         Assert.AreEqual("Updated Name", project.Name);
-        Assert.IsTrue(project.UpdatedAt > initialUpdateAt, "名前更新により最終更新日時が更新されていること");
     }
 
     /// <summary>

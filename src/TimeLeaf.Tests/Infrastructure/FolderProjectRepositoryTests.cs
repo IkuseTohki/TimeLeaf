@@ -214,10 +214,7 @@ public class FolderProjectRepositoryTests
         var repository = new FolderProjectRepository(_tempDir, _loggerMock.Object);
         var projectId = Guid.NewGuid();
 
-        // ミリ秒未満の精度は JSON シリアライズで落ちる可能性があるため、
-        // 秒単位で固定した日時を使用してテストする（あるいはミリ秒込で比較）
-        var createdAt = new DateTime(2026, 2, 20, 10, 0, 0);
-        var updatedAt = new DateTime(2026, 2, 23, 15, 30, 45);
+        var createdAt = new DateTime(2026, 2, 20, 10, 0, 0, DateTimeKind.Utc);
 
         var project = new Project(
             projectId,
@@ -226,17 +223,21 @@ public class FolderProjectRepositoryTests
             ProjectStatus.Initial,
             ProjectHealth.Healthy,
             createdAt,
-            updatedAt,
+            createdAt,
             null,
             null
         );
         // Act
         await repository.SaveAsync(project, "test-user");
+        var savedUpdatedAt = project.UpdatedAt; // 保存によって確定した時刻
         var loadedProject = await repository.LoadAsync(projectId);
 
         // Assert
         Assert.IsNotNull(loadedProject);
         Assert.AreEqual(createdAt, loadedProject.CreatedAt, "作成日時が一致すること");
-        Assert.AreEqual(updatedAt, loadedProject.UpdatedAt, "最終更新日時が一致すること");
+
+        // 許容誤差（シリアライズ等によるわずかな差）
+        var diff = (savedUpdatedAt - loadedProject.UpdatedAt).Duration();
+        Assert.IsTrue(diff < TimeSpan.FromSeconds(1), $"最終更新日時が一致すること (Diff: {diff})");
     }
 }

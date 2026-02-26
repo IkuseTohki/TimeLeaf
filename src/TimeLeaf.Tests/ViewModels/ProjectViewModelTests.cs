@@ -319,7 +319,7 @@ public class ProjectViewModelTests
         // Arrange
         // 1時間前の時刻を作成 (UTC)
         var oneHourAgo = DateTime.UtcNow.AddHours(-1);
-        
+
         var project = new Project();
         project.SetUpdatedAt(oneHourAgo);
         var viewModel = new ProjectViewModel(project);

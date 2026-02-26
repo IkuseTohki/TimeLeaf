@@ -16,7 +16,8 @@ public record CommitFileName(DateTime Timestamp, string UserId, Guid Guid, strin
     /// </summary>
     public static string Generate(DateTime timestamp, string userId, Guid guid, string category)
     {
-        return $"{timestamp.ToString(TimeFormat)}_{userId}_{guid:n}_{category}.json";
+        var utcTimestamp = timestamp.ToUniversalTime();
+        return $"{utcTimestamp.ToString(TimeFormat)}_{userId}_{guid:n}_{category}.json";
     }
 
     /// <summary>
@@ -34,6 +35,7 @@ public record CommitFileName(DateTime Timestamp, string UserId, Guid Guid, strin
 
         // タイムスタンプのパース (yyyyMMdd_HHmmss_fff)
         var timeStr = $"{parts[0]}_{parts[1]}_{parts[2]}";
+        // ファイル名はUTCとして保存されているため、明示的にUTCとしてパースする
         var timestamp = DateTime.ParseExact(timeStr, TimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal);
 
         var userId = parts[3];

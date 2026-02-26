@@ -98,7 +98,6 @@ public class Project
     {
         if (Name == name) return;
         Name = name;
-        RefreshUpdatedAt();
     }
 
     /// <summary>
@@ -108,7 +107,6 @@ public class Project
     {
         if (Description == description) return;
         Description = description;
-        RefreshUpdatedAt();
     }
 
     /// <summary>
@@ -118,7 +116,6 @@ public class Project
     {
         if (Status == status) return;
         Status = status;
-        RefreshUpdatedAt();
     }
 
     /// <summary>
@@ -128,7 +125,6 @@ public class Project
     {
         if (HealthStatus == health) return;
         HealthStatus = health;
-        RefreshUpdatedAt();
     }
 
     /// <summary>
@@ -138,7 +134,6 @@ public class Project
     {
         if (task == null) throw new ArgumentNullException(nameof(task));
         _tasks.Add(task);
-        RefreshUpdatedAt();
     }
 
     /// <summary>
@@ -150,7 +145,6 @@ public class Project
         if (task != null)
         {
             _tasks.Remove(task);
-            RefreshUpdatedAt();
         }
     }
 
@@ -161,7 +155,6 @@ public class Project
     {
         if (milestone == null) throw new ArgumentNullException(nameof(milestone));
         _milestones.Add(milestone);
-        RefreshUpdatedAt();
     }
 
     /// <summary>

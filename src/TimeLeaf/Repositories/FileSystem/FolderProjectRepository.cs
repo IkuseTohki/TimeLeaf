@@ -68,7 +68,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         if (_justWrittenFiles.TryGetValue(fileName, out var writeTime))
         {
             // 書き込みから1秒以内のイベントは無視する
-            if (DateTime.Now - writeTime < TimeSpan.FromSeconds(1))
+            if (DateTime.UtcNow - writeTime < TimeSpan.FromSeconds(1))
             {
                 _logger.LogDebug("Ignoring file change event for our own write (within 1s): {FileName}", fileName);
                 return;
@@ -116,7 +116,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
 
     private void CleanupIgnoreList()
     {
-        var now = DateTime.Now;
+        var now = DateTime.UtcNow;
         var toRemove = _justWrittenFiles.Where(kv => now - kv.Value > TimeSpan.FromSeconds(10)).Select(kv => kv.Key).ToList();
         foreach (var key in toRemove)
         {
@@ -197,7 +197,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         _logger.LogDebug("Found project directory {TargetDir} for {ProjectId}.", targetDir, projectId);
 
         var metaPath = Path.Combine(targetDir, ".project");
-        DateTime createdAt = DateTime.Now;
+        DateTime createdAt = DateTime.UtcNow;
         if (File.Exists(metaPath))
         {
             var metaJson = await File.ReadAllTextAsync(metaPath);
@@ -231,7 +231,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
 
         // 履歴がなくても、IDが分かっていればプロジェクトとして成立させる
         var project = new Project { Id = projectId, CreatedAt = createdAt };
-        var allCommentDtos = new List<CommentDto>();
+        var allCommentData = new List<(CommentDto Dto, DateTime Timestamp)>();
 
         foreach (var file in files)
         {
@@ -257,7 +257,6 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                             project.UpdateDescription(basic.Description);
                             project.UpdateStatus(basic.Status);
                             project.UpdateHealth(basic.HealthStatus);
-                            project.SetUpdatedAt(basic.UpdatedAt); // 最終更新日時を復元
 
                             // マイルストーンのクリアと再追加
                             // 本来は Project クラスに ClearMilestones があるべきだが、一旦リフレクションを避けるため
@@ -325,7 +324,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                         var commentDto = JsonSerializer.Deserialize<CommentDto>(json, _options);
                         if (commentDto != null)
                         {
-                            allCommentDtos.Add(commentDto);
+                            allCommentData.Add((commentDto, file.Meta.Timestamp));
                             _lastSavedContent[GetCacheKey(projectId, $"Comment_{commentDto.Id}")] = json;
                         }
                         break;
@@ -346,8 +345,9 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         }
 
         // コメントをタスクに紐付け（すべてのタスクスナップショット適用後に実行）
-        foreach (var dto in allCommentDtos)
+        foreach (var entry in allCommentData)
         {
+            var dto = entry.Dto;
             var targetTask = project.Tasks.FirstOrDefault(t => t.Id == dto.TaskId);
             if (targetTask != null)
             {
@@ -358,7 +358,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                         Id = dto.Id,
                         TaskId = dto.TaskId,
                         AuthorId = dto.AuthorId,
-                        CreatedAt = dto.CreatedAt,
+                        CreatedAt = entry.Timestamp, // ファイル名から復元したタイムスタンプを使用
                         Content = dto.Content,
                         AttachmentLinks = dto.AttachmentLinks ?? new()
                     });
@@ -410,15 +410,17 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
 
             var changesDir = Path.Combine(projectDir, "changes");
 
+            // この保存セッションで使用する「コミット時刻」を決定する
+            var commitTime = DateTime.UtcNow;
+
             // 1. ProjectBasic Snapshot
             var basicSnapshot = new ProjectBasicDto(
                 project.Name,
                 project.Description,
                 project.Status,
                 project.HealthStatus,
-                project.UpdatedAt, // 最終更新日時を保存
                 project.Milestones.Select(m => new MilestoneDto(m.Date, m.Label)).ToList());
-            await TrySaveCategoryAsync(project.Id, changesDir, "ProjectBasic", basicSnapshot, project.UpdatedAt, userId);
+            await TrySaveCategoryAsync(project.Id, changesDir, "ProjectBasic", basicSnapshot, commitTime, userId);
 
             // 2. ProjectTasks Snapshot
             var tasksSnapshot = project.Tasks.Select(t => new ProjectTaskDto(
@@ -435,7 +437,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                 t.ActualCost,
                 t.Assignee,
                 t.Dependencies)).ToList();
-            await TrySaveCategoryAsync(project.Id, changesDir, "ProjectTasks", tasksSnapshot, project.UpdatedAt, userId);
+            await TrySaveCategoryAsync(project.Id, changesDir, "ProjectTasks", tasksSnapshot, commitTime, userId);
 
             // 3. Comments (Incremental)
             foreach (var t in project.Tasks)
@@ -446,7 +448,10 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                 }
             }
 
-            _logger.LogInformation("Project {ProjectId} saved successfully.", project.Id);
+            // 保存が成功した事実を以て、プロジェクトの最終更新日時を確定させる
+            project.SetUpdatedAt(commitTime);
+
+            _logger.LogInformation("Project {ProjectId} saved successfully. UpdatedAt set to {CommitTime}", project.Id, commitTime);
         }
         catch (Exception ex)
         {
@@ -473,12 +478,12 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
             Directory.CreateDirectory(changesDir);
         }
 
-        var commentDto = new CommentDto(comment.Id, comment.TaskId, comment.AuthorId, comment.CreatedAt, comment.Content, comment.AttachmentLinks);
+        var commentDto = new CommentDto(comment.Id, comment.TaskId, comment.AuthorId, comment.Content, comment.AttachmentLinks);
         var json = JsonSerializer.Serialize(commentDto, _options);
         var fileName = CommitFileName.Generate(comment.CreatedAt, userId, comment.Id, category);
         var fullPath = Path.Combine(changesDir, fileName);
 
-        _justWrittenFiles[fileName] = DateTime.Now;
+        _justWrittenFiles[fileName] = DateTime.UtcNow;
 
         try
         {
@@ -539,8 +544,8 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
     }
 
     private record MilestoneDto(DateTime Date, string Label);
-    private record CommentDto(Guid Id, Guid TaskId, string AuthorId, DateTime CreatedAt, string Content, List<string> AttachmentLinks);
-    private record ProjectBasicDto(string Name, string Description, ProjectStatus Status, ProjectHealth HealthStatus, DateTime UpdatedAt, List<MilestoneDto> Milestones);
+    private record CommentDto(Guid Id, Guid TaskId, string AuthorId, string Content, List<string> AttachmentLinks);
+    private record ProjectBasicDto(string Name, string Description, ProjectStatus Status, ProjectHealth HealthStatus, List<MilestoneDto> Milestones);
     private record ProjectTaskDto(
         Guid Id,
         string Name,

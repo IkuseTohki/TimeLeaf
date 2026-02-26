@@ -105,7 +105,7 @@ public partial class ProjectViewModel : ObservableObject
         {
             if (_project.UpdatedAt != value)
             {
-                _project.SetUpdatedAt(value);
+                _project.SetUpdatedAt(value.ToUniversalTime());
                 OnPropertyChanged(nameof(UpdatedAt));
                 OnPropertyChanged(nameof(DisplayLastUpdated));
             }
@@ -119,8 +119,10 @@ public partial class ProjectViewModel : ObservableObject
     {
         get
         {
+            var utcNow = DateTime.UtcNow;
+            var diff = utcNow - UpdatedAt.ToUniversalTime();
             var localUpdatedAt = UpdatedAt.ToLocalTime();
-            var diff = DateTime.Now - localUpdatedAt;
+
             if (diff.TotalSeconds < 0) return localUpdatedAt.ToString("yyyy/MM/dd HH:mm");
             if (diff.TotalSeconds < 60) return "たった今";
             if (diff.TotalMinutes < 60) return $"{(int)diff.TotalMinutes}分前";
@@ -224,12 +226,10 @@ public partial class ProjectViewModel : ObservableObject
     {
         if (IsSyncing) return;
 
-        // 個々のタスクのプロパティ（コスト、担当者、ステータス等）が変更された場合に、
-        // プロジェクト全体の最終更新日時を更新し、通知を行う。
+        // 個々のタスクのプロパティ（コスト、担当者、ステータス等）が変更された場合
+        // 親である ProjectViewModel の Tasks プロパティが変更されたとみなして通知する。
         // これにより MainViewModel の自動保存がトリガーされる。
-        _project.RefreshUpdatedAt();
-        OnPropertyChanged(nameof(UpdatedAt));
-        OnPropertyChanged(nameof(DisplayLastUpdated));
+        OnPropertyChanged(nameof(Tasks));
 
         if (e.PropertyName == nameof(ProjectTaskViewModel.EstimatedCost) ||
             e.PropertyName == nameof(ProjectTaskViewModel.ActualCost))
@@ -244,7 +244,5 @@ public partial class ProjectViewModel : ObservableObject
         OnPropertyChanged(nameof(TotalActualCost));
         OnPropertyChanged(nameof(DisplayTotalEstimatedCost));
         OnPropertyChanged(nameof(DisplayTotalActualCost));
-        OnPropertyChanged(nameof(UpdatedAt));
-        OnPropertyChanged(nameof(DisplayLastUpdated));
     }
 }

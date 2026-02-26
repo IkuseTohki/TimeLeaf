@@ -97,10 +97,13 @@ public partial class MainViewModel : ObservableObject
         {
             if (_isSyncing) return;
 
-            // UpdatedAt が変更された = ドメイン層で何らかの重要な変更があったとみなす
-            // ドメインエンティティのビジネスメソッドはすべてこれを更新するため、
-            // これ一つを監視するだけで整合性を保った自動保存が可能。
-            if (e.PropertyName == nameof(ProjectViewModel.UpdatedAt))
+            // 保存対象となる主要なデータプロパティの変更を監視して自動保存をキックする
+            if (e.PropertyName == nameof(ProjectViewModel.Name) ||
+                e.PropertyName == nameof(ProjectViewModel.Description) ||
+                e.PropertyName == nameof(ProjectViewModel.Status) ||
+                e.PropertyName == nameof(ProjectViewModel.HealthStatus) ||
+                e.PropertyName == nameof(ProjectViewModel.Tasks) ||
+                e.PropertyName == nameof(ProjectViewModel.Milestones))
             {
                 await AutoSaveProjectAsync(projectViewModel);
             }

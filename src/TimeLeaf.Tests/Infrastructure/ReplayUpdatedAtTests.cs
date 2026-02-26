@@ -41,33 +41,141 @@ public class ReplayUpdatedAtTests
     [TestMethod]
     public async Task Replay_ShouldPreservePastUpdatedAt_AndNotOverwriteWithNow()
     {
-        // Arrange: 10日前の日付でプロジェクトを保存する
+        // Arrange: 10日前の日付を持つファイルを直接作成する
         var projectId = Guid.NewGuid();
         var pastTime = DateTime.UtcNow.AddDays(-10);
-        var project = new Project { Id = projectId };
-        project.UpdateName("Old Project");
-        var task = new ProjectTask();
-        task.UpdateName("Old Task");
-        project.AddTask(task);
-        project.SetUpdatedAt(pastTime); // 強制的に過去の時間をセット
 
-        // 保存（内部で過去の時間を含むJSONが書き出される）
-        await _repository.SaveAsync(project, "test-user");
+        // フォルダ構成の作成
+        var projectDir = Path.Combine(_tempDir, $"{projectId}_Test");
+        var changesDir = Path.Combine(projectDir, "changes");
+        Directory.CreateDirectory(changesDir);
 
-        // Act: リポジトリを再生成してロード
-        var loggerMock = new Mock<ILogger<FolderProjectRepository>>();
-        var newRepository = new FolderProjectRepository(_tempDir, loggerMock.Object);
-        var loadedProject = await newRepository.LoadAsync(projectId);
+        // .project ファイル
+        var meta = "{\"ProjectId\":\"" + projectId + "\", \"CreatedAt\":\"2026-01-01T00:00:00Z\", \"CreatedBy\":\"test\", \"SchemaVersion\":1}";
+        await File.WriteAllTextAsync(Path.Combine(projectDir, ".project"), meta);
+
+        // 過去の日時を持つ履歴ファイル
+        var fileName = CommitFileName.Generate(pastTime, "user-A", Guid.NewGuid(), "ProjectBasic");
+        var json = "{\"Name\":\"Old Project\", \"Description\":\"\", \"Status\":\"Initial\", \"HealthStatus\":\"Healthy\", \"Milestones\":[]}";
+        await File.WriteAllTextAsync(Path.Combine(changesDir, fileName), json);
+
+        // Act: ロード
+        var loadedProject = await _repository.LoadAsync(projectId);
 
         // Assert
         Assert.IsNotNull(loadedProject);
-        
-        // 許容誤差（ミリ秒以下が切り捨てられる可能性があるため1秒以内とする）
+
+        // 許容誤差（パースの精度）
         var diff = (loadedProject.UpdatedAt - pastTime).Duration();
-        Assert.IsTrue(diff < TimeSpan.FromSeconds(1), 
-            $"UpdatedAt should be close to {pastTime}, but was {loadedProject.UpdatedAt} (Diff: {diff})");
-        
-        Assert.IsTrue(loadedProject.UpdatedAt < DateTime.UtcNow.AddMinutes(-1), 
-            "UpdatedAt should NOT be 'Just Now'.");
+        Assert.IsTrue(diff < TimeSpan.FromSeconds(1),
+            $"UpdatedAt should be {pastTime}, but was {loadedProject.UpdatedAt} (Diff: {diff})");
+    }
+
+    /// <summary>
+    /// テスト観点: JSONデータ本体に更新日時が含まれていない状態でロード（Replay）した際、
+    /// 最後に適用された履歴ファイル（ファイル名）のタイムスタンプが 
+    /// Project.UpdatedAt として正しく設定されることを確認する。
+    /// </summary>
+    [TestMethod]
+    public async Task Replay_ShouldDeriveUpdatedAtFromLatestFileName_WhenJsonHasNoTime()
+    {
+        // Arrange: 意図的に異なるタイムスタンプを持つ2つのファイルを直接作成する
+        var projectId = Guid.NewGuid();
+        var olderTime = new DateTime(2026, 1, 1, 10, 0, 0, DateTimeKind.Utc);
+        var newerTime = new DateTime(2026, 1, 1, 12, 0, 0, DateTimeKind.Utc);
+
+        var projectDir = Path.Combine(_tempDir, $"{projectId}_MetadataSource");
+        var changesDir = Path.Combine(projectDir, "changes");
+        Directory.CreateDirectory(changesDir);
+
+        await File.WriteAllTextAsync(Path.Combine(projectDir, ".project"), "{\"ProjectId\":\"" + projectId + "\", \"CreatedAt\":\"2026-01-01T00:00:00Z\", \"CreatedBy\":\"test\", \"SchemaVersion\":1}");
+
+        // 1. 10:00 のタイムスタンプを持つファイル
+        var file1 = CommitFileName.Generate(olderTime, "user-A", Guid.NewGuid(), "ProjectBasic");
+        await File.WriteAllTextAsync(Path.Combine(changesDir, file1), "{\"Name\":\"Old\"}");
+
+        // 2. 12:00 のタイムスタンプを持つファイル
+        var file2 = CommitFileName.Generate(newerTime, "user-A", Guid.NewGuid(), "ProjectTasks");
+        await File.WriteAllTextAsync(Path.Combine(changesDir, file2), "[]");
+
+        // Act: ロード
+        var loadedProject = await _repository.LoadAsync(projectId);
+
+        // Assert
+        Assert.IsNotNull(loadedProject);
+
+        // 最終更新日時は「最後（最新）のファイル」である 12:00 になっているべき
+        Assert.AreEqual(newerTime, loadedProject.UpdatedAt,
+            "最終更新日時は最新の履歴ファイルのタイムスタンプから復元されるべき");
+    }
+
+    /// <summary>
+    /// テスト観点: コメントのレコード（JSON）に作成日時が含まれていない状態でロード（Replay）した際、
+    /// そのファイル名のタイムスタンプが Comment.CreatedAt として正しく設定されることを確認する。
+    /// </summary>
+    [TestMethod]
+    public async Task Replay_ShouldRestoreCommentCreatedAtFromFileMetadata()
+    {
+        // Arrange: 過去の日時を持つコメントファイルを直接作成する
+        var projectId = Guid.NewGuid();
+        var taskId = Guid.NewGuid();
+        var commentId = Guid.NewGuid();
+        var commentTime = new DateTime(2026, 1, 1, 15, 0, 0, DateTimeKind.Utc);
+
+        var projectDir = Path.Combine(_tempDir, $"{projectId}_CommentSource");
+        var changesDir = Path.Combine(projectDir, "changes");
+        Directory.CreateDirectory(changesDir);
+
+        await File.WriteAllTextAsync(Path.Combine(projectDir, ".project"), "{\"ProjectId\":\"" + projectId + "\", \"CreatedAt\":\"2026-01-01T00:00:00Z\", \"CreatedBy\":\"test\", \"SchemaVersion\":1}");
+
+        // 1. タスクが必要なので作成
+        var taskFile = CommitFileName.Generate(commentTime.AddMinutes(-1), "user-A", Guid.NewGuid(), "ProjectTasks");
+        await File.WriteAllTextAsync(Path.Combine(changesDir, taskFile), "[{\"Id\":\"" + taskId + "\", \"Name\":\"Test Task\"}]");
+
+        // 2. JSON内に CreatedAt を持たないコメントファイル
+        var fileName = CommitFileName.Generate(commentTime, "user-A", commentId, "Comment");
+        var json = "{\"Id\":\"" + commentId + "\", \"TaskId\":\"" + taskId + "\", \"AuthorId\":\"user-A\", \"Content\":\"Hello\", \"AttachmentLinks\":[]}";
+        await File.WriteAllTextAsync(Path.Combine(changesDir, fileName), json);
+
+        // Act: ロード
+        var loadedProject = await _repository.LoadAsync(projectId);
+
+        // Assert
+        var comment = loadedProject?.Tasks.FirstOrDefault()?.Comments.FirstOrDefault();
+        Assert.IsNotNull(comment, "コメントがロードされていること");
+
+        // ファイル名の 15:00 が復元されているべき
+        Assert.AreEqual(commentTime, comment.CreatedAt,
+            "コメントの作成日時はファイル名のタイムスタンプから復元されるべき");
+    }
+
+    /// <summary>
+    /// テスト観点: エンティティの各プロパティを変更しただけでは UpdatedAt は更新されず、    /// SaveAsync によるディスクへの保存が成功したタイミングで、
+    /// 保存されたタイムスタンプが Project.UpdatedAt に反映されることを確認する。
+    /// </summary>
+    [TestMethod]
+    public async Task Save_ShouldUpdateUpdatedAtOnlyAfterSuccess()
+    {
+        // Arrange
+        var project = new Project();
+        project.UpdateName("Initial Name");
+        var originalUpdatedAt = project.UpdatedAt;
+
+        // 少し時間を置いてから名前を変更
+        await Task.Delay(10);
+        project.UpdateName("Changed Name");
+
+        // Assert (Pre-Save): まだ UpdatedAt は変わっていないはず（新しい仕様）
+        Assert.AreEqual(originalUpdatedAt, project.UpdatedAt, "保存前は最終更新日時は変更されないこと");
+
+        // Act: 保存
+        var startTime = DateTime.UtcNow;
+        await _repository.SaveAsync(project, "user-A");
+        var endTime = DateTime.UtcNow;
+
+        // Assert (Post-Save): 保存成功後に、保存時のタイムスタンプで更新されていること
+        Assert.AreNotEqual(originalUpdatedAt, project.UpdatedAt, "保存後に最終更新日時は更新されるべき");
+        Assert.IsTrue(project.UpdatedAt >= startTime && project.UpdatedAt <= endTime,
+            $"UpdatedAt ({project.UpdatedAt}) は保存期間中 ({startTime}～{endTime}) の時刻であるべき");
     }
 }

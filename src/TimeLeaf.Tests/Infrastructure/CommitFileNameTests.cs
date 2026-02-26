@@ -17,7 +17,8 @@ public class CommitFileNameTests
     public void Generate_ShouldReturnCorrectFormat()
     {
         // Arrange
-        var timestamp = new DateTime(2026, 2, 21, 15, 30, 45, 123);
+        // UTCとして明示的に作成
+        var timestamp = new DateTime(2026, 2, 21, 15, 30, 45, 123, DateTimeKind.Utc);
         var userId = "kiddy";
         var guid = Guid.Parse("12345678-1234-1234-1234-1234567890ab");
         var category = "TaskBasic";
@@ -42,7 +43,8 @@ public class CommitFileNameTests
         var result = CommitFileName.Parse(fileName);
 
         // Assert
-        Assert.AreEqual(new DateTime(2026, 2, 21, 15, 30, 45, 123), result.Timestamp);
+        // Parse は常に Kind=Utc で返す
+        Assert.AreEqual(new DateTime(2026, 2, 21, 15, 30, 45, 123, DateTimeKind.Utc), result.Timestamp);
         Assert.AreEqual("kiddy", result.UserId);
         Assert.AreEqual(Guid.Parse("12345678-1234-1234-1234-1234567890ab"), result.Guid);
         Assert.AreEqual("TaskBasic", result.Category);
@@ -55,7 +57,7 @@ public class CommitFileNameTests
     public void Sorting_ShouldBeChronological()
     {
         // Arrange
-        var baseTime = new DateTime(2026, 2, 21, 10, 0, 0);
+        var baseTime = new DateTime(2026, 2, 21, 10, 0, 0, DateTimeKind.Utc);
         var list = new List<string>
         {
             CommitFileName.Generate(baseTime.AddMilliseconds(200), "user1", Guid.NewGuid(), "Cat"),

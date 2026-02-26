@@ -144,15 +144,14 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
                 TaskId = SelectedTask.Id,
                 AuthorId = _userService.GetCurrentUserId(),
                 Content = NewCommentContent,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.UtcNow
             };
 
             SelectedTask.Model.AddComment(comment);
             _logger.LogInformation("Comment added to task {TaskId}.", SelectedTask.Id);
 
-            // コメント追加に伴う最終更新日時の通知を強制する（自動保存トリガー）
-            _projectViewModel.Model.RefreshUpdatedAt();
-            _projectViewModel.SyncFromModel(); // これにより UpdatedAt の通知も飛ぶ
+            // コメント追加に伴う通知を発生させる（自動保存トリガー）
+            _projectViewModel.SyncFromModel();
 
             NewCommentContent = string.Empty;
         }
