@@ -43,8 +43,9 @@ public class EndToEndFlowTests
             .Returns(new Mock<ILogger<OverviewViewModel>>().Object);
         _serviceProviderMock.Setup(sp => sp.GetService(typeof(ICurrentUserService)))
             .Returns(_userServiceMock.Object);
+        var saveProjectUseCase = new SaveProjectUseCase(_repositoryMock.Object, _userServiceMock.Object);
         _serviceProviderMock.Setup(sp => sp.GetService(typeof(IAddProjectUseCase)))
-            .Returns(new AddProjectUseCase(_repositoryMock.Object, _userServiceMock.Object));
+            .Returns(new AddProjectUseCase(saveProjectUseCase));
         _serviceProviderMock.Setup(sp => sp.GetService(typeof(IDialogService)))
             .Returns(_dialogServiceMock.Object);
         _serviceProviderMock.Setup(sp => sp.GetService(typeof(IServiceProvider)))
@@ -63,7 +64,7 @@ public class EndToEndFlowTests
         var saveUseCaseMock = new Mock<ISaveProjectUseCase>();
         var findProjectUseCaseMock = new Mock<IFindProjectUseCase>();
         var syncServiceMock = new Mock<IProjectSyncService>();
-        var addProjectUseCase = new AddProjectUseCase(_repositoryMock.Object, _userServiceMock.Object);
+        var addProjectUseCase = new AddProjectUseCase(new SaveProjectUseCase(_repositoryMock.Object, _userServiceMock.Object));
         var viewModelFactoryMock = new Mock<IViewModelFactory>();
 
         var allProjects = new List<Project>();
@@ -107,7 +108,10 @@ public class EndToEndFlowTests
         _repositoryMock.Verify(r => r.SaveAsync(projectVM.Model, "test-user"), Times.AtLeastOnce(), "プロジェクト作成時に保存されること");
 
         // 3. Navigate to Project
-        var workspaceVM = new ProjectWorkspaceViewModel(projectVM, new Mock<ICurrentUserService>().Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
+        var addTaskUseCase = new AddTaskUseCase(saveUseCaseMock.Object);
+        var addCommentUseCase = new AddCommentUseCase(saveUseCaseMock.Object, new Mock<ICurrentUserService>().Object);
+        var addMilestoneUseCase = new AddMilestoneUseCase(saveUseCaseMock.Object);
+        var workspaceVM = new ProjectWorkspaceViewModel(projectVM, addTaskUseCase, addCommentUseCase, addMilestoneUseCase, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
         viewModelFactoryMock.Setup(x => x.CreateProjectWorkspaceViewModel(projectVM)).Returns(workspaceVM);
 
         mainVM.NavigateToProjectCommand.Execute(projectVM);

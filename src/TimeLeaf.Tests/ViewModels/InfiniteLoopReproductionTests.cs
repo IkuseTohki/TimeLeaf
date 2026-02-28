@@ -83,7 +83,10 @@ public class InfiniteLoopReproductionTests
         await Task.Delay(100); // Wait for initialize
 
         var projectVM = mainVM.Projects.First();
-        var workspaceVM = new ProjectWorkspaceViewModel(projectVM, _userServiceMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
+        var addTaskUseCase = new AddTaskUseCase(saveUseCaseMock.Object);
+        var addCommentUseCase = new AddCommentUseCase(saveUseCaseMock.Object, _userServiceMock.Object);
+        var addMilestoneUseCase = new AddMilestoneUseCase(saveUseCaseMock.Object);
+        var workspaceVM = new ProjectWorkspaceViewModel(projectVM, addTaskUseCase, addCommentUseCase, addMilestoneUseCase, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
 
         // 2. Act - Add a task with estimated cost
         // これにより ViewModel の UpdatedAt が更新され、SaveAsync が呼ばれるはず
@@ -148,7 +151,10 @@ public class InfiniteLoopReproductionTests
         await Task.Delay(100);
 
         var projectVM = mainVM.Projects.First();
-        var workspaceVM = new ProjectWorkspaceViewModel(projectVM, _userServiceMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
+        var addTaskUseCase = new AddTaskUseCase(saveUseCaseMock.Object);
+        var addCommentUseCase = new AddCommentUseCase(saveUseCaseMock.Object, _userServiceMock.Object);
+        var addMilestoneUseCase = new AddMilestoneUseCase(saveUseCaseMock.Object);
+        var workspaceVM = new ProjectWorkspaceViewModel(projectVM, addTaskUseCase, addCommentUseCase, addMilestoneUseCase, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
 
         // 2. Act - Add 1st task
         workspaceVM.NewTaskName = "Task 1";

@@ -84,7 +84,10 @@ public class ProjectWorkspaceViewModelSaveTests
         var projectViewModel = mainViewModel.Projects.First(p => p.Id == projectId);
 
         // MainViewModel から WorkspaceViewModel へ遷移したと仮定
-        var workspaceViewModel = new ProjectWorkspaceViewModel(projectViewModel, _userServiceMock.Object, _workspaceLoggerMock.Object);
+        var addTaskUseCase = new AddTaskUseCase(saveUseCaseMock.Object);
+        var addCommentUseCase = new AddCommentUseCase(saveUseCaseMock.Object, _userServiceMock.Object);
+        var addMilestoneUseCase = new AddMilestoneUseCase(saveUseCaseMock.Object);
+        var workspaceViewModel = new ProjectWorkspaceViewModel(projectViewModel, addTaskUseCase, addCommentUseCase, addMilestoneUseCase, _workspaceLoggerMock.Object);
 
         // Act
         workspaceViewModel.NewTaskName = "New Task to Save";

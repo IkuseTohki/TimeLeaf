@@ -11,13 +11,11 @@ namespace TimeLeaf.UseCases;
 /// </summary>
 public class AddProjectUseCase : IAddProjectUseCase
 {
-    private readonly IProjectRepository _repository;
-    private readonly ICurrentUserService _userService;
+    private readonly ISaveProjectUseCase _saveUseCase;
 
-    public AddProjectUseCase(IProjectRepository repository, ICurrentUserService userService)
+    public AddProjectUseCase(ISaveProjectUseCase saveUseCase)
     {
-        _repository = repository;
-        _userService = userService;
+        _saveUseCase = saveUseCase;
     }
 
     public async Task<Project> ExecuteAsync(string name, string description, ProjectStatus status, ProjectHealth health)
@@ -28,8 +26,7 @@ public class AddProjectUseCase : IAddProjectUseCase
         project.UpdateStatus(status);
         project.UpdateHealth(health);
 
-        var userId = _userService.GetCurrentUserId();
-        await _repository.SaveAsync(project, userId);
+        await _saveUseCase.ExecuteAsync(project);
         return project;
     }
 }

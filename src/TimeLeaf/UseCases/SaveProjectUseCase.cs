@@ -24,4 +24,10 @@ public class SaveProjectUseCase : ISaveProjectUseCase
         var userId = _userService.GetCurrentUserId();
         await _repository.SaveAsync(project, userId);
     }
+
+    public async System.Threading.Tasks.Task ExecuteAsync(System.Collections.Generic.IEnumerable<Project> projects)
+    {
+        var userId = _userService.GetCurrentUserId();
+        await _repository.SaveAllAsync(projects, userId);
+    }
 }

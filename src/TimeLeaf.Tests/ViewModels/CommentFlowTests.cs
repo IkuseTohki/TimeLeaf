@@ -65,12 +65,16 @@ public class CommentFlowTests
 
         loadUseCaseMock.Setup(r => r.ExecuteAsync()).ReturnsAsync(new[] { project });
 
+        var addTaskUseCase = new AddTaskUseCase(_saveUseCaseMock.Object);
+        var addCommentUseCase = new AddCommentUseCase(_saveUseCaseMock.Object, _userServiceMock.Object);
+        var addMilestoneUseCase = new AddMilestoneUseCase(_saveUseCaseMock.Object);
+
         // Factory mock setup
         viewModelFactoryMock.Setup(x => x.CreateOverviewViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>()))
             .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, addProjectUseCaseMock.Object, _dialogServiceMock.Object, _serviceProviderMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
 
         viewModelFactoryMock.Setup(x => x.CreateProjectWorkspaceViewModel(It.IsAny<ProjectViewModel>()))
-            .Returns((ProjectViewModel pvm) => new ProjectWorkspaceViewModel(pvm, _userServiceMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object));
+            .Returns((ProjectViewModel pvm) => new ProjectWorkspaceViewModel(pvm, addTaskUseCase, addCommentUseCase, addMilestoneUseCase, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object));
 
         _mainViewModel = new MainViewModel(
             loadUseCaseMock.Object,
@@ -123,9 +127,11 @@ public class CommentFlowTests
     {
         // Arrange
         var projectViewModel = _mainViewModel.Projects.First();
-        var userServiceMock = new Mock<ICurrentUserService>();
         var loggerMock = new Mock<ILogger<ProjectWorkspaceViewModel>>();
-        var workspaceViewModel = new ProjectWorkspaceViewModel(projectViewModel, userServiceMock.Object, loggerMock.Object);
+        var addTaskUseCase = new AddTaskUseCase(_saveUseCaseMock.Object);
+        var addCommentUseCase = new AddCommentUseCase(_saveUseCaseMock.Object, _userServiceMock.Object);
+        var addMilestoneUseCase = new AddMilestoneUseCase(_saveUseCaseMock.Object);
+        var workspaceViewModel = new ProjectWorkspaceViewModel(projectViewModel, addTaskUseCase, addCommentUseCase, addMilestoneUseCase, loggerMock.Object);
 
         var targetTask = workspaceViewModel.Tasks.First();
         workspaceViewModel.SelectedTask = targetTask;

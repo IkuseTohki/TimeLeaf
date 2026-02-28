@@ -20,27 +20,25 @@ public class AddProjectUseCaseTests
     public async System.Threading.Tasks.Task ExecuteAsync_ShouldCreateAndSaveProject()
     {
         // Arrange
-        var repositoryMock = new Mock<IProjectRepository>();
-        var userServiceMock = new Mock<ICurrentUserService>();
-        userServiceMock.Setup(u => u.GetCurrentUserId()).Returns("test-user");
-        var useCase = new AddProjectUseCase(repositoryMock.Object, userServiceMock.Object);
+        var saveUseCaseMock = new Mock<ISaveProjectUseCase>();
+        var useCase = new AddProjectUseCase(saveUseCaseMock.Object);
 
         var name = "Test Project";
         var description = "Test Description";
         var status = ProjectStatus.InProgress;
-        var health = (ProjectHealth)3; // ProjectHealth.AtRisk の値 (例)
+        var health = (ProjectHealth)3;
 
         // Act
         var createdProject = await useCase.ExecuteAsync(name, description, status, health);
 
         // Assert
-        // 1. リポジトリの SaveAsync が1回だけ呼び出されたことを確認
-        repositoryMock.Verify(r => r.SaveAsync(It.Is<Project>(p =>
+        // 1. ISaveProjectUseCase の ExecuteAsync が1回だけ呼び出されたことを確認
+        saveUseCaseMock.Verify(s => s.ExecuteAsync(It.Is<Project>(p =>
             p.Name == name &&
             p.Description == description &&
             p.Status == status &&
             p.HealthStatus == health
-        ), "test-user"), Times.Once);
+        )), Times.Once);
 
         // 2. 返されたプロジェクトのプロパティが正しいことを確認
         Assert.IsNotNull(createdProject);

@@ -5,6 +5,7 @@ using Moq;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Repositories;
 using TimeLeaf.Services;
+using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
 
 namespace TimeLeaf.Tests.ViewModels;
@@ -16,7 +17,7 @@ public class ProjectWorkspaceViewModelTests
     /// テスト観点: タスク名を入力して追加コマンドを実行した際、プロジェクトにタスクが追加されることを確認する。
     /// </summary>
     [TestMethod]
-    public void AddTask_ShouldAddTaskToProject()
+    public async System.Threading.Tasks.Task AddTask_ShouldAddTaskToProject()
     {
         // Arrange
         var project = new Project();
@@ -24,14 +25,19 @@ public class ProjectWorkspaceViewModelTests
         var projectViewModel = new ProjectViewModel(project);
         var userServiceMock = new Mock<ICurrentUserService>();
         var loggerMock = new Mock<ILogger<ProjectWorkspaceViewModel>>();
-        var viewModel = new ProjectWorkspaceViewModel(projectViewModel, userServiceMock.Object, loggerMock.Object);
+        var saveUseCaseMock = new Mock<ISaveProjectUseCase>();
+        var addTaskUseCase = new AddTaskUseCase(saveUseCaseMock.Object);
+        var addCommentUseCase = new AddCommentUseCase(saveUseCaseMock.Object, userServiceMock.Object);
+        var addMilestoneUseCase = new AddMilestoneUseCase(saveUseCaseMock.Object);
+
+        var viewModel = new ProjectWorkspaceViewModel(projectViewModel, addTaskUseCase, addCommentUseCase, addMilestoneUseCase, loggerMock.Object);
         var taskName = "New Task";
         var taskDesc = "New Description";
         viewModel.NewTaskName = taskName;
         viewModel.NewTaskDescription = taskDesc;
 
         // Act
-        viewModel.AddTaskCommand.Execute(null);
+        await viewModel.AddTaskCommand.ExecuteAsync(null);
 
         // Assert
         Assert.AreEqual(1, viewModel.Tasks.Count);

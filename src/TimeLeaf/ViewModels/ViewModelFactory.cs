@@ -34,7 +34,9 @@ public class ViewModelFactory : IViewModelFactory
     {
         return new ProjectWorkspaceViewModel(
             projectViewModel,
-            _serviceProvider.GetRequiredService<ICurrentUserService>(),
+            _serviceProvider.GetRequiredService<IAddTaskUseCase>(),
+            _serviceProvider.GetRequiredService<IAddCommentUseCase>(),
+            _serviceProvider.GetRequiredService<IAddMilestoneUseCase>(),
             _serviceProvider.GetRequiredService<ILogger<ProjectWorkspaceViewModel>>());
     }
 

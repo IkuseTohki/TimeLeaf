@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Models.Enums;
 using TimeLeaf.Services;
+using TimeLeaf.UseCases;
 
 namespace TimeLeaf.ViewModels;
 
@@ -18,7 +19,9 @@ namespace TimeLeaf.ViewModels;
 public partial class ProjectWorkspaceViewModel : ObservableObject
 {
     private readonly ProjectViewModel _projectViewModel;
-    private readonly ICurrentUserService _userService;
+    private readonly IAddTaskUseCase _addTaskUseCase;
+    private readonly IAddCommentUseCase _addCommentUseCase;
+    private readonly IAddMilestoneUseCase _addMilestoneUseCase;
     private readonly ILogger<ProjectWorkspaceViewModel> _logger;
 
     public IEnumerable<TimeLeaf.Models.Enums.TaskStatus> TaskStatusValues => (TimeLeaf.Models.Enums.TaskStatus[])Enum.GetValues(typeof(TimeLeaf.Models.Enums.TaskStatus));
@@ -88,12 +91,21 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
     /// コンストラクタ。
     /// </summary>
     /// <param name="projectViewModel">管理対象となるプロジェクトのViewModel。</param>
-    /// <param name="userService">ユーザーサービス。</param>
+    /// <param name="addTaskUseCase">タスク追加ユースケース。</param>
+    /// <param name="addCommentUseCase">コメント追加ユースケース。</param>
+    /// <param name="addMilestoneUseCase">マイルストーン追加ユースケース。</param>
     /// <param name="logger">ロガー。</param>
-    public ProjectWorkspaceViewModel(ProjectViewModel projectViewModel, ICurrentUserService userService, ILogger<ProjectWorkspaceViewModel> logger)
+    public ProjectWorkspaceViewModel(
+        ProjectViewModel projectViewModel,
+        IAddTaskUseCase addTaskUseCase,
+        IAddCommentUseCase addCommentUseCase,
+        IAddMilestoneUseCase addMilestoneUseCase,
+        ILogger<ProjectWorkspaceViewModel> logger)
     {
         _projectViewModel = projectViewModel ?? throw new ArgumentNullException(nameof(projectViewModel));
-        _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+        _addTaskUseCase = addTaskUseCase ?? throw new ArgumentNullException(nameof(addTaskUseCase));
+        _addCommentUseCase = addCommentUseCase ?? throw new ArgumentNullException(nameof(addCommentUseCase));
+        _addMilestoneUseCase = addMilestoneUseCase ?? throw new ArgumentNullException(nameof(addMilestoneUseCase));
         _logger = logger;
 
         // タスクリストの変更（再ロード等）を監視して、選択状態を維持する
@@ -131,7 +143,7 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
     /// 選択中のタスクにコメントを追加するコマンド。
     /// </summary>
     [RelayCommand(CanExecute = nameof(CanAddComment))]
-    private void AddComment()
+    private async System.Threading.Tasks.Task AddComment()
     {
         if (SelectedTask == null || string.IsNullOrWhiteSpace(NewCommentContent)) return;
 
@@ -139,15 +151,7 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
 
         try
         {
-            var comment = new Comment
-            {
-                TaskId = SelectedTask.Id,
-                AuthorId = _userService.GetCurrentUserId(),
-                Content = NewCommentContent,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            SelectedTask.Model.AddComment(comment);
+            await _addCommentUseCase.ExecuteAsync(_projectViewModel.Model, SelectedTask.Model, NewCommentContent);
             _logger.LogInformation("Comment added to task {TaskId}.", SelectedTask.Id);
 
             // コメント追加に伴う通知を発生させる（自動保存トリガー）
@@ -175,7 +179,7 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
     /// 新規マイルストーンを追加するコマンド。
     /// </summary>
     [RelayCommand]
-    private void AddMilestone()
+    private async System.Threading.Tasks.Task AddMilestone()
     {
         _logger.LogInformation("Attempting to add new milestone with label: {NewMilestoneLabel}", NewMilestoneLabel);
         if (string.IsNullOrWhiteSpace(NewMilestoneLabel))
@@ -186,11 +190,7 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
 
         try
         {
-            _projectViewModel.Model.AddMilestone(new Milestone
-            {
-                Date = NewMilestoneDate,
-                Label = NewMilestoneLabel
-            });
+            await _addMilestoneUseCase.ExecuteAsync(_projectViewModel.Model, NewMilestoneDate, NewMilestoneLabel);
             _logger.LogInformation("Milestone '{MilestoneLabel}' added to project {ProjectId}.", NewMilestoneLabel, _projectViewModel.Id);
 
             _projectViewModel.SyncFromModel(); // UIに反映
@@ -208,7 +208,7 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
     /// 新規タスクを追加するコマンド。
     /// </summary>
     [RelayCommand]
-    private void AddTask()
+    private async System.Threading.Tasks.Task AddTask()
     {
         _logger.LogInformation("Attempting to add new task with name: {NewTaskName}", NewTaskName);
         if (string.IsNullOrWhiteSpace(NewTaskName))
@@ -219,19 +219,22 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
 
         try
         {
-            var taskEntity = new ProjectTask(); // ProjectTaskエンティティを作成
-            taskEntity.UpdateName(NewTaskName);
-            taskEntity.UpdateDescription(NewTaskDescription);
-            taskEntity.UpdateStatus(NewTaskStatus);
-            taskEntity.UpdatePriority(NewTaskPriority);
-            taskEntity.UpdateSchedule(NewTaskScheduledStartDate, NewTaskDeadline);
-            taskEntity.UpdateActualDates(NewTaskActualStartDate, NewTaskActualEndDate);
-            taskEntity.UpdateEstimatedCost(NewTaskEstimatedCost);
-            taskEntity.UpdateActualCost(NewTaskActualCost);
-            taskEntity.AssignTo(NewTaskAssignee);
+            await _addTaskUseCase.ExecuteAsync(
+                _projectViewModel.Model,
+                NewTaskName,
+                NewTaskDescription,
+                NewTaskStatus,
+                NewTaskPriority,
+                NewTaskScheduledStartDate,
+                NewTaskDeadline,
+                NewTaskActualStartDate,
+                NewTaskActualEndDate,
+                NewTaskEstimatedCost,
+                NewTaskActualCost,
+                NewTaskAssignee
+            );
 
-            _projectViewModel.Model.AddTask(taskEntity); // ドメインメソッドを使用
-            _logger.LogInformation("Task '{TaskName}' (ID: {TaskId}) added to project {ProjectId}.", taskEntity.Name, taskEntity.Id, _projectViewModel.Id);
+            _logger.LogInformation("Task '{TaskName}' added to project {ProjectId}.", NewTaskName, _projectViewModel.Id);
 
             _projectViewModel.SyncFromModel(); // UIに反映
 
@@ -250,7 +253,6 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to add task with name: {NewTaskName} to project {ProjectId}.", NewTaskName, _projectViewModel.Id);
-            // ここでUIにエラーを通知する等の処理を追加することも検討できます。
         }
     }
 }

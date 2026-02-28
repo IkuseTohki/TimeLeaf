@@ -61,10 +61,12 @@ public partial class App : Application
 
         // ユースケースの登録
         services.AddTransient<ILoadProjectsUseCase, LoadProjectsUseCase>();
-        services.AddTransient<ISaveProjectsUseCase, SaveProjectsUseCase>();
         services.AddTransient<ISaveProjectUseCase, SaveProjectUseCase>();
         services.AddTransient<IFindProjectUseCase, FindProjectUseCase>();
         services.AddTransient<IAddProjectUseCase, AddProjectUseCase>();
+        services.AddTransient<IAddTaskUseCase, AddTaskUseCase>();
+        services.AddTransient<IAddCommentUseCase, AddCommentUseCase>();
+        services.AddTransient<IAddMilestoneUseCase, AddMilestoneUseCase>();
 
         // ViewModel の登録
         services.AddTransient<MainViewModel>();

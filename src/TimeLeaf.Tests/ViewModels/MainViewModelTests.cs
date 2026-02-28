@@ -46,8 +46,11 @@ public class MainViewModelTests
         _viewModelFactoryMock.Setup(x => x.CreateOverviewViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>()))
             .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, _addProjectUseCaseMock.Object, new Mock<LeafKit.UI.Services.IDialogService>().Object, new Mock<IServiceProvider>().Object, new Mock<ILogger<OverviewViewModel>>().Object));
 
+        var addTaskUseCaseMock = new Mock<IAddTaskUseCase>();
+        var addCommentUseCaseMock = new Mock<IAddCommentUseCase>();
+        var addMilestoneUseCaseMock = new Mock<IAddMilestoneUseCase>();
         _viewModelFactoryMock.Setup(x => x.CreateProjectWorkspaceViewModel(It.IsAny<ProjectViewModel>()))
-            .Returns((ProjectViewModel pvm) => new ProjectWorkspaceViewModel(pvm, new Mock<ICurrentUserService>().Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object));
+            .Returns((ProjectViewModel pvm) => new ProjectWorkspaceViewModel(pvm, addTaskUseCaseMock.Object, addCommentUseCaseMock.Object, addMilestoneUseCaseMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object));
     }
 
     private MainViewModel CreateViewModel()
@@ -131,7 +134,10 @@ public class MainViewModelTests
         project.UpdateName("Test Project");
         var projectViewModel = new ProjectViewModel(project);
 
-        var expectedWorkspace = new ProjectWorkspaceViewModel(projectViewModel, new Mock<ICurrentUserService>().Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
+        var addTaskUseCaseMock = new Mock<IAddTaskUseCase>();
+        var addCommentUseCaseMock = new Mock<IAddCommentUseCase>();
+        var addMilestoneUseCaseMock = new Mock<IAddMilestoneUseCase>();
+        var expectedWorkspace = new ProjectWorkspaceViewModel(projectViewModel, addTaskUseCaseMock.Object, addCommentUseCaseMock.Object, addMilestoneUseCaseMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
         _viewModelFactoryMock.Setup(x => x.CreateProjectWorkspaceViewModel(projectViewModel)).Returns(expectedWorkspace);
 
         // Act

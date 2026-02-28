@@ -95,7 +95,7 @@ public partial class MainViewModel : ObservableObject
 
         projectViewModel.PropertyChanged += async (sender, e) =>
         {
-            if (_isSyncing) return;
+            if (_isSyncing || projectViewModel.IsSyncing) return;
 
             // 保存対象となる主要なデータプロパティの変更を監視して自動保存をキックする
             if (e.PropertyName == nameof(ProjectViewModel.Name) ||
