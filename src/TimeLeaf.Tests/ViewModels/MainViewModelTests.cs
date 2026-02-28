@@ -26,6 +26,8 @@ public class MainViewModelTests
     private Mock<IFindProjectUseCase> _findProjectUseCaseMock = null!;
     private Mock<IProjectSyncService> _syncServiceMock = null!;
     private Mock<IAddProjectUseCase> _addProjectUseCaseMock = null!;
+    private Mock<IProjectSaveCoordinator> _saveCoordinatorMock = null!;
+    private Mock<IDispatcherService> _dispatcherServiceMock = null!;
     private Mock<IViewModelFactory> _viewModelFactoryMock = null!;
     private Mock<ILogger<MainViewModel>> _loggerMock = null!;
 
@@ -38,13 +40,21 @@ public class MainViewModelTests
         _findProjectUseCaseMock = new Mock<IFindProjectUseCase>();
         _syncServiceMock = new Mock<IProjectSyncService>();
         _addProjectUseCaseMock = new Mock<IAddProjectUseCase>();
+        _saveCoordinatorMock = new Mock<IProjectSaveCoordinator>();
+        _dispatcherServiceMock = new Mock<IDispatcherService>();
         _viewModelFactoryMock = new Mock<IViewModelFactory>();
         _loggerMock = new Mock<ILogger<MainViewModel>>();
+
+        _dispatcherServiceMock.Setup(x => x.InvokeAsync(It.IsAny<Action>()))
+            .Callback<Action>(a => a())
+            .Returns(Task.CompletedTask);
+        _dispatcherServiceMock.Setup(x => x.InvokeAsync(It.IsAny<Func<Task>>()))
+            .Returns<Func<Task>>(f => f());
 
         _loadUseCaseMock.Setup(x => x.ExecuteAsync()).ReturnsAsync(new List<Project>());
 
         _viewModelFactoryMock.Setup(x => x.CreateOverviewViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>()))
-            .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, _addProjectUseCaseMock.Object, new Mock<LeafKit.UI.Services.IDialogService>().Object, new Mock<IServiceProvider>().Object, new Mock<ILogger<OverviewViewModel>>().Object));
+            .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, _addProjectUseCaseMock.Object, new Mock<LeafKit.UI.Services.IDialogService>().Object, _viewModelFactoryMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
 
         var addTaskUseCaseMock = new Mock<IAddTaskUseCase>();
         var addCommentUseCaseMock = new Mock<IAddCommentUseCase>();
@@ -61,6 +71,8 @@ public class MainViewModelTests
             _findProjectUseCaseMock.Object,
             _syncServiceMock.Object,
             _addProjectUseCaseMock.Object,
+            _saveCoordinatorMock.Object,
+            _dispatcherServiceMock.Object,
             _viewModelFactoryMock.Object,
             _loggerMock.Object);
     }
@@ -157,7 +169,7 @@ public class MainViewModelTests
         // Arrange
         var viewModel = CreateViewModel();
 
-        var expectedOverview = new OverviewViewModel(viewModel.Projects, _addProjectUseCaseMock.Object, new Mock<LeafKit.UI.Services.IDialogService>().Object, new Mock<IServiceProvider>().Object, new Mock<ILogger<OverviewViewModel>>().Object);
+        var expectedOverview = new OverviewViewModel(viewModel.Projects, _addProjectUseCaseMock.Object, new Mock<LeafKit.UI.Services.IDialogService>().Object, _viewModelFactoryMock.Object, new Mock<ILogger<OverviewViewModel>>().Object);
         _viewModelFactoryMock.Setup(x => x.CreateOverviewViewModel(viewModel.Projects)).Returns(expectedOverview);
 
         // Act

@@ -70,14 +70,21 @@ public class InfiniteLoopReproductionTests
         loadUseCaseMock.Setup(r => r.ExecuteAsync()).ReturnsAsync(new List<Project> { projectEntity });
 
         viewModelFactoryMock.Setup(x => x.CreateOverviewViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>()))
-            .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, addProjectUseCaseMock.Object, _dialogServiceMock.Object, _serviceProviderMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
+            .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, addProjectUseCaseMock.Object, _dialogServiceMock.Object, viewModelFactoryMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
 
+        var dispatcherMock = new Mock<IDispatcherService>();
+        dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Action>())).Callback<Action>(a => a()).Returns(Task.CompletedTask);
+        dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Func<Task>>())).Returns<Func<Task>>(f => f());
+
+        var saveCoordinator = new ProjectSaveCoordinator(saveUseCaseMock.Object, new Mock<ILogger<ProjectSaveCoordinator>>().Object);
         var mainVM = new MainViewModel(
             loadUseCaseMock.Object,
             saveUseCaseMock.Object,
             findProjectUseCaseMock.Object,
             syncServiceMock.Object,
             addProjectUseCaseMock.Object,
+            saveCoordinator,
+            dispatcherMock.Object,
             viewModelFactoryMock.Object,
             loggerMock.Object);
         await Task.Delay(100); // Wait for initialize
@@ -138,14 +145,21 @@ public class InfiniteLoopReproductionTests
         loadUseCaseMock.Setup(r => r.ExecuteAsync()).ReturnsAsync(new List<Project> { projectEntity });
 
         viewModelFactoryMock.Setup(x => x.CreateOverviewViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>()))
-            .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, addProjectUseCaseMock.Object, _dialogServiceMock.Object, _serviceProviderMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
+            .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, addProjectUseCaseMock.Object, _dialogServiceMock.Object, viewModelFactoryMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
 
+        var dispatcherMock = new Mock<IDispatcherService>();
+        dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Action>())).Callback<Action>(a => a()).Returns(Task.CompletedTask);
+        dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Func<Task>>())).Returns<Func<Task>>(f => f());
+
+        var saveCoordinator = new ProjectSaveCoordinator(saveUseCaseMock.Object, new Mock<ILogger<ProjectSaveCoordinator>>().Object);
         var mainVM = new MainViewModel(
             loadUseCaseMock.Object,
             saveUseCaseMock.Object,
             findProjectUseCaseMock.Object,
             syncServiceMock.Object,
             addProjectUseCaseMock.Object,
+            saveCoordinator,
+            dispatcherMock.Object,
             viewModelFactoryMock.Object,
             loggerMock.Object);
         await Task.Delay(100);

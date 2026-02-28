@@ -71,10 +71,15 @@ public class CommentFlowTests
 
         // Factory mock setup
         viewModelFactoryMock.Setup(x => x.CreateOverviewViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>()))
-            .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, addProjectUseCaseMock.Object, _dialogServiceMock.Object, _serviceProviderMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
+            .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, addProjectUseCaseMock.Object, _dialogServiceMock.Object, viewModelFactoryMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
 
         viewModelFactoryMock.Setup(x => x.CreateProjectWorkspaceViewModel(It.IsAny<ProjectViewModel>()))
             .Returns((ProjectViewModel pvm) => new ProjectWorkspaceViewModel(pvm, addTaskUseCase, addCommentUseCase, addMilestoneUseCase, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object));
+
+        var saveCoordinator = new ProjectSaveCoordinator(_saveUseCaseMock.Object, new Mock<ILogger<ProjectSaveCoordinator>>().Object);
+        var dispatcherMock = new Mock<IDispatcherService>();
+        dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Action>())).Callback<Action>(a => a()).Returns(Task.CompletedTask);
+        dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Func<Task>>())).Returns<Func<Task>>(f => f());
 
         _mainViewModel = new MainViewModel(
             loadUseCaseMock.Object,
@@ -82,6 +87,8 @@ public class CommentFlowTests
             findProjectUseCaseMock.Object,
             syncServiceMock.Object,
             addProjectUseCaseMock.Object,
+            saveCoordinator,
+            dispatcherMock.Object,
             viewModelFactoryMock.Object,
             loggerMock.Object);
 

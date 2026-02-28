@@ -8,7 +8,6 @@ using TimeLeaf.Models.Entities;
 using TimeLeaf.Models.Enums;
 using TimeLeaf.UseCases;
 
-using Microsoft.Extensions.DependencyInjection;
 using LeafKit.UI.Services;
 
 namespace TimeLeaf.ViewModels;
@@ -20,7 +19,7 @@ public partial class OverviewViewModel : ObservableObject
 {
     private readonly IAddProjectUseCase _addProjectUseCase;
     private readonly IDialogService _dialogService;
-    private readonly IServiceProvider _serviceProvider;
+    private readonly IViewModelFactory _viewModelFactory;
     private readonly ILogger<OverviewViewModel> _logger;
 
     /// <summary>
@@ -34,19 +33,19 @@ public partial class OverviewViewModel : ObservableObject
     /// <param name="projects">共有プロジェクトリスト。</param>
     /// <param name="addProjectUseCase">プロジェクト追加ユースケース。</param>
     /// <param name="dialogService">ダイアログサービス。</param>
-    /// <param name="serviceProvider">サービスプロバイダー。</param>
+    /// <param name="viewModelFactory">ViewModelファクトリ。</param>
     /// <param name="logger">ロガー。</param>
     public OverviewViewModel(
         ObservableCollection<ProjectViewModel> projects,
         IAddProjectUseCase addProjectUseCase,
         IDialogService dialogService,
-        IServiceProvider serviceProvider,
+        IViewModelFactory viewModelFactory,
         ILogger<OverviewViewModel> logger)
     {
         Projects = projects;
         _addProjectUseCase = addProjectUseCase;
         _dialogService = dialogService;
-        _serviceProvider = serviceProvider;
+        _viewModelFactory = viewModelFactory;
         _logger = logger;
         _logger.LogInformation("OverviewViewModel initialized.");
     }
@@ -61,7 +60,7 @@ public partial class OverviewViewModel : ObservableObject
 
         try
         {
-            var addProjectVm = _serviceProvider.GetRequiredService<AddProjectViewModel>();
+            var addProjectVm = _viewModelFactory.CreateAddProjectViewModel();
             var result = await _dialogService.ShowDialogAsync(addProjectVm);
 
             if (result)

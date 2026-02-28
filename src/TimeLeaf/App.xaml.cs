@@ -49,6 +49,7 @@ public partial class App : Application
         var storagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory ?? string.Empty, "storage");
 
         services.AddSingleton<ICurrentUserService, WindowsCurrentUserService>();
+        services.AddSingleton<IDispatcherService, WpfDispatcherService>();
 
         // 永続化層のコンポーネント登録
         services.AddSingleton<IProjectFileSystemSerializer, JsonProjectFileSystemSerializer>();
@@ -79,6 +80,9 @@ public partial class App : Application
         services.AddTransient<IAddTaskUseCase, AddTaskUseCase>();
         services.AddTransient<IAddCommentUseCase, AddCommentUseCase>();
         services.AddTransient<IAddMilestoneUseCase, AddMilestoneUseCase>();
+
+        // コーディネーターの登録
+        services.AddSingleton<IProjectSaveCoordinator, ProjectSaveCoordinator>();
 
         // ViewModel の登録
         services.AddTransient<MainViewModel>();

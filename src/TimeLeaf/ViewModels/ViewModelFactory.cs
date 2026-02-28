@@ -26,7 +26,7 @@ public class ViewModelFactory : IViewModelFactory
             projects,
             _serviceProvider.GetRequiredService<IAddProjectUseCase>(),
             _serviceProvider.GetRequiredService<LeafKit.UI.Services.IDialogService>(),
-            _serviceProvider, // TODO: OverviewViewModel も ServiceProvider への依存を排除すべき
+            this,
             _serviceProvider.GetRequiredService<ILogger<OverviewViewModel>>());
     }
 

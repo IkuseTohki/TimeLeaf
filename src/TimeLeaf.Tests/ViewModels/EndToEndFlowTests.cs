@@ -76,9 +76,13 @@ public class EndToEndFlowTests
             .Returns(Task.CompletedTask);
 
         var initialProjects = new ObservableCollection<ProjectViewModel>();
-        var overviewVM = new OverviewViewModel(initialProjects, addProjectUseCase, _dialogServiceMock.Object, _serviceProviderMock.Object, new Mock<ILogger<OverviewViewModel>>().Object);
+        var overviewVM = new OverviewViewModel(initialProjects, addProjectUseCase, _dialogServiceMock.Object, viewModelFactoryMock.Object, new Mock<ILogger<OverviewViewModel>>().Object);
         viewModelFactoryMock.Setup(x => x.CreateOverviewViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>()))
             .Returns(overviewVM);
+
+        var dispatcherMock = new Mock<IDispatcherService>();
+        dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Action>())).Callback<Action>(a => a()).Returns(Task.CompletedTask);
+        dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Func<Task>>())).Returns<Func<Task>>(f => f());
 
         var mainVM = new MainViewModel(
             loadUseCaseMock.Object,
@@ -86,13 +90,15 @@ public class EndToEndFlowTests
             findProjectUseCaseMock.Object,
             syncServiceMock.Object,
             addProjectUseCase,
+            new Mock<IProjectSaveCoordinator>().Object,
+            dispatcherMock.Object,
             viewModelFactoryMock.Object,
             _mainLoggerMock.Object);
         await System.Threading.Tasks.Task.Delay(100);
 
         // 2. Add a new project (Overview -> Dialog -> UseCase -> MainVM.Projects)
         var addProjectVm = new AddProjectViewModel { Name = "E2E Project" };
-        _serviceProviderMock.Setup(sp => sp.GetService(typeof(AddProjectViewModel))).Returns(addProjectVm);
+        viewModelFactoryMock.Setup(x => x.CreateAddProjectViewModel()).Returns(addProjectVm);
         _dialogServiceMock.Setup(ds => ds.ShowDialogAsync(addProjectVm)).ReturnsAsync(true);
 
         await overviewVM.AddProjectCommand.ExecuteAsync(null);

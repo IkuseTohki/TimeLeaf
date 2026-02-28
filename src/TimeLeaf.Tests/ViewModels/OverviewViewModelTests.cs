@@ -27,7 +27,7 @@ public class OverviewViewModelTests
         var projects = new ObservableCollection<ProjectViewModel>();
         var addProjectUseCaseMock = new Mock<IAddProjectUseCase>();
         var dialogServiceMock = new Mock<IDialogService>();
-        var serviceProviderMock = new Mock<IServiceProvider>();
+        var viewModelFactoryMock = new Mock<IViewModelFactory>();
 
         var projectName = "Test Project";
         var projectDesc = "Test Description";
@@ -37,7 +37,7 @@ public class OverviewViewModelTests
         addProjectVm.Name = projectName;
         addProjectVm.Description = projectDesc;
 
-        serviceProviderMock.Setup(x => x.GetService(typeof(AddProjectViewModel)))
+        viewModelFactoryMock.Setup(x => x.CreateAddProjectViewModel())
             .Returns(addProjectVm);
 
         // ダイアログを表示して true (確定) を返すように設定
@@ -62,7 +62,7 @@ public class OverviewViewModelTests
             projects,
             addProjectUseCaseMock.Object,
             dialogServiceMock.Object,
-            serviceProviderMock.Object,
+            viewModelFactoryMock.Object,
             loggerMock.Object);
 
         // Act

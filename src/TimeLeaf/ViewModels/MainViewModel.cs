@@ -25,10 +25,10 @@ public partial class MainViewModel : ObservableObject
     private readonly IFindProjectUseCase _findProjectUseCase;
     private readonly IProjectSyncService _syncService;
     private readonly IAddProjectUseCase _addProjectUseCase;
+    private readonly IProjectSaveCoordinator _saveCoordinator;
+    private readonly IDispatcherService _dispatcherService;
     private readonly IViewModelFactory _viewModelFactory;
     private readonly ILogger<MainViewModel> _logger;
-
-    private bool _isSyncing = false;
 
     [ObservableProperty]
     private ObservableObject _currentViewModel;
@@ -47,6 +47,8 @@ public partial class MainViewModel : ObservableObject
         IFindProjectUseCase findProjectUseCase,
         IProjectSyncService syncService,
         IAddProjectUseCase addProjectUseCase,
+        IProjectSaveCoordinator saveCoordinator,
+        IDispatcherService dispatcherService,
         IViewModelFactory viewModelFactory,
         ILogger<MainViewModel> logger)
     {
@@ -55,6 +57,8 @@ public partial class MainViewModel : ObservableObject
         _findProjectUseCase = findProjectUseCase;
         _syncService = syncService;
         _addProjectUseCase = addProjectUseCase;
+        _saveCoordinator = saveCoordinator;
+        _dispatcherService = dispatcherService;
         _viewModelFactory = viewModelFactory;
         _logger = logger;
 
@@ -65,72 +69,21 @@ public partial class MainViewModel : ObservableObject
         // 外部変更（同期）の監視をサービス経由で行う
         _syncService.ProjectChanged += OnProjectChanged;
 
-        // 内部変更の監視と自動保存
-        Projects.CollectionChanged += (s, e) =>
-        {
-            if (e.NewItems != null)
-            {
-                foreach (var newItem in e.NewItems)
-                {
-                    if (newItem is ProjectViewModel itemViewModel)
-                    {
-                        WireProjectViewModelEvents(itemViewModel);
-                    }
-                }
-            }
-        };
+        // 自動保存の開始
+        _saveCoordinator.StartMonitoring(Projects);
 
         _ = InitializeAsync();
 
         _logger.LogInformation("MainViewModel Initializing Complete");
     }
 
-    /// <summary>
-    /// ProjectViewModel の変更を監視し、ドメインルール（UpdatedAtの更新）に基づいて
-    /// 自動保存を実行するようにイベントを購読します。
-    /// </summary>
-    private void WireProjectViewModelEvents(ProjectViewModel projectViewModel)
-    {
-        _logger.LogDebug("Wiring events for project {ProjectId}", projectViewModel.Id);
-
-        projectViewModel.PropertyChanged += async (sender, e) =>
-        {
-            if (_isSyncing || projectViewModel.IsSyncing) return;
-
-            // 保存対象となる主要なデータプロパティの変更を監視して自動保存をキックする
-            if (e.PropertyName == nameof(ProjectViewModel.Name) ||
-                e.PropertyName == nameof(ProjectViewModel.Description) ||
-                e.PropertyName == nameof(ProjectViewModel.Status) ||
-                e.PropertyName == nameof(ProjectViewModel.HealthStatus) ||
-                e.PropertyName == nameof(ProjectViewModel.Tasks) ||
-                e.PropertyName == nameof(ProjectViewModel.Milestones))
-            {
-                await AutoSaveProjectAsync(projectViewModel);
-            }
-        };
-    }
-
-    private async System.Threading.Tasks.Task AutoSaveProjectAsync(ProjectViewModel projectViewModel)
-    {
-        _logger.LogInformation("Auto-save triggered for project {ProjectId} ({ProjectName})", projectViewModel.Id, projectViewModel.Name);
-        try
-        {
-            await _saveSingleUseCase.ExecuteAsync(projectViewModel.Model);
-            _logger.LogInformation("Auto-save completed for project {ProjectId}", projectViewModel.Id);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to auto-save project {ProjectId}", projectViewModel.Id);
-        }
-    }
-
     private void OnProjectChanged(Guid projectId)
     {
         _logger.LogInformation("Project changed event received for {ProjectId}", projectId);
 
-        async System.Threading.Tasks.Task UpdateAction()
+        _ = _dispatcherService.InvokeAsync(async () =>
         {
-            _isSyncing = true;
+            _saveCoordinator.IsEnabled = false;
             try
             {
                 var updatedProjectEntity = await _findProjectUseCase.ExecuteAsync(projectId);
@@ -155,42 +108,22 @@ public partial class MainViewModel : ObservableObject
             }
             finally
             {
-                _isSyncing = false;
+                _saveCoordinator.IsEnabled = true;
             }
-        }
-
-        // Application.Current.Dispatcher が利用可能な場合はそれを使用し、
-        // テスト環境などで利用不可な場合は直接実行する。
-        var dispatcher = Application.Current?.Dispatcher;
-        if (dispatcher != null && !dispatcher.CheckAccess())
-        {
-            dispatcher.InvokeAsync(UpdateAction);
-        }
-        else
-        {
-            _ = UpdateAction();
-        }
+        });
     }
 
     private async System.Threading.Tasks.Task InitializeAsync()
     {
         _logger.LogInformation("Loading initial projects");
-        _isSyncing = true;
+        _saveCoordinator.IsEnabled = false;
         try
         {
             var projectEntities = await _loadUseCase.ExecuteAsync();
             foreach (var projectEntity in projectEntities)
             {
                 var projectViewModel = new ProjectViewModel(projectEntity);
-                projectViewModel.IsSyncing = true;
-                try
-                {
-                    Projects.Add(projectViewModel); // Projects.CollectionChanged によって WireProjectViewModelEvents が呼ばれる
-                }
-                finally
-                {
-                    projectViewModel.IsSyncing = false;
-                }
+                Projects.Add(projectViewModel);
             }
         }
         catch (Exception ex)
@@ -199,7 +132,7 @@ public partial class MainViewModel : ObservableObject
         }
         finally
         {
-            _isSyncing = false;
+            _saveCoordinator.IsEnabled = true;
         }
         _logger.LogInformation("Loading initial projects Complete");
     }
