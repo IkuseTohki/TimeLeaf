@@ -20,9 +20,15 @@ namespace TimeLeaf;
 public partial class App : Application
 {
     private IServiceProvider _serviceProvider = null!;
+    private static bool _isErrorDialogShowing = false;
 
     public App()
     {
+        // 未ハンドルの例外をキャッチする
+        this.DispatcherUnhandledException += App_DispatcherUnhandledException;
+        AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+        System.Threading.Tasks.TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
+
         // Serilog の設定
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()
@@ -30,9 +36,94 @@ public partial class App : Application
             .WriteTo.File("logs/timeleaf-.txt", rollingInterval: RollingInterval.Day)
             .CreateLogger();
 
-        var services = new ServiceCollection();
-        ConfigureServices(services);
-        _serviceProvider = services.BuildServiceProvider();
+        try
+        {
+            var services = new ServiceCollection();
+            ConfigureServices(services);
+            _serviceProvider = services.BuildServiceProvider();
+        }
+        catch (Exception ex)
+        {
+            HandleGlobalException(ex, "App Constructor Exception");
+        }
+    }
+
+    private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+    {
+        HandleGlobalException(e.Exception, "UI Thread Dispatcher Exception");
+        e.Handled = true;
+    }
+
+    private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+    {
+        HandleGlobalException(e.ExceptionObject as Exception, "AppDomain Unhandled Exception");
+    }
+
+    private void TaskScheduler_UnobservedTaskException(object sender, System.Threading.Tasks.UnobservedTaskExceptionEventArgs e)
+    {
+        HandleGlobalException(e.Exception, "TaskScheduler Unobserved Exception");
+        e.SetObserved();
+    }
+
+    private void HandleGlobalException(Exception? ex, string type)
+    {
+        if (ex == null) return;
+
+        // すでにエラーダイアログが表示されている場合は何もしない（ログのみ）
+        lock (typeof(App))
+        {
+            if (_isErrorDialogShowing)
+            {
+                Log.Warning("Additional error suppressed while error dialog is showing: {Message}", ex.Message);
+                return;
+            }
+            _isErrorDialogShowing = true;
+        }
+
+        // ログに記録して即座にフラッシュする
+        Log.Fatal(ex, "Critical Unhandled Error [{Type}]: {Message}", type, ex.Message);
+        Log.CloseAndFlush();
+
+        var detail = $"【エラーの種類】: {type}\n" +
+                     $"【メッセージ】: {ex.Message}\n\n" +
+                     $"【スタックトレース】:\n{ex}";
+
+        void ShowErrorWindow()
+        {
+            try
+            {
+                var errorWin = new FatalErrorWindow(detail);
+                errorWin.ShowDialog();
+            }
+            catch (Exception fallbackEx)
+            {
+                // XAMLパースエラーなどで FatalErrorWindow 自体が表示できない場合の最終手段
+                MessageBox.Show(
+                    $"致命的なエラーが発生しました。さらに、エラーダイアログの表示にも失敗しました。\n\n" +
+                    $"元のエラー: {ex.Message}\n\n" +
+                    $"表示エラー: {fallbackEx.Message}",
+                    "TimeLeaf 致命的なエラー",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            finally
+            {
+                // ダイアログを閉じた後は、さらなる例外発生を防ぐためにアプリケーションを即座に終了させる。
+                // 致命的なエラーであるため、状態の不整合を防ぐためにもプロセスレベルでの終了が望ましい。
+                Environment.Exit(1);
+            }
+        }
+
+        // UIスレッドでウィンドウを表示する
+        var dispatcher = Application.Current?.Dispatcher;
+        if (dispatcher != null && !dispatcher.CheckAccess())
+        {
+            dispatcher.Invoke(ShowErrorWindow);
+        }
+        else
+        {
+            ShowErrorWindow();
+        }
     }
 
     private void ConfigureServices(IServiceCollection services)
@@ -110,8 +201,8 @@ public partial class App : Application
         }
         catch (Exception ex)
         {
-            Log.Fatal(ex, "Application start-up failed");
-            throw;
+            HandleGlobalException(ex, "Application Start-up Exception");
+            // HandleGlobalException 内で Environment.Exit(1) されるため、ここには到達しない。
         }
     }
 

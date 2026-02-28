@@ -166,6 +166,9 @@ public partial class ProjectTaskViewModel : ObservableObject
         }
     }
 
+    [ObservableProperty]
+    private bool _isSelected;
+
     /// <summary>
     /// 依存タスクのIDリスト。
     /// </summary>

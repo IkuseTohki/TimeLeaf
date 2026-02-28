@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using TimeLeaf.Models.Entities;
+using TimeLeaf.ViewModels.Workspace;
 
 namespace TimeLeaf.ViewModels;
 
@@ -12,4 +13,9 @@ public interface IViewModelFactory
     OverviewViewModel CreateOverviewViewModel(ObservableCollection<ProjectViewModel> projects);
     ProjectWorkspaceViewModel CreateProjectWorkspaceViewModel(ProjectViewModel projectViewModel);
     AddProjectViewModel CreateAddProjectViewModel();
+
+    ProjectDashboardViewModel CreateProjectDashboardViewModel(ProjectViewModel projectViewModel);
+    ProjectTasksViewModel CreateProjectTasksViewModel(ProjectViewModel projectViewModel);
+    ProjectTimelineViewModel CreateProjectTimelineViewModel(ProjectViewModel projectViewModel);
+    ProjectSettingsViewModel CreateProjectSettingsViewModel(ProjectViewModel projectViewModel);
 }

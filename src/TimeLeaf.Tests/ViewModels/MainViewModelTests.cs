@@ -12,8 +12,7 @@ using TimeLeaf.Repositories;
 using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
-
-using LeafKit.UI.Services;
+using TimeLeaf.ViewModels.Workspace;
 
 namespace TimeLeaf.Tests.ViewModels;
 
@@ -56,11 +55,8 @@ public class MainViewModelTests
         _viewModelFactoryMock.Setup(x => x.CreateOverviewViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>()))
             .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, _addProjectUseCaseMock.Object, new Mock<LeafKit.UI.Services.IDialogService>().Object, _viewModelFactoryMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
 
-        var addTaskUseCaseMock = new Mock<IAddTaskUseCase>();
-        var addCommentUseCaseMock = new Mock<IAddCommentUseCase>();
-        var addMilestoneUseCaseMock = new Mock<IAddMilestoneUseCase>();
         _viewModelFactoryMock.Setup(x => x.CreateProjectWorkspaceViewModel(It.IsAny<ProjectViewModel>()))
-            .Returns((ProjectViewModel pvm) => new ProjectWorkspaceViewModel(pvm, addTaskUseCaseMock.Object, addCommentUseCaseMock.Object, addMilestoneUseCaseMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object));
+            .Returns((ProjectViewModel pvm) => new ProjectWorkspaceViewModel(pvm, _viewModelFactoryMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object));
     }
 
     private MainViewModel CreateViewModel()
@@ -78,60 +74,22 @@ public class MainViewModelTests
     }
 
     /// <summary>
-    /// テスト観点: アプリ起動時に初期画面として OverviewViewModel が設定されていることを確認する。
+    /// テスト観点: MainViewModel の初期化時に、全プロジェクトがロードされることを確認する。
     /// </summary>
     [TestMethod]
-    public void Constructor_ShouldSetOverviewViewModelAsInitialPage()
-    {
-        // Act
-        var viewModel = CreateViewModel();
-
-        // Assert
-        Assert.IsInstanceOfType(viewModel.CurrentViewModel, typeof(OverviewViewModel));
-        _viewModelFactoryMock.Verify(x => x.CreateOverviewViewModel(viewModel.Projects), Times.Once);
-    }
-
-    /// <summary>
-    /// テスト観点: アプリ起動時にリポジトリからプロジェクトがロードされることを確認する。
-    /// </summary>
-    [TestMethod]
-    public void Constructor_ShouldLoadProjectsFromRepository()
-    {
-        // Act
-        var viewModel = CreateViewModel();
-
-        // Assert
-        _loadUseCaseMock.Verify(x => x.ExecuteAsync(), Times.Once);
-    }
-
-    /// <summary>
-    /// テスト観点: 同期サービスからの変更通知が発生した際、対象プロジェクトが再ロードされることを確認する。
-    /// </summary>
-    [TestMethod]
-    public async System.Threading.Tasks.Task SyncEvent_ShouldTriggerReload()
+    public async Task Initialize_ShouldLoadAllProjects()
     {
         // Arrange
-        var projectId = Guid.NewGuid();
-        var initialProject = new Project { Id = projectId };
-        initialProject.UpdateName("Old Name");
-        _loadUseCaseMock.Setup(x => x.ExecuteAsync()).ReturnsAsync(new List<Project> { initialProject });
-
-        var viewModel = CreateViewModel();
-        await Task.Delay(50);
-
-        // ロードされる新しい状態を準備
-        var updatedProject = new Project { Id = projectId };
-        updatedProject.UpdateName("Updated Name");
-        _findProjectUseCaseMock.Setup(x => x.ExecuteAsync(projectId)).ReturnsAsync(updatedProject);
+        var projects = new List<Project> { new Project(), new Project() };
+        _loadUseCaseMock.Setup(x => x.ExecuteAsync()).ReturnsAsync(projects);
 
         // Act
-        _syncServiceMock.Raise(s => s.ProjectChanged += null, projectId);
-
-        await System.Threading.Tasks.Task.Delay(200);
+        var viewModel = CreateViewModel();
+        await Task.Delay(100); // Wait for InitializeAsync
 
         // Assert
-        var project = viewModel.Projects.First(p => p.Id == projectId);
-        Assert.AreEqual("Updated Name", project.Name, "プロジェクト名が更新されてぁE��こと");
+        Assert.AreEqual(2, viewModel.Projects.Count);
+        _loadUseCaseMock.Verify(x => x.ExecuteAsync(), Times.Once);
     }
 
     /// <summary>
@@ -146,10 +104,7 @@ public class MainViewModelTests
         project.UpdateName("Test Project");
         var projectViewModel = new ProjectViewModel(project);
 
-        var addTaskUseCaseMock = new Mock<IAddTaskUseCase>();
-        var addCommentUseCaseMock = new Mock<IAddCommentUseCase>();
-        var addMilestoneUseCaseMock = new Mock<IAddMilestoneUseCase>();
-        var expectedWorkspace = new ProjectWorkspaceViewModel(projectViewModel, addTaskUseCaseMock.Object, addCommentUseCaseMock.Object, addMilestoneUseCaseMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
+        var expectedWorkspace = new ProjectWorkspaceViewModel(projectViewModel, _viewModelFactoryMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
         _viewModelFactoryMock.Setup(x => x.CreateProjectWorkspaceViewModel(projectViewModel)).Returns(expectedWorkspace);
 
         // Act

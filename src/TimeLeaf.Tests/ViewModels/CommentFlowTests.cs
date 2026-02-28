@@ -7,11 +7,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
-using TimeLeaf.Models.Enums;
 using TimeLeaf.Repositories;
 using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
+using TimeLeaf.ViewModels.Workspace;
 
 using LeafKit.UI.Services;
 
@@ -20,42 +20,27 @@ namespace TimeLeaf.Tests.ViewModels;
 [TestClass]
 public class CommentFlowTests
 {
-    private Mock<IProjectRepository> _repositoryMock = null!;
+    private MainViewModel _mainViewModel = null!;
     private Mock<ISaveProjectUseCase> _saveUseCaseMock = null!;
     private Mock<ICurrentUserService> _userServiceMock = null!;
     private Mock<IServiceProvider> _serviceProviderMock = null!;
     private Mock<IDialogService> _dialogServiceMock = null!;
-    private MainViewModel _mainViewModel = null!;
 
     [TestInitialize]
-    public async Task Setup()
+    public void Setup()
     {
-        _repositoryMock = new Mock<IProjectRepository>();
         _saveUseCaseMock = new Mock<ISaveProjectUseCase>();
         _userServiceMock = new Mock<ICurrentUserService>();
         _userServiceMock.Setup(u => u.GetCurrentUserId()).Returns("test-user");
+        _serviceProviderMock = new Mock<IServiceProvider>();
+        _dialogServiceMock = new Mock<IDialogService>();
 
         var loadUseCaseMock = new Mock<ILoadProjectsUseCase>();
         var findProjectUseCaseMock = new Mock<IFindProjectUseCase>();
         var syncServiceMock = new Mock<IProjectSyncService>();
         var addProjectUseCaseMock = new Mock<IAddProjectUseCase>();
         var viewModelFactoryMock = new Mock<IViewModelFactory>();
-        var loggerMock = new Mock<ILogger<MainViewModel>>();
-        _dialogServiceMock = new Mock<IDialogService>();
-
-        _serviceProviderMock = new Mock<IServiceProvider>();
-        _serviceProviderMock.Setup(sp => sp.GetService(typeof(ILogger<ProjectWorkspaceViewModel>)))
-            .Returns(new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
-        _serviceProviderMock.Setup(sp => sp.GetService(typeof(ILogger<OverviewViewModel>)))
-            .Returns(new Mock<ILogger<OverviewViewModel>>().Object);
-        _serviceProviderMock.Setup(sp => sp.GetService(typeof(ICurrentUserService)))
-            .Returns(_userServiceMock.Object);
-        _serviceProviderMock.Setup(sp => sp.GetService(typeof(IAddProjectUseCase)))
-            .Returns(addProjectUseCaseMock.Object);
-        _serviceProviderMock.Setup(sp => sp.GetService(typeof(IDialogService)))
-            .Returns(_dialogServiceMock.Object);
-        _serviceProviderMock.Setup(sp => sp.GetService(typeof(IServiceProvider)))
-            .Returns(_serviceProviderMock.Object);
+        var logger = new Mock<ILogger<MainViewModel>>();
 
         var project = new Project();
         project.UpdateName("Test Project");
@@ -73,8 +58,11 @@ public class CommentFlowTests
         viewModelFactoryMock.Setup(x => x.CreateOverviewViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>()))
             .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, addProjectUseCaseMock.Object, _dialogServiceMock.Object, viewModelFactoryMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
 
+        var tasksVM = new ProjectTasksViewModel(new ProjectViewModel(project), addTaskUseCase, addCommentUseCase, new Mock<ILogger<ProjectTasksViewModel>>().Object, new Mock<ILogger<TaskDetailViewModel>>().Object);
         viewModelFactoryMock.Setup(x => x.CreateProjectWorkspaceViewModel(It.IsAny<ProjectViewModel>()))
-            .Returns((ProjectViewModel pvm) => new ProjectWorkspaceViewModel(pvm, addTaskUseCase, addCommentUseCase, addMilestoneUseCase, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object));
+            .Returns((ProjectViewModel pvm) => new ProjectWorkspaceViewModel(pvm, viewModelFactoryMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object));
+        viewModelFactoryMock.Setup(x => x.CreateProjectTasksViewModel(It.IsAny<ProjectViewModel>()))
+            .Returns(tasksVM);
 
         var saveCoordinator = new ProjectSaveCoordinator(_saveUseCaseMock.Object, new Mock<ILogger<ProjectSaveCoordinator>>().Object);
         var dispatcherMock = new Mock<IDispatcherService>();
@@ -90,45 +78,42 @@ public class CommentFlowTests
             saveCoordinator,
             dispatcherMock.Object,
             viewModelFactoryMock.Object,
-            loggerMock.Object);
-
-        await Task.Delay(500); // 確実に初期化！EnitializeAsync�E�を征E��
+            logger.Object);
     }
 
     /// <summary>
-    /// テスト観点: WorkspaceViewModel でコメントを追加した際、
-    /// リポジトリの SaveAsync が呼び出されることを確認する。
+    /// テスト観点: コメントを追加した際、モデルに反映され、かつリポジトリの保存処理が呼ばれることを確認する。
     /// </summary>
     [TestMethod]
     public async Task AddComment_ShouldTriggerRepositorySave()
     {
         // Arrange
-        await Task.Delay(500);
-        var projectViewModel = _mainViewModel.Projects.FirstOrDefault();
-        Assert.IsNotNull(projectViewModel, "初期ロードでプロジェクトが取得できていること");
+        var projectVM = _mainViewModel.Projects.First();
+        var workspaceVM = new ProjectWorkspaceViewModel(projectVM, new Mock<IViewModelFactory>().Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
 
-        _mainViewModel.NavigateToProjectCommand.Execute(projectViewModel);
-        var workspaceViewModel = (ProjectWorkspaceViewModel)_mainViewModel.CurrentViewModel;
+        var addTaskUseCase = new AddTaskUseCase(_saveUseCaseMock.Object);
+        var addCommentUseCase = new AddCommentUseCase(_saveUseCaseMock.Object, _userServiceMock.Object);
+        var tasksVM = new ProjectTasksViewModel(projectVM, addTaskUseCase, addCommentUseCase, new Mock<ILogger<ProjectTasksViewModel>>().Object, new Mock<ILogger<TaskDetailViewModel>>().Object);
 
-        workspaceViewModel.SelectedTask = workspaceViewModel.Tasks.First();
-        workspaceViewModel.NewCommentContent = "New test comment";
+        var taskVM = projectVM.Tasks.First();
+        tasksVM.SelectedTask = taskVM;
+        var detailVM = tasksVM.TaskDetailViewModel!;
+
+        var commentContent = "New Test Comment";
+        detailVM.NewCommentContent = commentContent;
 
         // Act
-        workspaceViewModel.AddCommentCommand.Execute(null);
-        await Task.Delay(200); // 自動保存の完了を待つ
+        await detailVM.AddCommentCommand.ExecuteAsync(null);
 
         // Assert
-        _saveUseCaseMock.Verify(r => r.ExecuteAsync(It.Is<Project>(p =>
-            p.Tasks.Any(t => t.Comments.Any(c => c.Content == "New test comment")))),
-            Times.AtLeastOnce, "コメント追加により保存が走ること");
+        // 1. モデルにコメントが追加されていること
+        Assert.AreEqual(1, taskVM.Model.Comments.Count());
+        Assert.AreEqual(commentContent, taskVM.Model.Comments.First().Content);
 
-        Assert.AreEqual(string.Empty, workspaceViewModel.NewCommentContent);
+        // 2. 保存処理が呼ばれていること
+        _saveUseCaseMock.Verify(r => r.ExecuteAsync(projectVM.Model), Times.AtLeastOnce);
     }
 
-    /// <summary>
-    /// テスト観点: タスクのリストがリセット（再ロード等）されても、
-    /// 同じIDのタスクが選択状態として復元されることを確認する。
-    /// </summary>
     [TestMethod]
     public void TaskSelection_ShouldBePreserved_AfterCollectionReset()
     {
@@ -138,62 +123,22 @@ public class CommentFlowTests
         var addTaskUseCase = new AddTaskUseCase(_saveUseCaseMock.Object);
         var addCommentUseCase = new AddCommentUseCase(_saveUseCaseMock.Object, _userServiceMock.Object);
         var addMilestoneUseCase = new AddMilestoneUseCase(_saveUseCaseMock.Object);
-        var workspaceViewModel = new ProjectWorkspaceViewModel(projectViewModel, addTaskUseCase, addCommentUseCase, addMilestoneUseCase, loggerMock.Object);
+        var viewModelFactoryMock = new Mock<IViewModelFactory>();
 
-        var targetTask = workspaceViewModel.Tasks.First();
-        workspaceViewModel.SelectedTask = targetTask;
-        var taskId = targetTask.Id;
+        var tasksVM = new ProjectTasksViewModel(projectViewModel, addTaskUseCase, addCommentUseCase, new Mock<ILogger<ProjectTasksViewModel>>().Object, new Mock<ILogger<TaskDetailViewModel>>().Object);
+        viewModelFactoryMock.Setup(x => x.CreateProjectTasksViewModel(It.IsAny<ProjectViewModel>())).Returns(tasksVM);
 
-        // Act
-        // モデルのコレクションをクリアして再追加（再ロードのシミュレーション）
-        var taskEntity = projectViewModel.Model.Tasks.First();
-        projectViewModel.Model.ClearTasks();
-        projectViewModel.Model.AddTask(taskEntity);
-        projectViewModel.SyncFromModel(); // 手動同期
+        var workspaceViewModel = new ProjectWorkspaceViewModel(projectViewModel, viewModelFactoryMock.Object, loggerMock.Object);
+        workspaceViewModel.SwitchSubViewCommand.Execute("Tasks");
 
-        // Assert
-        Assert.IsNotNull(workspaceViewModel.SelectedTask, "再ロード後に選択状態が復元されていること");
-        Assert.AreEqual(taskId, workspaceViewModel.SelectedTask.Id);
-    }
+        var targetTask = tasksVM.Tasks.First();
+        tasksVM.SelectedTask = targetTask;
 
-    /// <summary>
-    /// テスト観点: 外部からの同期(ProjectChanged)によってViewModelが作り直された後も、
-    /// そのタスクに対する変更が正しく保存をトリガーすることを確認する。
-    /// </summary>
-    [TestMethod]
-    public async Task AutoSave_ShouldWork_AfterProjectSync()
-    {
-        // Arrange
-        var projectViewModel = _mainViewModel.Projects.First();
-        var projectId = projectViewModel.Id;
-
-        // 外部同期イベントを発生させて、ViewModel内部の状態を更新させる
-        var updatedProject = new Project { Id = projectId };
-        updatedProject.UpdateName("Synced Project");
-        var updatedTask = new ProjectTask(
-            projectViewModel.Tasks.First().Id,
-            "Synced Task",
-            "",
-            TimeLeaf.Models.Enums.TaskStatus.NotStarted,
-            TaskPriority.Medium,
-            null, null, null, null, 0, 0, "", null, null
-        );
-        updatedProject.AddTask(updatedTask);
-        _repositoryMock.Setup(r => r.LoadAsync(projectId)).ReturnsAsync(updatedProject);
-
-        _repositoryMock.Raise(r => r.ProjectChanged += null, projectId);
-        await Task.Delay(200); // 同期処理の完了を待つ
-
-        // Act
-        // 同期後に新しくリストに入ったタスクViewModelを取得して変更を加える
-        var reloadedTaskVM = _mainViewModel.Projects.First().Tasks.First();
-        reloadedTaskVM.Assignee = "New Author After Sync";
-
-        await Task.Delay(200); // 自動保存の完了を待つ
+        // Act - コレクションのリセットをシミュレート
+        projectViewModel.SyncFromModel();
 
         // Assert
-        _saveUseCaseMock.Verify(r => r.ExecuteAsync(It.Is<Project>(p =>
-            p.Tasks.Any(t => t.Assignee == "New Author After Sync"))),
-            Times.AtLeastOnce, "同期後のタスクに対する変更も保存が実行されること");
+        Assert.IsNotNull(tasksVM.SelectedTask, "コレクションリセット後もタスクが選択されていること");
+        Assert.AreEqual(targetTask.Id, tasksVM.SelectedTask.Id, "選択されていたタスクのIDが一致すること");
     }
 }

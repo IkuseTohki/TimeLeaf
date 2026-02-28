@@ -1,76 +1,33 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
-using TimeLeaf.Models.Entities;
-using TimeLeaf.Models.Enums;
-using TimeLeaf.Services;
 using TimeLeaf.UseCases;
+using TimeLeaf.ViewModels.Workspace;
 
 namespace TimeLeaf.ViewModels;
 
 /// <summary>
-/// 特定のプロジェクト内のタスク管理（ワークスペース）を担当するViewModel。
+/// 特定のプロジェクト内のナビゲーションと各サブビューの管理を担当する親ViewModel。
 /// </summary>
 public partial class ProjectWorkspaceViewModel : ObservableObject
 {
     private readonly ProjectViewModel _projectViewModel;
-    private readonly IAddTaskUseCase _addTaskUseCase;
-    private readonly IAddCommentUseCase _addCommentUseCase;
-    private readonly IAddMilestoneUseCase _addMilestoneUseCase;
+    private readonly IViewModelFactory _viewModelFactory;
     private readonly ILogger<ProjectWorkspaceViewModel> _logger;
 
-    public IEnumerable<TimeLeaf.Models.Enums.TaskStatus> TaskStatusValues => (TimeLeaf.Models.Enums.TaskStatus[])Enum.GetValues(typeof(TimeLeaf.Models.Enums.TaskStatus));
-    public IEnumerable<TaskPriority> TaskPriorityValues => (TaskPriority[])Enum.GetValues(typeof(TaskPriority));
-
+    /// <summary>
+    /// 現在表示中のサブビューのViewModel。
+    /// </summary>
     [ObservableProperty]
-    private string _newTaskName = string.Empty;
+    private ObservableObject _currentSubViewModel;
 
+    /// <summary>
+    /// サイドバーが展開されているかどうか。
+    /// </summary>
     [ObservableProperty]
-    private string _newTaskDescription = string.Empty;
-
-    [ObservableProperty]
-    private TimeLeaf.Models.Enums.TaskStatus _newTaskStatus = TimeLeaf.Models.Enums.TaskStatus.NotStarted;
-
-    [ObservableProperty]
-    private TaskPriority _newTaskPriority = TaskPriority.Medium;
-
-    [ObservableProperty]
-    private DateTime? _newTaskScheduledStartDate;
-
-    [ObservableProperty]
-    private DateTime? _newTaskDeadline;
-
-    [ObservableProperty]
-    private DateTime? _newTaskActualStartDate;
-
-    [ObservableProperty]
-    private DateTime? _newTaskActualEndDate;
-
-    [ObservableProperty]
-    private double _newTaskEstimatedCost;
-
-    [ObservableProperty]
-    private double _newTaskActualCost;
-
-    [ObservableProperty]
-    private string _newTaskAssignee = string.Empty;
-
-    [ObservableProperty]
-    private DateTime _newMilestoneDate = DateTime.Today;
-
-    [ObservableProperty]
-    private string _newMilestoneLabel = string.Empty;
-
-    [ObservableProperty]
-    private ProjectTaskViewModel? _selectedTask;
-
-    [ObservableProperty]
-    private string _newCommentContent = string.Empty;
+    private bool _isSidebarExpanded = true;
 
     /// <summary>
     /// 管理対象プロジェクトの名称。
@@ -78,181 +35,50 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
     public string ProjectName => _projectViewModel.Name;
 
     /// <summary>
-    /// 表示対象となるタスクのリスト。
+    /// 管理対象プロジェクトのID。
     /// </summary>
-    public ObservableCollection<ProjectTaskViewModel> Tasks => _projectViewModel.Tasks;
-
-    /// <summary>
-    /// プロジェクトのマイルストーン。
-    /// </summary>
-    public ObservableCollection<Milestone> Milestones => _projectViewModel.Milestones;
+    public Guid Id => _projectViewModel.Id;
 
     /// <summary>
     /// コンストラクタ。
     /// </summary>
-    /// <param name="projectViewModel">管理対象となるプロジェクトのViewModel。</param>
-    /// <param name="addTaskUseCase">タスク追加ユースケース。</param>
-    /// <param name="addCommentUseCase">コメント追加ユースケース。</param>
-    /// <param name="addMilestoneUseCase">マイルストーン追加ユースケース。</param>
-    /// <param name="logger">ロガー。</param>
     public ProjectWorkspaceViewModel(
         ProjectViewModel projectViewModel,
-        IAddTaskUseCase addTaskUseCase,
-        IAddCommentUseCase addCommentUseCase,
-        IAddMilestoneUseCase addMilestoneUseCase,
+        IViewModelFactory viewModelFactory,
         ILogger<ProjectWorkspaceViewModel> logger)
     {
         _projectViewModel = projectViewModel ?? throw new ArgumentNullException(nameof(projectViewModel));
-        _addTaskUseCase = addTaskUseCase ?? throw new ArgumentNullException(nameof(addTaskUseCase));
-        _addCommentUseCase = addCommentUseCase ?? throw new ArgumentNullException(nameof(addCommentUseCase));
-        _addMilestoneUseCase = addMilestoneUseCase ?? throw new ArgumentNullException(nameof(addMilestoneUseCase));
+        _viewModelFactory = viewModelFactory ?? throw new ArgumentNullException(nameof(viewModelFactory));
         _logger = logger;
 
-        // タスクリストの変更（再ロード等）を監視して、選択状態を維持する
-        Tasks.CollectionChanged += OnTasksCollectionChanged;
+        // 初期表示としてダッシュボードを設定
+        _currentSubViewModel = _viewModelFactory.CreateProjectDashboardViewModel(_projectViewModel);
 
         _logger.LogInformation("ProjectWorkspaceViewModel initialized for project {ProjectId}.", _projectViewModel.Id);
     }
 
-    private Guid? _lastSelectedTaskId;
-
-    partial void OnSelectedTaskChanged(ProjectTaskViewModel? value)
-    {
-        if (value != null)
-        {
-            _lastSelectedTaskId = value.Id;
-        }
-        AddCommentCommand.NotifyCanExecuteChanged();
-    }
-
-    private void OnTasksCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-    {
-        // リロード等によって選択が外れた場合、IDを元に再選択を試みる
-        if (SelectedTask == null && _lastSelectedTaskId.HasValue)
-        {
-            var matchingTask = Tasks.FirstOrDefault(t => t.Id == _lastSelectedTaskId.Value);
-            if (matchingTask != null)
-            {
-                _logger.LogDebug("Restoring selection for task {TaskId} after collection change.", _lastSelectedTaskId);
-                SelectedTask = matchingTask;
-            }
-        }
-    }
-
     /// <summary>
-    /// 選択中のタスクにコメントを追加するコマンド。
-    /// </summary>
-    [RelayCommand(CanExecute = nameof(CanAddComment))]
-    private async System.Threading.Tasks.Task AddComment()
-    {
-        if (SelectedTask == null || string.IsNullOrWhiteSpace(NewCommentContent)) return;
-
-        _logger.LogInformation("Adding comment to task {TaskId}.", SelectedTask.Id);
-
-        try
-        {
-            await _addCommentUseCase.ExecuteAsync(_projectViewModel.Model, SelectedTask.Model, NewCommentContent);
-            _logger.LogInformation("Comment added to task {TaskId}.", SelectedTask.Id);
-
-            // コメント追加に伴う通知を発生させる（自動保存トリガー）
-            _projectViewModel.SyncFromModel();
-
-            NewCommentContent = string.Empty;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to add comment to task {TaskId}.", SelectedTask.Id);
-        }
-    }
-
-    private bool CanAddComment() => SelectedTask != null && !string.IsNullOrWhiteSpace(NewCommentContent);
-
-    [RelayCommand]
-    private void ClearSelection() => SelectedTask = null;
-
-    partial void OnNewCommentContentChanged(string value)
-    {
-        AddCommentCommand.NotifyCanExecuteChanged();
-    }
-
-    /// <summary>
-    /// 新規マイルストーンを追加するコマンド。
+    /// サイドバーの開閉を切り替えます。
     /// </summary>
     [RelayCommand]
-    private async System.Threading.Tasks.Task AddMilestone()
-    {
-        _logger.LogInformation("Attempting to add new milestone with label: {NewMilestoneLabel}", NewMilestoneLabel);
-        if (string.IsNullOrWhiteSpace(NewMilestoneLabel))
-        {
-            _logger.LogWarning("Milestone label is empty. Cannot add milestone.");
-            return;
-        }
-
-        try
-        {
-            await _addMilestoneUseCase.ExecuteAsync(_projectViewModel.Model, NewMilestoneDate, NewMilestoneLabel);
-            _logger.LogInformation("Milestone '{MilestoneLabel}' added to project {ProjectId}.", NewMilestoneLabel, _projectViewModel.Id);
-
-            _projectViewModel.SyncFromModel(); // UIに反映
-
-            NewMilestoneLabel = string.Empty;
-            NewMilestoneDate = DateTime.Today;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to add milestone with label: {NewMilestoneLabel} to project {ProjectId}.", NewMilestoneLabel, _projectViewModel.Id);
-        }
-    }
+    private void ToggleSidebar() => IsSidebarExpanded = !IsSidebarExpanded;
 
     /// <summary>
-    /// 新規タスクを追加するコマンド。
+    /// 表示するサブビューを切り替えます。
     /// </summary>
+    /// <param name="viewName">切り替え先のビュー名 (Dashboard, Tasks, Timeline, Settings)</param>
     [RelayCommand]
-    private async System.Threading.Tasks.Task AddTask()
+    private void SwitchSubView(string viewName)
     {
-        _logger.LogInformation("Attempting to add new task with name: {NewTaskName}", NewTaskName);
-        if (string.IsNullOrWhiteSpace(NewTaskName))
+        _logger.LogInformation("Switching sub-view to {ViewName}", viewName);
+
+        CurrentSubViewModel = viewName switch
         {
-            _logger.LogWarning("Task name is empty. Cannot add task.");
-            return;
-        }
-
-        try
-        {
-            await _addTaskUseCase.ExecuteAsync(
-                _projectViewModel.Model,
-                NewTaskName,
-                NewTaskDescription,
-                NewTaskStatus,
-                NewTaskPriority,
-                NewTaskScheduledStartDate,
-                NewTaskDeadline,
-                NewTaskActualStartDate,
-                NewTaskActualEndDate,
-                NewTaskEstimatedCost,
-                NewTaskActualCost,
-                NewTaskAssignee
-            );
-
-            _logger.LogInformation("Task '{TaskName}' added to project {ProjectId}.", NewTaskName, _projectViewModel.Id);
-
-            _projectViewModel.SyncFromModel(); // UIに反映
-
-            NewTaskName = string.Empty;
-            NewTaskDescription = string.Empty;
-            NewTaskStatus = TimeLeaf.Models.Enums.TaskStatus.NotStarted;
-            NewTaskPriority = TaskPriority.Medium;
-            NewTaskScheduledStartDate = null;
-            NewTaskDeadline = null;
-            NewTaskActualStartDate = null;
-            NewTaskActualEndDate = null;
-            NewTaskEstimatedCost = 0;
-            NewTaskActualCost = 0;
-            NewTaskAssignee = string.Empty;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to add task with name: {NewTaskName} to project {ProjectId}.", NewTaskName, _projectViewModel.Id);
-        }
+            "Dashboard" => _viewModelFactory.CreateProjectDashboardViewModel(_projectViewModel),
+            "Tasks" => _viewModelFactory.CreateProjectTasksViewModel(_projectViewModel),
+            "Timeline" => _viewModelFactory.CreateProjectTimelineViewModel(_projectViewModel),
+            "Settings" => _viewModelFactory.CreateProjectSettingsViewModel(_projectViewModel),
+            _ => CurrentSubViewModel
+        };
     }
 }

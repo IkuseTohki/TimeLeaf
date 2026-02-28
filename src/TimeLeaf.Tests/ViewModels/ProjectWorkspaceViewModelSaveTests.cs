@@ -12,6 +12,7 @@ using TimeLeaf.Repositories;
 using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
+using TimeLeaf.ViewModels.Workspace;
 
 using LeafKit.UI.Services;
 
@@ -92,11 +93,16 @@ public class ProjectWorkspaceViewModelSaveTests
         var addTaskUseCase = new AddTaskUseCase(saveUseCaseMock.Object);
         var addCommentUseCase = new AddCommentUseCase(saveUseCaseMock.Object, _userServiceMock.Object);
         var addMilestoneUseCase = new AddMilestoneUseCase(saveUseCaseMock.Object);
-        var workspaceViewModel = new ProjectWorkspaceViewModel(projectViewModel, addTaskUseCase, addCommentUseCase, addMilestoneUseCase, _workspaceLoggerMock.Object);
+
+        var workspaceViewModel = new ProjectWorkspaceViewModel(projectViewModel, viewModelFactoryMock.Object, _workspaceLoggerMock.Object);
+        var tasksViewModel = new ProjectTasksViewModel(projectViewModel, addTaskUseCase, addCommentUseCase, new Mock<ILogger<ProjectTasksViewModel>>().Object, new Mock<ILogger<TaskDetailViewModel>>().Object);
+
+        viewModelFactoryMock.Setup(x => x.CreateProjectTasksViewModel(projectViewModel)).Returns(tasksViewModel);
+        workspaceViewModel.SwitchSubViewCommand.Execute("Tasks");
 
         // Act
-        workspaceViewModel.NewTaskName = "New Task to Save";
-        workspaceViewModel.AddTaskCommand.Execute(null);
+        tasksViewModel.NewTaskName = "New Task to Save";
+        await tasksViewModel.AddTaskCommand.ExecuteAsync(null);
 
         // Assert
         // 少し待って非同期の保存処理を待機
@@ -192,6 +198,6 @@ public class ProjectWorkspaceViewModelSaveTests
 
         // Assert
         await System.Threading.Tasks.Task.Delay(500);
-        saveUseCaseMock.Verify(r => r.ExecuteAsync(It.Is<Project>(p => p.Id == projectId && p.Name == "New Name")), Times.AtLeastOnce(), "プロジェクト�Eプロパティ変更時にリポジトリの SaveAsync が呼び出されること");
+        saveUseCaseMock.Verify(r => r.ExecuteAsync(It.Is<Project>(p => p.Id == projectId && p.Name == "New Name")), Times.AtLeastOnce(), "プロジェクトのプロパティ変更時にリポジトリの SaveAsync が呼び出されること");
     }
 }

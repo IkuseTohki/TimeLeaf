@@ -3,10 +3,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
-using TimeLeaf.Repositories;
 using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
+using TimeLeaf.ViewModels.Workspace;
 
 namespace TimeLeaf.Tests.ViewModels;
 
@@ -14,10 +14,11 @@ namespace TimeLeaf.Tests.ViewModels;
 public class ProjectWorkspaceViewModelTests
 {
     /// <summary>
-    /// テスト観点: タスク名を入力して追加コマンドを実行した際、プロジェクトにタスクが追加されることを確認する。
+    /// テスト観点: タスク追加コマンドを実行した際、サブビューである ProjectTasksViewModel を通じて
+    /// プロジェクトにタスクが追加されることを確認する。
     /// </summary>
     [TestMethod]
-    public async System.Threading.Tasks.Task AddTask_ShouldAddTaskToProject()
+    public async System.Threading.Tasks.Task AddTask_ShouldAddTaskToProject_ViaSubViewModel()
     {
         // Arrange
         var project = new Project();
@@ -25,26 +26,36 @@ public class ProjectWorkspaceViewModelTests
         var projectViewModel = new ProjectViewModel(project);
         var userServiceMock = new Mock<ICurrentUserService>();
         var loggerMock = new Mock<ILogger<ProjectWorkspaceViewModel>>();
+        var tasksLoggerMock = new Mock<ILogger<ProjectTasksViewModel>>();
+        var detailLoggerMock = new Mock<ILogger<TaskDetailViewModel>>();
         var saveUseCaseMock = new Mock<ISaveProjectUseCase>();
         var addTaskUseCase = new AddTaskUseCase(saveUseCaseMock.Object);
         var addCommentUseCase = new AddCommentUseCase(saveUseCaseMock.Object, userServiceMock.Object);
         var addMilestoneUseCase = new AddMilestoneUseCase(saveUseCaseMock.Object);
+        var viewModelFactoryMock = new Mock<IViewModelFactory>();
 
-        var viewModel = new ProjectWorkspaceViewModel(projectViewModel, addTaskUseCase, addCommentUseCase, addMilestoneUseCase, loggerMock.Object);
+        var tasksViewModel = new ProjectTasksViewModel(projectViewModel, addTaskUseCase, addCommentUseCase, tasksLoggerMock.Object, detailLoggerMock.Object);
+        viewModelFactoryMock.Setup(x => x.CreateProjectDashboardViewModel(It.IsAny<ProjectViewModel>()))
+            .Returns(new ProjectDashboardViewModel(projectViewModel, addMilestoneUseCase, new Mock<ILogger<ProjectDashboardViewModel>>().Object));
+        viewModelFactoryMock.Setup(x => x.CreateProjectTasksViewModel(It.IsAny<ProjectViewModel>()))
+            .Returns(tasksViewModel);
+
+        var viewModel = new ProjectWorkspaceViewModel(projectViewModel, viewModelFactoryMock.Object, loggerMock.Object);
+
+        // Tasks ビューに切り替え
+        viewModel.SwitchSubViewCommand.Execute("Tasks");
+        var activeTasksViewModel = (ProjectTasksViewModel)viewModel.CurrentSubViewModel;
+
         var taskName = "New Task";
-        var taskDesc = "New Description";
-        viewModel.NewTaskName = taskName;
-        viewModel.NewTaskDescription = taskDesc;
+        activeTasksViewModel.NewTaskName = taskName;
 
         // Act
-        await viewModel.AddTaskCommand.ExecuteAsync(null);
+        await activeTasksViewModel.AddTaskCommand.ExecuteAsync(null);
 
         // Assert
-        Assert.AreEqual(1, viewModel.Tasks.Count);
-        var added = viewModel.Tasks.First();
+        Assert.AreEqual(1, projectViewModel.Tasks.Count);
+        var added = projectViewModel.Tasks.First();
         Assert.AreEqual(taskName, added.Name);
-        Assert.AreEqual(taskDesc, added.Description);
-        Assert.AreEqual(string.Empty, viewModel.NewTaskName);
-        Assert.AreEqual(string.Empty, viewModel.NewTaskDescription);
+        Assert.AreEqual(string.Empty, activeTasksViewModel.NewTaskName);
     }
 }

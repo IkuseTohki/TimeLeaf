@@ -4,12 +4,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TimeLeaf.Services;
 using TimeLeaf.UseCases;
+using TimeLeaf.ViewModels.Workspace;
 
 namespace TimeLeaf.ViewModels;
 
 /// <summary>
-/// IViewModelFactory の具象実装。
-/// 内部で IServiceProvider を使用し、依存関係を解決しながら ViewModel を生成する。
+/// ViewModel を生成するための具体的なファクトリクラス。
 /// </summary>
 public class ViewModelFactory : IViewModelFactory
 {
@@ -34,14 +34,40 @@ public class ViewModelFactory : IViewModelFactory
     {
         return new ProjectWorkspaceViewModel(
             projectViewModel,
-            _serviceProvider.GetRequiredService<IAddTaskUseCase>(),
-            _serviceProvider.GetRequiredService<IAddCommentUseCase>(),
-            _serviceProvider.GetRequiredService<IAddMilestoneUseCase>(),
+            this,
             _serviceProvider.GetRequiredService<ILogger<ProjectWorkspaceViewModel>>());
     }
 
     public AddProjectViewModel CreateAddProjectViewModel()
     {
         return _serviceProvider.GetRequiredService<AddProjectViewModel>();
+    }
+
+    public ProjectDashboardViewModel CreateProjectDashboardViewModel(ProjectViewModel projectViewModel)
+    {
+        return new ProjectDashboardViewModel(
+            projectViewModel,
+            _serviceProvider.GetRequiredService<IAddMilestoneUseCase>(),
+            _serviceProvider.GetRequiredService<ILogger<ProjectDashboardViewModel>>());
+    }
+
+    public ProjectTasksViewModel CreateProjectTasksViewModel(ProjectViewModel projectViewModel)
+    {
+        return new ProjectTasksViewModel(
+            projectViewModel,
+            _serviceProvider.GetRequiredService<IAddTaskUseCase>(),
+            _serviceProvider.GetRequiredService<IAddCommentUseCase>(),
+            _serviceProvider.GetRequiredService<ILogger<ProjectTasksViewModel>>(),
+            _serviceProvider.GetRequiredService<ILogger<TaskDetailViewModel>>());
+    }
+
+    public ProjectTimelineViewModel CreateProjectTimelineViewModel(ProjectViewModel projectViewModel)
+    {
+        return new ProjectTimelineViewModel(projectViewModel);
+    }
+
+    public ProjectSettingsViewModel CreateProjectSettingsViewModel(ProjectViewModel projectViewModel)
+    {
+        return new ProjectSettingsViewModel(projectViewModel);
     }
 }

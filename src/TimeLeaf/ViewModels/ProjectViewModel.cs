@@ -145,23 +145,37 @@ public partial class ProjectViewModel : ObservableObject
     /// <summary>
     /// プロジェクト全体の合計見積工数。
     /// </summary>
-    public double TotalEstimatedCost => _project.TotalEstimatedCost;
+    public double TotalEstimatedCost { get => _project.TotalEstimatedCost; set { } }
 
     /// <summary>
     /// プロジェクト全体の合計実績工数。
     /// </summary>
-    public double TotalActualCost => _project.TotalActualCost;
+    public double TotalActualCost { get => _project.TotalActualCost; set { } }
 
     /// <summary>
     /// UI表示用の合計見積工数文字列。
     /// </summary>
-    public string DisplayTotalEstimatedCost => $"合計見積: {TotalEstimatedCost}";
+    public string DisplayTotalEstimatedCost { get => $"合計見積: {TotalEstimatedCost}"; set { } }
 
     /// <summary>
     /// UI表示用の合計実績工数文字列。
     /// </summary>
-    public string DisplayTotalActualCost => $"合計実績: {TotalActualCost}";
+    public string DisplayTotalActualCost { get => $"合計実績: {TotalActualCost}"; set { } }
 
+    /// <summary>
+    /// タスクの総数。
+    /// </summary>
+    public int TotalTaskCount { get => _project.Tasks.Count; set { } }
+
+    /// <summary>
+    /// 完了済みタスクの数。
+    /// </summary>
+    public int CompletedTaskCount { get => _project.Tasks.Count(t => t.Status == TimeLeaf.Models.Enums.TaskStatus.Completed); set { } }
+
+    /// <summary>
+    /// 全体の進捗率 (0-100)。
+    /// </summary>
+    public double CompletionPercentage { get => TotalTaskCount == 0 ? 0 : (double)CompletedTaskCount / TotalTaskCount * 100; set { } }
 
     /// <summary>
     /// コンストラクタ。

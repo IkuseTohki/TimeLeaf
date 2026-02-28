@@ -4,324 +4,168 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:TimeLeaf.ViewModels"
+             xmlns:wv="clr-namespace:TimeLeaf.Views.Workspace"
+             xmlns:wvm="clr-namespace:TimeLeaf.ViewModels.Workspace"
              d:DataContext="{d:DesignInstance vm:ProjectWorkspaceViewModel}"
-             d:DesignHeight="450"
-             d:DesignWidth="800"
+             d:DesignHeight="600"
+             d:DesignWidth="1000"
              mc:Ignorable="d">
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+    <UserControl.Resources>
+        <!-- サブビューのDataTemplate定義 -->
+        <DataTemplate DataType="{x:Type wvm:ProjectDashboardViewModel}">
+            <wv:ProjectDashboardView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type wvm:ProjectTasksViewModel}">
+            <wv:ProjectTasksView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type wvm:ProjectTimelineViewModel}">
+            <wv:ProjectTimelineView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type wvm:ProjectSettingsViewModel}">
+            <wv:ProjectSettingsView />
+        </DataTemplate>
+    </UserControl.Resources>
 
-        <!-- ヘッダーエリア -->
-        <StackPanel Margin="0,0,0,20" Orientation="Horizontal">
-            <Button Padding="10,5"
-                    Command="{Binding DataContext.NavigateBackCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                    Content="← 戻る" />
-            <TextBlock Margin="20,0,0,0"
-                       VerticalAlignment="Center"
-                       FontSize="20"
-                       FontWeight="Bold">
-                <Run Text="Leaf Chronicles －" />
-                <Run Text="{Binding ProjectName, Mode=OneWay}" />
-                <Run Text="－" />
-            </TextBlock>
-        </StackPanel>
+    <Grid Background="#F9F7F2">
+        <Grid.ColumnDefinitions>
+            <!-- サイドバーのカラム。IsSidebarExpanded に応じて幅を変更 -->
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
-        <!-- マイルストーンエリア -->
-        <Border Grid.Row="1"
-                Margin="0,0,0,20"
-                Padding="15,10"
-                Background="#FAFAFA"
-                BorderBrush="#DDD"
-                BorderThickness="1"
-                CornerRadius="4">
-            <StackPanel>
-                <TextBlock FontWeight="Bold" Text="マイルストーン" />
-                <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
-                    <DatePicker Width="120" SelectedDate="{Binding NewMilestoneDate}" />
-                    <TextBox Width="200"
-                             Margin="10,0,0,0"
-                             VerticalContentAlignment="Center"
-                             Tag="ラベル"
-                             Text="{Binding NewMilestoneLabel, UpdateSourceTrigger=PropertyChanged}" />
-                    <Button Margin="10,0,0,0"
-                            Padding="10,0"
-                            Command="{Binding AddMilestoneCommand}"
-                            Content="追加" />
-                </StackPanel>
-                <ItemsControl Margin="0,10,0,0" ItemsSource="{Binding Milestones}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Border Margin="0,0,10,5"
-                                    Padding="8,4"
-                                    Background="White"
-                                    BorderBrush="#DDD"
-                                    BorderThickness="1"
-                                    CornerRadius="2">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="Bold" Text="{Binding Date, StringFormat={}{0:yyyy/MM/dd}}" />
-                                    <TextBlock Margin="8,0,0,0" Text="{Binding Label}" />
-                                </StackPanel>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </StackPanel>
+        <!-- オーガニック・サイドバー -->
+        <Border x:Name="SidebarBorder"
+                Grid.Column="0"
+                Width="{Binding IsSidebarExpanded, Converter={StaticResource BooleanToDoubleConverter}, ConverterParameter='220,80'}"
+                Background="#2D5A27"
+                CornerRadius="0,32,32,0">
+            <Grid>
+                <DockPanel LastChildFill="True">
+                    <!-- ブランドロゴエリア -->
+                    <StackPanel Margin="20,32,20,40"
+                                DockPanel.Dock="Top"
+                                Orientation="Horizontal">
+                        <Path Width="24"
+                              Height="24"
+                              Data="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z"
+                              Fill="White" />
+                        <TextBlock Margin="12,0,0,0"
+                                   VerticalAlignment="Center"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Foreground="White"
+                                   Text="TimeLeaf"
+                                   Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                    </StackPanel>
+
+                    <!-- ナビゲーションメニュー -->
+                    <StackPanel>
+                        <Button Command="{Binding SwitchSubViewCommand}"
+                                CommandParameter="Dashboard"
+                                Style="{StaticResource SidebarItemStyle}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontSize="18" Text="🏠" />
+                                <TextBlock Margin="16,0,0,0"
+                                           VerticalAlignment="Center"
+                                           Text="Dashboard"
+                                           Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            </StackPanel>
+                        </Button>
+                        <Button Command="{Binding SwitchSubViewCommand}"
+                                CommandParameter="Tasks"
+                                Style="{StaticResource SidebarItemStyle}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontSize="18" Text="🌿" />
+                                <TextBlock Margin="16,0,0,0"
+                                           VerticalAlignment="Center"
+                                           Text="Tasks"
+                                           Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            </StackPanel>
+                        </Button>
+                        <Button Command="{Binding SwitchSubViewCommand}"
+                                CommandParameter="Timeline"
+                                Style="{StaticResource SidebarItemStyle}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontSize="18" Text="⏳" />
+                                <TextBlock Margin="16,0,0,0"
+                                           VerticalAlignment="Center"
+                                           Text="Timeline"
+                                           Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            </StackPanel>
+                        </Button>
+                        <Button Command="{Binding SwitchSubViewCommand}"
+                                CommandParameter="Settings"
+                                Style="{StaticResource SidebarItemStyle}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontSize="18" Text="⚙️" />
+                                <TextBlock Margin="16,0,0,0"
+                                           VerticalAlignment="Center"
+                                           Text="Settings"
+                                           Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </DockPanel>
+
+                <!-- 折りたたみボタン -->
+                <Button Width="24"
+                        Height="24"
+                        Margin="0,0,-12,32"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Bottom"
+                        Command="{Binding ToggleSidebarCommand}"
+                        Content="{Binding IsSidebarExpanded, Converter={StaticResource SidebarToggleIconConverter}}" />
+            </Grid>
         </Border>
 
-        <!-- 入力エリア -->
-        <StackPanel Grid.Row="2" Margin="0,0,0,20">
-            <StackPanel Orientation="Horizontal">
-                <TextBox Width="200"
-                         Height="32"
-                         Padding="5,0"
-                         VerticalContentAlignment="Center"
-                         Tag="タスク名"
-                         Text="{Binding NewTaskName, UpdateSourceTrigger=PropertyChanged}" />
-                <TextBox Width="100"
-                         Height="32"
-                         Margin="10,0,0,0"
-                         Padding="5,0"
-                         VerticalContentAlignment="Center"
-                         Tag="担当者"
-                         Text="{Binding NewTaskAssignee, UpdateSourceTrigger=PropertyChanged}" />
-                <ComboBox Width="120"
-                          Margin="10,0,0,0"
-                          ItemsSource="{Binding TaskStatusValues}"
-                          SelectedItem="{Binding NewTaskStatus}" />
-                <ComboBox Width="100"
-                          Margin="10,0,0,0"
-                          ItemsSource="{Binding TaskPriorityValues}"
-                          SelectedItem="{Binding NewTaskPriority}" />
-                <Button Margin="10,0,0,0"
-                        Padding="15,0"
-                        Command="{Binding AddTaskCommand}"
-                        Content="タスク追加" />
-            </StackPanel>
-            <StackPanel Margin="0,10,0,0" Orientation="Horizontal">
-                <TextBlock VerticalAlignment="Center" Text="予定: " />
-                <DatePicker Width="120"
-                            Margin="5,0,0,0"
-                            SelectedDate="{Binding NewTaskScheduledStartDate}" />
-                <TextBlock Margin="20,0,0,0"
-                           VerticalAlignment="Center"
-                           Text="期限: " />
-                <DatePicker Width="120"
-                            Margin="5,0,0,0"
-                            SelectedDate="{Binding NewTaskDeadline}" />
-                <TextBlock Margin="20,0,0,0"
-                           VerticalAlignment="Center"
-                           Text="開始: " />
-                <DatePicker Width="120"
-                            Margin="5,0,0,0"
-                            SelectedDate="{Binding NewTaskActualStartDate}" />
-                <TextBlock Margin="20,0,0,0"
-                           VerticalAlignment="Center"
-                           Text="終了: " />
-                <DatePicker Width="120"
-                            Margin="5,0,0,0"
-                            SelectedDate="{Binding NewTaskActualEndDate}" />
-            </StackPanel>
-            <StackPanel Margin="0,10,0,0" Orientation="Horizontal">
-                <TextBlock VerticalAlignment="Center" Text="見積: " />
-                <TextBox Width="60"
-                         Margin="5,0,0,0"
-                         VerticalContentAlignment="Center"
-                         Text="{Binding NewTaskEstimatedCost, UpdateSourceTrigger=PropertyChanged}" />
-                <TextBlock Margin="20,0,0,0"
-                           VerticalAlignment="Center"
-                           Text="実績: " />
-                <TextBox Width="60"
-                         Margin="5,0,0,0"
-                         VerticalContentAlignment="Center"
-                         Text="{Binding NewTaskActualCost, UpdateSourceTrigger=PropertyChanged}" />
-            </StackPanel>
-            <TextBox Height="40"
-                     Margin="0,10,0,0"
-                     AcceptsReturn="True"
-                     Tag="説明"
-                     Text="{Binding NewTaskDescription, UpdateSourceTrigger=PropertyChanged}"
-                     TextWrapping="Wrap" />
-        </StackPanel>
+        <!-- メインコンテンツエリア -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
-        <!-- 表示エリア -->
-        <Grid Grid.Row="3">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
+            <!-- ヘッダー -->
+            <Grid Margin="48,32,48,16">
+                <StackPanel VerticalAlignment="Bottom">
+                    <TextBlock FontSize="28"
+                               FontWeight="Bold"
+                               Foreground="#2D5A27">
+                        <Run Text="{Binding ProjectName, Mode=OneWay}" />
+                        <Run BaselineAlignment="Center"
+                             FontSize="12"
+                             Text=" 進行中" />
+                    </TextBlock>
+                    <TextBlock Margin="0,8,0,0"
+                               FontSize="13"
+                               Foreground="#706E6B"
+                               Text="根を張り始めて 12日目 － 最後の記録: たった今" />
+                </StackPanel>
 
-            <ScrollViewer Grid.Column="0">
-                <ListBox HorizontalContentAlignment="Stretch"
-                         BorderThickness="0"
-                         ItemsSource="{Binding Tasks}"
-                         SelectedItem="{Binding SelectedTask}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <Border Padding="10"
-                                    BorderBrush="#EEE"
-                                    BorderThickness="0,0,0,1">
-                                <StackPanel>
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock FontSize="16" Text="{Binding Name}" />
-                                        <Border Margin="10,0,0,0"
-                                                Padding="4,1"
-                                                Background="#F5F5F5"
-                                                CornerRadius="2">
-                                            <TextBlock FontSize="10"
-                                                       Foreground="#666"
-                                                       Text="{Binding Status}" />
-                                        </Border>
-                                        <Border Margin="5,0,0,0"
-                                                Padding="4,1"
-                                                Background="#FFF3E0"
-                                                CornerRadius="2">
-                                            <TextBlock FontSize="10"
-                                                       Foreground="#E65100"
-                                                       Text="{Binding Priority}" />
-                                        </Border>
-                                        <TextBlock Margin="15,0,0,0"
-                                                   VerticalAlignment="Center"
-                                                   FontSize="12"
-                                                   Foreground="#444"
-                                                   Text="{Binding Assignee}" />
-                                    </StackPanel>
-                                    <StackPanel Margin="0,4,0,0" Orientation="Horizontal">
-                                        <TextBlock FontSize="11" Foreground="#888">
-                                            <Run Text="予定: " />
-                                            <Run Text="{Binding ScheduledStartDate, StringFormat={}{0:yyyy/MM/dd}, TargetNullValue=-}" />
-                                        </TextBlock>
-                                        <TextBlock Margin="15,0,0,0"
-                                                   FontSize="11"
-                                                   Foreground="#888">
-                                            <Run Text="期限: " />
-                                            <Run Text="{Binding Deadline, StringFormat={}{0:yyyy/MM/dd}, TargetNullValue=-}" />
-                                        </TextBlock>
-                                        <TextBlock Margin="15,0,0,0"
-                                                   FontSize="11"
-                                                   Foreground="#888">
-                                            <Run Text="開始: " />
-                                            <Run Text="{Binding ActualStartDate, StringFormat={}{0:yyyy/MM/dd}, TargetNullValue=-}" />
-                                        </TextBlock>
-                                        <TextBlock Margin="15,0,0,0"
-                                                   FontSize="11"
-                                                   Foreground="#888">
-                                            <Run Text="終了: " />
-                                            <Run Text="{Binding ActualEndDate, StringFormat={}{0:yyyy/MM/dd}, TargetNullValue=-}" />
-                                        </TextBlock>
-                                        <TextBlock Margin="15,0,0,0"
-                                                   FontSize="11"
-                                                   Foreground="#888">
-                                            <Run Text="見積: " />
-                                            <Run Text="{Binding EstimatedCost}" />
-                                        </TextBlock>
-                                        <TextBlock Margin="15,0,0,0"
-                                                   FontSize="11"
-                                                   Foreground="#888">
-                                            <Run Text="実績: " />
-                                            <Run Text="{Binding ActualCost}" />
-                                        </TextBlock>
-                                    </StackPanel>
-                                    <TextBlock Margin="0,4,0,0"
-                                               FontSize="12"
-                                               Foreground="#666"
-                                               Text="{Binding Description}"
-                                               Visibility="{Binding Description, Converter={StaticResource StringToVisibilityConverter}}" />
-                                </StackPanel>
-                            </Border>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </ScrollViewer>
-
-            <!-- タスク詳細・コメントパネル -->
-            <Border Grid.Column="1"
-                    Width="350"
-                    Margin="20,0,0,0"
-                    Padding="15"
-                    Background="#F9F9F9"
-                    BorderBrush="#DDD"
-                    BorderThickness="1"
-                    CornerRadius="4"
-                    Visibility="{Binding SelectedTask, Converter={StaticResource NullToVisibilityConverter}}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-
-                    <TextBlock FontWeight="Bold" Text="タスク詳細" />
-                    <Button HorizontalAlignment="Right"
-                            Background="Transparent"
-                            BorderThickness="0"
-                            Command="{Binding ClearSelectionCommand}"
-                            Content="✕" />
-
-                    <StackPanel Grid.Row="1" Margin="0,10">
-                        <TextBlock FontSize="18"
+                <!-- 戻るボタン等 -->
+                <StackPanel HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            Orientation="Horizontal">
+                    <Button Padding="12,6"
+                            Command="{Binding DataContext.NavigateBackCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                            Content="← 森へ戻る"
+                            Style="{StaticResource OrganicButtonStyle}" />
+                    <Border Width="40"
+                            Height="40"
+                            Margin="16,0,0,0"
+                            Background="#4A7c44"
+                            CornerRadius="20">
+                        <TextBlock HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
                                    FontWeight="Bold"
-                                   Text="{Binding SelectedTask.Name}" />
-                        <TextBlock Margin="0,5"
-                                   FontStyle="Italic"
-                                   Foreground="#666"
-                                   Text="{Binding SelectedTask.Description}"
-                                   TextWrapping="Wrap" />
-                    </StackPanel>
+                                   Foreground="White"
+                                   Text="KT" />
+                    </Border>
+                </StackPanel>
+            </Grid>
 
-                    <!-- コメントリスト -->
-                    <ScrollViewer Grid.Row="2" Margin="0,10">
-                        <ItemsControl ItemsSource="{Binding SelectedTask.Comments}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border Margin="0,0,0,10"
-                                            Padding="10"
-                                            Background="White"
-                                            BorderBrush="#EEE"
-                                            BorderThickness="1"
-                                            CornerRadius="4">
-                                        <StackPanel>
-                                            <StackPanel Orientation="Horizontal">
-                                                <TextBlock FontWeight="Bold" Text="{Binding AuthorId}" />
-                                                <TextBlock Margin="10,0,0,0"
-                                                           FontSize="10"
-                                                           Foreground="#888"
-                                                           Text="{Binding CreatedAt, StringFormat={}{0:MM/dd HH:mm}}" />
-                                            </StackPanel>
-                                            <TextBlock Margin="0,5,0,0"
-                                                       Text="{Binding Content}"
-                                                       TextWrapping="Wrap" />
-                                        </StackPanel>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </ScrollViewer>
-
-                    <!-- コメント入力 -->
-                    <StackPanel Grid.Row="3" Margin="0,10,0,0">
-                        <TextBox Height="60"
-                                 AcceptsReturn="True"
-                                 Tag="コメントを入力..."
-                                 Text="{Binding NewCommentContent, UpdateSourceTrigger=PropertyChanged}"
-                                 TextWrapping="Wrap" />
-                        <Button Margin="0,5,0,0"
-                                Padding="10,5"
-                                Command="{Binding AddCommentCommand}"
-                                Content="コメント投稿" />
-                    </StackPanel>
-                </Grid>
-            </Border>
+            <!-- サブビュー表示領域 -->
+            <ContentControl Grid.Row="1" Content="{Binding CurrentSubViewModel}" />
         </Grid>
     </Grid>
 </UserControl>

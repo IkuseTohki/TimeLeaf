@@ -12,6 +12,7 @@ using TimeLeaf.Repositories;
 using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
+using TimeLeaf.ViewModels.Workspace;
 
 using LeafKit.UI.Services;
 
@@ -117,20 +118,25 @@ public class EndToEndFlowTests
         var addTaskUseCase = new AddTaskUseCase(saveUseCaseMock.Object);
         var addCommentUseCase = new AddCommentUseCase(saveUseCaseMock.Object, new Mock<ICurrentUserService>().Object);
         var addMilestoneUseCase = new AddMilestoneUseCase(saveUseCaseMock.Object);
-        var workspaceVM = new ProjectWorkspaceViewModel(projectVM, addTaskUseCase, addCommentUseCase, addMilestoneUseCase, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
+
+        var workspaceVM = new ProjectWorkspaceViewModel(projectVM, viewModelFactoryMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
+        var tasksVM = new ProjectTasksViewModel(projectVM, addTaskUseCase, addCommentUseCase, new Mock<ILogger<ProjectTasksViewModel>>().Object, new Mock<ILogger<TaskDetailViewModel>>().Object);
+
         viewModelFactoryMock.Setup(x => x.CreateProjectWorkspaceViewModel(projectVM)).Returns(workspaceVM);
+        viewModelFactoryMock.Setup(x => x.CreateProjectTasksViewModel(projectVM)).Returns(tasksVM);
 
         mainVM.NavigateToProjectCommand.Execute(projectVM);
+        workspaceVM.SwitchSubViewCommand.Execute("Tasks");
 
         // 4. Add a Task in Workspace
-        workspaceVM.NewTaskName = "E2E Task";
-        workspaceVM.AddTaskCommand.Execute(null);
+        tasksVM.NewTaskName = "E2E Task";
+        await tasksVM.AddTaskCommand.ExecuteAsync(null);
 
         await System.Threading.Tasks.Task.Delay(500);
         saveUseCaseMock.Verify(r => r.ExecuteAsync(It.Is<Project>(p => p.Id == projectVM.Id && p.Tasks.Any(t => t.Name == "E2E Task"))), Times.AtLeastOnce(), "タスク追加時に保存されること");
 
         // 5. Update Task Property
-        var taskVM = workspaceVM.Tasks.First(t => t.Name == "E2E Task");
+        var taskVM = projectVM.Tasks.First(t => t.Name == "E2E Task");
         taskVM.Assignee = "E2E User";
 
         await System.Threading.Tasks.Task.Delay(500);
