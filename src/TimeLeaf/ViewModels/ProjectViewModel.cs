@@ -13,7 +13,7 @@ namespace TimeLeaf.ViewModels;
 /// </summary>
 public partial class ProjectViewModel : ObservableObject
 {
-    private readonly Project _project;
+    private Project _project;
 
     /// <summary>
     /// 同期中（外部からの読み込み中）かどうかを示すフラグ。
@@ -176,6 +176,19 @@ public partial class ProjectViewModel : ObservableObject
     }
 
     /// <summary>
+    /// モデルの状態を最新のエンティティで更新し、UIに同期します。
+    /// </summary>
+    /// <param name="newModel">最新の状態を持つエンティティ。</param>
+    public void UpdateFromModel(Project newModel)
+    {
+        if (newModel == null) throw new ArgumentNullException(nameof(newModel));
+        if (newModel.Id != _project.Id) throw new ArgumentException("Cannot update ViewModel with a different Project ID.");
+
+        _project = newModel;
+        SyncFromModel();
+    }
+
+    /// <summary>
     /// モデルの状態をUIコレクションに同期します。
     /// </summary>
     public void SyncFromModel()
@@ -183,21 +196,52 @@ public partial class ProjectViewModel : ObservableObject
         IsSyncing = true;
         try
         {
-            // タスクの同期
-            foreach (var t in Tasks) t.PropertyChanged -= OnProjectTaskViewModelPropertyChanged;
-            Tasks.Clear();
-            foreach (var task in _project.Tasks)
+            // 1. タスクの差分同期
+            var modelTaskIds = _project.Tasks.Select(t => t.Id).ToHashSet();
+
+            // 削除されたタスクの除去
+            var tasksToRemove = Tasks.Where(vm => !modelTaskIds.Contains(vm.Id)).ToList();
+            foreach (var vm in tasksToRemove)
             {
-                var taskVm = new ProjectTaskViewModel(task);
-                Tasks.Add(taskVm);
-                taskVm.PropertyChanged += OnProjectTaskViewModelPropertyChanged;
+                vm.PropertyChanged -= OnProjectTaskViewModelPropertyChanged;
+                Tasks.Remove(vm);
             }
 
-            // マイルストーンの同期
-            Milestones.Clear();
-            foreach (var m in _project.Milestones)
+            // 追加または更新（順序を維持）
+            for (int i = 0; i < _project.Tasks.Count; i++)
             {
-                Milestones.Add(m);
+                var taskModel = _project.Tasks[i];
+                var existingVm = Tasks.FirstOrDefault(vm => vm.Id == taskModel.Id);
+
+                if (existingVm != null)
+                {
+                    // 既存: 中身を更新
+                    existingVm.UpdateFromModel(taskModel);
+
+                    // 並び順が違う場合は移動
+                    var currentIndex = Tasks.IndexOf(existingVm);
+                    if (currentIndex != i)
+                    {
+                        Tasks.Move(currentIndex, i);
+                    }
+                }
+                else
+                {
+                    // 新規: インスタンス作成
+                    var newTaskVm = new ProjectTaskViewModel(taskModel);
+                    newTaskVm.PropertyChanged += OnProjectTaskViewModelPropertyChanged;
+                    Tasks.Insert(i, newTaskVm);
+                }
+            }
+
+            // 2. マイルストーンの差分同期 (Milestone は Record なので単純な入れ替えを避ける)
+            if (!Milestones.SequenceEqual(_project.Milestones))
+            {
+                Milestones.Clear();
+                foreach (var m in _project.Milestones)
+                {
+                    Milestones.Add(m);
+                }
             }
 
             NotifyAllProperties();

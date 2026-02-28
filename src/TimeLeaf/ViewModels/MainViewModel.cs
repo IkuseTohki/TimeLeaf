@@ -139,29 +139,8 @@ public partial class MainViewModel : ObservableObject
                 var existingViewModel = Projects.FirstOrDefault(pvm => pvm.Id == projectId);
                 if (existingViewModel != null)
                 {
-                    existingViewModel.IsSyncing = true;
-                    try
-                    {
-                        _logger.LogDebug("Updating existing project {ProjectId} ViewModel.", projectId);
-                        existingViewModel.Model.UpdateName(updatedProjectEntity.Name);
-                        existingViewModel.Model.UpdateDescription(updatedProjectEntity.Description);
-                        existingViewModel.Model.UpdateStatus(updatedProjectEntity.Status);
-                        existingViewModel.Model.UpdateHealth(updatedProjectEntity.HealthStatus);
-                        existingViewModel.Model.SetUpdatedAt(updatedProjectEntity.UpdatedAt);
-
-                        // Tasksの同期
-                        existingViewModel.Model.ClearTasks();
-                        foreach (var t in updatedProjectEntity.Tasks)
-                        {
-                            existingViewModel.Model.AddTask(t);
-                        }
-
-                        existingViewModel.SyncFromModel();
-                    }
-                    finally
-                    {
-                        existingViewModel.IsSyncing = false;
-                    }
+                    _logger.LogDebug("Updating existing project {ProjectId} ViewModel via differential sync.", projectId);
+                    existingViewModel.UpdateFromModel(updatedProjectEntity);
                 }
                 else
                 {

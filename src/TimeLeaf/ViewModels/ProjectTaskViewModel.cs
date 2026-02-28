@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Models.Enums;
@@ -10,7 +11,7 @@ namespace TimeLeaf.ViewModels;
 /// </summary>
 public partial class ProjectTaskViewModel : ObservableObject
 {
-    private readonly ProjectTask _projectTask;
+    private ProjectTask _projectTask;
 
     /// <summary>
     /// 基になるProjectTaskエンティティ。
@@ -171,11 +172,57 @@ public partial class ProjectTaskViewModel : ObservableObject
     public System.Collections.Generic.List<Guid> Dependencies => _projectTask.Dependencies;
 
     /// <summary>
+    /// タスクに関するコメントのリスト（UI用）。
+    /// </summary>
+    public System.Collections.ObjectModel.ObservableCollection<Comment> Comments { get; } = new();
+
+    /// <summary>
     /// コンストラクタ。
     /// </summary>
     /// <param name="projectTask">ラップするProjectTaskエンティティ。</param>
     public ProjectTaskViewModel(ProjectTask projectTask)
     {
         _projectTask = projectTask ?? throw new ArgumentNullException(nameof(projectTask));
+        SyncComments();
+    }
+
+    private void SyncComments()
+    {
+        // レコード（値）の不一致がある場合のみ更新
+        if (!Comments.SequenceEqual(_projectTask.Comments))
+        {
+            Comments.Clear();
+            foreach (var comment in _projectTask.Comments)
+            {
+                Comments.Add(comment);
+            }
+        }
+    }
+
+    /// <summary>
+    /// モデルの状態を最新のエンティティで更新し、通知を発生させます。
+    /// </summary>
+    /// <param name="newModel">最新の状態を持つエンティティ。</param>
+    public void UpdateFromModel(ProjectTask newModel)
+    {
+        if (newModel == null) throw new ArgumentNullException(nameof(newModel));
+        if (newModel.Id != _projectTask.Id) throw new ArgumentException("Cannot update ViewModel with a different Task ID.");
+
+        _projectTask = newModel;
+        SyncComments();
+
+        OnPropertyChanged(nameof(Name));
+        OnPropertyChanged(nameof(Description));
+        OnPropertyChanged(nameof(Status));
+        OnPropertyChanged(nameof(Priority));
+        OnPropertyChanged(nameof(ScheduledStartDate));
+        OnPropertyChanged(nameof(Deadline));
+        OnPropertyChanged(nameof(ActualStartDate));
+        OnPropertyChanged(nameof(ActualEndDate));
+        OnPropertyChanged(nameof(EstimatedCost));
+        OnPropertyChanged(nameof(ActualCost));
+        OnPropertyChanged(nameof(Assignee));
+        OnPropertyChanged(nameof(Dependencies));
+        OnPropertyChanged(nameof(Comments));
     }
 }

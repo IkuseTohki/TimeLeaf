@@ -332,4 +332,44 @@ public class ProjectViewModelTests
         Assert.AreNotEqual("たった今", actual, "過去の日時（1時間前）に対して「たった今」と表示される不具合を再現");
         Assert.IsTrue(actual.Contains("時間前") || actual.Contains("分前"), $"Actual was: {actual}");
     }
+
+    /// <summary>
+    /// テスト観点: SyncFromModel を呼び出した際、既に存在するタスクの ViewModel インスタンスが
+    /// 維持（再利用）されることを確認する（差分更新の検証）。
+    /// </summary>
+    [TestMethod]
+    public void SyncFromModel_ShouldPreserveExistingViewModelInstances()
+    {
+        // Arrange
+        var project = new Project();
+        var task1 = new ProjectTask();
+        task1.UpdateName("Task 1");
+        project.AddTask(task1);
+
+        var viewModel = new ProjectViewModel(project);
+        viewModel.SyncFromModel();
+
+        var initialTaskVm1 = viewModel.Tasks.First(t => t.Id == task1.Id);
+
+        // Act
+        // 1. タスク2を追加
+        var task2 = new ProjectTask();
+        task2.UpdateName("Task 2");
+        project.AddTask(task2);
+
+        // 2. タスク1の名称をモデル側で書き換え
+        task1.UpdateName("Task 1 Updated");
+
+        viewModel.SyncFromModel();
+
+        // Assert
+        Assert.AreEqual(2, viewModel.Tasks.Count, "タスクが2つになっていること");
+
+        var currentTaskVm1 = viewModel.Tasks.First(t => t.Id == task1.Id);
+        var currentTaskVm2 = viewModel.Tasks.First(t => t.Id == task2.Id);
+
+        Assert.AreSame(initialTaskVm1, currentTaskVm1, "既存タスクの ViewModel インスタンスが再利用されていること");
+        Assert.AreEqual("Task 1 Updated", currentTaskVm1.Name, "再利用された ViewModel のプロパティが更新されていること");
+        Assert.AreEqual("Task 2", currentTaskVm2.Name, "新規タスクの ViewModel が正しく作成されていること");
+    }
 }
