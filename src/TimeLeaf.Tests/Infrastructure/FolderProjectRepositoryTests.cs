@@ -31,6 +31,14 @@ public class FolderProjectRepositoryTests
         _loggerMock = new Mock<ILogger<FolderProjectRepository>>();
     }
 
+    private FolderProjectRepository CreateRepository()
+    {
+        var serializer = new JsonProjectFileSystemSerializer();
+        var generator = new DefaultCommitFileNameGenerator();
+        var monitor = new FileSystemProjectStorageMonitor(_tempDir, new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object);
+        return new FolderProjectRepository(_tempDir, monitor, serializer, generator, _loggerMock.Object);
+    }
+
     [TestCleanup]
     public void Cleanup()
     {
@@ -47,7 +55,7 @@ public class FolderProjectRepositoryTests
     public async System.Threading.Tasks.Task SaveAllAsync_ShouldCreateCorrectFolderStructure()
     {
         // Arrange
-        var repository = new FolderProjectRepository(_tempDir, _loggerMock.Object);
+        var repository = CreateRepository();
         var project = new Project();
         project.UpdateName("StructureTest");
         var projects = new List<Project> { project };
@@ -70,7 +78,8 @@ public class FolderProjectRepositoryTests
 
         var basicFile = files.FirstOrDefault(f => f.Contains("ProjectBasic"));
         Assert.IsNotNull(basicFile, "ProjectBasic ファイルが出力されていること");
-        var commitFile = CommitFileName.Parse(Path.GetFileName(basicFile));
+        var generator = new DefaultCommitFileNameGenerator();
+        var commitFile = generator.Parse(Path.GetFileName(basicFile));
         Assert.AreEqual("test-user", commitFile.UserId);
         Assert.AreEqual("ProjectBasic", commitFile.Category);
 
@@ -86,7 +95,7 @@ public class FolderProjectRepositoryTests
     public async System.Threading.Tasks.Task SaveAndLoad_ShouldPreserveTaskCostProperties()
     {
         // Arrange
-        var repository = new FolderProjectRepository(_tempDir, _loggerMock.Object);
+        var repository = CreateRepository();
         var projectId = Guid.NewGuid();
         var project = new Project { Id = projectId };
         project.UpdateName("CostTest");
@@ -119,7 +128,7 @@ public class FolderProjectRepositoryTests
     public async System.Threading.Tasks.Task SaveAndLoad_ShouldPreserveTaskAssignmentAndDependencies()
     {
         // Arrange
-        var repository = new FolderProjectRepository(_tempDir, _loggerMock.Object);
+        var repository = CreateRepository();
         var projectId = Guid.NewGuid();
         var project = new Project { Id = projectId };
         project.UpdateName("RelationTest");
@@ -151,7 +160,7 @@ public class FolderProjectRepositoryTests
     public async System.Threading.Tasks.Task SaveAndLoad_ShouldPreserveMilestones()
     {
         // Arrange
-        var repository = new FolderProjectRepository(_tempDir, _loggerMock.Object);
+        var repository = CreateRepository();
         var projectId = Guid.NewGuid();
         var project = new Project { Id = projectId };
         project.UpdateName("MilestoneTest");
@@ -177,7 +186,7 @@ public class FolderProjectRepositoryTests
     public async System.Threading.Tasks.Task SaveAndLoad_ShouldPreserveTaskScheduleProperties()
     {
         // Arrange
-        var repository = new FolderProjectRepository(_tempDir, _loggerMock.Object);
+        var repository = CreateRepository();
         var projectId = Guid.NewGuid();
         var project = new Project { Id = projectId };
         project.UpdateName("ScheduleTest");
@@ -211,7 +220,7 @@ public class FolderProjectRepositoryTests
     public async System.Threading.Tasks.Task SaveAndLoad_ShouldPreserveTimeMetadata()
     {
         // Arrange
-        var repository = new FolderProjectRepository(_tempDir, _loggerMock.Object);
+        var repository = CreateRepository();
         var projectId = Guid.NewGuid();
 
         var createdAt = new DateTime(2026, 2, 20, 10, 0, 0, DateTimeKind.Utc);

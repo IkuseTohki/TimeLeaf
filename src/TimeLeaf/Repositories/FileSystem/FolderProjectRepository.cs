@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Models.Enums;
 using TimeLeaf.Repositories;
+using TimeLeaf.Repositories.FileSystem.Dtos;
 
 namespace TimeLeaf.Repositories.FileSystem;
 
@@ -21,107 +22,37 @@ namespace TimeLeaf.Repositories.FileSystem;
 public class FolderProjectRepository : IProjectRepository, IDisposable
 {
     private readonly string _baseDirectory;
+    private readonly IProjectStorageMonitor _monitor;
+    private readonly IProjectFileSystemSerializer _serializer;
+    private readonly ICommitFileNameGenerator _fileNameGenerator;
     private readonly ILogger<FolderProjectRepository> _logger;
-    private static readonly JsonSerializerOptions _options = new()
-    {
-        PropertyNameCaseInsensitive = true,
-        WriteIndented = true,
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping, // 日本語をエスケープせずに保存
-        Converters = { new JsonStringEnumConverter() } // Enum を文字列で保存
-    };
 
     private readonly ConcurrentDictionary<string, string> _lastSavedContent = new();
-    private readonly ConcurrentDictionary<string, DateTime> _justWrittenFiles = new();
-    private readonly FileSystemWatcher _watcher;
 
     public event Action<Guid>? ProjectChanged;
 
-    public FolderProjectRepository(string baseDirectory, ILogger<FolderProjectRepository> logger)
+    public FolderProjectRepository(
+        string baseDirectory,
+        IProjectStorageMonitor monitor,
+        IProjectFileSystemSerializer serializer,
+        ICommitFileNameGenerator fileNameGenerator,
+        ILogger<FolderProjectRepository> logger)
     {
         _baseDirectory = baseDirectory;
+        _monitor = monitor;
+        _serializer = serializer;
+        _fileNameGenerator = fileNameGenerator;
         _logger = logger;
 
         _logger.LogInformation("FolderProjectRepository initializing with base directory: {BaseDirectory}", _baseDirectory);
 
-        if (!Directory.Exists(_baseDirectory))
-        {
-            _logger.LogInformation("Base directory {BaseDirectory} does not exist. Creating it.", _baseDirectory);
-            Directory.CreateDirectory(_baseDirectory);
-        }
-
-        // FileSystemWatcher の初期化
-        _watcher = new FileSystemWatcher(_baseDirectory)
-        {
-            IncludeSubdirectories = true,
-            Filter = "*.json",
-            NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite
-        };
-        _watcher.Created += OnFileCreated;
-        _watcher.Changed += OnFileCreated;
-        _watcher.EnableRaisingEvents = true;
-        _logger.LogDebug("FileSystemWatcher initialized for {BaseDirectory}", _baseDirectory);
+        _monitor.ProjectChanged += OnMonitorProjectChanged;
     }
 
-    private void OnFileCreated(object sender, FileSystemEventArgs e)
+    private void OnMonitorProjectChanged(Guid projectId)
     {
-        var fileName = Path.GetFileName(e.FullPath);
-        if (_justWrittenFiles.TryGetValue(fileName, out var writeTime))
-        {
-            // 書き込みから1秒以内のイベントは無視する
-            if (DateTime.UtcNow - writeTime < TimeSpan.FromSeconds(1))
-            {
-                _logger.LogDebug("Ignoring file change event for our own write (within 1s): {FileName}", fileName);
-                return;
-            }
-            else
-            {
-                // 1秒以上経過している場合はリストから削除して、外部変更として扱う
-                _justWrittenFiles.TryRemove(fileName, out _);
-            }
-        }
-
-        _logger.LogInformation("File created/changed event detected: {FullPath} (ChangeType: {ChangeType})", e.FullPath, e.ChangeType);
-        // パス例: storage/{Guid}_{Name}/changes/{Timestamp}_{User}_{Guid}_{Category}.json
-        // ルートディレクトリからの相対パスを取得して解析
-        var relativePath = Path.GetRelativePath(_baseDirectory, e.FullPath);
-        var pathParts = relativePath.Split(Path.DirectorySeparatorChar);
-
-        if (pathParts.Length >= 2)
-        {
-            // 最初のディレクトリ名が {Guid}_{Name} 形式であることを期待
-            var projectDirName = pathParts[0];
-            var idPart = projectDirName.Split('_')[0];
-
-            if (Guid.TryParse(idPart, out var projectId))
-            {
-                _logger.LogDebug("Project ID {ProjectId} extracted from path. Invoking ProjectChanged event.", projectId);
-                System.Threading.Tasks.Task.Run(() => ProjectChanged?.Invoke(projectId));
-            }
-            else
-            {
-                _logger.LogWarning("Could not parse Project ID from directory name: {ProjectDirName}", projectDirName);
-            }
-        }
-        else
-        {
-            _logger.LogWarning("Invalid file path format for project change detection: {FullPath}", e.FullPath);
-        }
-
-        // 定期的に古い無視リストを掃除する（簡易的）
-        if (_justWrittenFiles.Count > 100)
-        {
-            CleanupIgnoreList();
-        }
-    }
-
-    private void CleanupIgnoreList()
-    {
-        var now = DateTime.UtcNow;
-        var toRemove = _justWrittenFiles.Where(kv => now - kv.Value > TimeSpan.FromSeconds(10)).Select(kv => kv.Key).ToList();
-        foreach (var key in toRemove)
-        {
-            _justWrittenFiles.TryRemove(key, out _);
-        }
+        // UIスレッド等での実行を考慮し、Task.Runで非同期にイベントを発火させる
+        System.Threading.Tasks.Task.Run(() => ProjectChanged?.Invoke(projectId));
     }
 
     /// <summary>
@@ -152,7 +83,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
             try
             {
                 var metaJson = await File.ReadAllTextAsync(metaPath);
-                var meta = JsonSerializer.Deserialize<ProjectMetadataDto>(metaJson, _options);
+                var meta = _serializer.Deserialize<ProjectMetadataDto>(metaJson);
                 if (meta == null)
                 {
                     _logger.LogWarning("Could not deserialize .project metadata from {MetaPath}. Skipping.", metaPath);
@@ -201,7 +132,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         if (File.Exists(metaPath))
         {
             var metaJson = await File.ReadAllTextAsync(metaPath);
-            var meta = JsonSerializer.Deserialize<ProjectMetadataDto>(metaJson, _options);
+            var meta = _serializer.Deserialize<ProjectMetadataDto>(metaJson);
             if (meta != null)
             {
                 createdAt = meta.CreatedAt;
@@ -222,7 +153,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         }
 
         var files = Directory.GetFiles(changesDir, "*.json")
-            .Select(f => new { Path = f, Meta = CommitFileName.Parse(Path.GetFileName(f)) })
+            .Select(f => new { Path = f, Meta = _fileNameGenerator.Parse(Path.GetFileName(f)) })
             .OrderBy(x => x.Meta.Timestamp)
             .ThenBy(x => x.Meta.Guid)
             .ToList();
@@ -250,7 +181,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                 switch (file.Meta.Category)
                 {
                     case "ProjectBasic":
-                        var basic = JsonSerializer.Deserialize<ProjectBasicDto>(json, _options);
+                        var basic = _serializer.Deserialize<ProjectBasicDto>(json);
                         if (basic != null)
                         {
                             project.UpdateName(basic.Name);
@@ -258,10 +189,6 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                             project.UpdateStatus(basic.Status);
                             project.UpdateHealth(basic.HealthStatus);
 
-                            // マイルストーンのクリアと再追加
-                            // 本来は Project クラスに ClearMilestones があるべきだが、一旦リフレクションを避けるため
-                            // 既存の private field へのアクセスや Project 側の修正が必要。
-                            // 今回は Project.cs を修正して ClearMethods を追加した前提で進める。
                             project.ClearMilestones();
                             if (basic.Milestones != null)
                             {
@@ -272,14 +199,10 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                             }
                             _logger.LogTrace("Replayed ProjectBasic for {ProjectId}. Name: {Name}", projectId, project.Name);
                         }
-                        else
-                        {
-                            _logger.LogWarning("Could not deserialize ProjectBasic from {FileName}", Path.GetFileName(file.Path));
-                        }
                         break;
 
                     case "ProjectTasks":
-                        var tasks = JsonSerializer.Deserialize<List<ProjectTaskDto>>(json, _options);
+                        var tasks = _serializer.Deserialize<List<ProjectTaskDto>>(json);
                         if (tasks != null)
                         {
                             // 既存のコメントを退避（スナップショットにはコメントが含まれないため、Replay済みのものを保持する）
@@ -314,14 +237,10 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                             }
                             _logger.LogTrace("Replayed {TaskCount} tasks for ProjectTasks for {ProjectId}.", tasks.Count, projectId);
                         }
-                        else
-                        {
-                            _logger.LogWarning("Could not deserialize ProjectTasks from {FileName}", Path.GetFileName(file.Path));
-                        }
                         break;
 
                     case "Comment":
-                        var commentDto = JsonSerializer.Deserialize<CommentDto>(json, _options);
+                        var commentDto = _serializer.Deserialize<CommentDto>(json);
                         if (commentDto != null)
                         {
                             allCommentData.Add((commentDto, file.Meta.Timestamp));
@@ -334,17 +253,13 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
             {
                 _logger.LogWarning(ioEx, "IOException while processing file {FileName} for project {ProjectId}. Skipping.", Path.GetFileName(file.Path), projectId);
             }
-            catch (JsonException jsonEx)
-            {
-                _logger.LogError(jsonEx, "JsonException while deserializing file {FileName} for project {ProjectId}. Content: {JsonContent}", Path.GetFileName(file.Path), projectId, await File.ReadAllTextAsync(file.Path));
-            }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unexpected error while processing file {FileName} for project {ProjectId}.", Path.GetFileName(file.Path), projectId);
+                _logger.LogError(ex, "Error while processing file {FileName} for project {ProjectId}.", Path.GetFileName(file.Path), projectId);
             }
         }
 
-        // コメントをタスクに紐付け（すべてのタスクスナップショット適用後に実行）
+        // コメントをタスクに紐付け
         foreach (var entry in allCommentData)
         {
             var dto = entry.Dto;
@@ -358,25 +273,18 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                         Id = dto.Id,
                         TaskId = dto.TaskId,
                         AuthorId = dto.AuthorId,
-                        CreatedAt = entry.Timestamp, // ファイル名から復元したタイムスタンプを使用
+                        CreatedAt = entry.Timestamp,
                         Content = dto.Content,
                         AttachmentLinks = dto.AttachmentLinks ?? new()
                     });
                 }
             }
-            else
-            {
-                _logger.LogWarning("Comment {CommentId} refers to missing task {TaskId} in project {ProjectId}. Skipping.", dto.Id, dto.TaskId, projectId);
-            }
         }
 
-        // Replay 中の AddTask 等の呼び出しによって UpdatedAt が「今」に上書きされてしまうのを防ぐため、
-        // 最後に履歴ファイルの中で最も新しいタイムスタンプを正として再設定する。
         if (files.Any())
         {
             var latestTimestamp = files.Last().Meta.Timestamp;
             project.SetUpdatedAt(latestTimestamp);
-            _logger.LogDebug("Restored UpdatedAt to the latest commit timestamp: {Timestamp}", latestTimestamp);
         }
 
         return project;
@@ -384,7 +292,6 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
 
     public async System.Threading.Tasks.Task SaveAllAsync(IEnumerable<Project> projects, string userId)
     {
-        _logger.LogInformation("Saving {ProjectCount} projects.", projects.Count());
         foreach (var project in projects) await SaveAsync(project, userId);
     }
 
@@ -396,7 +303,6 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
             var projectDir = Path.Combine(_baseDirectory, $"{project.Id}_{project.Name}");
             if (!Directory.Exists(projectDir))
             {
-                _logger.LogDebug("Project directory {ProjectDir} does not exist. Creating it.", projectDir);
                 Directory.CreateDirectory(projectDir);
             }
 
@@ -404,13 +310,10 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
             if (!File.Exists(metaFilePath))
             {
                 var metadata = new ProjectMetadataDto(project.Id, project.CreatedAt, userId, 1);
-                await File.WriteAllTextAsync(metaFilePath, JsonSerializer.Serialize(metadata, _options));
-                _logger.LogDebug(".project metadata created for {ProjectId}.", project.Id);
+                await File.WriteAllTextAsync(metaFilePath, _serializer.Serialize(metadata));
             }
 
             var changesDir = Path.Combine(projectDir, "changes");
-
-            // この保存セッションで使用する「コミット時刻」を決定する
             var commitTime = DateTime.UtcNow;
 
             // 1. ProjectBasic Snapshot
@@ -448,15 +351,12 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                 }
             }
 
-            // 保存が成功した事実を以て、プロジェクトの最終更新日時を確定させる
             project.SetUpdatedAt(commitTime);
-
-            _logger.LogInformation("Project {ProjectId} saved successfully. UpdatedAt set to {CommitTime}", project.Id, commitTime);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to save project {ProjectName} ({ProjectId})", project.Name, project.Id);
-            throw; // 再スローして上位で捕捉されるようにする
+            throw;
         }
     }
 
@@ -465,31 +365,21 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         var category = "Comment";
         var cacheKey = GetCacheKey(projectId, $"{category}_{comment.Id}");
 
-        if (_lastSavedContent.ContainsKey(cacheKey))
-        {
-            _logger.LogTrace("Comment {CommentId} already saved or replayed. Skipping.", comment.Id);
-            return; // 既に保存済み（またはReplay済み）ならスキップ
-        }
+        if (_lastSavedContent.ContainsKey(cacheKey)) return;
 
-        _logger.LogDebug("Saving new incremental comment {CommentId} for task {TaskId}.", comment.Id, comment.TaskId);
-
-        if (!Directory.Exists(changesDir))
-        {
-            Directory.CreateDirectory(changesDir);
-        }
+        if (!Directory.Exists(changesDir)) Directory.CreateDirectory(changesDir);
 
         var commentDto = new CommentDto(comment.Id, comment.TaskId, comment.AuthorId, comment.Content, comment.AttachmentLinks);
-        var json = JsonSerializer.Serialize(commentDto, _options);
-        var fileName = CommitFileName.Generate(comment.CreatedAt, userId, comment.Id, category);
+        var json = _serializer.Serialize(commentDto);
+        var fileName = _fileNameGenerator.Generate(comment.CreatedAt, userId, comment.Id, category);
         var fullPath = Path.Combine(changesDir, fileName);
 
-        _justWrittenFiles[fileName] = DateTime.UtcNow;
+        _monitor.MarkFileAsJustWritten(fileName);
 
         try
         {
             await File.WriteAllTextAsync(fullPath, json);
             _lastSavedContent[cacheKey] = json;
-            _logger.LogDebug("Incremental Comment {CommentId} for task {TaskId} saved to {FileName}.", comment.Id, comment.TaskId, fileName);
         }
         catch (Exception ex)
         {
@@ -500,37 +390,25 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
 
     private async System.Threading.Tasks.Task TrySaveCategoryAsync(Guid projectId, string changesDir, string category, object data, DateTime timestamp, string userId)
     {
-        _logger.LogDebug("Attempting to save category {Category} for project {ProjectId}.", category, projectId);
-        var json = JsonSerializer.Serialize(data, _options);
+        var json = _serializer.Serialize(data);
         var cacheKey = GetCacheKey(projectId, category);
 
-        if (_lastSavedContent.TryGetValue(cacheKey, out var lastJson) && lastJson == json)
-        {
-            _logger.LogTrace("Category {Category} for project {ProjectId} has no changes. Skipping save.", category, projectId);
-            return;
-        }
+        if (_lastSavedContent.TryGetValue(cacheKey, out var lastJson) && lastJson == json) return;
 
-        if (!Directory.Exists(changesDir))
-        {
-            _logger.LogDebug("Changes directory {ChangesDir} does not exist. Creating it.", changesDir);
-            Directory.CreateDirectory(changesDir);
-        }
+        if (!Directory.Exists(changesDir)) Directory.CreateDirectory(changesDir);
 
-        // 外部から渡された userId を使用してファイル名を生成
-        var fileName = CommitFileName.Generate(timestamp, userId, Guid.NewGuid(), category);
+        var fileName = _fileNameGenerator.Generate(timestamp, userId, Guid.NewGuid(), category);
         var fullPath = Path.Combine(changesDir, fileName);
-        _justWrittenFiles[fileName] = DateTime.UtcNow; // 自前での書き込みであることをマーク
+        _monitor.MarkFileAsJustWritten(fileName);
 
         try
         {
             await File.WriteAllTextAsync(fullPath, json);
             _lastSavedContent[cacheKey] = json;
-            _logger.LogDebug("Category {Category} for project {ProjectId} saved to {FileName}.", category, projectId, fileName);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error saving category {Category} for project {ProjectId} to {FileName}.", category, projectId, fileName);
-            _justWrittenFiles.TryRemove(fileName, out _); // 失敗した場合はリストから削除
             throw;
         }
     }
@@ -540,25 +418,5 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
     public void Dispose()
     {
         _logger.LogInformation("FolderProjectRepository disposing.");
-        _watcher.Dispose();
     }
-
-    private record MilestoneDto(DateTime Date, string Label);
-    private record CommentDto(Guid Id, Guid TaskId, string AuthorId, string Content, List<string> AttachmentLinks);
-    private record ProjectBasicDto(string Name, string Description, ProjectStatus Status, ProjectHealth HealthStatus, List<MilestoneDto> Milestones);
-    private record ProjectTaskDto(
-        Guid Id,
-        string Name,
-        string Description,
-        TimeLeaf.Models.Enums.TaskStatus Status,
-        TaskPriority Priority,
-        DateTime? ScheduledStartDate,
-        DateTime? Deadline,
-        DateTime? ActualStartDate,
-        DateTime? ActualEndDate,
-        double EstimatedCost,
-        double ActualCost,
-        string Assignee,
-        List<Guid> Dependencies);
-    private record ProjectMetadataDto(Guid ProjectId, DateTime CreatedAt, string CreatedBy, int SchemaVersion);
 }

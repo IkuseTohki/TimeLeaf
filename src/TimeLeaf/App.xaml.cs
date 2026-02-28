@@ -49,8 +49,20 @@ public partial class App : Application
         var storagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory ?? string.Empty, "storage");
 
         services.AddSingleton<ICurrentUserService, WindowsCurrentUserService>();
+
+        // 永続化層のコンポーネント登録
+        services.AddSingleton<IProjectFileSystemSerializer, JsonProjectFileSystemSerializer>();
+        services.AddSingleton<ICommitFileNameGenerator, DefaultCommitFileNameGenerator>();
+        services.AddSingleton<IProjectStorageMonitor>(sp =>
+            new FileSystemProjectStorageMonitor(storagePath, sp.GetRequiredService<ILogger<FileSystemProjectStorageMonitor>>()));
+
         services.AddSingleton<IProjectRepository>(sp =>
-            new FolderProjectRepository(storagePath, sp.GetRequiredService<ILogger<FolderProjectRepository>>()));
+            new FolderProjectRepository(
+                storagePath,
+                sp.GetRequiredService<IProjectStorageMonitor>(),
+                sp.GetRequiredService<IProjectFileSystemSerializer>(),
+                sp.GetRequiredService<ICommitFileNameGenerator>(),
+                sp.GetRequiredService<ILogger<FolderProjectRepository>>()));
 
         // LeafKit.UI サービスの登録
         services.AddSingleton<IDialogService, DialogService>();

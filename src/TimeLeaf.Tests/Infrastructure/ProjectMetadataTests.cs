@@ -42,7 +42,10 @@ public class ProjectMetadataTests
     public async System.Threading.Tasks.Task SaveAsync_ShouldCreateImmutableMetadataFile()
     {
         // Arrange
-        var repo = new FolderProjectRepository(_tempDir, _loggerMock.Object);
+        var serializer = new JsonProjectFileSystemSerializer();
+        var generator = new DefaultCommitFileNameGenerator();
+        var monitor = new FileSystemProjectStorageMonitor(_tempDir, new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object);
+        var repo = new FolderProjectRepository(_tempDir, monitor, serializer, generator, _loggerMock.Object);
         var project = new Project();
         project.UpdateName("MetaTest");
 
@@ -80,7 +83,10 @@ public class ProjectMetadataTests
     public async System.Threading.Tasks.Task LoadAllAsync_ShouldSortByCreatedAt()
     {
         // Arrange
-        var repo = new FolderProjectRepository(_tempDir, _loggerMock.Object);
+        var serializer = new JsonProjectFileSystemSerializer();
+        var generator = new DefaultCommitFileNameGenerator();
+        var monitor = new FileSystemProjectStorageMonitor(_tempDir, new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object);
+        var repo = new FolderProjectRepository(_tempDir, monitor, serializer, generator, _loggerMock.Object);
 
         // 1つ目のプロジェクト作成
         var p1 = new Project();

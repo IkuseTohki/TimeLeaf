@@ -12,6 +12,8 @@ namespace TimeLeaf.Tests.Infrastructure;
 [TestClass]
 public class DateTimeHandlingTests
 {
+    private readonly ICommitFileNameGenerator _generator = new DefaultCommitFileNameGenerator();
+
     [TestMethod]
     public void CommitFileName_ShouldPreserveTimePoint_RegardlessOfLocalTime()
     {
@@ -29,10 +31,10 @@ public class DateTimeHandlingTests
         var userId = "user1";
         var guid = Guid.NewGuid();
         var category = "ProjectBasic";
-        var fileName = CommitFileName.Generate(localTime, userId, guid, category);
+        var fileName = _generator.Generate(localTime, userId, guid, category);
 
         // パース
-        var parsed = CommitFileName.Parse(fileName);
+        var parsed = _generator.Parse(fileName);
 
         // 検証: パースされた時刻をローカル時刻に変換したとき、元の時刻と一致すべき
         Assert.AreEqual(localTime.ToUniversalTime(), parsed.Timestamp, "ファイル名からパースされた時刻はUTC基準で一致すべき");
@@ -52,8 +54,8 @@ public class DateTimeHandlingTests
         var category = "Category";
 
         // Act
-        var fileName = CommitFileName.Generate(timestamp, userId, guid, category);
-        var parsed = CommitFileName.Parse(fileName);
+        var fileName = _generator.Generate(timestamp, userId, guid, category);
+        var parsed = _generator.Parse(fileName);
 
         // Assert
         Assert.AreEqual(timestamp.ToUniversalTime(), parsed.Timestamp, comment);
@@ -66,8 +68,8 @@ public class DateTimeHandlingTests
         var t1 = new DateTime(2025, 12, 31, 23, 59, 59, 999, DateTimeKind.Utc);
         var t2 = new DateTime(2026, 01, 01, 00, 00, 00, 001, DateTimeKind.Utc);
 
-        var f1 = CommitFileName.Generate(t1, "u", Guid.NewGuid(), "C");
-        var f2 = CommitFileName.Generate(t2, "u", Guid.NewGuid(), "C");
+        var f1 = _generator.Generate(t1, "u", Guid.NewGuid(), "C");
+        var f2 = _generator.Generate(t2, "u", Guid.NewGuid(), "C");
 
         // Act
         var sorted = new[] { f2, f1 }.OrderBy(x => x).ToList();

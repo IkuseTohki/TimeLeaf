@@ -23,7 +23,10 @@ public class ReplayUpdatedAtTests
         _tempDir = Path.Combine(Path.GetTempPath(), "TimeLeaf_ReplayTest_" + Guid.NewGuid());
         Directory.CreateDirectory(_tempDir);
         var loggerMock = new Mock<ILogger<FolderProjectRepository>>();
-        _repository = new FolderProjectRepository(_tempDir, loggerMock.Object);
+        var serializer = new JsonProjectFileSystemSerializer();
+        var generator = new DefaultCommitFileNameGenerator();
+        var monitor = new FileSystemProjectStorageMonitor(_tempDir, new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object);
+        _repository = new FolderProjectRepository(_tempDir, monitor, serializer, generator, loggerMock.Object);
     }
 
     [TestCleanup]
@@ -55,7 +58,7 @@ public class ReplayUpdatedAtTests
         await File.WriteAllTextAsync(Path.Combine(projectDir, ".project"), meta);
 
         // 過去の日時を持つ履歴ファイル
-        var fileName = CommitFileName.Generate(pastTime, "user-A", Guid.NewGuid(), "ProjectBasic");
+        var fileName = new DefaultCommitFileNameGenerator().Generate(pastTime, "user-A", Guid.NewGuid(), "ProjectBasic");
         var json = "{\"Name\":\"Old Project\", \"Description\":\"\", \"Status\":\"Initial\", \"HealthStatus\":\"Healthy\", \"Milestones\":[]}";
         await File.WriteAllTextAsync(Path.Combine(changesDir, fileName), json);
 
@@ -91,11 +94,11 @@ public class ReplayUpdatedAtTests
         await File.WriteAllTextAsync(Path.Combine(projectDir, ".project"), "{\"ProjectId\":\"" + projectId + "\", \"CreatedAt\":\"2026-01-01T00:00:00Z\", \"CreatedBy\":\"test\", \"SchemaVersion\":1}");
 
         // 1. 10:00 のタイムスタンプを持つファイル
-        var file1 = CommitFileName.Generate(olderTime, "user-A", Guid.NewGuid(), "ProjectBasic");
+        var file1 = new DefaultCommitFileNameGenerator().Generate(olderTime, "user-A", Guid.NewGuid(), "ProjectBasic");
         await File.WriteAllTextAsync(Path.Combine(changesDir, file1), "{\"Name\":\"Old\"}");
 
         // 2. 12:00 のタイムスタンプを持つファイル
-        var file2 = CommitFileName.Generate(newerTime, "user-A", Guid.NewGuid(), "ProjectTasks");
+        var file2 = new DefaultCommitFileNameGenerator().Generate(newerTime, "user-A", Guid.NewGuid(), "ProjectTasks");
         await File.WriteAllTextAsync(Path.Combine(changesDir, file2), "[]");
 
         // Act: ロード
@@ -129,11 +132,11 @@ public class ReplayUpdatedAtTests
         await File.WriteAllTextAsync(Path.Combine(projectDir, ".project"), "{\"ProjectId\":\"" + projectId + "\", \"CreatedAt\":\"2026-01-01T00:00:00Z\", \"CreatedBy\":\"test\", \"SchemaVersion\":1}");
 
         // 1. タスクが必要なので作成
-        var taskFile = CommitFileName.Generate(commentTime.AddMinutes(-1), "user-A", Guid.NewGuid(), "ProjectTasks");
+        var taskFile = new DefaultCommitFileNameGenerator().Generate(commentTime.AddMinutes(-1), "user-A", Guid.NewGuid(), "ProjectTasks");
         await File.WriteAllTextAsync(Path.Combine(changesDir, taskFile), "[{\"Id\":\"" + taskId + "\", \"Name\":\"Test Task\"}]");
 
         // 2. JSON内に CreatedAt を持たないコメントファイル
-        var fileName = CommitFileName.Generate(commentTime, "user-A", commentId, "Comment");
+        var fileName = new DefaultCommitFileNameGenerator().Generate(commentTime, "user-A", commentId, "Comment");
         var json = "{\"Id\":\"" + commentId + "\", \"TaskId\":\"" + taskId + "\", \"AuthorId\":\"user-A\", \"Content\":\"Hello\", \"AttachmentLinks\":[]}";
         await File.WriteAllTextAsync(Path.Combine(changesDir, fileName), json);
 

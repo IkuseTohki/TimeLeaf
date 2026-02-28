@@ -40,7 +40,10 @@ public class StorageMonitoringTests
     public async System.Threading.Tasks.Task FileWatcher_ShouldTriggerEvent_OnNewFile()
     {
         // Arrange
-        var repository = new FolderProjectRepository(_tempDir, _loggerMock.Object);
+        var serializer = new JsonProjectFileSystemSerializer();
+        var generator = new DefaultCommitFileNameGenerator();
+        var monitor = new FileSystemProjectStorageMonitor(_tempDir, new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object);
+        var repository = new FolderProjectRepository(_tempDir, monitor, serializer, generator, _loggerMock.Object);
         var projectId = Guid.NewGuid();
         var projectDir = Path.Combine(_tempDir, $"{projectId}_TestProject");
         var changesDir = Path.Combine(projectDir, "changes");

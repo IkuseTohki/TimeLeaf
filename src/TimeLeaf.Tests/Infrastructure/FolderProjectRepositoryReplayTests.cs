@@ -59,15 +59,18 @@ public class FolderProjectRepositoryReplayTests
         await File.WriteAllTextAsync(metaFile,
             JsonSerializer.Serialize(new { ProjectId = projectId, CreatedAt = baseTime, SchemaVersion = 1 }));
         // 1. 古い変更 (Name = "Old Name")
-        var oldFile = CommitFileName.Generate(baseTime, "user1", Guid.NewGuid(), "ProjectBasic");
+        var oldFile = new DefaultCommitFileNameGenerator().Generate(baseTime, "user1", Guid.NewGuid(), "ProjectBasic");
         await File.WriteAllTextAsync(Path.Combine(changesDir, oldFile),
             JsonSerializer.Serialize(new { Name = "Old Name" }));
 
         // 2. 新しい変更 (Name = "New Name")
-        var newFile = CommitFileName.Generate(baseTime.AddSeconds(1), "user1", Guid.NewGuid(), "ProjectBasic");
+        var newFile = new DefaultCommitFileNameGenerator().Generate(baseTime.AddSeconds(1), "user1", Guid.NewGuid(), "ProjectBasic");
         await File.WriteAllTextAsync(Path.Combine(changesDir, newFile),
             JsonSerializer.Serialize(new { Name = "New Name" }));
-        var repository = new FolderProjectRepository(_tempDir, _loggerMock.Object);
+        var serializer = new JsonProjectFileSystemSerializer();
+        var generator = new DefaultCommitFileNameGenerator();
+        var monitor = new FileSystemProjectStorageMonitor(_tempDir, new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object);
+        var repository = new FolderProjectRepository(_tempDir, monitor, serializer, generator, _loggerMock.Object);
 
         // Act
         var projects = (await repository.LoadAllAsync()).ToList();
@@ -95,11 +98,14 @@ public class FolderProjectRepositoryReplayTests
         await File.WriteAllTextAsync(metaFile,
             JsonSerializer.Serialize(new { ProjectId = projectId, CreatedAt = baseTime, SchemaVersion = 1 }));
 
-        var commitFile = CommitFileName.Generate(baseTime.AddSeconds(1), "user1", Guid.NewGuid(), "ProjectBasic");
+        var commitFile = new DefaultCommitFileNameGenerator().Generate(baseTime.AddSeconds(1), "user1", Guid.NewGuid(), "ProjectBasic");
         await File.WriteAllTextAsync(Path.Combine(changesDir, commitFile),
             JsonSerializer.Serialize(new { Name = "Desc Test Project", Description = "Test Description" }));
 
-        var repository = new FolderProjectRepository(_tempDir, _loggerMock.Object);
+        var serializer = new JsonProjectFileSystemSerializer();
+        var generator = new DefaultCommitFileNameGenerator();
+        var monitor = new FileSystemProjectStorageMonitor(_tempDir, new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object);
+        var repository = new FolderProjectRepository(_tempDir, monitor, serializer, generator, _loggerMock.Object);
 
         // Act
         var projects = (await repository.LoadAllAsync()).ToList();

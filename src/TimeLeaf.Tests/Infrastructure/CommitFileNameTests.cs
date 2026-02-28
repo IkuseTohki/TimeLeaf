@@ -9,6 +9,8 @@ namespace TimeLeaf.Tests.Infrastructure;
 [TestClass]
 public class CommitFileNameTests
 {
+    private ICommitFileNameGenerator _generator = new DefaultCommitFileNameGenerator();
+
     /// <summary>
     /// テスト観点: 各要素から、仕様書(ADR-0001)に準拠したファイル名が生成されることを確認する。
     /// 命名規則: {yyyyMMdd_HHmmss_fff}_{UserID}_{GUID}_{Category}.json
@@ -24,7 +26,7 @@ public class CommitFileNameTests
         var category = "TaskBasic";
 
         // Act
-        string fileName = CommitFileName.Generate(timestamp, userId, guid, category);
+        string fileName = _generator.Generate(timestamp, userId, guid, category);
 
         // Assert
         Assert.AreEqual("20260221_153045_123_kiddy_123456781234123412341234567890ab_TaskBasic.json", fileName);
@@ -40,7 +42,7 @@ public class CommitFileNameTests
         var fileName = "20260221_153045_123_kiddy_123456781234123412341234567890ab_TaskBasic.json";
 
         // Act
-        var result = CommitFileName.Parse(fileName);
+        var result = _generator.Parse(fileName);
 
         // Assert
         // Parse は常に Kind=Utc で返す
@@ -60,9 +62,9 @@ public class CommitFileNameTests
         var baseTime = new DateTime(2026, 2, 21, 10, 0, 0, DateTimeKind.Utc);
         var list = new List<string>
         {
-            CommitFileName.Generate(baseTime.AddMilliseconds(200), "user1", Guid.NewGuid(), "Cat"),
-            CommitFileName.Generate(baseTime.AddMilliseconds(100), "user1", Guid.NewGuid(), "Cat"),
-            CommitFileName.Generate(baseTime.AddMilliseconds(150), "user1", Guid.NewGuid(), "Cat")
+            _generator.Generate(baseTime.AddMilliseconds(200), "user1", Guid.NewGuid(), "Cat"),
+            _generator.Generate(baseTime.AddMilliseconds(100), "user1", Guid.NewGuid(), "Cat"),
+            _generator.Generate(baseTime.AddMilliseconds(150), "user1", Guid.NewGuid(), "Cat")
         };
 
         // Act

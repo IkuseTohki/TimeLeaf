@@ -42,7 +42,10 @@ public class SurgicalSavingTests
     public async System.Threading.Tasks.Task SaveProjectAsync_ShouldOnlyAffectTargetProject()
     {
         // Arrange
-        var repo = new FolderProjectRepository(_tempDir, _loggerMock.Object);
+        var serializer = new JsonProjectFileSystemSerializer();
+        var generator = new DefaultCommitFileNameGenerator();
+        var monitor = new FileSystemProjectStorageMonitor(_tempDir, new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object);
+        var repo = new FolderProjectRepository(_tempDir, monitor, serializer, generator, _loggerMock.Object);
         var projectA = new Project();
         projectA.UpdateName("ProjectA");
         var projectB = new Project();
@@ -68,7 +71,10 @@ public class SurgicalSavingTests
     public async System.Threading.Tasks.Task SaveProjectAsync_ShouldNotCreateFile_IfContentIsSame()
     {
         // Arrange
-        var repo = new FolderProjectRepository(_tempDir, _loggerMock.Object);
+        var serializer = new JsonProjectFileSystemSerializer();
+        var generator = new DefaultCommitFileNameGenerator();
+        var monitor = new FileSystemProjectStorageMonitor(_tempDir, new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object);
+        var repo = new FolderProjectRepository(_tempDir, monitor, serializer, generator, _loggerMock.Object);
         var project = new Project();
         project.UpdateName("SameName");
 

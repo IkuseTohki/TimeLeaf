@@ -46,7 +46,10 @@ public class CommentStorageTests
     public async Task SaveAndLoad_ShouldPreserveComments()
     {
         // Arrange
-        var repository = new FolderProjectRepository(_tempDir, _loggerMock.Object);
+        var serializer = new JsonProjectFileSystemSerializer();
+        var generator = new DefaultCommitFileNameGenerator();
+        var monitor = new FileSystemProjectStorageMonitor(_tempDir, new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object);
+        var repository = new FolderProjectRepository(_tempDir, monitor, serializer, generator, _loggerMock.Object);
         var project = new Project();
         project.UpdateName("CommentTestProject");
         var task = new ProjectTask();
@@ -88,7 +91,10 @@ public class CommentStorageTests
     public async Task SaveAndLoad_MultipleComments_ShouldIncrementalAccumulate()
     {
         // Arrange
-        var repository = new FolderProjectRepository(_tempDir, _loggerMock.Object);
+        var serializer = new JsonProjectFileSystemSerializer();
+        var generator = new DefaultCommitFileNameGenerator();
+        var monitor = new FileSystemProjectStorageMonitor(_tempDir, new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object);
+        var repository = new FolderProjectRepository(_tempDir, monitor, serializer, generator, _loggerMock.Object);
         var project = new Project();
         project.UpdateName("MultiCommentProject");
         var task = new ProjectTask();
