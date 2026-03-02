@@ -24,7 +24,7 @@
             <Button HorizontalAlignment="Right"
                     Command="{Binding AddProjectCommand}"
                     Content="+ 新規プロジェクト"
-                    Style="{StaticResource PrimaryButtonStyle}" />
+                    Style="{StaticResource PrimaryButtonStyle2}" />
         </DockPanel>
 
         <!-- プロジェクトグリッド -->

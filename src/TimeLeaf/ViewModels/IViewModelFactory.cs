@@ -13,6 +13,7 @@ public interface IViewModelFactory
     OverviewViewModel CreateOverviewViewModel(ObservableCollection<ProjectViewModel> projects);
     ProjectWorkspaceViewModel CreateProjectWorkspaceViewModel(ProjectViewModel projectViewModel);
     AddProjectViewModel CreateAddProjectViewModel();
+    AddTaskViewModel CreateAddTaskViewModel();
 
     ProjectDashboardViewModel CreateProjectDashboardViewModel(ProjectViewModel projectViewModel);
     ProjectTasksViewModel CreateProjectTasksViewModel(ProjectViewModel projectViewModel);

@@ -58,7 +58,7 @@ public class CommentFlowTests
         viewModelFactoryMock.Setup(x => x.CreateOverviewViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>()))
             .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, addProjectUseCaseMock.Object, _dialogServiceMock.Object, viewModelFactoryMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
 
-        var tasksVM = new ProjectTasksViewModel(new ProjectViewModel(project), addTaskUseCase, addCommentUseCase, new Mock<ILogger<ProjectTasksViewModel>>().Object, new Mock<ILogger<TaskDetailViewModel>>().Object);
+        var tasksVM = new ProjectTasksViewModel(new ProjectViewModel(project), addTaskUseCase, addCommentUseCase, viewModelFactoryMock.Object, _dialogServiceMock.Object, new Mock<ILogger<ProjectTasksViewModel>>().Object, new Mock<ILogger<TaskDetailViewModel>>().Object);
         viewModelFactoryMock.Setup(x => x.CreateProjectWorkspaceViewModel(It.IsAny<ProjectViewModel>()))
             .Returns((ProjectViewModel pvm) => new ProjectWorkspaceViewModel(pvm, viewModelFactoryMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object));
         viewModelFactoryMock.Setup(x => x.CreateProjectTasksViewModel(It.IsAny<ProjectViewModel>()))
@@ -93,7 +93,7 @@ public class CommentFlowTests
 
         var addTaskUseCase = new AddTaskUseCase(_saveUseCaseMock.Object);
         var addCommentUseCase = new AddCommentUseCase(_saveUseCaseMock.Object, _userServiceMock.Object);
-        var tasksVM = new ProjectTasksViewModel(projectVM, addTaskUseCase, addCommentUseCase, new Mock<ILogger<ProjectTasksViewModel>>().Object, new Mock<ILogger<TaskDetailViewModel>>().Object);
+        var tasksVM = new ProjectTasksViewModel(projectVM, addTaskUseCase, addCommentUseCase, new Mock<IViewModelFactory>().Object, _dialogServiceMock.Object, new Mock<ILogger<ProjectTasksViewModel>>().Object, new Mock<ILogger<TaskDetailViewModel>>().Object);
 
         var taskVM = projectVM.Tasks.First();
         tasksVM.SelectedTask = taskVM;
@@ -125,7 +125,7 @@ public class CommentFlowTests
         var addMilestoneUseCase = new AddMilestoneUseCase(_saveUseCaseMock.Object);
         var viewModelFactoryMock = new Mock<IViewModelFactory>();
 
-        var tasksVM = new ProjectTasksViewModel(projectViewModel, addTaskUseCase, addCommentUseCase, new Mock<ILogger<ProjectTasksViewModel>>().Object, new Mock<ILogger<TaskDetailViewModel>>().Object);
+        var tasksVM = new ProjectTasksViewModel(projectViewModel, addTaskUseCase, addCommentUseCase, viewModelFactoryMock.Object, _dialogServiceMock.Object, new Mock<ILogger<ProjectTasksViewModel>>().Object, new Mock<ILogger<TaskDetailViewModel>>().Object);
         viewModelFactoryMock.Setup(x => x.CreateProjectTasksViewModel(It.IsAny<ProjectViewModel>())).Returns(tasksVM);
 
         var workspaceViewModel = new ProjectWorkspaceViewModel(projectViewModel, viewModelFactoryMock.Object, loggerMock.Object);

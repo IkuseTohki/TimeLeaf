@@ -52,36 +52,39 @@
             </Grid>
 
             <!-- タスク追加入力 -->
-            <Border Margin="0,0,0,16"
-                    Padding="16,8"
-                    DockPanel.Dock="Top"
-                    Style="{StaticResource OrganicCardStyle}">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Margin="0,0,16,0"
-                               VerticalAlignment="Center"
-                               FontSize="20"
-                               Text="🌱" />
-                    <TextBox Grid.Column="1"
-                             VerticalContentAlignment="Center"
-                             Background="Transparent"
-                             BorderThickness="0"
-                             FontSize="15"
-                             Tag="新しいタスクの種をまく..."
-                             Text="{Binding NewTaskName, UpdateSourceTrigger=PropertyChanged}" />
-                    <Button Grid.Column="2"
-                            Padding="20,8"
-                            Background="#4A7c44"
-                            Command="{Binding AddTaskCommand}"
-                            Content="追加"
-                            Foreground="White"
-                            Style="{StaticResource RoundButtonStyle}" />
-                </Grid>
-            </Border>
+            <Button Margin="0,0,0,16"
+                    Padding="16,12"
+                    HorizontalContentAlignment="Stretch"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Command="{Binding AddTaskCommand}"
+                    DockPanel.Dock="Top">
+                <Border Padding="16,8" Style="{StaticResource OrganicCardStyle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Margin="0,0,16,0"
+                                   VerticalAlignment="Center"
+                                   FontSize="20"
+                                   Text="🌱" />
+                        <TextBlock Grid.Column="1"
+                                   VerticalAlignment="Center"
+                                   FontSize="15"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   Text="新しいタスクの種をまく..." />
+                        <Button Grid.Column="2"
+                                Padding="20,8"
+                                Background="#4A7c44"
+                                Command="{Binding AddTaskCommand}"
+                                Content="追加"
+                                Foreground="White"
+                                Style="{StaticResource RoundButtonStyle}" />
+                    </Grid>
+                </Border>
+            </Button>
 
             <!-- タスクリスト -->
             <ScrollViewer VerticalScrollBarVisibility="Auto">

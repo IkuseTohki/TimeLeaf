@@ -18,13 +18,12 @@ public partial class ProjectTasksViewModel : ObservableObject
     private readonly ProjectViewModel _projectViewModel;
     private readonly IAddTaskUseCase _addTaskUseCase;
     private readonly IAddCommentUseCase _addCommentUseCase;
+    private readonly IViewModelFactory _viewModelFactory;
+    private readonly LeafKit.UI.Services.IDialogService _dialogService;
     private readonly ILogger<ProjectTasksViewModel> _logger;
     private readonly ILogger<TaskDetailViewModel> _detailLogger;
 
     public ObservableCollection<ProjectTaskViewModel> Tasks => _projectViewModel.Tasks;
-
-    [ObservableProperty]
-    private string _newTaskName = string.Empty;
 
     [ObservableProperty]
     private ProjectTaskViewModel? _selectedTask;
@@ -39,12 +38,16 @@ public partial class ProjectTasksViewModel : ObservableObject
         ProjectViewModel projectViewModel,
         IAddTaskUseCase addTaskUseCase,
         IAddCommentUseCase addCommentUseCase,
+        IViewModelFactory viewModelFactory,
+        LeafKit.UI.Services.IDialogService dialogService,
         ILogger<ProjectTasksViewModel> logger,
         ILogger<TaskDetailViewModel> detailLogger)
     {
         _projectViewModel = projectViewModel;
         _addTaskUseCase = addTaskUseCase;
         _addCommentUseCase = addCommentUseCase;
+        _viewModelFactory = viewModelFactory;
+        _dialogService = dialogService;
         _logger = logger;
         _detailLogger = detailLogger;
     }
@@ -81,21 +84,35 @@ public partial class ProjectTasksViewModel : ObservableObject
     [RelayCommand]
     private async System.Threading.Tasks.Task AddTask()
     {
-        if (string.IsNullOrWhiteSpace(NewTaskName)) return;
+        _logger.LogInformation("AddTask dialog started.");
 
         try
         {
-            await _addTaskUseCase.ExecuteAsync(
-                _projectViewModel.Model,
-                NewTaskName,
-                string.Empty,
-                TimeLeaf.Models.Enums.TaskStatus.NotStarted,
-                TaskPriority.Medium,
-                null, null, null, null, 0, 0, string.Empty
-            );
+            var addTaskVm = _viewModelFactory.CreateAddTaskViewModel();
+            var result = await _dialogService.ShowDialogAsync(addTaskVm);
 
-            _projectViewModel.SyncFromModel();
-            NewTaskName = string.Empty;
+            if (result)
+            {
+                _logger.LogDebug("Adding task: {Name}", addTaskVm.Name);
+
+                await _addTaskUseCase.ExecuteAsync(
+                    _projectViewModel.Model,
+                    addTaskVm.Name,
+                    addTaskVm.Description,
+                    addTaskVm.Status,
+                    addTaskVm.Priority,
+                    null, // scheduledStartDate
+                    addTaskVm.DueDate, // deadline
+                    null, // actualStartDate
+                    null, // actualEndDate
+                    addTaskVm.EstimatedWorkHours ?? 0,
+                    0,    // actualCost
+                    addTaskVm.Assignee ?? string.Empty
+                );
+
+                _projectViewModel.SyncFromModel();
+                _logger.LogInformation("AddTask completed successfully.");
+            }
         }
         catch (Exception ex)
         {

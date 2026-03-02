@@ -88,13 +88,24 @@ public class InfiniteLoopReproductionTests
         var addMilestoneUseCase = new AddMilestoneUseCase(saveUseCaseMock.Object);
 
         var workspaceVM = new ProjectWorkspaceViewModel(projectVM, viewModelFactoryMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
-        var tasksVM = new ProjectTasksViewModel(projectVM, addTaskUseCase, addCommentUseCase, new Mock<ILogger<ProjectTasksViewModel>>().Object, new Mock<ILogger<TaskDetailViewModel>>().Object);
+        var dialogServiceMock = new Mock<LeafKit.UI.Services.IDialogService>();
+        var tasksVM = new ProjectTasksViewModel(
+            projectVM,
+            addTaskUseCase,
+            addCommentUseCase,
+            viewModelFactoryMock.Object,
+            dialogServiceMock.Object,
+            new Mock<ILogger<ProjectTasksViewModel>>().Object,
+            new Mock<ILogger<TaskDetailViewModel>>().Object);
 
         viewModelFactoryMock.Setup(x => x.CreateProjectTasksViewModel(projectVM)).Returns(tasksVM);
         workspaceVM.SwitchSubViewCommand.Execute("Tasks");
 
         // 2. Act - Add a task with estimated cost
-        tasksVM.NewTaskName = "Task 1";
+        var addTaskViewModel1 = new AddTaskViewModel { Name = "Task 1" };
+        viewModelFactoryMock.Setup(x => x.CreateAddTaskViewModel()).Returns(addTaskViewModel1);
+        dialogServiceMock.Setup(x => x.ShowDialogAsync(addTaskViewModel1)).ReturnsAsync(true);
+
         await tasksVM.AddTaskCommand.ExecuteAsync(null);
         var task1 = projectVM.Tasks.First();
         task1.EstimatedCost = 10.0;
@@ -146,17 +157,29 @@ public class InfiniteLoopReproductionTests
         var addMilestoneUseCase = new AddMilestoneUseCase(saveUseCaseMock.Object);
 
         var workspaceVM = new ProjectWorkspaceViewModel(projectVM, viewModelFactoryMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
-        var tasksVM = new ProjectTasksViewModel(projectVM, addTaskUseCase, addCommentUseCase, new Mock<ILogger<ProjectTasksViewModel>>().Object, new Mock<ILogger<TaskDetailViewModel>>().Object);
+        var dialogServiceMock = new Mock<LeafKit.UI.Services.IDialogService>();
+        var tasksVM = new ProjectTasksViewModel(
+            projectVM,
+            addTaskUseCase,
+            addCommentUseCase,
+            viewModelFactoryMock.Object,
+            dialogServiceMock.Object,
+            new Mock<ILogger<ProjectTasksViewModel>>().Object,
+            new Mock<ILogger<TaskDetailViewModel>>().Object);
 
         viewModelFactoryMock.Setup(x => x.CreateProjectTasksViewModel(projectVM)).Returns(tasksVM);
         workspaceVM.SwitchSubViewCommand.Execute("Tasks");
 
         // 2. Act - Add 1st task
-        tasksVM.NewTaskName = "Task 1";
+        var addTaskViewModel1 = new AddTaskViewModel { Name = "Task 1" };
+        viewModelFactoryMock.Setup(x => x.CreateAddTaskViewModel()).Returns(addTaskViewModel1);
+        dialogServiceMock.Setup(x => x.ShowDialogAsync(addTaskViewModel1)).ReturnsAsync(true);
         await tasksVM.AddTaskCommand.ExecuteAsync(null);
 
         // 3. Act - Add 2nd task immediately
-        tasksVM.NewTaskName = "Task 2";
+        var addTaskViewModel2 = new AddTaskViewModel { Name = "Task 2" };
+        viewModelFactoryMock.Setup(x => x.CreateAddTaskViewModel()).Returns(addTaskViewModel2);
+        dialogServiceMock.Setup(x => x.ShowDialogAsync(addTaskViewModel2)).ReturnsAsync(true);
         await tasksVM.AddTaskCommand.ExecuteAsync(null);
 
         await Task.Delay(500);

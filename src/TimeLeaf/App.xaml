@@ -32,6 +32,9 @@
             <DataTemplate DataType="{x:Type viewModels:AddProjectViewModel}">
                 <views:AddProjectView />
             </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModels:AddTaskViewModel}">
+                <views:AddTaskView />
+            </DataTemplate>
 
         </ResourceDictionary>
     </Application.Resources>

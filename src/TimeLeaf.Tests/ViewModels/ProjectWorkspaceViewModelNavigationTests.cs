@@ -33,7 +33,14 @@ public class ProjectWorkspaceViewModelNavigationTests
         _viewModelFactoryMock.Setup(x => x.CreateProjectDashboardViewModel(It.IsAny<ProjectViewModel>()))
             .Returns((ProjectViewModel pvm) => new ProjectDashboardViewModel(pvm, _addMilestoneUseCaseMock.Object, new Mock<ILogger<ProjectDashboardViewModel>>().Object));
         _viewModelFactoryMock.Setup(x => x.CreateProjectTasksViewModel(It.IsAny<ProjectViewModel>()))
-            .Returns((ProjectViewModel pvm) => new ProjectTasksViewModel(pvm, _addTaskUseCaseMock.Object, _addCommentUseCaseMock.Object, new Mock<ILogger<ProjectTasksViewModel>>().Object, new Mock<ILogger<TaskDetailViewModel>>().Object));
+            .Returns((ProjectViewModel pvm) => new ProjectTasksViewModel(
+                pvm,
+                _addTaskUseCaseMock.Object,
+                _addCommentUseCaseMock.Object,
+                _viewModelFactoryMock.Object,
+                new Mock<LeafKit.UI.Services.IDialogService>().Object,
+                new Mock<ILogger<ProjectTasksViewModel>>().Object,
+                new Mock<ILogger<TaskDetailViewModel>>().Object));
         _viewModelFactoryMock.Setup(x => x.CreateProjectTimelineViewModel(It.IsAny<ProjectViewModel>()))
             .Returns((ProjectViewModel pvm) => new ProjectTimelineViewModel(pvm));
         _viewModelFactoryMock.Setup(x => x.CreateProjectSettingsViewModel(It.IsAny<ProjectViewModel>()))

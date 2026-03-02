@@ -33,8 +33,22 @@ public class ProjectWorkspaceViewModelTests
         var addCommentUseCase = new AddCommentUseCase(saveUseCaseMock.Object, userServiceMock.Object);
         var addMilestoneUseCase = new AddMilestoneUseCase(saveUseCaseMock.Object);
         var viewModelFactoryMock = new Mock<IViewModelFactory>();
+        var dialogServiceMock = new Mock<LeafKit.UI.Services.IDialogService>();
 
-        var tasksViewModel = new ProjectTasksViewModel(projectViewModel, addTaskUseCase, addCommentUseCase, tasksLoggerMock.Object, detailLoggerMock.Object);
+        var taskName = "New Task";
+        var addTaskViewModel = new AddTaskViewModel { Name = taskName };
+        viewModelFactoryMock.Setup(x => x.CreateAddTaskViewModel()).Returns(addTaskViewModel);
+        dialogServiceMock.Setup(x => x.ShowDialogAsync(addTaskViewModel)).ReturnsAsync(true);
+
+        var tasksViewModel = new ProjectTasksViewModel(
+            projectViewModel,
+            addTaskUseCase,
+            addCommentUseCase,
+            viewModelFactoryMock.Object,
+            dialogServiceMock.Object,
+            tasksLoggerMock.Object,
+            detailLoggerMock.Object);
+
         viewModelFactoryMock.Setup(x => x.CreateProjectDashboardViewModel(It.IsAny<ProjectViewModel>()))
             .Returns(new ProjectDashboardViewModel(projectViewModel, addMilestoneUseCase, new Mock<ILogger<ProjectDashboardViewModel>>().Object));
         viewModelFactoryMock.Setup(x => x.CreateProjectTasksViewModel(It.IsAny<ProjectViewModel>()))
@@ -46,9 +60,6 @@ public class ProjectWorkspaceViewModelTests
         viewModel.SwitchSubViewCommand.Execute("Tasks");
         var activeTasksViewModel = (ProjectTasksViewModel)viewModel.CurrentSubViewModel;
 
-        var taskName = "New Task";
-        activeTasksViewModel.NewTaskName = taskName;
-
         // Act
         await activeTasksViewModel.AddTaskCommand.ExecuteAsync(null);
 
@@ -56,6 +67,5 @@ public class ProjectWorkspaceViewModelTests
         Assert.AreEqual(1, projectViewModel.Tasks.Count);
         var added = projectViewModel.Tasks.First();
         Assert.AreEqual(taskName, added.Name);
-        Assert.AreEqual(string.Empty, activeTasksViewModel.NewTaskName);
     }
 }

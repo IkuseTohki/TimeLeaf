@@ -95,20 +95,31 @@ public class ProjectWorkspaceViewModelSaveTests
         var addMilestoneUseCase = new AddMilestoneUseCase(saveUseCaseMock.Object);
 
         var workspaceViewModel = new ProjectWorkspaceViewModel(projectViewModel, viewModelFactoryMock.Object, _workspaceLoggerMock.Object);
-        var tasksViewModel = new ProjectTasksViewModel(projectViewModel, addTaskUseCase, addCommentUseCase, new Mock<ILogger<ProjectTasksViewModel>>().Object, new Mock<ILogger<TaskDetailViewModel>>().Object);
+        var tasksViewModel = new ProjectTasksViewModel(
+            projectViewModel,
+            addTaskUseCase,
+            addCommentUseCase,
+            viewModelFactoryMock.Object,
+            _dialogServiceMock.Object,
+            new Mock<ILogger<ProjectTasksViewModel>>().Object,
+            new Mock<ILogger<TaskDetailViewModel>>().Object);
 
         viewModelFactoryMock.Setup(x => x.CreateProjectTasksViewModel(projectViewModel)).Returns(tasksViewModel);
         workspaceViewModel.SwitchSubViewCommand.Execute("Tasks");
 
         // Act
-        tasksViewModel.NewTaskName = "New Task to Save";
+        var taskName = "New Task to Save";
+        var addTaskViewModel = new AddTaskViewModel { Name = taskName };
+        viewModelFactoryMock.Setup(x => x.CreateAddTaskViewModel()).Returns(addTaskViewModel);
+        _dialogServiceMock.Setup(x => x.ShowDialogAsync(addTaskViewModel)).ReturnsAsync(true);
+
         await tasksViewModel.AddTaskCommand.ExecuteAsync(null);
 
         // Assert
         // 少し待って非同期の保存処理を待機
         await System.Threading.Tasks.Task.Delay(500);
 
-        saveUseCaseMock.Verify(r => r.ExecuteAsync(It.Is<Project>(p => p.Id == projectId && p.Tasks.Any(t => t.Name == "New Task to Save"))), Times.AtLeastOnce(), "タスク追加時にリポジトリの SaveAsync が呼び出されること");
+        saveUseCaseMock.Verify(r => r.ExecuteAsync(It.Is<Project>(p => p.Id == projectId && p.Tasks.Any(t => t.Name == taskName))), Times.AtLeastOnce(), "タスク追加時にリポジトリの SaveAsync が呼び出されること");
     }
 
     /// <summary>

@@ -120,7 +120,14 @@ public class EndToEndFlowTests
         var addMilestoneUseCase = new AddMilestoneUseCase(saveUseCaseMock.Object);
 
         var workspaceVM = new ProjectWorkspaceViewModel(projectVM, viewModelFactoryMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
-        var tasksVM = new ProjectTasksViewModel(projectVM, addTaskUseCase, addCommentUseCase, new Mock<ILogger<ProjectTasksViewModel>>().Object, new Mock<ILogger<TaskDetailViewModel>>().Object);
+        var tasksVM = new ProjectTasksViewModel(
+            projectVM,
+            addTaskUseCase,
+            addCommentUseCase,
+            viewModelFactoryMock.Object,
+            _dialogServiceMock.Object,
+            new Mock<ILogger<ProjectTasksViewModel>>().Object,
+            new Mock<ILogger<TaskDetailViewModel>>().Object);
 
         viewModelFactoryMock.Setup(x => x.CreateProjectWorkspaceViewModel(projectVM)).Returns(workspaceVM);
         viewModelFactoryMock.Setup(x => x.CreateProjectTasksViewModel(projectVM)).Returns(tasksVM);
@@ -129,11 +136,15 @@ public class EndToEndFlowTests
         workspaceVM.SwitchSubViewCommand.Execute("Tasks");
 
         // 4. Add a Task in Workspace
-        tasksVM.NewTaskName = "E2E Task";
+        var taskName = "E2E Task";
+        var addTaskViewModel = new AddTaskViewModel { Name = taskName };
+        viewModelFactoryMock.Setup(x => x.CreateAddTaskViewModel()).Returns(addTaskViewModel);
+        _dialogServiceMock.Setup(ds => ds.ShowDialogAsync(addTaskViewModel)).ReturnsAsync(true);
+
         await tasksVM.AddTaskCommand.ExecuteAsync(null);
 
         await System.Threading.Tasks.Task.Delay(500);
-        saveUseCaseMock.Verify(r => r.ExecuteAsync(It.Is<Project>(p => p.Id == projectVM.Id && p.Tasks.Any(t => t.Name == "E2E Task"))), Times.AtLeastOnce(), "タスク追加時に保存されること");
+        saveUseCaseMock.Verify(r => r.ExecuteAsync(It.Is<Project>(p => p.Id == projectVM.Id && p.Tasks.Any(t => t.Name == taskName))), Times.AtLeastOnce(), "タスク追加時に保存されること");
 
         // 5. Update Task Property
         var taskVM = projectVM.Tasks.First(t => t.Name == "E2E Task");

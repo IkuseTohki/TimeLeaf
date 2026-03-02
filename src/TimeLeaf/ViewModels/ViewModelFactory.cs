@@ -43,6 +43,11 @@ public class ViewModelFactory : IViewModelFactory
         return _serviceProvider.GetRequiredService<AddProjectViewModel>();
     }
 
+    public AddTaskViewModel CreateAddTaskViewModel()
+    {
+        return _serviceProvider.GetRequiredService<AddTaskViewModel>();
+    }
+
     public ProjectDashboardViewModel CreateProjectDashboardViewModel(ProjectViewModel projectViewModel)
     {
         return new ProjectDashboardViewModel(
@@ -57,6 +62,8 @@ public class ViewModelFactory : IViewModelFactory
             projectViewModel,
             _serviceProvider.GetRequiredService<IAddTaskUseCase>(),
             _serviceProvider.GetRequiredService<IAddCommentUseCase>(),
+            this,
+            _serviceProvider.GetRequiredService<LeafKit.UI.Services.IDialogService>(),
             _serviceProvider.GetRequiredService<ILogger<ProjectTasksViewModel>>(),
             _serviceProvider.GetRequiredService<ILogger<TaskDetailViewModel>>());
     }
