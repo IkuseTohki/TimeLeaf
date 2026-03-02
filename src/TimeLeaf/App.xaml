@@ -4,7 +4,9 @@
              xmlns:converters="clr-namespace:TimeLeaf.ViewModels.Converters"
              xmlns:local="clr-namespace:TimeLeaf"
              xmlns:viewModels="clr-namespace:TimeLeaf.ViewModels"
-             xmlns:views="clr-namespace:TimeLeaf.Views">
+             xmlns:views="clr-namespace:TimeLeaf.Views"
+             xmlns:workspace="clr-namespace:TimeLeaf.ViewModels.Workspace"
+             xmlns:workspaceViews="clr-namespace:TimeLeaf.Views.Workspace">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -34,6 +36,9 @@
             </DataTemplate>
             <DataTemplate DataType="{x:Type viewModels:AddTaskViewModel}">
                 <views:AddTaskView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type workspace:TaskDetailViewModel}">
+                <workspaceViews:TaskDetailView />
             </DataTemplate>
 
         </ResourceDictionary>

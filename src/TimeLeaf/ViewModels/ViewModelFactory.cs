@@ -61,7 +61,6 @@ public class ViewModelFactory : IViewModelFactory
         return new ProjectTasksViewModel(
             projectViewModel,
             _serviceProvider.GetRequiredService<IAddTaskUseCase>(),
-            _serviceProvider.GetRequiredService<IAddCommentUseCase>(),
             this,
             _serviceProvider.GetRequiredService<LeafKit.UI.Services.IDialogService>(),
             _serviceProvider.GetRequiredService<ILogger<ProjectTasksViewModel>>(),
@@ -76,5 +75,19 @@ public class ViewModelFactory : IViewModelFactory
     public ProjectSettingsViewModel CreateProjectSettingsViewModel(ProjectViewModel projectViewModel)
     {
         return new ProjectSettingsViewModel(projectViewModel);
+    }
+
+    public TaskSummaryViewModel CreateTaskSummaryViewModel(ProjectTaskViewModel taskViewModel)
+    {
+        return new TaskSummaryViewModel(taskViewModel);
+    }
+
+    public TaskDetailViewModel CreateTaskDetailViewModel(ProjectViewModel projectViewModel, ProjectTaskViewModel taskViewModel)
+    {
+        return new TaskDetailViewModel(
+            projectViewModel,
+            taskViewModel,
+            _serviceProvider.GetRequiredService<IAddCommentUseCase>(),
+            _serviceProvider.GetRequiredService<ILogger<TaskDetailViewModel>>());
     }
 }

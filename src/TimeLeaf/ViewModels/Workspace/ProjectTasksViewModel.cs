@@ -17,7 +17,6 @@ public partial class ProjectTasksViewModel : ObservableObject
 {
     private readonly ProjectViewModel _projectViewModel;
     private readonly IAddTaskUseCase _addTaskUseCase;
-    private readonly IAddCommentUseCase _addCommentUseCase;
     private readonly IViewModelFactory _viewModelFactory;
     private readonly LeafKit.UI.Services.IDialogService _dialogService;
     private readonly ILogger<ProjectTasksViewModel> _logger;
@@ -29,7 +28,7 @@ public partial class ProjectTasksViewModel : ObservableObject
     private ProjectTaskViewModel? _selectedTask;
 
     [ObservableProperty]
-    private TaskDetailViewModel? _taskDetailViewModel;
+    private TaskSummaryViewModel? _taskSummaryViewModel;
 
     [ObservableProperty]
     private bool _isDetailVisible;
@@ -37,7 +36,6 @@ public partial class ProjectTasksViewModel : ObservableObject
     public ProjectTasksViewModel(
         ProjectViewModel projectViewModel,
         IAddTaskUseCase addTaskUseCase,
-        IAddCommentUseCase addCommentUseCase,
         IViewModelFactory viewModelFactory,
         LeafKit.UI.Services.IDialogService dialogService,
         ILogger<ProjectTasksViewModel> logger,
@@ -45,7 +43,6 @@ public partial class ProjectTasksViewModel : ObservableObject
     {
         _projectViewModel = projectViewModel;
         _addTaskUseCase = addTaskUseCase;
-        _addCommentUseCase = addCommentUseCase;
         _viewModelFactory = viewModelFactory;
         _dialogService = dialogService;
         _logger = logger;
@@ -61,14 +58,13 @@ public partial class ProjectTasksViewModel : ObservableObject
 
         if (value != null)
         {
-            TaskDetailViewModel = new TaskDetailViewModel(_projectViewModel, value, _addCommentUseCase, _detailLogger);
+            TaskSummaryViewModel = _viewModelFactory.CreateTaskSummaryViewModel(value);
             IsDetailVisible = true;
         }
         else
         {
             IsDetailVisible = false;
-            // メモリ解放を促すため、少し遅らせて null にすることを検討できるが、一旦即座に null
-            TaskDetailViewModel = null;
+            TaskSummaryViewModel = null;
         }
     }
 
@@ -79,6 +75,16 @@ public partial class ProjectTasksViewModel : ObservableObject
     private void SelectTask(ProjectTaskViewModel task)
     {
         SelectedTask = task;
+    }
+
+    [RelayCommand]
+    private async System.Threading.Tasks.Task OpenTaskDetailWindow(ProjectTaskViewModel task)
+    {
+        _logger.LogInformation("Opening TaskDetailWindow for: {TaskName}", task.Name);
+        var detailVm = _viewModelFactory.CreateTaskDetailViewModel(_projectViewModel, task);
+
+        // ダイアログを表示（別ウィンドウとして開く）
+        await _dialogService.ShowDialogAsync(detailVm);
     }
 
     [RelayCommand]

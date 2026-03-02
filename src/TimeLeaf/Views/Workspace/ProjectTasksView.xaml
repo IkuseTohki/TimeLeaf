@@ -91,68 +91,70 @@
                 <ItemsControl ItemsSource="{Binding Tasks}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Button Margin="0,0,0,8"
-                                    Padding="0"
-                                    HorizontalContentAlignment="Stretch"
-                                    Background="Transparent"
-                                    BorderThickness="0"
-                                    Command="{Binding DataContext.SelectTaskCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                    CommandParameter="{Binding}">
-                                <Border Padding="24,16"
-                                        Background="{DynamicResource SurfaceBaseBrush}"
-                                        BorderBrush="{DynamicResource OutlineBaseBrush}"
-                                        BorderThickness="1">
-                                    <Border.Style>
-                                        <Style TargetType="Border">
-                                            <Setter Property="CornerRadius" Value="12,32,12,32" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                    <Setter Property="Background" Value="{DynamicResource SurfaceLayer1Brush}" />
-                                                    <Setter Property="BorderBrush" Value="{DynamicResource BrandPrimaryHoverBrush}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Border.Style>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
-                                        <CheckBox Margin="0,0,20,0"
-                                                  VerticalAlignment="Center"
-                                                  IsChecked="{Binding Status, Converter={StaticResource TaskStatusToBoolConverter}}" />
-                                        <TextBlock Grid.Column="1"
+                            <Border Margin="0,0,0,8"
+                                    Padding="24,16"
+                                    Background="{DynamicResource SurfaceBaseBrush}"
+                                    BorderBrush="{DynamicResource OutlineBaseBrush}"
+                                    BorderThickness="1"
+                                    Cursor="Hand">
+                                <Border.InputBindings>
+                                    <MouseBinding Command="{Binding DataContext.SelectTaskCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                  CommandParameter="{Binding}"
+                                                  MouseAction="LeftClick" />
+                                    <MouseBinding Command="{Binding DataContext.OpenTaskDetailWindowCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                  CommandParameter="{Binding}"
+                                                  MouseAction="LeftDoubleClick" />
+                                </Border.InputBindings>
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius" Value="12,32,12,32" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                <Setter Property="Background" Value="{DynamicResource SurfaceLayer1Brush}" />
+                                                <Setter Property="BorderBrush" Value="{DynamicResource BrandPrimaryHoverBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <CheckBox Margin="0,0,20,0"
+                                              VerticalAlignment="Center"
+                                              IsChecked="{Binding Status, Converter={StaticResource TaskStatusToBoolConverter}}" />
+                                    <TextBlock Grid.Column="1"
+                                               VerticalAlignment="Center"
+                                               FontSize="15"
+                                               FontWeight="SemiBold"
+                                               Text="{Binding Name}" />
+                                    <Border Grid.Column="2"
+                                            Margin="0,0,20,0"
+                                            Padding="10,2"
+                                            Background="#FFEBEE"
+                                            CornerRadius="10"
+                                            Visibility="{Binding Priority, Converter={StaticResource PriorityToVisibilityConverter}}">
+                                        <TextBlock FontSize="11"
+                                                   FontWeight="Bold"
+                                                   Foreground="#C62828"
+                                                   Text="緊急" />
+                                    </Border>
+                                    <Border Grid.Column="3"
+                                            Width="28"
+                                            Height="28"
+                                            Background="{DynamicResource StateHoverBrush}"
+                                            CornerRadius="14">
+                                        <TextBlock HorizontalAlignment="Center"
                                                    VerticalAlignment="Center"
-                                                   FontSize="15"
-                                                   FontWeight="SemiBold"
-                                                   Text="{Binding Name}" />
-                                        <Border Grid.Column="2"
-                                                Margin="0,0,20,0"
-                                                Padding="10,2"
-                                                Background="#FFEBEE"
-                                                CornerRadius="10"
-                                                Visibility="{Binding Priority, Converter={StaticResource PriorityToVisibilityConverter}}">
-                                            <TextBlock FontSize="11"
-                                                       FontWeight="Bold"
-                                                       Foreground="#C62828"
-                                                       Text="緊急" />
-                                        </Border>
-                                        <Border Grid.Column="3"
-                                                Width="28"
-                                                Height="28"
-                                                Background="{DynamicResource StateHoverBrush}"
-                                                CornerRadius="14">
-                                            <TextBlock HorizontalAlignment="Center"
-                                                       VerticalAlignment="Center"
-                                                       FontSize="10"
-                                                       FontWeight="Bold"
-                                                       Text="KT" />
-                                        </Border>
-                                    </Grid>
-                                </Border>
-                            </Button>
+                                                   FontSize="10"
+                                                   FontWeight="Bold"
+                                                   Text="KT" />
+                                    </Border>
+                                </Grid>
+                            </Border>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
@@ -161,16 +163,16 @@
 
         <!-- タスク詳細パネル (Drawer) -->
         <Border Grid.Column="1"
-                Width="450"
+                Width="180"
                 Background="{DynamicResource SurfaceBaseBrush}"
                 BorderBrush="{DynamicResource OutlineBaseBrush}"
                 BorderThickness="1,0,0,0"
                 CornerRadius="32,0,0,32"
                 Visibility="{Binding IsDetailVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
-            <ContentControl Content="{Binding TaskDetailViewModel}">
+            <ContentControl Content="{Binding TaskSummaryViewModel}">
                 <ContentControl.Resources>
-                    <DataTemplate DataType="{x:Type wvm:TaskDetailViewModel}">
-                        <wv:TaskDetailPanelView />
+                    <DataTemplate DataType="{x:Type wvm:TaskSummaryViewModel}">
+                        <wv:TaskQuickPanelView />
                     </DataTemplate>
                 </ContentControl.Resources>
             </ContentControl>

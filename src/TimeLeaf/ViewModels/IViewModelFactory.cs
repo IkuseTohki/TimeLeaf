@@ -19,4 +19,7 @@ public interface IViewModelFactory
     ProjectTasksViewModel CreateProjectTasksViewModel(ProjectViewModel projectViewModel);
     ProjectTimelineViewModel CreateProjectTimelineViewModel(ProjectViewModel projectViewModel);
     ProjectSettingsViewModel CreateProjectSettingsViewModel(ProjectViewModel projectViewModel);
+
+    TaskSummaryViewModel CreateTaskSummaryViewModel(ProjectTaskViewModel taskViewModel);
+    TaskDetailViewModel CreateTaskDetailViewModel(ProjectViewModel projectViewModel, ProjectTaskViewModel taskViewModel);
 }

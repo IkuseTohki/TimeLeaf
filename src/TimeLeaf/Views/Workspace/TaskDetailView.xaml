@@ -1,0 +1,233 @@
+<UserControl x:Class="TimeLeaf.Views.Workspace.TaskDetailView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:TimeLeaf.Views.Controls"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:wvm="clr-namespace:TimeLeaf.ViewModels.Workspace"
+             Width="900"
+             Height="500"
+             MinWidth="600"
+             MinHeight="400"
+             d:DataContext="{d:DesignInstance wvm:TaskDetailViewModel}"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <Style x:Key="SectionHeaderStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Foreground" Value="#4A7c44" />
+            <Setter Property="Margin" Value="0,0,0,12" />
+        </Style>
+        <Style x:Key="MetaLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="10" />
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+            <Setter Property="Margin" Value="0,0,0,2" />
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource SurfaceBaseBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <!-- 左側: メインエリア（可変幅） -->
+                <ColumnDefinition Width="180" />
+                <!-- 右側: プロパティ欄 (幅180) -->
+            </Grid.ColumnDefinitions>
+
+            <!-- 左側: メインコンテンツ (縦に 1.タイトル, 2.説明, 3.対話) -->
+            <Grid Grid.Column="0" Margin="32,24">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <!-- 1. タイトル -->
+                    <RowDefinition Height="1.2*" />
+                    <!-- 2. 詳細説明 -->
+                    <RowDefinition Height="Auto" />
+                    <!-- セパレーター -->
+                    <RowDefinition Height="2*" />
+                    <!-- 3. ディスカッション -->
+                </Grid.RowDefinitions>
+
+                <!-- 1. タスクタイトル -->
+                <TextBox Grid.Row="0"
+                         Margin="0,0,0,24"
+                         FontSize="24"
+                         FontWeight="Bold"
+                         Style="{StaticResource OrganicTextBoxStyle}"
+                         Text="{Binding Task.Name, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!-- 2. ROOTS (詳細説明) -->
+                <DockPanel Grid.Row="1" Margin="0,0,0,24">
+                    <TextBlock DockPanel.Dock="Top"
+                               Style="{StaticResource SectionHeaderStyle}"
+                               Text="ROOTS (詳細説明)" />
+                    <TextBox AcceptsReturn="True"
+                             Style="{StaticResource OrganicTextBoxStyle}"
+                             Text="{Binding Task.Description, UpdateSourceTrigger=PropertyChanged}"
+                             TextWrapping="Wrap" />
+                </DockPanel>
+
+                <Separator Grid.Row="2"
+                           Margin="0,0,0,24"
+                           Background="{DynamicResource OutlineBaseBrush}" />
+
+                <!-- 3. DISCUSSION (対話) -->
+                <Grid Grid.Row="3">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="DISCUSSION (対話)" />
+
+                    <!-- コメント履歴 -->
+                    <ScrollViewer Grid.Row="1"
+                                  Margin="0,0,0,12"
+                                  VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding Task.Comments}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,0,0,16">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Width="28"
+                                                Height="28"
+                                                VerticalAlignment="Top"
+                                                Background="{DynamicResource StateHoverBrush}"
+                                                CornerRadius="14">
+                                            <TextBlock HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"
+                                                       FontSize="9"
+                                                       FontWeight="Bold"
+                                                       Text="KT" />
+                                        </Border>
+                                        <StackPanel Grid.Column="1" Margin="12,0,0,0">
+                                            <Grid Margin="0,0,0,2">
+                                                <TextBlock FontSize="11"
+                                                           FontWeight="Bold"
+                                                           Foreground="#4A7c44"
+                                                           Text="{Binding AuthorId}" />
+                                                <TextBlock HorizontalAlignment="Right"
+                                                           FontSize="9"
+                                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                                           Text="{Binding CreatedAt, StringFormat={}{0:MM/dd HH:mm}}" />
+                                            </Grid>
+                                            <Border Padding="10"
+                                                    Background="White"
+                                                    CornerRadius="0,12,12,12">
+                                                <TextBlock FontSize="12"
+                                                           LineHeight="16"
+                                                           Text="{Binding Content}"
+                                                           TextWrapping="Wrap" />
+                                            </Border>
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                    </ScrollViewer>
+
+                    <!-- コメント入力 -->
+                    <Border Grid.Row="2"
+                            Padding="0,12,0,0"
+                            BorderBrush="{DynamicResource OutlineBaseBrush}"
+                            BorderThickness="0,1,0,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox Height="44"
+                                     AcceptsReturn="True"
+                                     Style="{StaticResource OrganicTextBoxStyle}"
+                                     Tag="メッセージを送信..."
+                                     Text="{Binding NewCommentContent, UpdateSourceTrigger=PropertyChanged}" />
+                            <Button Grid.Column="1"
+                                    Margin="12,0,0,0"
+                                    Padding="16,0"
+                                    Background="#4A7c44"
+                                    Command="{Binding AddCommentCommand}"
+                                    Content="送信"
+                                    Foreground="White"
+                                    Style="{StaticResource RoundButtonStyle}" />
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Grid>
+
+            <!-- 右側: プロパティ サイドバー -->
+            <Border Grid.Column="1"
+                    Padding="16"
+                    Background="{DynamicResource SurfaceLayer1Brush}"
+                    BorderBrush="{DynamicResource OutlineBaseBrush}"
+                    BorderThickness="1,0,0,0">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="プロパティ" />
+
+                        <StackPanel Margin="0,0,0,16">
+                            <TextBlock Style="{StaticResource MetaLabelStyle}" Text="ステータス" />
+                            <controls:TaskStatusPicker SelectedStatus="{Binding Task.Status, Mode=TwoWay}" />
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,0,16">
+                            <TextBlock Style="{StaticResource MetaLabelStyle}" Text="優先度" />
+                            <ComboBox ItemsSource="{Binding Task.PriorityValues}" SelectedItem="{Binding Task.Priority, Mode=TwoWay}" />
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,0,16">
+                            <TextBlock Style="{StaticResource MetaLabelStyle}" Text="担当者" />
+                            <TextBlock FontSize="12"
+                                       FontWeight="Bold"
+                                       Text="{Binding Task.Assignee}" />
+                        </StackPanel>
+
+                        <Separator Margin="0,0,0,16" Background="{DynamicResource OutlineBaseBrush}" />
+
+                        <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="スケジュール" />
+                        <StackPanel Margin="0,0,0,12">
+                            <TextBlock Style="{StaticResource MetaLabelStyle}" Text="期限" />
+                            <DatePicker SelectedDate="{Binding Task.Deadline}" />
+                        </StackPanel>
+                        <StackPanel Margin="0,0,0,12">
+                            <TextBlock Style="{StaticResource MetaLabelStyle}" Text="実績開始" />
+                            <DatePicker SelectedDate="{Binding Task.ActualStartDate}" />
+                        </StackPanel>
+                        <StackPanel Margin="0,0,0,16">
+                            <TextBlock Style="{StaticResource MetaLabelStyle}" Text="実績終了" />
+                            <DatePicker SelectedDate="{Binding Task.ActualEndDate}" />
+                        </StackPanel>
+
+                        <Separator Margin="0,0,0,16" Background="{DynamicResource OutlineBaseBrush}" />
+
+                        <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="工数 (h)" />
+                        <controls:TaskCostEditor ActualCost="{Binding Task.ActualCost, Mode=TwoWay}" EstimatedCost="{Binding Task.EstimatedCost, Mode=TwoWay}" />
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <!-- アクション フッター -->
+        <Border Grid.Row="1"
+                Padding="24,12"
+                Background="{DynamicResource SurfaceLayer1Brush}"
+                BorderBrush="{DynamicResource OutlineBaseBrush}"
+                BorderThickness="0,1,0,0">
+            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                <Button Padding="20,6"
+                        Command="{Binding CloseCommand}"
+                        CommandParameter="True"
+                        Content="保存して閉じる"
+                        Style="{StaticResource RoundButtonStyle}" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

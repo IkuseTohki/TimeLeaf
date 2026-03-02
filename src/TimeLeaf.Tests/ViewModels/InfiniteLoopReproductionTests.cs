@@ -92,7 +92,6 @@ public class InfiniteLoopReproductionTests
         var tasksVM = new ProjectTasksViewModel(
             projectVM,
             addTaskUseCase,
-            addCommentUseCase,
             viewModelFactoryMock.Object,
             dialogServiceMock.Object,
             new Mock<ILogger<ProjectTasksViewModel>>().Object,
@@ -161,7 +160,6 @@ public class InfiniteLoopReproductionTests
         var tasksVM = new ProjectTasksViewModel(
             projectVM,
             addTaskUseCase,
-            addCommentUseCase,
             viewModelFactoryMock.Object,
             dialogServiceMock.Object,
             new Mock<ILogger<ProjectTasksViewModel>>().Object,

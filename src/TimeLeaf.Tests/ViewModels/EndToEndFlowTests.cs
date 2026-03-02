@@ -123,7 +123,6 @@ public class EndToEndFlowTests
         var tasksVM = new ProjectTasksViewModel(
             projectVM,
             addTaskUseCase,
-            addCommentUseCase,
             viewModelFactoryMock.Object,
             _dialogServiceMock.Object,
             new Mock<ILogger<ProjectTasksViewModel>>().Object,

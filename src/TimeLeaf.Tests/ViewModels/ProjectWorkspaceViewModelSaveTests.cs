@@ -76,7 +76,7 @@ public class ProjectWorkspaceViewModelSaveTests
         loadUseCaseMock.Setup(r => r.ExecuteAsync()).ReturnsAsync(new List<Project> { project });
 
         viewModelFactoryMock.Setup(x => x.CreateOverviewViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>()))
-            .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, addProjectUseCaseMock.Object, new Mock<LeafKit.UI.Services.IDialogService>().Object, viewModelFactoryMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
+            .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, addProjectUseCaseMock.Object, _dialogServiceMock.Object, viewModelFactoryMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
 
         var dispatcherMock = new Mock<IDispatcherService>();
         dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Action>())).Callback<Action>(a => a()).Returns(Task.CompletedTask);
@@ -91,18 +91,16 @@ public class ProjectWorkspaceViewModelSaveTests
 
         // MainViewModel から WorkspaceViewModel へ遷移したと仮定
         var addTaskUseCase = new AddTaskUseCase(saveUseCaseMock.Object);
-        var addCommentUseCase = new AddCommentUseCase(saveUseCaseMock.Object, _userServiceMock.Object);
-        var addMilestoneUseCase = new AddMilestoneUseCase(saveUseCaseMock.Object);
 
         var workspaceViewModel = new ProjectWorkspaceViewModel(projectViewModel, viewModelFactoryMock.Object, _workspaceLoggerMock.Object);
         var tasksViewModel = new ProjectTasksViewModel(
             projectViewModel,
             addTaskUseCase,
-            addCommentUseCase,
             viewModelFactoryMock.Object,
             _dialogServiceMock.Object,
             new Mock<ILogger<ProjectTasksViewModel>>().Object,
             new Mock<ILogger<TaskDetailViewModel>>().Object);
+
 
         viewModelFactoryMock.Setup(x => x.CreateProjectTasksViewModel(projectViewModel)).Returns(tasksViewModel);
         workspaceViewModel.SwitchSubViewCommand.Execute("Tasks");
@@ -148,7 +146,7 @@ public class ProjectWorkspaceViewModelSaveTests
         loadUseCaseMock.Setup(r => r.ExecuteAsync()).ReturnsAsync(new List<Project> { project });
 
         viewModelFactoryMock.Setup(x => x.CreateOverviewViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>()))
-            .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, addProjectUseCaseMock.Object, new Mock<LeafKit.UI.Services.IDialogService>().Object, viewModelFactoryMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
+            .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, addProjectUseCaseMock.Object, _dialogServiceMock.Object, viewModelFactoryMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
 
         var dispatcherMock = new Mock<IDispatcherService>();
         dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Action>())).Callback<Action>(a => a()).Returns(Task.CompletedTask);
@@ -192,7 +190,7 @@ public class ProjectWorkspaceViewModelSaveTests
         loadUseCaseMock.Setup(r => r.ExecuteAsync()).ReturnsAsync(new List<Project> { project });
 
         viewModelFactoryMock.Setup(x => x.CreateOverviewViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>()))
-            .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, addProjectUseCaseMock.Object, new Mock<LeafKit.UI.Services.IDialogService>().Object, viewModelFactoryMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
+            .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, addProjectUseCaseMock.Object, _dialogServiceMock.Object, viewModelFactoryMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
 
         var dispatcherMock = new Mock<IDispatcherService>();
         dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Action>())).Callback<Action>(a => a()).Returns(Task.CompletedTask);
