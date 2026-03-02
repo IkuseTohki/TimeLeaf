@@ -29,8 +29,8 @@
     <!-- プロジェクト内で多用するオーガニックなボタンスタイル -->
     <Style x:Key="OrganicButtonStyle" TargetType="Button">
         <Setter Property="Padding" Value="12,6" />
-        <Setter Property="Background" Value="White" />
-        <Setter Property="BorderBrush" Value="#E0DDD5" />
+        <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
@@ -44,7 +44,7 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="#F3F0E9" />
+                            <Setter Property="Background" Value="{DynamicResource ButtonHoverBackgroundBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -54,9 +54,9 @@
 
     <!-- オーガニックなカード（Border）スタイル -->
     <Style x:Key="OrganicCardStyle" TargetType="Border">
-        <Setter Property="Background" Value="White" />
+        <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />
         <Setter Property="CornerRadius" Value="16" />
-        <Setter Property="BorderBrush" Value="#E0DDD5" />
+        <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Effect">
             <Setter.Value>
@@ -70,8 +70,8 @@
 
     <!-- オーガニックな入力欄（TextBox）スタイル -->
     <Style x:Key="OrganicTextBoxStyle" TargetType="TextBox">
-        <Setter Property="Background" Value="White" />
-        <Setter Property="BorderBrush" Value="#E0DDD5" />
+        <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="12,8" />
         <Style.Resources>
@@ -91,7 +91,7 @@
         <Setter Property="Margin" Value="8,4" />
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="#3D6A37" />
+                <Setter Property="Background" Value="{DynamicResource SidebarHoverBackgroundBrush}" />
                 <Setter Property="Foreground" Value="White" />
             </Trigger>
         </Style.Triggers>

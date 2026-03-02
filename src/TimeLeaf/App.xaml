@@ -9,7 +9,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <!-- LeafKit.UI Resources -->
-                <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/LightColors.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/ForestColors.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/ControlStyles.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/ComponentStyles.xaml" />
                 <!-- App Specific Resources -->

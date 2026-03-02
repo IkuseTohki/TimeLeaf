@@ -23,15 +23,15 @@
                     <TextBlock VerticalAlignment="Center"
                                FontSize="20"
                                FontWeight="Bold"
-                               Foreground="#2D5A27"
+                               Foreground="{DynamicResource TextPrimaryBrush}"
                                Text="作業の森" />
                     <Border Margin="24,0,0,0"
                             Padding="4"
-                            Background="#E8F0E6"
+                            Background="{DynamicResource SurfaceLayer1Brush}"
                             CornerRadius="20">
                         <StackPanel Orientation="Horizontal">
                             <Button Padding="16,6"
-                                    Background="White"
+                                    Background="{DynamicResource SurfaceBaseBrush}"
                                     BorderThickness="0"
                                     Content="リスト"
                                     Style="{StaticResource RoundButtonStyle}" />
@@ -39,7 +39,7 @@
                                     Background="Transparent"
                                     BorderThickness="0"
                                     Content="カンバン"
-                                    Foreground="#4A7c44"
+                                    Foreground="{DynamicResource BrandPrimaryHoverBrush}"
                                     Style="{StaticResource RoundButtonStyle}" />
                         </StackPanel>
                     </Border>
@@ -99,16 +99,16 @@
                                     Command="{Binding DataContext.SelectTaskCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                     CommandParameter="{Binding}">
                                 <Border Padding="24,16"
-                                        Background="White"
-                                        BorderBrush="#E0DDD5"
+                                        Background="{DynamicResource SurfaceBaseBrush}"
+                                        BorderBrush="{DynamicResource OutlineBaseBrush}"
                                         BorderThickness="1">
                                     <Border.Style>
                                         <Style TargetType="Border">
                                             <Setter Property="CornerRadius" Value="12,32,12,32" />
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                    <Setter Property="Background" Value="#E8F0E6" />
-                                                    <Setter Property="BorderBrush" Value="#4A7c44" />
+                                                    <Setter Property="Background" Value="{DynamicResource SurfaceLayer1Brush}" />
+                                                    <Setter Property="BorderBrush" Value="{DynamicResource BrandPrimaryHoverBrush}" />
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
@@ -142,7 +142,7 @@
                                         <Border Grid.Column="3"
                                                 Width="28"
                                                 Height="28"
-                                                Background="#DDD"
+                                                Background="{DynamicResource StateHoverBrush}"
                                                 CornerRadius="14">
                                             <TextBlock HorizontalAlignment="Center"
                                                        VerticalAlignment="Center"
@@ -162,8 +162,8 @@
         <!-- タスク詳細パネル (Drawer) -->
         <Border Grid.Column="1"
                 Width="450"
-                Background="White"
-                BorderBrush="#E0DDD5"
+                Background="{DynamicResource SurfaceBaseBrush}"
+                BorderBrush="{DynamicResource OutlineBaseBrush}"
                 BorderThickness="1,0,0,0"
                 CornerRadius="32,0,0,32"
                 Visibility="{Binding IsDetailVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
