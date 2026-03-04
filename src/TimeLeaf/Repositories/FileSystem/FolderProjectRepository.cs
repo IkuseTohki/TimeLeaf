@@ -152,27 +152,40 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
             return new Project { Id = projectId, CreatedAt = createdAt };
         }
 
-        var files = Directory.GetFiles(changesDir, "*.json")
-            .Select(f => new { Path = f, Meta = _fileNameGenerator.Parse(Path.GetFileName(f)) })
+        // 全ファイルを再帰的に取得し、タイムスタンプ順にソート
+        var files = Directory.GetFiles(changesDir, "*.json", SearchOption.AllDirectories)
+            .Select(f =>
+            {
+                var fileName = Path.GetFileName(f);
+                var meta = _fileNameGenerator.Parse(fileName);
+
+                // 親フォルダ名から EntityID を取得（直下なら ProjectID、サブフォルダなら TaskID）
+                var parentDirName = Path.GetFileName(Path.GetDirectoryName(f)!);
+                var entityId = Guid.TryParse(parentDirName, out var id) ? id : projectId;
+
+                return new { Path = f, Meta = meta, EntityId = entityId };
+            })
             .OrderBy(x => x.Meta.Timestamp)
-            .ThenBy(x => x.Meta.Guid)
             .ToList();
 
         _logger.LogDebug("Found {ChangeFileCount} change files for project {ProjectId}.", files.Count, projectId);
 
-        // 履歴がなくても、IDが分かっていればプロジェクトとして成立させる
         var project = new Project { Id = projectId, CreatedAt = createdAt };
         var allCommentData = new List<(CommentDto Dto, DateTime Timestamp)>();
+
+        // タスクを保持するための作業用辞書
+        var taskMap = new Dictionary<Guid, ProjectTask>();
 
         foreach (var file in files)
         {
             try
             {
-                _logger.LogDebug("Processing change file: {FileName} (Category: {Category})", Path.GetFileName(file.Path), file.Meta.Category);
-                var json = await File.ReadAllTextAsync(file.Path);
-                var cacheKey = GetCacheKey(projectId, file.Meta.Category);
+                _logger.LogDebug("Processing change file: {FileName} (Entity: {EntityId}, Category: {Category})",
+                    Path.GetFileName(file.Path), file.EntityId, file.Meta.Category);
 
-                // コメント以外は最新の状態を保持するためにキャッシュを更新
+                var json = await File.ReadAllTextAsync(file.Path);
+                var cacheKey = GetCacheKey(file.EntityId, file.Meta.Category);
+
                 if (file.Meta.Category != "Comment")
                 {
                     _lastSavedContent[cacheKey] = json;
@@ -180,62 +193,65 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
 
                 switch (file.Meta.Category)
                 {
-                    case "ProjectBasic":
+                    // --- Project カテゴリ ---
+                    case "Project_Basic":
                         var basic = _serializer.Deserialize<ProjectBasicDto>(json);
                         if (basic != null)
                         {
                             project.UpdateName(basic.Name);
-                            project.UpdateDescription(basic.Description);
                             project.UpdateStatus(basic.Status);
                             project.UpdateHealth(basic.HealthStatus);
-
-                            project.ClearMilestones();
-                            if (basic.Milestones != null)
-                            {
-                                foreach (var m in basic.Milestones)
-                                {
-                                    project.AddMilestone(new Milestone { Date = m.Date, Label = m.Label });
-                                }
-                            }
-                            _logger.LogTrace("Replayed ProjectBasic for {ProjectId}. Name: {Name}", projectId, project.Name);
                         }
                         break;
 
-                    case "ProjectTasks":
-                        var tasks = _serializer.Deserialize<List<ProjectTaskDto>>(json);
-                        if (tasks != null)
+                    case "Project_Description":
+                        var pDesc = _serializer.Deserialize<ProjectDescriptionDto>(json);
+                        if (pDesc != null) project.UpdateDescription(pDesc.Description);
+                        break;
+
+                    case "Project_Milestones":
+                        var pMilestones = _serializer.Deserialize<ProjectMilestonesDto>(json);
+                        if (pMilestones != null)
                         {
-                            // 既存のコメントを退避（スナップショットにはコメントが含まれないため、Replay済みのものを保持する）
-                            var commentMap = project.Tasks.ToDictionary(t => t.Id, t => t.Comments.ToList());
+                            project.ClearMilestones();
+                            foreach (var m in pMilestones.Milestones)
+                                project.AddMilestone(new Milestone { Date = m.Date, Label = m.Label });
+                        }
+                        break;
 
-                            project.ClearTasks();
-                            foreach (var t in tasks)
-                            {
-                                var newTask = new ProjectTask(
-                                    t.Id,
-                                    t.Name,
-                                    t.Description,
-                                    t.Status,
-                                    t.Priority,
-                                    t.ScheduledStartDate,
-                                    t.Deadline,
-                                    t.ActualStartDate,
-                                    t.ActualEndDate,
-                                    t.EstimatedCost,
-                                    t.ActualCost,
-                                    t.Assignee ?? string.Empty,
-                                    t.Dependencies ?? new(),
-                                    null // Comments will be loaded below
-                                );
+                    // --- Task カテゴリ ---
+                    case "Task_Planning":
+                        var planning = _serializer.Deserialize<TaskPlanningDto>(json);
+                        if (planning != null)
+                        {
+                            var task = GetOrCreateTask(project, taskMap, planning.Id);
+                            task.UpdateName(planning.Name);
+                            task.UpdatePriority(planning.Priority);
+                            task.UpdateSchedule(planning.ScheduledStartDate, planning.Deadline);
+                            task.UpdateEstimatedCost(planning.EstimatedCost);
+                            task.AssignTo(planning.Assignee);
+                            task.Dependencies.Clear();
+                            if (planning.Dependencies != null) task.Dependencies.AddRange(planning.Dependencies);
+                        }
+                        break;
 
-                                if (commentMap.TryGetValue(newTask.Id, out var existingComments))
-                                {
-                                    newTask.LoadComments(existingComments);
-                                }
+                    case "Task_Progress":
+                        var progress = _serializer.Deserialize<TaskProgressDto>(json);
+                        if (progress != null)
+                        {
+                            var task = GetOrCreateTask(project, taskMap, progress.Id);
+                            task.UpdateStatus(progress.Status);
+                            task.UpdateActualDates(progress.ActualStartDate, progress.ActualEndDate);
+                            task.UpdateActualCost(progress.ActualCost);
+                        }
+                        break;
 
-                                project.AddTask(newTask);
-                            }
-                            _logger.LogTrace("Replayed {TaskCount} tasks for ProjectTasks for {ProjectId}.", tasks.Count, projectId);
+                    case "Task_Description":
+                        var tDesc = _serializer.Deserialize<TaskDescriptionDto>(json);
+                        if (tDesc != null)
+                        {
+                            var task = GetOrCreateTask(project, taskMap, tDesc.Id);
+                            task.UpdateDescription(tDesc.Description);
                         }
                         break;
 
@@ -244,14 +260,10 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                         if (commentDto != null)
                         {
                             allCommentData.Add((commentDto, file.Meta.Timestamp));
-                            _lastSavedContent[GetCacheKey(projectId, $"Comment_{commentDto.Id}")] = json;
+                            _lastSavedContent[GetCacheKey(commentDto.Id, "Comment")] = json;
                         }
                         break;
                 }
-            }
-            catch (IOException ioEx)
-            {
-                _logger.LogWarning(ioEx, "IOException while processing file {FileName} for project {ProjectId}. Skipping.", Path.GetFileName(file.Path), projectId);
             }
             catch (Exception ex)
             {
@@ -259,12 +271,11 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
             }
         }
 
-        // コメントをタスクに紐付け
+        // コメントの紐付け
         foreach (var entry in allCommentData)
         {
             var dto = entry.Dto;
-            var targetTask = project.Tasks.FirstOrDefault(t => t.Id == dto.TaskId);
-            if (targetTask != null)
+            if (taskMap.TryGetValue(dto.TaskId, out var targetTask))
             {
                 if (!targetTask.Comments.Any(c => c.Id == dto.Id))
                 {
@@ -288,6 +299,16 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         }
 
         return project;
+    }
+
+    private ProjectTask GetOrCreateTask(Project project, Dictionary<Guid, ProjectTask> map, Guid taskId)
+    {
+        if (map.TryGetValue(taskId, out var task)) return task;
+
+        var newTask = new ProjectTask { Id = taskId };
+        project.AddTask(newTask);
+        map[taskId] = newTask;
+        return newTask;
     }
 
     public async System.Threading.Tasks.Task SaveAllAsync(IEnumerable<Project> projects, string userId)
@@ -316,38 +337,45 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
             var changesDir = Path.Combine(projectDir, "changes");
             var commitTime = DateTime.UtcNow;
 
-            // 1. ProjectBasic Snapshot
-            var basicSnapshot = new ProjectBasicDto(
-                project.Name,
-                project.Description,
-                project.Status,
-                project.HealthStatus,
-                project.Milestones.Select(m => new MilestoneDto(m.Date, m.Label)).ToList());
-            await TrySaveCategoryAsync(project.Id, changesDir, "ProjectBasic", basicSnapshot, commitTime, userId);
+            // 1. プロジェクト情報の保存 (3カテゴリ)
+            var basicSnapshot = new ProjectBasicDto(project.Name, project.Status, project.HealthStatus);
+            await TrySaveCategoryAsync(project.Id, changesDir, "Project_Basic", basicSnapshot, commitTime, userId);
 
-            // 2. ProjectTasks Snapshot
-            var tasksSnapshot = project.Tasks.Select(t => new ProjectTaskDto(
-                t.Id,
-                t.Name,
-                t.Description,
-                t.Status,
-                t.Priority,
-                t.ScheduledStartDate,
-                t.Deadline,
-                t.ActualStartDate,
-                t.ActualEndDate,
-                t.EstimatedCost,
-                t.ActualCost,
-                t.Assignee,
-                t.Dependencies)).ToList();
-            await TrySaveCategoryAsync(project.Id, changesDir, "ProjectTasks", tasksSnapshot, commitTime, userId);
+            var descSnapshot = new ProjectDescriptionDto(project.Description);
+            await TrySaveCategoryAsync(project.Id, changesDir, "Project_Description", descSnapshot, commitTime, userId);
 
-            // 3. Comments (Incremental)
-            foreach (var t in project.Tasks)
+            var milestoneSnapshot = new ProjectMilestonesDto(project.Milestones.Select(m => new MilestoneDto(m.Date, m.Label)).ToList());
+            await TrySaveCategoryAsync(project.Id, changesDir, "Project_Milestones", milestoneSnapshot, commitTime, userId);
+
+            // 2. タスク情報の保存 (各タスク 3カテゴリ)
+            foreach (var task in project.Tasks)
             {
-                foreach (var c in t.Comments)
+                var planning = new TaskPlanningDto(
+                    task.Id,
+                    task.Name,
+                    task.Priority,
+                    task.ScheduledStartDate,
+                    task.Deadline,
+                    task.EstimatedCost,
+                    task.Assignee,
+                    task.Dependencies.ToList());
+                await TrySaveCategoryAsync(task.Id, changesDir, "Task_Planning", planning, commitTime, userId, isTask: true);
+
+                var progress = new TaskProgressDto(
+                    task.Id,
+                    task.Status,
+                    task.ActualStartDate,
+                    task.ActualEndDate,
+                    task.ActualCost);
+                await TrySaveCategoryAsync(task.Id, changesDir, "Task_Progress", progress, commitTime, userId, isTask: true);
+
+                var taskDesc = new TaskDescriptionDto(task.Id, task.Description);
+                await TrySaveCategoryAsync(task.Id, changesDir, "Task_Description", taskDesc, commitTime, userId, isTask: true);
+
+                // 3. コメントの保存 (各コメント 1ファイル)
+                foreach (var comment in task.Comments)
                 {
-                    await TrySaveCommentAsync(project.Id, changesDir, c, userId);
+                    await TrySaveCommentAsync(project.Id, task.Id, changesDir, comment, userId);
                 }
             }
 
@@ -360,19 +388,21 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         }
     }
 
-    private async System.Threading.Tasks.Task TrySaveCommentAsync(Guid projectId, string changesDir, Comment comment, string userId)
+    private async System.Threading.Tasks.Task TrySaveCommentAsync(Guid projectId, Guid taskId, string changesDir, Comment comment, string userId)
     {
         var category = "Comment";
-        var cacheKey = GetCacheKey(projectId, $"{category}_{comment.Id}");
+        var cacheKey = GetCacheKey(taskId, $"{category}_{comment.Id}");
 
         if (_lastSavedContent.ContainsKey(cacheKey)) return;
 
-        if (!Directory.Exists(changesDir)) Directory.CreateDirectory(changesDir);
+        // タスクIDごとのサブフォルダを作成
+        var taskDir = Path.Combine(changesDir, taskId.ToString());
+        if (!Directory.Exists(taskDir)) Directory.CreateDirectory(taskDir);
 
         var commentDto = new CommentDto(comment.Id, comment.TaskId, comment.AuthorId, comment.Content, comment.AttachmentLinks);
         var json = _serializer.Serialize(commentDto);
-        var fileName = _fileNameGenerator.Generate(comment.CreatedAt, userId, comment.Id, category);
-        var fullPath = Path.Combine(changesDir, fileName);
+        var fileName = _fileNameGenerator.Generate(comment.CreatedAt, userId, category);
+        var fullPath = Path.Combine(taskDir, fileName);
 
         _monitor.MarkFileAsJustWritten(fileName);
 
@@ -388,17 +418,19 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         }
     }
 
-    private async System.Threading.Tasks.Task TrySaveCategoryAsync(Guid projectId, string changesDir, string category, object data, DateTime timestamp, string userId)
+    private async System.Threading.Tasks.Task TrySaveCategoryAsync(Guid entityId, string changesDir, string category, object data, DateTime timestamp, string userId, bool isTask = false)
     {
         var json = _serializer.Serialize(data);
-        var cacheKey = GetCacheKey(projectId, category);
+        var cacheKey = GetCacheKey(entityId, category);
 
         if (_lastSavedContent.TryGetValue(cacheKey, out var lastJson) && lastJson == json) return;
 
-        if (!Directory.Exists(changesDir)) Directory.CreateDirectory(changesDir);
+        // 出力先の決定（タスクならサブフォルダ、プロジェクトなら直下）
+        var targetDir = isTask ? Path.Combine(changesDir, entityId.ToString()) : changesDir;
+        if (!Directory.Exists(targetDir)) Directory.CreateDirectory(targetDir);
 
-        var fileName = _fileNameGenerator.Generate(timestamp, userId, Guid.NewGuid(), category);
-        var fullPath = Path.Combine(changesDir, fileName);
+        var fileName = _fileNameGenerator.Generate(timestamp, userId, category);
+        var fullPath = Path.Combine(targetDir, fileName);
         _monitor.MarkFileAsJustWritten(fileName);
 
         try
@@ -408,7 +440,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error saving category {Category} for project {ProjectId} to {FileName}.", category, projectId, fileName);
+            _logger.LogError(ex, "Error saving category {Category} for entity {EntityId} to {FileName}.", category, entityId, fileName);
             throw;
         }
     }

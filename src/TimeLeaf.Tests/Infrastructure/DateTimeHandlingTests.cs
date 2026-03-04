@@ -31,7 +31,7 @@ public class DateTimeHandlingTests
         var userId = "user1";
         var guid = Guid.NewGuid();
         var category = "ProjectBasic";
-        var fileName = _generator.Generate(localTime, userId, guid, category);
+        var fileName = _generator.Generate(localTime, userId, category);
 
         // パース
         var parsed = _generator.Parse(fileName);
@@ -54,7 +54,7 @@ public class DateTimeHandlingTests
         var category = "Category";
 
         // Act
-        var fileName = _generator.Generate(timestamp, userId, guid, category);
+        var fileName = _generator.Generate(timestamp, userId, category);
         var parsed = _generator.Parse(fileName);
 
         // Assert
@@ -68,8 +68,8 @@ public class DateTimeHandlingTests
         var t1 = new DateTime(2025, 12, 31, 23, 59, 59, 999, DateTimeKind.Utc);
         var t2 = new DateTime(2026, 01, 01, 00, 00, 00, 001, DateTimeKind.Utc);
 
-        var f1 = _generator.Generate(t1, "u", Guid.NewGuid(), "C");
-        var f2 = _generator.Generate(t2, "u", Guid.NewGuid(), "C");
+        var f1 = _generator.Generate(t1, "u", "C");
+        var f2 = _generator.Generate(t2, "u", "C");
 
         // Act
         var sorted = new[] { f2, f1 }.OrderBy(x => x).ToList();

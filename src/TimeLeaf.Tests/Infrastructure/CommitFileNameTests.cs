@@ -13,7 +13,7 @@ public class CommitFileNameTests
 
     /// <summary>
     /// テスト観点: 各要素から、仕様書(ADR-0001)に準拠したファイル名が生成されることを確認する。
-    /// 命名規則: {yyyyMMdd_HHmmss_fff}_{UserID}_{GUID}_{Category}.json
+    /// 命名規則: {yyyyMMdd}_{HHmmss}_{fff}_{UserID}_{Category}.json
     /// </summary>
     [TestMethod]
     public void Generate_ShouldReturnCorrectFormat()
@@ -22,14 +22,13 @@ public class CommitFileNameTests
         // UTCとして明示的に作成
         var timestamp = new DateTime(2026, 2, 21, 15, 30, 45, 123, DateTimeKind.Utc);
         var userId = "kiddy";
-        var guid = Guid.Parse("12345678-1234-1234-1234-1234567890ab");
-        var category = "TaskBasic";
+        var category = "Task_Planning";
 
         // Act
-        string fileName = _generator.Generate(timestamp, userId, guid, category);
+        string fileName = _generator.Generate(timestamp, userId, category);
 
         // Assert
-        Assert.AreEqual("20260221_153045_123_kiddy_123456781234123412341234567890ab_TaskBasic.json", fileName);
+        Assert.AreEqual("20260221_153045_123_kiddy_Task_Planning.json", fileName);
     }
 
     /// <summary>
@@ -39,7 +38,7 @@ public class CommitFileNameTests
     public void Parse_ShouldReturnCorrectAttributes()
     {
         // Arrange
-        var fileName = "20260221_153045_123_kiddy_123456781234123412341234567890ab_TaskBasic.json";
+        var fileName = "20260221_153045_123_kiddy_Task_Planning.json";
 
         // Act
         var result = _generator.Parse(fileName);
@@ -48,8 +47,7 @@ public class CommitFileNameTests
         // Parse は常に Kind=Utc で返す
         Assert.AreEqual(new DateTime(2026, 2, 21, 15, 30, 45, 123, DateTimeKind.Utc), result.Timestamp);
         Assert.AreEqual("kiddy", result.UserId);
-        Assert.AreEqual(Guid.Parse("12345678-1234-1234-1234-1234567890ab"), result.Guid);
-        Assert.AreEqual("TaskBasic", result.Category);
+        Assert.AreEqual("Task_Planning", result.Category);
     }
 
     /// <summary>
@@ -62,9 +60,9 @@ public class CommitFileNameTests
         var baseTime = new DateTime(2026, 2, 21, 10, 0, 0, DateTimeKind.Utc);
         var list = new List<string>
         {
-            _generator.Generate(baseTime.AddMilliseconds(200), "user1", Guid.NewGuid(), "Cat"),
-            _generator.Generate(baseTime.AddMilliseconds(100), "user1", Guid.NewGuid(), "Cat"),
-            _generator.Generate(baseTime.AddMilliseconds(150), "user1", Guid.NewGuid(), "Cat")
+            _generator.Generate(baseTime.AddMilliseconds(200), "user1", "Cat"),
+            _generator.Generate(baseTime.AddMilliseconds(100), "user1", "Cat"),
+            _generator.Generate(baseTime.AddMilliseconds(150), "user1", "Cat")
         };
 
         // Act

@@ -49,15 +49,18 @@ public class FolderProjectRepositoryTests
     }
 
     /// <summary>
-    /// テスト観点: プロジェクトを保存した際、仕様書通りのフォルダ構造とファイルが生成されることを確認する。
+    /// テスト観点: プロジェクトを保存した際、仕様書通りのハイブリッドフォルダ構造（プロジェクトは直下、タスクはサブフォルダ）とファイルが生成されることを確認する。
     /// </summary>
     [TestMethod]
-    public async System.Threading.Tasks.Task SaveAllAsync_ShouldCreateCorrectFolderStructure()
+    public async System.Threading.Tasks.Task SaveAllAsync_ShouldCreateCorrectHybridFolderStructure()
     {
         // Arrange
         var repository = CreateRepository();
         var project = new Project();
         project.UpdateName("StructureTest");
+        var task = new ProjectTask();
+        task.UpdateName("SubFolderTask");
+        project.AddTask(task);
         var projects = new List<Project> { project };
 
         // Act
@@ -72,20 +75,25 @@ public class FolderProjectRepositoryTests
         var changesDir = Path.Combine(expectedProjectDir, "changes");
         Assert.IsTrue(Directory.Exists(changesDir), "changes フォルダが作成されること");
 
-        // 3. 履歴ファイルの存在確認
-        var files = Directory.GetFiles(changesDir);
-        Assert.IsTrue(files.Any(), "履歴ファイル(JSON)が出力されること");
+        // 3. プロジェクト基本情報（直下）の存在確認
+        var rootFiles = Directory.GetFiles(changesDir);
+        var basicFile = rootFiles.FirstOrDefault(f => f.Contains("Project_Basic"));
+        Assert.IsNotNull(basicFile, "Project_Basic ファイルが changes 直下に出力されていること");
 
-        var basicFile = files.FirstOrDefault(f => f.Contains("ProjectBasic"));
-        Assert.IsNotNull(basicFile, "ProjectBasic ファイルが出力されていること");
-        var generator = new DefaultCommitFileNameGenerator();
-        var commitFile = generator.Parse(Path.GetFileName(basicFile));
-        Assert.AreEqual("test-user", commitFile.UserId);
-        Assert.AreEqual("ProjectBasic", commitFile.Category);
+        // ファイル名形式の確認: yyyyMMdd_HHmmss_fff_{UserID}_{Category}.json
+        var fileName = Path.GetFileName(basicFile);
+        var parts = fileName.Split('_');
+        Assert.IsTrue(parts.Length >= 5, "ファイル名は少なくとも5つのパーツ（日付, 時刻, ミリ秒, ユーザーID, カテゴリ...）で構成されること");
+        Assert.AreEqual("test-user", parts[3]);
+        Assert.IsTrue(parts[4].StartsWith("Project"), "5番目以降のパーツはカテゴリ名であること");
 
-        // 4. 内容の確認
-        var json = File.ReadAllText(basicFile);
-        StringAssert.Contains(json, "StructureTest", "プロジェクト名がJSONに含まれていること");
+        // 4. タスク情報（サブフォルダ）の存在確認
+        var taskDir = Path.Combine(changesDir, task.Id.ToString());
+        Assert.IsTrue(Directory.Exists(taskDir), "タスクIDのサブフォルダが作成されること");
+
+        var taskFiles = Directory.GetFiles(taskDir);
+        Assert.IsTrue(taskFiles.Any(f => f.Contains("Task_Planning")), "Task_Planning ファイルがタスクサブフォルダ内に出力されていること");
+        Assert.IsTrue(taskFiles.Any(f => f.Contains("Task_Progress")), "Task_Progress ファイルがタスクサブフォルダ内に出力されていること");
     }
 
     /// <summary>

@@ -80,7 +80,7 @@ public class CommentStorageTests
         // 物理ファイルの確認
         var projectDir = Path.Combine(_tempDir, $"{project.Id}_{project.Name}");
         var changesDir = Path.Combine(projectDir, "changes");
-        var files = Directory.GetFiles(changesDir, "*_Comment.json");
+        var files = Directory.GetFiles(changesDir, "*_Comment.json", SearchOption.AllDirectories);
         Assert.AreEqual(1, files.Length, "コメントファイルが1つ出力されていること");
     }
 
@@ -118,7 +118,7 @@ public class CommentStorageTests
         // 物理ファイルの確認
         var projectDir = Path.Combine(_tempDir, $"{project.Id}_{project.Name}");
         var changesDir = Path.Combine(projectDir, "changes");
-        var files = Directory.GetFiles(changesDir, "*_Comment.json");
+        var files = Directory.GetFiles(changesDir, "*_Comment.json", SearchOption.AllDirectories);
         Assert.AreEqual(2, files.Length, "コメントファイルが2つ独立して出力されていること");
     }
 }

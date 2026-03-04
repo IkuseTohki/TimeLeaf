@@ -59,14 +59,14 @@ public class FolderProjectRepositoryReplayTests
         await File.WriteAllTextAsync(metaFile,
             JsonSerializer.Serialize(new { ProjectId = projectId, CreatedAt = baseTime, SchemaVersion = 1 }));
         // 1. 古い変更 (Name = "Old Name")
-        var oldFile = new DefaultCommitFileNameGenerator().Generate(baseTime, "user1", Guid.NewGuid(), "ProjectBasic");
+        var oldFile = new DefaultCommitFileNameGenerator().Generate(baseTime, "user1", "Project_Basic");
         await File.WriteAllTextAsync(Path.Combine(changesDir, oldFile),
-            JsonSerializer.Serialize(new { Name = "Old Name" }));
+            JsonSerializer.Serialize(new { Name = "Old Name", Status = "Initial", HealthStatus = "Healthy" }));
 
         // 2. 新しい変更 (Name = "New Name")
-        var newFile = new DefaultCommitFileNameGenerator().Generate(baseTime.AddSeconds(1), "user1", Guid.NewGuid(), "ProjectBasic");
+        var newFile = new DefaultCommitFileNameGenerator().Generate(baseTime.AddSeconds(1), "user1", "Project_Basic");
         await File.WriteAllTextAsync(Path.Combine(changesDir, newFile),
-            JsonSerializer.Serialize(new { Name = "New Name" }));
+            JsonSerializer.Serialize(new { Name = "New Name", Status = "Initial", HealthStatus = "Healthy" }));
         var serializer = new JsonProjectFileSystemSerializer();
         var generator = new DefaultCommitFileNameGenerator();
         var monitor = new FileSystemProjectStorageMonitor(_tempDir, new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object);
@@ -98,9 +98,13 @@ public class FolderProjectRepositoryReplayTests
         await File.WriteAllTextAsync(metaFile,
             JsonSerializer.Serialize(new { ProjectId = projectId, CreatedAt = baseTime, SchemaVersion = 1 }));
 
-        var commitFile = new DefaultCommitFileNameGenerator().Generate(baseTime.AddSeconds(1), "user1", Guid.NewGuid(), "ProjectBasic");
-        await File.WriteAllTextAsync(Path.Combine(changesDir, commitFile),
-            JsonSerializer.Serialize(new { Name = "Desc Test Project", Description = "Test Description" }));
+        var basicFile = new DefaultCommitFileNameGenerator().Generate(baseTime.AddSeconds(1), "user1", "Project_Basic");
+        await File.WriteAllTextAsync(Path.Combine(changesDir, basicFile),
+            JsonSerializer.Serialize(new { Name = "Desc Test Project", Status = "InProgress", HealthStatus = "Healthy" }));
+
+        var descFile = new DefaultCommitFileNameGenerator().Generate(baseTime.AddSeconds(2), "user1", "Project_Description");
+        await File.WriteAllTextAsync(Path.Combine(changesDir, descFile),
+            JsonSerializer.Serialize(new { Description = "Test Description" }));
 
         var serializer = new JsonProjectFileSystemSerializer();
         var generator = new DefaultCommitFileNameGenerator();
