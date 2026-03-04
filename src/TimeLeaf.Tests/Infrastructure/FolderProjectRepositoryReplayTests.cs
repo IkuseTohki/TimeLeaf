@@ -173,7 +173,7 @@ public class FolderProjectRepositoryReplayTests
         Assert.IsNotNull(project);
         Assert.AreEqual("Complex Project", project.Name);
         Assert.AreEqual(1, project.Tasks.Count);
-        
+
         var task = project.Tasks.First();
         Assert.AreEqual("Task 1", task.Name);
         Assert.AreEqual(TimeLeaf.Models.Enums.TaskStatus.InProgress, task.Status);
