@@ -37,14 +37,14 @@
                 BorderBrush="#E0DDD5"
                 BorderThickness="1"
                 CornerRadius="8">
-            <TextBox x:Name="ErrorDetailText"
-                     Margin="12"
+            <TextBox Margin="12"
                      AcceptsReturn="True"
                      Background="Transparent"
                      BorderThickness="0"
                      FontFamily="Consolas, Meiryo"
                      FontSize="12"
                      IsReadOnly="True"
+                     Text="{Binding ErrorDetail, Mode=OneWay}"
                      TextWrapping="Wrap"
                      VerticalScrollBarVisibility="Auto" />
         </Border>
@@ -56,7 +56,7 @@
             <Button Margin="0,0,12,0"
                     Padding="16,8"
                     Background="#4A7c44"
-                    Click="CopyButton_Click"
+                    Command="{Binding CopyErrorDetailCommand}"
                     Content="エラー内容をコピー"
                     FontWeight="Bold"
                     Foreground="White">

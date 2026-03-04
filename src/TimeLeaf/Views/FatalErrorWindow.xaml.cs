@@ -1,5 +1,5 @@
-using System;
 using System.Windows;
+using TimeLeaf.ViewModels;
 
 namespace TimeLeaf.Views;
 
@@ -11,20 +11,7 @@ public partial class FatalErrorWindow : Window
     public FatalErrorWindow(string errorDetail)
     {
         InitializeComponent();
-        ErrorDetailText.Text = errorDetail;
-    }
-
-    private void CopyButton_Click(object sender, RoutedEventArgs e)
-    {
-        try
-        {
-            Clipboard.SetText(ErrorDetailText.Text);
-            MessageBox.Show("エラー内容をクリップボードにコピーしました。", "コピー完了", MessageBoxButton.OK, MessageBoxImage.Information);
-        }
-        catch
-        {
-            // クリップボード操作に失敗しても何もしない
-        }
+        DataContext = new FatalErrorViewModel { ErrorDetail = errorDetail };
     }
 
     private void CloseButton_Click(object sender, RoutedEventArgs e)

@@ -101,15 +101,6 @@ public class Project
     }
 
     /// <summary>
-    /// プロジェクトの概要を更新します。
-    /// </summary>
-    public void UpdateDescription(string description)
-    {
-        if (Description == description) return;
-        Description = description;
-    }
-
-    /// <summary>
     /// プロジェクトのステータスを更新します。
     /// </summary>
     public void UpdateStatus(ProjectStatus status)
@@ -125,6 +116,37 @@ public class Project
     {
         if (HealthStatus == health) return;
         HealthStatus = health;
+    }
+
+    /// <summary>
+    /// プロジェクトの基本情報を更新します。
+    /// </summary>
+    public void UpdateBasicInfo(string name, ProjectStatus status, ProjectHealth health)
+    {
+        UpdateName(name);
+        UpdateStatus(status);
+        UpdateHealth(health);
+    }
+
+    /// <summary>
+    /// マイルストーンを一括で再設定します（履歴再生用）。
+    /// </summary>
+    public void ReplayMilestones(IEnumerable<Milestone> milestones)
+    {
+        _milestones.Clear();
+        if (milestones != null)
+        {
+            _milestones.AddRange(milestones);
+        }
+    }
+
+    /// <summary>
+    /// プロジェクトの概要を更新します。
+    /// </summary>
+    public void UpdateDescription(string description)
+    {
+        if (Description == description) return;
+        Description = description;
     }
 
     /// <summary>
@@ -149,28 +171,20 @@ public class Project
     }
 
     /// <summary>
+    /// プロジェクトのタスクをすべてクリアします（再ロード用）。
+    /// </summary>
+    public void ClearTasks()
+    {
+        _tasks.Clear();
+    }
+
+    /// <summary>
     /// プロジェクトにマイルストーンを追加します。
     /// </summary>
     public void AddMilestone(Milestone milestone)
     {
         if (milestone == null) throw new ArgumentNullException(nameof(milestone));
         _milestones.Add(milestone);
-    }
-
-    /// <summary>
-    /// プロジェクトのマイルストーンをすべてクリアします（再ロード用）。
-    /// </summary>
-    public void ClearMilestones()
-    {
-        _milestones.Clear();
-    }
-
-    /// <summary>
-    /// プロジェクトのタスクをすべてクリアします（再ロード用）。
-    /// </summary>
-    public void ClearTasks()
-    {
-        _tasks.Clear();
     }
 
     /// <summary>

@@ -254,7 +254,6 @@ public class ProjectViewModelTests
         project.ClearTasks();
         projectViewModel.SyncFromModel();
 
-        // Assert
         Assert.AreEqual(0, project.Tasks.Count, "Modelのタスクがクリアされていること");
         Assert.AreEqual(0, projectViewModel.Tasks.Count, "Model.Clear() 後に ViewModel のタスクもクリアされていること");
     }
