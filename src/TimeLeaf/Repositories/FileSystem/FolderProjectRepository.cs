@@ -254,6 +254,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         try
         {
             await File.WriteAllTextAsync(fullPath, json);
+            File.SetAttributes(fullPath, File.GetAttributes(fullPath) | FileAttributes.ReadOnly);
             _lastSavedContent[cacheKey] = json;
         }
         catch (Exception ex)
@@ -281,6 +282,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         try
         {
             await File.WriteAllTextAsync(fullPath, json);
+            File.SetAttributes(fullPath, File.GetAttributes(fullPath) | FileAttributes.ReadOnly);
             _lastSavedContent[cacheKey] = json;
         }
         catch (Exception ex)

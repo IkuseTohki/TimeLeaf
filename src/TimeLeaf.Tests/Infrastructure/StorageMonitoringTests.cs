@@ -30,7 +30,14 @@ public class StorageMonitoringTests
     [TestCleanup]
     public void Cleanup()
     {
-        if (Directory.Exists(_tempDir)) Directory.Delete(_tempDir, true);
+        if (Directory.Exists(_tempDir))
+        {
+            foreach (var file in Directory.GetFiles(_tempDir, "*", SearchOption.AllDirectories))
+            {
+                File.SetAttributes(file, FileAttributes.Normal);
+            }
+            Directory.Delete(_tempDir, true);
+        }
     }
 
     /// <summary>

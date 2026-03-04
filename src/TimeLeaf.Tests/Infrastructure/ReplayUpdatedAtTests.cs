@@ -28,12 +28,17 @@ public class ReplayUpdatedAtTests
         var monitor = new FileSystemProjectStorageMonitor(_tempDir, new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object);
         _repository = new FolderProjectRepository(_tempDir, monitor, serializer, generator, loggerMock.Object);
     }
-
     [TestCleanup]
     public void Cleanup()
     {
         if (Directory.Exists(_tempDir))
+        {
+            foreach (var file in Directory.GetFiles(_tempDir, "*", SearchOption.AllDirectories))
+            {
+                File.SetAttributes(file, FileAttributes.Normal);
+            }
             Directory.Delete(_tempDir, true);
+        }
     }
 
     /// <summary>

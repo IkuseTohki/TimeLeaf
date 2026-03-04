@@ -44,6 +44,11 @@ public class FolderProjectRepositoryTests
     {
         if (Directory.Exists(_tempDir))
         {
+            // 読み取り専用属性がついていると削除に失敗するため、全ファイルの属性を解除する
+            foreach (var file in Directory.GetFiles(_tempDir, "*", SearchOption.AllDirectories))
+            {
+                File.SetAttributes(file, FileAttributes.Normal);
+            }
             Directory.Delete(_tempDir, true);
         }
     }
@@ -94,6 +99,33 @@ public class FolderProjectRepositoryTests
         var taskFiles = Directory.GetFiles(taskDir);
         Assert.IsTrue(taskFiles.Any(f => f.Contains("Task_Planning")), "Task_Planning ファイルがタスクサブフォルダ内に出力されていること");
         Assert.IsTrue(taskFiles.Any(f => f.Contains("Task_Progress")), "Task_Progress ファイルがタスクサブフォルダ内に出力されていること");
+    }
+
+    /// <summary>
+    /// テスト観点: 保存された履歴ファイル（JSON）に、OSレベルの読み取り専用属性が付与されていることを確認する。
+    /// </summary>
+    [TestMethod]
+    public async System.Threading.Tasks.Task SaveAsync_ShouldSetReadOnlyAttribute()
+    {
+        // Arrange
+        var repository = CreateRepository();
+        var project = new Project();
+        project.UpdateBasicInfo("ReadOnlyTest", ProjectStatus.InProgress, ProjectHealth.Healthy);
+
+        // Act
+        await repository.SaveAsync(project, "test-user");
+
+        // Assert
+        var projectDir = Path.Combine(_tempDir, $"{project.Id}_{project.Name}");
+        var changesDir = Path.Combine(projectDir, "changes");
+        var files = Directory.GetFiles(changesDir, "*.json", SearchOption.AllDirectories);
+
+        Assert.IsTrue(files.Length > 0, "ファイルが出力されていること");
+        foreach (var file in files)
+        {
+            var attributes = File.GetAttributes(file);
+            Assert.IsTrue(attributes.HasFlag(FileAttributes.ReadOnly), $"ファイル {Path.GetFileName(file)} が読み取り専用属性を持っていること");
+        }
     }
 
     /// <summary>
