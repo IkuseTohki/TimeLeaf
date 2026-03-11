@@ -42,6 +42,23 @@ public partial class MainViewModel : ObservableObject
     private int _unreadNotificationCount;
 
     /// <summary>
+    /// メインウィンドウが表示されているかどうか。
+    /// </summary>
+    [ObservableProperty]
+    private bool _isWindowVisible = true;
+
+    /// <summary>
+    /// アプリケーションを完全に終了してもよいかどうか。
+    /// false の場合はウィンドウを閉じる代わりに隠す挙動になります。
+    /// </summary>
+    public bool CanExit { get; private set; } = false;
+
+    /// <summary>
+    /// アプリケーションの終了が要求されたときに発生します。
+    /// </summary>
+    public event EventHandler? ExitRequested;
+
+    /// <summary>
     /// 全プロジェクトのリスト（メモリ内保持）。
     /// </summary>
     public ObservableCollection<ProjectViewModel> Projects { get; } = new();
@@ -93,6 +110,14 @@ public partial class MainViewModel : ObservableObject
             _osNotificationService.Show(n.Title, n.Message);
         };
         UpdateUnreadCount();
+
+        // トレイイベントの購読
+        _osNotificationService.RequestOpen += (s, e) => IsWindowVisible = true;
+        _osNotificationService.RequestExit += (s, e) =>
+        {
+            CanExit = true;
+            ExitRequested?.Invoke(this, EventArgs.Empty);
+        };
 
         // 自動保存の開始
         _saveCoordinator.StartMonitoring(Projects);

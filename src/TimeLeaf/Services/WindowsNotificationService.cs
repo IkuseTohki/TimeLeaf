@@ -14,6 +14,16 @@ public class WindowsNotificationService : IOSNotificationService, IDisposable
     private bool _isDisposed;
 
     /// <summary>
+    /// トレイアイコンからアプリケーションの表示が要求されたときに発生します。
+    /// </summary>
+    public event EventHandler? RequestOpen;
+
+    /// <summary>
+    /// トレイアイコンからアプリケーションの終了が要求されたときに発生します。
+    /// </summary>
+    public event EventHandler? RequestExit;
+
+    /// <summary>
     /// コンストラクタ。
     /// </summary>
     public WindowsNotificationService()
@@ -25,6 +35,17 @@ public class WindowsNotificationService : IOSNotificationService, IDisposable
             Visible = true,
             Text = "TimeLeaf"
         };
+
+        // ダブルクリックで開く
+        _notifyIcon.DoubleClick += (s, e) => RequestOpen?.Invoke(this, EventArgs.Empty);
+
+        // コンテキストメニューの作成
+        var contextMenu = new ContextMenuStrip();
+        contextMenu.Items.Add("TimeLeaf を開く", null, (s, e) => RequestOpen?.Invoke(this, EventArgs.Empty));
+        contextMenu.Items.Add(new ToolStripSeparator());
+        contextMenu.Items.Add("終了", null, (s, e) => RequestExit?.Invoke(this, EventArgs.Empty));
+
+        _notifyIcon.ContextMenuStrip = contextMenu;
     }
 
     /// <summary>
@@ -38,6 +59,16 @@ public class WindowsNotificationService : IOSNotificationService, IDisposable
 
         // 5000ミリ秒（5秒）表示
         _notifyIcon.ShowBalloonTip(5000, title, message, ToolTipIcon.Info);
+    }
+
+    /// <summary>
+    /// トレイアイコンの可視状態を設定します。
+    /// </summary>
+    /// <param name="isVisible">表示する場合は true。</param>
+    public void SetTrayVisible(bool isVisible)
+    {
+        if (_isDisposed) return;
+        _notifyIcon.Visible = isVisible;
     }
 
     /// <summary>

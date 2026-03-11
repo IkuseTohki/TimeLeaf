@@ -1,6 +1,7 @@
 using System.Windows;
 using LeafKit.UI.Services;
 using TimeLeaf.Services;
+using TimeLeaf.ViewModels;
 
 namespace TimeLeaf.Views;
 
@@ -13,5 +14,17 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         Snackbar.Initialize(snackbarService, dispatcherService);
+
+        this.Loaded += (s, e) =>
+        {
+            if (this.DataContext is MainViewModel viewModel)
+            {
+                // トレイメニューからの完全終了要求をハンドル
+                viewModel.ExitRequested += (sender, args) =>
+                {
+                    Application.Current.Shutdown();
+                };
+            }
+        };
     }
 }
