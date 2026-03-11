@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,6 +26,8 @@ public class CommentFlowTests
     private Mock<ICurrentUserService> _userServiceMock = null!;
     private Mock<IServiceProvider> _serviceProviderMock = null!;
     private Mock<IDialogService> _dialogServiceMock = null!;
+    private Mock<INotificationService> _notificationServiceMock = null!;
+    private Mock<IOSNotificationService> _osNotificationServiceMock = null!;
 
     [TestInitialize]
     public void Setup()
@@ -34,13 +37,16 @@ public class CommentFlowTests
         _userServiceMock.Setup(u => u.GetCurrentUserId()).Returns("test-user");
         _serviceProviderMock = new Mock<IServiceProvider>();
         _dialogServiceMock = new Mock<IDialogService>();
+        _notificationServiceMock = new Mock<INotificationService>();
+        _notificationServiceMock.Setup(x => x.UnreadNotifications).Returns(new List<Notification>());
+        _osNotificationServiceMock = new Mock<IOSNotificationService>();
 
         var loadUseCaseMock = new Mock<ILoadProjectsUseCase>();
         var findProjectUseCaseMock = new Mock<IFindProjectUseCase>();
         var syncServiceMock = new Mock<IProjectSyncService>();
         var addProjectUseCaseMock = new Mock<IAddProjectUseCase>();
         var viewModelFactoryMock = new Mock<IViewModelFactory>();
-        var logger = new Mock<ILogger<MainViewModel>>();
+        var loggerMock = new Mock<ILogger<MainViewModel>>();
 
         var project = new Project();
         project.UpdateName("Test Project");
@@ -58,12 +64,15 @@ public class CommentFlowTests
             .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, addProjectUseCaseMock.Object, _dialogServiceMock.Object, viewModelFactoryMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
 
         viewModelFactoryMock.Setup(x => x.CreateProjectWorkspaceViewModel(It.IsAny<ProjectViewModel>()))
-            .Returns((ProjectViewModel pvm) => new ProjectWorkspaceViewModel(pvm, viewModelFactoryMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object));
+            .Returns((ProjectViewModel pvm) => new ProjectWorkspaceViewModel(pvm, _notificationServiceMock.Object, viewModelFactoryMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object));
 
         var saveCoordinator = new ProjectSaveCoordinator(_saveUseCaseMock.Object, new Mock<ILogger<ProjectSaveCoordinator>>().Object);
         var dispatcherMock = new Mock<IDispatcherService>();
         dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Action>())).Callback<Action>(a => a()).Returns(Task.CompletedTask);
         dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Func<Task>>())).Returns<Func<Task>>(f => f());
+
+        var snackbarServiceMock = new Mock<ISnackbarService>();
+        var checkDeadlinesUseCaseMock = new Mock<ICheckTaskDeadlinesUseCase>();
 
         _mainViewModel = new MainViewModel(
             loadUseCaseMock.Object,
@@ -74,7 +83,11 @@ public class CommentFlowTests
             saveCoordinator,
             dispatcherMock.Object,
             viewModelFactoryMock.Object,
-            logger.Object);
+            _notificationServiceMock.Object,
+            snackbarServiceMock.Object,
+            _osNotificationServiceMock.Object,
+            checkDeadlinesUseCaseMock.Object,
+            loggerMock.Object);
     }
 
     /// <summary>
@@ -130,7 +143,7 @@ public class CommentFlowTests
         viewModelFactoryMock.Setup(x => x.CreateTaskSummaryViewModel(It.IsAny<ProjectTaskViewModel>()))
             .Returns((ProjectTaskViewModel tvm) => new TaskSummaryViewModel(tvm));
 
-        var workspaceViewModel = new ProjectWorkspaceViewModel(projectViewModel, viewModelFactoryMock.Object, loggerMock.Object);
+        var workspaceViewModel = new ProjectWorkspaceViewModel(projectViewModel, _notificationServiceMock.Object, viewModelFactoryMock.Object, loggerMock.Object);
         workspaceViewModel.SwitchSubViewCommand.Execute("Tasks");
 
         var targetTask = tasksVM.Tasks.First();

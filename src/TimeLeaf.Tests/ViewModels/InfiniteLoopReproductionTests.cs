@@ -13,6 +13,7 @@ using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
 using TimeLeaf.ViewModels.Workspace;
+using LeafKit.UI.Services;
 
 namespace TimeLeaf.Tests.ViewModels;
 
@@ -70,6 +71,12 @@ public class InfiniteLoopReproductionTests
             .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, addProjectUseCaseMock.Object, new Mock<LeafKit.UI.Services.IDialogService>().Object, viewModelFactoryMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
 
         var saveCoordinator = new ProjectSaveCoordinator(saveUseCaseMock.Object, new Mock<ILogger<ProjectSaveCoordinator>>().Object);
+        var notificationServiceMock = new Mock<INotificationService>();
+        notificationServiceMock.Setup(x => x.UnreadNotifications).Returns(new List<Notification>());
+        var snackbarServiceMock = new Mock<ISnackbarService>();
+        var osNotificationServiceMock = new Mock<IOSNotificationService>();
+        var checkDeadlinesUseCaseMock = new Mock<ICheckTaskDeadlinesUseCase>();
+
         var mainVM = new MainViewModel(
             loadUseCaseMock.Object,
             saveUseCaseMock.Object,
@@ -79,7 +86,12 @@ public class InfiniteLoopReproductionTests
             saveCoordinator,
             dispatcherMock.Object,
             viewModelFactoryMock.Object,
+            notificationServiceMock.Object,
+            snackbarServiceMock.Object,
+            osNotificationServiceMock.Object,
+            checkDeadlinesUseCaseMock.Object,
             _loggerMock.Object);
+
         await Task.Delay(100); // Wait for initialize
 
         var projectVM = mainVM.Projects.First();
@@ -87,7 +99,7 @@ public class InfiniteLoopReproductionTests
         var addCommentUseCase = new AddCommentUseCase(saveUseCaseMock.Object, _userServiceMock.Object);
         var addMilestoneUseCase = new AddMilestoneUseCase(saveUseCaseMock.Object);
 
-        var workspaceVM = new ProjectWorkspaceViewModel(projectVM, viewModelFactoryMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
+        var workspaceVM = new ProjectWorkspaceViewModel(projectVM, notificationServiceMock.Object, viewModelFactoryMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
         var dialogServiceMock = new Mock<LeafKit.UI.Services.IDialogService>();
         var tasksVM = new ProjectTasksViewModel(
             projectVM,
@@ -138,6 +150,12 @@ public class InfiniteLoopReproductionTests
             .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, addProjectUseCaseMock.Object, new Mock<LeafKit.UI.Services.IDialogService>().Object, viewModelFactoryMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
 
         var saveCoordinator = new ProjectSaveCoordinator(saveUseCaseMock.Object, new Mock<ILogger<ProjectSaveCoordinator>>().Object);
+        var notificationServiceMock = new Mock<INotificationService>();
+        notificationServiceMock.Setup(x => x.UnreadNotifications).Returns(new List<Notification>());
+        var snackbarServiceMock = new Mock<ISnackbarService>();
+        var osNotificationServiceMock = new Mock<IOSNotificationService>();
+        var checkDeadlinesUseCaseMock = new Mock<ICheckTaskDeadlinesUseCase>();
+
         var mainVM = new MainViewModel(
             loadUseCaseMock.Object,
             saveUseCaseMock.Object,
@@ -147,7 +165,12 @@ public class InfiniteLoopReproductionTests
             saveCoordinator,
             dispatcherMock.Object,
             viewModelFactoryMock.Object,
+            notificationServiceMock.Object,
+            snackbarServiceMock.Object,
+            osNotificationServiceMock.Object,
+            checkDeadlinesUseCaseMock.Object,
             _loggerMock.Object);
+
         await Task.Delay(100);
 
         var projectVM = mainVM.Projects.First();
@@ -155,7 +178,7 @@ public class InfiniteLoopReproductionTests
         var addCommentUseCase = new AddCommentUseCase(saveUseCaseMock.Object, _userServiceMock.Object);
         var addMilestoneUseCase = new AddMilestoneUseCase(saveUseCaseMock.Object);
 
-        var workspaceVM = new ProjectWorkspaceViewModel(projectVM, viewModelFactoryMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
+        var workspaceVM = new ProjectWorkspaceViewModel(projectVM, notificationServiceMock.Object, viewModelFactoryMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
         var dialogServiceMock = new Mock<LeafKit.UI.Services.IDialogService>();
         var tasksVM = new ProjectTasksViewModel(
             projectVM,

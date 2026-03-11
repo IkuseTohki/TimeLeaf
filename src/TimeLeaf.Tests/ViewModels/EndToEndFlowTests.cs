@@ -85,16 +85,30 @@ public class EndToEndFlowTests
         dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Action>())).Callback<Action>(a => a()).Returns(Task.CompletedTask);
         dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Func<Task>>())).Returns<Func<Task>>(f => f());
 
+        var notificationServiceMock = new Mock<INotificationService>();
+        notificationServiceMock.Setup(x => x.UnreadNotifications).Returns(new List<Notification>());
+        var snackbarServiceMock = new Mock<ISnackbarService>();
+        var osNotificationServiceMock = new Mock<IOSNotificationService>();
+        var checkDeadlinesUseCaseMock = new Mock<ICheckTaskDeadlinesUseCase>();
+
+        var loggerMock = new Mock<ILogger<MainViewModel>>();
+        var saveCoordinator = new ProjectSaveCoordinator(saveUseCaseMock.Object, new Mock<ILogger<ProjectSaveCoordinator>>().Object);
+
         var mainVM = new MainViewModel(
             loadUseCaseMock.Object,
             saveUseCaseMock.Object,
             findProjectUseCaseMock.Object,
             syncServiceMock.Object,
             addProjectUseCase,
-            new Mock<IProjectSaveCoordinator>().Object,
+            saveCoordinator,
             dispatcherMock.Object,
             viewModelFactoryMock.Object,
-            _mainLoggerMock.Object);
+            notificationServiceMock.Object,
+            snackbarServiceMock.Object,
+            osNotificationServiceMock.Object,
+            checkDeadlinesUseCaseMock.Object,
+            loggerMock.Object);
+
         await System.Threading.Tasks.Task.Delay(100);
 
         // 2. Add a new project (Overview -> Dialog -> UseCase -> MainVM.Projects)
@@ -119,7 +133,7 @@ public class EndToEndFlowTests
         var addCommentUseCase = new AddCommentUseCase(saveUseCaseMock.Object, new Mock<ICurrentUserService>().Object);
         var addMilestoneUseCase = new AddMilestoneUseCase(saveUseCaseMock.Object);
 
-        var workspaceVM = new ProjectWorkspaceViewModel(projectVM, viewModelFactoryMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
+        var workspaceVM = new ProjectWorkspaceViewModel(projectVM, notificationServiceMock.Object, viewModelFactoryMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
         var tasksVM = new ProjectTasksViewModel(
             projectVM,
             addTaskUseCase,

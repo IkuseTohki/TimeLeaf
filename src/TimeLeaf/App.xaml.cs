@@ -161,6 +161,9 @@ public partial class App : Application
 
         // アプリケーションサービスの登録
         services.AddSingleton<IProjectSyncService, ProjectSyncService>();
+        services.AddSingleton<INotificationService, NotificationService>();
+        services.AddSingleton<ISnackbarService, SnackbarService>();
+        services.AddSingleton<IOSNotificationService, WindowsNotificationService>();
         services.AddSingleton<IViewModelFactory, ViewModelFactory>();
 
         // ユースケースの登録
@@ -171,6 +174,7 @@ public partial class App : Application
         services.AddTransient<IAddTaskUseCase, AddTaskUseCase>();
         services.AddTransient<IAddCommentUseCase, AddCommentUseCase>();
         services.AddTransient<IAddMilestoneUseCase, AddMilestoneUseCase>();
+        services.AddTransient<ICheckTaskDeadlinesUseCase, CheckTaskDeadlinesUseCase>();
 
         // コーディネーターの登録
         services.AddSingleton<IProjectSaveCoordinator, ProjectSaveCoordinator>();

@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 using TimeLeaf.UseCases;
+using TimeLeaf.Services;
 using TimeLeaf.ViewModels.Workspace;
 
 namespace TimeLeaf.ViewModels;
@@ -14,6 +15,7 @@ namespace TimeLeaf.ViewModels;
 public partial class ProjectWorkspaceViewModel : ObservableObject
 {
     private readonly ProjectViewModel _projectViewModel;
+    private readonly INotificationService _notificationService;
     private readonly IViewModelFactory _viewModelFactory;
     private readonly ILogger<ProjectWorkspaceViewModel> _logger;
 
@@ -30,6 +32,12 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
     private bool _isSidebarExpanded = true;
 
     /// <summary>
+    /// 未読の通知件数。
+    /// </summary>
+    [ObservableProperty]
+    private int _unreadNotificationCount;
+
+    /// <summary>
     /// 管理対象プロジェクトの名称。
     /// </summary>
     public string ProjectName => _projectViewModel.Name;
@@ -44,17 +52,28 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
     /// </summary>
     public ProjectWorkspaceViewModel(
         ProjectViewModel projectViewModel,
+        INotificationService notificationService,
         IViewModelFactory viewModelFactory,
         ILogger<ProjectWorkspaceViewModel> logger)
     {
         _projectViewModel = projectViewModel ?? throw new ArgumentNullException(nameof(projectViewModel));
+        _notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
         _viewModelFactory = viewModelFactory ?? throw new ArgumentNullException(nameof(viewModelFactory));
         _logger = logger;
 
         // 初期表示としてダッシュボードを設定
         _currentSubViewModel = _viewModelFactory.CreateProjectDashboardViewModel(_projectViewModel);
 
+        // 通知カウントの同期
+        _notificationService.UnreadCountChanged += (s, e) => UpdateUnreadCount();
+        UpdateUnreadCount();
+
         _logger.LogInformation("ProjectWorkspaceViewModel initialized for project {ProjectId}.", _projectViewModel.Id);
+    }
+
+    private void UpdateUnreadCount()
+    {
+        UnreadNotificationCount = _notificationService.UnreadNotifications.Count;
     }
 
     /// <summary>
@@ -78,6 +97,7 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
             "Tasks" => _viewModelFactory.CreateProjectTasksViewModel(_projectViewModel),
             "Timeline" => _viewModelFactory.CreateProjectTimelineViewModel(_projectViewModel),
             "Settings" => _viewModelFactory.CreateProjectSettingsViewModel(_projectViewModel),
+            "Notifications" => _viewModelFactory.CreateProjectNotificationsViewModel(),
             _ => CurrentSubViewModel
         };
     }

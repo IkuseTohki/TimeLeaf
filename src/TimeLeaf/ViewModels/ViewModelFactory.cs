@@ -34,6 +34,7 @@ public class ViewModelFactory : IViewModelFactory
     {
         return new ProjectWorkspaceViewModel(
             projectViewModel,
+            _serviceProvider.GetRequiredService<INotificationService>(),
             this,
             _serviceProvider.GetRequiredService<ILogger<ProjectWorkspaceViewModel>>());
     }
@@ -75,6 +76,12 @@ public class ViewModelFactory : IViewModelFactory
     public ProjectSettingsViewModel CreateProjectSettingsViewModel(ProjectViewModel projectViewModel)
     {
         return new ProjectSettingsViewModel(projectViewModel);
+    }
+
+    public ProjectNotificationsViewModel CreateProjectNotificationsViewModel()
+    {
+        return new ProjectNotificationsViewModel(
+            _serviceProvider.GetRequiredService<INotificationService>());
     }
 
     public TaskSummaryViewModel CreateTaskSummaryViewModel(ProjectTaskViewModel taskViewModel)

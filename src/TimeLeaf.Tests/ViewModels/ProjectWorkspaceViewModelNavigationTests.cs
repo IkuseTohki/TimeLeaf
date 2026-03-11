@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
+using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
 using TimeLeaf.ViewModels.Workspace;
@@ -14,6 +16,7 @@ namespace TimeLeaf.Tests.ViewModels;
 public class ProjectWorkspaceViewModelNavigationTests
 {
     private Mock<IViewModelFactory> _viewModelFactoryMock = null!;
+    private Mock<INotificationService> _notificationServiceMock = null!;
     private Mock<ILogger<ProjectWorkspaceViewModel>> _loggerMock = null!;
     private ProjectViewModel _projectViewModel = null!;
 
@@ -21,6 +24,8 @@ public class ProjectWorkspaceViewModelNavigationTests
     public void Initialize()
     {
         _viewModelFactoryMock = new Mock<IViewModelFactory>();
+        _notificationServiceMock = new Mock<INotificationService>();
+        _notificationServiceMock.Setup(x => x.UnreadNotifications).Returns(new List<Notification>());
         _loggerMock = new Mock<ILogger<ProjectWorkspaceViewModel>>();
 
         var project = new Project();
@@ -45,7 +50,7 @@ public class ProjectWorkspaceViewModelNavigationTests
     public void NavigateToProject_ShouldSetProjectWorkspaceViewModel()
     {
         // Arrange
-        var vm = new ProjectWorkspaceViewModel(_projectViewModel, _viewModelFactoryMock.Object, _loggerMock.Object);
+        var vm = new ProjectWorkspaceViewModel(_projectViewModel, _notificationServiceMock.Object, _viewModelFactoryMock.Object, _loggerMock.Object);
 
         // Act
         vm.SwitchSubViewCommand.Execute("Tasks");

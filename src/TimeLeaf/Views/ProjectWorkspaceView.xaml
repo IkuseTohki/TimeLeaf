@@ -24,6 +24,9 @@
         <DataTemplate DataType="{x:Type wvm:ProjectSettingsViewModel}">
             <wv:ProjectSettingsView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type wvm:ProjectNotificationsViewModel}">
+            <wv:ProjectNotificationsView />
+        </DataTemplate>
     </UserControl.Resources>
 
     <Grid Background="{DynamicResource SurfaceBaseBrush}">
@@ -103,6 +106,32 @@
                                            Text="Settings"
                                            Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BooleanToVisibilityConverter}}" />
                             </StackPanel>
+                        </Button>
+                        <Button Command="{Binding SwitchSubViewCommand}"
+                                CommandParameter="Notifications"
+                                Style="{StaticResource SidebarItemStyle}">
+                            <Grid>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock FontSize="18" Text="🔔" />
+                                    <TextBlock Margin="16,0,0,0"
+                                               VerticalAlignment="Center"
+                                               Text="Notifications"
+                                               Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                </StackPanel>
+                                <!-- バッジ -->
+                                <Border Margin="12,-8,0,0"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Top"
+                                        Style="{StaticResource NotificationBadgeStyle}"
+                                        Visibility="{Binding UnreadNotificationCount, Converter={StaticResource IntToVisibilityConverter}}">
+                                    <TextBlock HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               FontSize="10"
+                                               FontWeight="Bold"
+                                               Foreground="White"
+                                               Text="{Binding UnreadNotificationCount}" />
+                                </Border>
+                            </Grid>
                         </Button>
                     </StackPanel>
                 </DockPanel>

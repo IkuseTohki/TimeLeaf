@@ -12,6 +12,7 @@ using TimeLeaf.Models.Entities;
 using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
+using LeafKit.UI.Services;
 
 namespace TimeLeaf.ViewModels;
 
@@ -28,10 +29,17 @@ public partial class MainViewModel : ObservableObject
     private readonly IProjectSaveCoordinator _saveCoordinator;
     private readonly IDispatcherService _dispatcherService;
     private readonly IViewModelFactory _viewModelFactory;
+    private readonly INotificationService _notificationService;
+    private readonly ISnackbarService _snackbarService;
+    private readonly IOSNotificationService _osNotificationService;
+    private readonly ICheckTaskDeadlinesUseCase _checkDeadlinesUseCase;
     private readonly ILogger<MainViewModel> _logger;
 
     [ObservableProperty]
     private ObservableObject _currentViewModel;
+
+    [ObservableProperty]
+    private int _unreadNotificationCount;
 
     /// <summary>
     /// 全プロジェクトのリスト（メモリ内保持）。
@@ -50,6 +58,10 @@ public partial class MainViewModel : ObservableObject
         IProjectSaveCoordinator saveCoordinator,
         IDispatcherService dispatcherService,
         IViewModelFactory viewModelFactory,
+        INotificationService notificationService,
+        ISnackbarService snackbarService,
+        IOSNotificationService osNotificationService,
+        ICheckTaskDeadlinesUseCase checkDeadlinesUseCase,
         ILogger<MainViewModel> logger)
     {
         _loadUseCase = loadUseCase;
@@ -60,6 +72,10 @@ public partial class MainViewModel : ObservableObject
         _saveCoordinator = saveCoordinator;
         _dispatcherService = dispatcherService;
         _viewModelFactory = viewModelFactory;
+        _notificationService = notificationService;
+        _snackbarService = snackbarService;
+        _osNotificationService = osNotificationService;
+        _checkDeadlinesUseCase = checkDeadlinesUseCase;
         _logger = logger;
 
         _currentViewModel = _viewModelFactory.CreateOverviewViewModel(Projects);
@@ -69,12 +85,26 @@ public partial class MainViewModel : ObservableObject
         // 外部変更（同期）の監視をサービス経由で行う
         _syncService.ProjectChanged += OnProjectChanged;
 
+        // 通知センターとの同期
+        _notificationService.UnreadCountChanged += (s, e) => UpdateUnreadCount();
+        _notificationService.NotificationAdded += (s, n) =>
+        {
+            _snackbarService.Show($"{n.Title}: {n.Message}");
+            _osNotificationService.Show(n.Title, n.Message);
+        };
+        UpdateUnreadCount();
+
         // 自動保存の開始
         _saveCoordinator.StartMonitoring(Projects);
 
         _ = InitializeAsync();
 
         _logger.LogInformation("MainViewModel Initializing Complete");
+    }
+
+    private void UpdateUnreadCount()
+    {
+        UnreadNotificationCount = _notificationService.UnreadNotifications.Count;
     }
 
     private void OnProjectChanged(Guid projectId)
@@ -101,6 +131,9 @@ public partial class MainViewModel : ObservableObject
                     var newProjectViewModel = new ProjectViewModel(updatedProjectEntity);
                     Projects.Add(newProjectViewModel);
                 }
+
+                // 同期後に期限チェックを実行
+                _checkDeadlinesUseCase.Execute(Projects.Select(p => p.Model));
             }
             catch (Exception ex)
             {
@@ -125,6 +158,9 @@ public partial class MainViewModel : ObservableObject
                 var projectViewModel = new ProjectViewModel(projectEntity);
                 Projects.Add(projectViewModel);
             }
+
+            // 初期化後に期限チェックを実行
+            _checkDeadlinesUseCase.Execute(Projects.Select(p => p.Model));
         }
         catch (Exception ex)
         {

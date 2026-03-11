@@ -13,6 +13,7 @@ using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
 using TimeLeaf.ViewModels.Workspace;
+using LeafKit.UI.Services;
 
 namespace TimeLeaf.Tests.ViewModels;
 
@@ -28,6 +29,10 @@ public class MainViewModelTests
     private Mock<IProjectSaveCoordinator> _saveCoordinatorMock = null!;
     private Mock<IDispatcherService> _dispatcherServiceMock = null!;
     private Mock<IViewModelFactory> _viewModelFactoryMock = null!;
+    private Mock<INotificationService> _notificationServiceMock = null!;
+    private Mock<ISnackbarService> _snackbarServiceMock = null!;
+    private Mock<IOSNotificationService> _osNotificationServiceMock = null!;
+    private Mock<ICheckTaskDeadlinesUseCase> _checkDeadlinesUseCaseMock = null!;
     private Mock<ILogger<MainViewModel>> _loggerMock = null!;
 
     [TestInitialize]
@@ -42,6 +47,11 @@ public class MainViewModelTests
         _saveCoordinatorMock = new Mock<IProjectSaveCoordinator>();
         _dispatcherServiceMock = new Mock<IDispatcherService>();
         _viewModelFactoryMock = new Mock<IViewModelFactory>();
+        _notificationServiceMock = new Mock<INotificationService>();
+        _notificationServiceMock.Setup(x => x.UnreadNotifications).Returns(new List<Notification>());
+        _snackbarServiceMock = new Mock<ISnackbarService>();
+        _osNotificationServiceMock = new Mock<IOSNotificationService>();
+        _checkDeadlinesUseCaseMock = new Mock<ICheckTaskDeadlinesUseCase>();
         _loggerMock = new Mock<ILogger<MainViewModel>>();
 
         _dispatcherServiceMock.Setup(x => x.InvokeAsync(It.IsAny<Action>()))
@@ -56,7 +66,7 @@ public class MainViewModelTests
             .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, _addProjectUseCaseMock.Object, new Mock<LeafKit.UI.Services.IDialogService>().Object, _viewModelFactoryMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
 
         _viewModelFactoryMock.Setup(x => x.CreateProjectWorkspaceViewModel(It.IsAny<ProjectViewModel>()))
-            .Returns((ProjectViewModel pvm) => new ProjectWorkspaceViewModel(pvm, _viewModelFactoryMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object));
+            .Returns((ProjectViewModel pvm) => new ProjectWorkspaceViewModel(pvm, _notificationServiceMock.Object, _viewModelFactoryMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object));
     }
 
     private MainViewModel CreateViewModel()
@@ -70,7 +80,49 @@ public class MainViewModelTests
             _saveCoordinatorMock.Object,
             _dispatcherServiceMock.Object,
             _viewModelFactoryMock.Object,
+            _notificationServiceMock.Object,
+            _snackbarServiceMock.Object,
+            _osNotificationServiceMock.Object,
+            _checkDeadlinesUseCaseMock.Object,
             _loggerMock.Object);
+    }
+
+    /// <summary>
+    /// テスト観点: 初期化完了後にタスクの期限チェックが実行されることを確認する。
+    /// </summary>
+    [TestMethod]
+    public async Task Initialize_ShouldCheckDeadlines()
+    {
+        // Arrange
+        var projects = new List<Project> { new Project() };
+        _loadUseCaseMock.Setup(x => x.ExecuteAsync()).ReturnsAsync(projects);
+
+        // Act
+        var viewModel = CreateViewModel();
+        await Task.Delay(200); // Wait for InitializeAsync
+
+        // Assert
+        _checkDeadlinesUseCaseMock.Verify(x => x.Execute(It.IsAny<IEnumerable<Project>>()), Times.AtLeastOnce);
+    }
+
+    /// <summary>
+    /// テスト観点: 通知サービスで未読数が増えた際、MainViewModel の UnreadNotificationCount が更新されることを確認する。
+    /// </summary>
+    [TestMethod]
+    public void UnreadNotificationCount_ShouldSyncWithNotificationService()
+    {
+        // Arrange
+        var notifications = new List<Notification> { new Notification("Title", "Message") };
+        _notificationServiceMock.Setup(x => x.UnreadNotifications).Returns(notifications);
+
+        var viewModel = CreateViewModel();
+
+        // Act
+        // 擬似的に通知イベントを発生させる
+        _notificationServiceMock.Raise(x => x.UnreadCountChanged += null, EventArgs.Empty);
+
+        // Assert
+        Assert.AreEqual(1, viewModel.UnreadNotificationCount);
     }
 
     /// <summary>
@@ -104,7 +156,7 @@ public class MainViewModelTests
         project.UpdateName("Test Project");
         var projectViewModel = new ProjectViewModel(project);
 
-        var expectedWorkspace = new ProjectWorkspaceViewModel(projectViewModel, _viewModelFactoryMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
+        var expectedWorkspace = new ProjectWorkspaceViewModel(projectViewModel, _notificationServiceMock.Object, _viewModelFactoryMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
         _viewModelFactoryMock.Setup(x => x.CreateProjectWorkspaceViewModel(projectViewModel)).Returns(expectedWorkspace);
 
         // Act
