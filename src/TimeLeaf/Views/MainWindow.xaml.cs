@@ -1,5 +1,6 @@
 using System.Windows;
 using LeafKit.UI.Services;
+using TimeLeaf.Services;
 
 namespace TimeLeaf.Views;
 
@@ -8,9 +9,9 @@ namespace TimeLeaf.Views;
 /// </summary>
 public partial class MainWindow : Window
 {
-    public MainWindow(ISnackbarService snackbarService)
+    public MainWindow(ISnackbarService snackbarService, IDispatcherService dispatcherService)
     {
         InitializeComponent();
-        Snackbar.Initialize(snackbarService);
+        Snackbar.Initialize(snackbarService, dispatcherService);
     }
 }
