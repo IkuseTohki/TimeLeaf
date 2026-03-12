@@ -72,6 +72,7 @@ public class ViewModelModelSyncTests
         viewModel.SyncFromModel(); // 同期メソッドを呼ぶ
 
         // Assert
+        Assert.IsNotNull(viewModel.Tasks);
         Assert.AreEqual(1, viewModel.Tasks.Count);
         Assert.AreEqual(newTask.Id, viewModel.Tasks.First().Id);
     }
@@ -96,6 +97,7 @@ public class ViewModelModelSyncTests
         viewModel.SyncFromModel(); // 同期メソッドを呼ぶ
 
         // Assert
+        Assert.IsNotNull(viewModel.Tasks);
         Assert.AreEqual(0, viewModel.Tasks.Count);
     }
 }

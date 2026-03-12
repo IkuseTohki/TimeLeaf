@@ -80,6 +80,7 @@ public class FolderProjectRepositoryReplayTests
         var projects = (await repository.LoadAllAsync()).ToList();
 
         // Assert
+        Assert.IsNotNull(projects);
         Assert.AreEqual(1, projects.Count);
         Assert.AreEqual(projectId, projects[0].Id);
         Assert.AreEqual("New Name", projects[0].Name, "最新のファイルの内容が反映されていること");
@@ -119,6 +120,7 @@ public class FolderProjectRepositoryReplayTests
         var projects = (await repository.LoadAllAsync()).ToList();
 
         // Assert
+        Assert.IsNotNull(projects);
         Assert.AreEqual(1, projects.Count);
         Assert.AreEqual("Test Description", projects[0].Description);
     }

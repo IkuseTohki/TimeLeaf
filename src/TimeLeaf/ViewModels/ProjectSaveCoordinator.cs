@@ -51,17 +51,23 @@ public class ProjectSaveCoordinator : IProjectSaveCoordinator
     {
         if (e.NewItems != null)
         {
-            foreach (ProjectViewModel vm in e.NewItems)
+            foreach (var item in e.NewItems)
             {
-                vm.PropertyChanged += OnProjectPropertyChanged;
+                if (item is ProjectViewModel vm)
+                {
+                    vm.PropertyChanged += OnProjectPropertyChanged;
+                }
             }
         }
 
         if (e.OldItems != null)
         {
-            foreach (ProjectViewModel vm in e.OldItems)
+            foreach (var item in e.OldItems)
             {
-                vm.PropertyChanged -= OnProjectPropertyChanged;
+                if (item is ProjectViewModel vm)
+                {
+                    vm.PropertyChanged -= OnProjectPropertyChanged;
+                }
             }
         }
     }

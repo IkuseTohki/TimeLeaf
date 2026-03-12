@@ -77,6 +77,7 @@ public class CommentStorageTests
         Assert.IsNotNull(loadedProject);
         var loadedTask = loadedProject.Tasks.FirstOrDefault(t => t.Id == task.Id);
         Assert.IsNotNull(loadedTask);
+        Assert.IsNotNull(loadedTask.Comments);
         Assert.AreEqual(1, loadedTask.Comments.Count);
         Assert.AreEqual("First Comment", loadedTask.Comments[0].Content);
         Assert.AreEqual("user-A", loadedTask.Comments[0].AuthorId);
@@ -85,6 +86,7 @@ public class CommentStorageTests
         var projectDir = Path.Combine(_tempDir, $"{project.Id}_{project.Name}");
         var changesDir = Path.Combine(projectDir, "changes");
         var files = Directory.GetFiles(changesDir, "*_Comment.json", SearchOption.AllDirectories);
+        Assert.IsNotNull(files);
         Assert.AreEqual(1, files.Length, "コメントファイルが1つ出力されていること");
     }
 
@@ -117,12 +119,14 @@ public class CommentStorageTests
         // Assert
         Assert.IsNotNull(loadedProject);
         var loadedTask = loadedProject.Tasks.First();
+        Assert.IsNotNull(loadedTask.Comments);
         Assert.AreEqual(2, loadedTask.Comments.Count);
 
         // 物理ファイルの確認
         var projectDir = Path.Combine(_tempDir, $"{project.Id}_{project.Name}");
         var changesDir = Path.Combine(projectDir, "changes");
         var files = Directory.GetFiles(changesDir, "*_Comment.json", SearchOption.AllDirectories);
+        Assert.IsNotNull(files);
         Assert.AreEqual(2, files.Length, "コメントファイルが2つ独立して出力されていること");
     }
 }

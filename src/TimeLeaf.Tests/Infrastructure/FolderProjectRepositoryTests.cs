@@ -189,6 +189,7 @@ public class FolderProjectRepositoryTests
         var loadedTask = loadedProject.Tasks.FirstOrDefault(t => t.Id == mainTask.Id);
         Assert.IsNotNull(loadedTask, "保存されたタスクがロードされること");
         Assert.AreEqual("user123", loadedTask.Assignee, "Assignee が正しく復元されること");
+        Assert.IsNotNull(loadedTask.Dependencies);
         Assert.AreEqual(1, loadedTask.Dependencies.Count, "Dependencies の要素数が正しいこと");
         Assert.AreEqual(depTaskId, loadedTask.Dependencies[0], "Dependencies の内容が正しいこと");
     }
@@ -214,6 +215,7 @@ public class FolderProjectRepositoryTests
 
         // Assert
         Assert.IsNotNull(loadedProject);
+        Assert.IsNotNull(loadedProject.Milestones);
         Assert.AreEqual(1, loadedProject.Milestones.Count, "ロードされたマイルストーンが1つであること");
         Assert.AreEqual(mDate, loadedProject.Milestones.First().Date, "マイルストーンの日付が一致すること");
         Assert.AreEqual(mLabel, loadedProject.Milestones.First().Label, "マイルストーンのラベルが一致すること");

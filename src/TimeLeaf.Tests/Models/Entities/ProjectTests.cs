@@ -44,6 +44,7 @@ public class ProjectTests
         project.AddTask(task);
 
         // Assert
+        Assert.IsNotNull(project.Tasks);
         Assert.AreEqual(1, project.Tasks.Count, "タスクが追加されていること");
         Assert.AreEqual(5.0, project.TotalEstimatedCost, "合計見積工数が正しく計算されていること");
     }
@@ -120,6 +121,7 @@ public class ProjectTests
         project.AddMilestone(new Milestone(milestoneDate, milestoneLabel));
 
         // Assert
+        Assert.IsNotNull(project.Milestones);
         Assert.AreEqual(1, project.Milestones.Count, "マイルストーンが1つ追加されていること");
         Assert.AreEqual(milestoneDate, project.Milestones.First().Date, "日付が正しく保持されていること");
         Assert.AreEqual(milestoneLabel, project.Milestones.First().Label, "ラベルが正しく保持されていること");
