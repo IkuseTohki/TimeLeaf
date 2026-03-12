@@ -10,6 +10,8 @@ using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
 using TimeLeaf.Views;
+using LeafKit.Services;
+using LeafKit.System.Services;
 using LeafKit.UI.Services;
 
 namespace TimeLeaf;
@@ -59,7 +61,7 @@ public partial class App : Application
         HandleGlobalException(e.ExceptionObject as Exception, "AppDomain Unhandled Exception");
     }
 
-    private void TaskScheduler_UnobservedTaskException(object sender, System.Threading.Tasks.UnobservedTaskExceptionEventArgs e)
+    private void TaskScheduler_UnobservedTaskException(object? sender, System.Threading.Tasks.UnobservedTaskExceptionEventArgs e)
     {
         HandleGlobalException(e.Exception, "TaskScheduler Unobserved Exception");
         e.SetObserved();
@@ -141,6 +143,7 @@ public partial class App : Application
 
         services.AddSingleton<ICurrentUserService, WindowsCurrentUserService>();
         services.AddSingleton<IDispatcherService, WpfDispatcherService>();
+        services.AddSingleton<ISingleInstanceService, SingleInstanceService>();
 
         // 永続化層のコンポーネント登録
         services.AddSingleton<IProjectFileSystemSerializer, JsonProjectFileSystemSerializer>();
@@ -199,21 +202,41 @@ public partial class App : Application
         try
         {
             Log.Information("Application Starting Up");
-            // DIコンテナからメインウィンドウを取得して表示
+
+            var singleInstanceService = _serviceProvider.GetRequiredService<ISingleInstanceService>();
+            const string AppId = "TimeLeaf-App-Instance";
+
+            if (!singleInstanceService.Start(AppId))
+            {
+                Log.Information("Another instance is already running. Notifying and exiting.");
+                singleInstanceService.NotifyFirstInstance(AppId);
+                this.Shutdown();
+                return;
+            }
+
+            // DIコンテナからメインウィンドウを取得
             var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
-            mainWindow.DataContext = _serviceProvider.GetRequiredService<MainViewModel>();
+            var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
+
+            // 多重起動通知を受けた際のアクティブ化設定
+            singleInstanceService.LaunchedAnotherInstance += (s, ev) =>
+            {
+                mainViewModel.IsWindowVisible = true;
+            };
+
+            mainWindow.DataContext = mainViewModel;
             mainWindow.Show();
         }
         catch (Exception ex)
         {
             HandleGlobalException(ex, "Application Start-up Exception");
-            // HandleGlobalException 内で Environment.Exit(1) されるため、ここには到達しない。
         }
     }
 
     protected override void OnExit(ExitEventArgs e)
     {
         Log.Information("Application Shutting Down");
+        _serviceProvider?.GetService<ISingleInstanceService>()?.Dispose();
         Log.CloseAndFlush();
         base.OnExit(e);
     }

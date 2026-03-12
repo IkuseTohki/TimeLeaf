@@ -10,6 +10,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <DebugType>embedded</DebugType>
     <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+    <NoWarn>$(NoWarn);NETSDK1138;NU1701</NoWarn>
 
     <!-- 単一ファイル配布 (SingleFile) 関連の設定 -->
     <PublishSingleFile>true</PublishSingleFile>
@@ -34,7 +35,9 @@
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.142" />
-    <ProjectReference Include="..\..\LeafKit\src\LeafKit.UI\LeafKit.UI.csproj" />
+    <ProjectReference Include="..\..\LeafKit\UI\src\LeafKit.UI\LeafKit.UI.csproj" />
+    <ProjectReference Include="..\..\LeafKit\Core\src\LeafKit.Core\LeafKit.Core.csproj" />
+    <ProjectReference Include="..\..\LeafKit\Core\src\LeafKit.System\LeafKit.System.csproj" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
