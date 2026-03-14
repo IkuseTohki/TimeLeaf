@@ -35,25 +35,17 @@ public class ProjectTasksViewModelTests
 
     /// <summary>
     /// テスト観点: タスクのダブルクリック時に実行される OpenTaskDetailWindowCommand が、
-    /// IDialogService を介して適切な TaskDetailViewModel を引数に呼び出されることを確認する。
-    /// これにより、別ウィンドウでの詳細表示機能の導線を検証する。
+    /// 直接ウィンドウを開くのではなく、親 ViewModel に詳細表示を依頼するイベントを発行することを確認する。
+    /// これにより、メインウィンドウ内での詳細表示への切り替えを検証する。
     /// </summary>
     [TestMethod]
-    public async System.Threading.Tasks.Task OpenTaskDetailWindowCommand_ShouldCallDialogService()
+    public async System.Threading.Tasks.Task OpenTaskDetailWindowCommand_ShouldRaiseTaskDetailRequested()
     {
         // Arrange
         var task = new ProjectTask();
         task.UpdateName("Test Task");
         var taskVm = new ProjectTaskViewModel(task);
-
-        var detailVm = new TaskDetailViewModel(
-            _projectViewModel,
-            taskVm,
-            new Mock<IAddCommentUseCase>().Object,
-            _detailLoggerMock.Object);
-
-        _viewModelFactoryMock.Setup(x => x.CreateTaskDetailViewModel(_projectViewModel, taskVm))
-            .Returns(detailVm);
+        ProjectTaskViewModel? requestedTask = null;
 
         var vm = new ProjectTasksViewModel(
             _projectViewModel,
@@ -63,13 +55,18 @@ public class ProjectTasksViewModelTests
             _loggerMock.Object,
             _detailLoggerMock.Object);
 
+        vm.TaskDetailRequested += (s, e) => requestedTask = e;
+
         // Act
-        await vm.OpenTaskDetailWindowCommand.ExecuteAsync(taskVm);
+        vm.OpenTaskDetailWindowCommand.Execute(taskVm);
 
         // Assert
+        Assert.AreEqual(taskVm, requestedTask, "ダブルクリック時に TaskDetailRequested イベントが適切なタスクで発行されること");
+
+        // 既存のウィンドウ表示は行われないことを確認（オプション）
         _dialogServiceMock.Verify(
-            x => x.ShowDialogAsync(It.Is<TaskDetailViewModel>(v => v.Task == taskVm)),
-            Times.Once,
-            "ダブルクリックコマンド実行時にDialogService経由で詳細ウィンドウが開かれること");
+            x => x.ShowDialogAsync(It.IsAny<TaskDetailViewModel>()),
+            Times.Never,
+            "メインウィンドウ内表示に切り替えたため、ダイアログサービスは呼ばれないこと");
     }
 }

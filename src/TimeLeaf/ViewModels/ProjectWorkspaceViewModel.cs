@@ -91,14 +91,59 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
     {
         _logger.LogInformation("Switching sub-view to {ViewName}", viewName);
 
+        // 古いViewModelのイベント購読解除
+        if (CurrentSubViewModel is ProjectTasksViewModel oldTasksVm)
+        {
+            oldTasksVm.TaskDetailRequested -= OnTaskDetailRequested;
+        }
+
         CurrentSubViewModel = viewName switch
         {
             "Dashboard" => _viewModelFactory.CreateProjectDashboardViewModel(_projectViewModel),
-            "Tasks" => _viewModelFactory.CreateProjectTasksViewModel(_projectViewModel),
+            "Tasks" => CreateTasksViewModel(),
             "Timeline" => _viewModelFactory.CreateProjectTimelineViewModel(_projectViewModel),
             "Settings" => _viewModelFactory.CreateProjectSettingsViewModel(_projectViewModel),
             "Notifications" => _viewModelFactory.CreateProjectNotificationsViewModel(),
             _ => CurrentSubViewModel
         };
     }
+
+    private ProjectTasksViewModel CreateTasksViewModel()
+    {
+        var vm = _viewModelFactory.CreateProjectTasksViewModel(_projectViewModel);
+        vm.TaskDetailRequested += OnTaskDetailRequested;
+        return vm;
+    }
+
+    private void OnTaskDetailRequested(object? sender, ProjectTaskViewModel task)
+    {
+        OpenTaskDetail(task);
+    }
+
+    /// <summary>
+    /// 指定されたタスクの詳細を表示します。
+    /// </summary>
+    /// <param name="task">表示対象のタスクViewModel。</param>
+    [RelayCommand]
+    private void OpenTaskDetail(ProjectTaskViewModel task)
+    {
+        _logger.LogInformation("Navigating to task detail for {TaskName} within main content area.", task.Name);
+        var detailVm = _viewModelFactory.CreateTaskDetailViewModel(_projectViewModel, task);
+
+        // 閉じる要求（戻る要求）をハンドル
+        detailVm.RequestClose += (result) => CloseTaskDetail();
+
+        CurrentSubViewModel = detailVm;
+    }
+
+    /// <summary>
+    /// タスク詳細の表示を閉じ、タスク一覧に戻ります。
+    /// </summary>
+    [RelayCommand]
+    private void CloseTaskDetail()
+    {
+        _logger.LogInformation("Closing task detail and returning to task list.");
+        SwitchSubView("Tasks");
+    }
 }
+

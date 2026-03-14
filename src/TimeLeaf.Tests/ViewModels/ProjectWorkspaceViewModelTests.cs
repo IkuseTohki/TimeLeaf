@@ -71,4 +71,24 @@ public class ProjectWorkspaceViewModelTests
         // Assert
         Assert.IsInstanceOfType(vm.CurrentSubViewModel, typeof(ProjectTasksViewModel));
     }
+
+    [TestMethod]
+    public void OpenTaskDetail_ShouldSwitchSubViewToTaskDetail()
+    {
+        // Arrange
+        var vm = new ProjectWorkspaceViewModel(_projectViewModel, _notificationServiceMock.Object, _viewModelFactoryMock.Object, _loggerMock.Object);
+        var task = new ProjectTask { Id = Guid.NewGuid() };
+        var taskVm = new ProjectTaskViewModel(task);
+        var detailVm = new TaskDetailViewModel(_projectViewModel, taskVm, new Mock<IAddCommentUseCase>().Object, new Mock<ILogger<TaskDetailViewModel>>().Object);
+
+        _viewModelFactoryMock.Setup(x => x.CreateTaskDetailViewModel(_projectViewModel, taskVm))
+            .Returns(detailVm);
+
+        // Act
+        vm.OpenTaskDetailCommand.Execute(taskVm);
+
+        // Assert
+        // オーバーレイ用プロパティではなく、メインコンテンツが切り替わることを確認
+        Assert.AreEqual(detailVm, vm.CurrentSubViewModel);
+    }
 }

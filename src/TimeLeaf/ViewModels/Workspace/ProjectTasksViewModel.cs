@@ -22,6 +22,11 @@ public partial class ProjectTasksViewModel : ObservableObject
     private readonly ILogger<ProjectTasksViewModel> _logger;
     private readonly ILogger<TaskDetailViewModel> _detailLogger;
 
+    /// <summary>
+    /// タスク詳細の表示がリクエストされたときに発生するイベント。
+    /// </summary>
+    public event EventHandler<ProjectTaskViewModel>? TaskDetailRequested;
+
     public ObservableCollection<ProjectTaskViewModel> Tasks => _projectViewModel.Tasks;
 
     [ObservableProperty]
@@ -78,13 +83,10 @@ public partial class ProjectTasksViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async System.Threading.Tasks.Task OpenTaskDetailWindow(ProjectTaskViewModel task)
+    private void OpenTaskDetailWindow(ProjectTaskViewModel task)
     {
-        _logger.LogInformation("Opening TaskDetailWindow for: {TaskName}", task.Name);
-        var detailVm = _viewModelFactory.CreateTaskDetailViewModel(_projectViewModel, task);
-
-        // ダイアログを表示（別ウィンドウとして開く）
-        await _dialogService.ShowDialogAsync(detailVm);
+        _logger.LogInformation("Requesting task detail for: {TaskName}", task.Name);
+        TaskDetailRequested?.Invoke(this, task);
     }
 
     [RelayCommand]
