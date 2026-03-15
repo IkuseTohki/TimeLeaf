@@ -304,7 +304,8 @@ public partial class MainViewModel : ObservableObject
 
                 var projectViewModel = new ProjectViewModel(projectEntity);
 
-                await _dispatcherService.InvokeAsync(() => {
+                await _dispatcherService.InvokeAsync(() =>
+                {
                     Projects.Add(projectViewModel);
                 });
 

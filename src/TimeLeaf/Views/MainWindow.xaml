@@ -110,22 +110,24 @@
 
                             <!-- プロジェクトセクション見出し -->
                             <Grid Margin="24,24,12,8">
-                                <TextBlock FontSize="11"
+                                <TextBlock VerticalAlignment="Center"
+                                           FontSize="11"
                                            FontWeight="Bold"
                                            Foreground="White"
                                            Opacity="0.6"
                                            Text="PROJECTS"
-                                           VerticalAlignment="Center"
                                            Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                                <Button HorizontalAlignment="Right"
+                                <Button Width="24"
+                                        Height="24"
+                                        Padding="4"
+                                        HorizontalAlignment="Right"
                                         VerticalAlignment="Center"
                                         Command="{Binding AddProjectCommand}"
                                         Style="{StaticResource SidebarItemStyle}"
-                                        Padding="4"
-                                        Width="24"
-                                        Height="24"
                                         ToolTip="新規プロジェクト作成">
-                                    <TextBlock Text="+" FontSize="14" FontWeight="Bold" />
+                                    <TextBlock FontSize="14"
+                                               FontWeight="Bold"
+                                               Text="+" />
                                 </Button>
                             </Grid>
 
