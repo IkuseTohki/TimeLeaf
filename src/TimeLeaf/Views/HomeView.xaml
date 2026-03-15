@@ -186,26 +186,73 @@
                                    Foreground="{DynamicResource TextPrimaryBrush}"
                                    Text="🏁 マイルストーン" />
                         <Border Margin="0,0,0,32"
-                                Padding="24"
+                                Padding="24,24,24,8"
                                 Style="{StaticResource OrganicCardStyle}">
                             <ItemsControl ItemsSource="{Binding UpcomingMilestones}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <StackPanel Margin="0,0,0,16">
-                                            <TextBlock FontSize="11"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       Text="{Binding Date, StringFormat={}{0:yyyy/MM/dd}}" />
-                                            <TextBlock FontWeight="Bold"
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="20" /> 
+                                                <!-- 次の項目への繋ぎ（空白行） -->
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="24" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <!-- タイムラインの縦線: 3行すべてを貫通させる -->
+                                            <Rectangle Grid.RowSpan="3"
+                                                       Grid.Column="0"
+                                                       Width="2"
+                                                       HorizontalAlignment="Center"
+                                                       Fill="{DynamicResource BrandPrimaryBrush}"
+                                                       Opacity="0.2" />
+
+                                            <!-- 1行目: 日付(曜日) プロジェクト名 -->
+                                            <StackPanel Grid.Row="0"
+                                                        Grid.Column="1"
+                                                        Margin="12,0,0,2"
+                                                        Orientation="Horizontal">
+                                                <TextBlock FontSize="11"
+                                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                                           Text="{Binding Date, StringFormat={}{0:MM/dd (ddd)}}" />
+                                                <TextBlock Margin="12,0,0,0"
+                                                           VerticalAlignment="Bottom"
+                                                           FontSize="10"
+                                                           FontWeight="Bold"
+                                                           Foreground="{DynamicResource BrandPrimaryBrush}"
+                                                           Opacity="0.8"
+                                                           Text="{Binding ProjectName}" />
+                                            </StackPanel>
+
+                                            <!-- タイムラインの丸（ドット）: 2行目の中央に配置 -->
+                                            <Ellipse Grid.Row="1"
+                                                     Grid.Column="0"
+                                                     Width="8"
+                                                     Height="8"
+                                                     HorizontalAlignment="Center"
+                                                     VerticalAlignment="Center"
+                                                     Fill="{DynamicResource BrandPrimaryBrush}" />
+
+                                            <!-- 2行目: マイルストーン名 -->
+                                            <TextBlock Grid.Row="1"
+                                                       Grid.Column="1"
+                                                       Margin="12,0,0,0"
+                                                       VerticalAlignment="Center"
+                                                       FontSize="14"
+                                                       FontWeight="Bold"
                                                        Foreground="{DynamicResource TextPrimaryBrush}"
-                                                       Text="{Binding Label}" />
-                                            <TextBlock FontSize="10"
-                                                       Foreground="{DynamicResource BrandPrimaryBrush}"
-                                                       Text="{Binding ProjectName}" />
-                                        </StackPanel>
+                                                       Text="{Binding Label}"
+                                                       TextWrapping="Wrap" />
+                                        </Grid>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
                         </Border>
+
 
                         <TextBlock Margin="0,0,0,16"
                                    FontSize="18"
