@@ -107,6 +107,7 @@ public class EndToEndFlowTests
             snackbarServiceMock.Object,
             osNotificationServiceMock.Object,
             checkDeadlinesUseCaseMock.Object,
+            _dialogServiceMock.Object,
             loggerMock.Object);
 
         await System.Threading.Tasks.Task.Delay(100);

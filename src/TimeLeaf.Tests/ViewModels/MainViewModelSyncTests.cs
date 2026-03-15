@@ -73,7 +73,7 @@ public class MainViewModelSyncTests
         var checkDeadlinesUseCaseMock = new Mock<ICheckTaskDeadlinesUseCase>();
 
         var saveCoordinator = new ProjectSaveCoordinator(saveUseCaseMock.Object, new Mock<ILogger<ProjectSaveCoordinator>>().Object);
-        var viewModel = new MainViewModel(loadUseCaseMock.Object, saveUseCaseMock.Object, findProjectUseCaseMock.Object, syncServiceMock.Object, addProjectUseCaseMock.Object, saveCoordinator, dispatcherMock.Object, viewModelFactoryMock.Object, notificationServiceMock.Object, snackbarServiceMock.Object, osNotificationServiceMock.Object, checkDeadlinesUseCaseMock.Object, loggerMock.Object);
+        var viewModel = new MainViewModel(loadUseCaseMock.Object, saveUseCaseMock.Object, findProjectUseCaseMock.Object, syncServiceMock.Object, addProjectUseCaseMock.Object, saveCoordinator, dispatcherMock.Object, viewModelFactoryMock.Object, notificationServiceMock.Object, snackbarServiceMock.Object, osNotificationServiceMock.Object, checkDeadlinesUseCaseMock.Object, dialogServiceMock.Object, loggerMock.Object);
         await System.Threading.Tasks.Task.Delay(100); // InitializeAsync の完了を待つ
 
         // ロードされる「最新」の状態を準備（別のタスクがある状態）

@@ -33,10 +33,40 @@ public partial class MainViewModel : ObservableObject
     private readonly ISnackbarService _snackbarService;
     private readonly IOSNotificationService _osNotificationService;
     private readonly ICheckTaskDeadlinesUseCase _checkDeadlinesUseCase;
+    private readonly IDialogService _dialogService;
     private readonly ILogger<MainViewModel> _logger;
 
     [ObservableProperty]
+    private MainNavigationContext _navigationContext;
+
+    partial void OnNavigationContextChanged(MainNavigationContext value)
+    {
+        _logger.LogInformation("NavigationContext changed to {Context}", value);
+        switch (value)
+        {
+            case MainNavigationContext.Home:
+                CurrentViewModel = _viewModelFactory.CreateHomeViewModel(Projects);
+                break;
+            case MainNavigationContext.AllTasks:
+                // TODO: AllTasksViewModel が必要
+                break;
+            case MainNavigationContext.Notifications:
+                CurrentViewModel = _viewModelFactory.CreateProjectNotificationsViewModel();
+                break;
+            case MainNavigationContext.ProjectDetail:
+                // ProjectDetail は NavigateToProject 経由で設定される
+                break;
+        }
+    }
+
+    [ObservableProperty]
     private ObservableObject _currentViewModel;
+
+    /// <summary>
+    /// サイドバーが展開されているかどうか。
+    /// </summary>
+    [ObservableProperty]
+    private bool _isSidebarExpanded = true;
 
     [ObservableProperty]
     private int _unreadNotificationCount;
@@ -79,6 +109,7 @@ public partial class MainViewModel : ObservableObject
         ISnackbarService snackbarService,
         IOSNotificationService osNotificationService,
         ICheckTaskDeadlinesUseCase checkDeadlinesUseCase,
+        IDialogService dialogService,
         ILogger<MainViewModel> logger)
     {
         _loadUseCase = loadUseCase;
@@ -93,9 +124,12 @@ public partial class MainViewModel : ObservableObject
         _snackbarService = snackbarService;
         _osNotificationService = osNotificationService;
         _checkDeadlinesUseCase = checkDeadlinesUseCase;
+        _dialogService = dialogService;
         _logger = logger;
 
-        _currentViewModel = _viewModelFactory.CreateOverviewViewModel(Projects);
+        // 状態の初期化（バックフィールドを直接初期化することで、コンパイラの非許容チェックを満足させる）
+        _navigationContext = MainNavigationContext.Home;
+        _currentViewModel = _viewModelFactory.CreateHomeViewModel(Projects);
 
         _logger.LogInformation("MainViewModel Initializing");
 
@@ -178,11 +212,16 @@ public partial class MainViewModel : ObservableObject
         try
         {
             var projectEntities = await _loadUseCase.ExecuteAsync();
-            foreach (var projectEntity in projectEntities)
+
+            await _dispatcherService.InvokeAsync(() =>
             {
-                var projectViewModel = new ProjectViewModel(projectEntity);
-                Projects.Add(projectViewModel);
-            }
+                Projects.Clear();
+                foreach (var projectEntity in projectEntities)
+                {
+                    var projectViewModel = new ProjectViewModel(projectEntity);
+                    Projects.Add(projectViewModel);
+                }
+            });
 
             // 初期化後に期限チェックを実行
             _checkDeadlinesUseCase.Execute(Projects.Select(p => p.Model));
@@ -199,17 +238,85 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void NavigateToHome()
+    {
+        NavigationContext = MainNavigationContext.Home;
+    }
+
+    [RelayCommand]
+    private void NavigateToAllTasks()
+    {
+        NavigationContext = MainNavigationContext.AllTasks;
+    }
+
+    [RelayCommand]
+    private void NavigateToNotifications()
+    {
+        NavigationContext = MainNavigationContext.Notifications;
+    }
+
+    [RelayCommand]
     private void NavigateToProject(ProjectViewModel projectViewModel)
     {
         if (projectViewModel == null) return;
         _logger.LogInformation("Navigating to project {ProjectId}", projectViewModel.Id);
+
+        // Context を先にセットし、その後に ViewModel をセットする
+        NavigationContext = MainNavigationContext.ProjectDetail;
         CurrentViewModel = _viewModelFactory.CreateProjectWorkspaceViewModel(projectViewModel);
     }
 
     [RelayCommand]
     private void NavigateBack()
     {
-        _logger.LogInformation("Navigating back to Overview");
-        CurrentViewModel = _viewModelFactory.CreateOverviewViewModel(Projects);
+        _logger.LogInformation("Navigating back to Home");
+        NavigationContext = MainNavigationContext.Home;
+    }
+
+    [RelayCommand]
+    private void ToggleSidebar()
+    {
+        IsSidebarExpanded = !IsSidebarExpanded;
+    }
+
+    /// <summary>
+    /// プロジェクト作成ダイアログを表示し、新規プロジェクトを追加します。
+    /// </summary>
+    [RelayCommand]
+    private async System.Threading.Tasks.Task AddProject()
+    {
+        _logger.LogInformation("AddProject started from MainViewModel.");
+
+        try
+        {
+            var addProjectVm = _viewModelFactory.CreateAddProjectViewModel();
+            var result = await _dialogService.ShowDialogAsync(addProjectVm);
+
+            if (result)
+            {
+                _logger.LogDebug("Adding project: {Name}", addProjectVm.Name);
+
+                var projectEntity = await _addProjectUseCase.ExecuteAsync(
+                    addProjectVm.Name,
+                    addProjectVm.Description,
+                    addProjectVm.Status,
+                    addProjectVm.Health);
+
+                var projectViewModel = new ProjectViewModel(projectEntity);
+
+                await _dispatcherService.InvokeAsync(() => {
+                    Projects.Add(projectViewModel);
+                });
+
+                _logger.LogInformation("AddProject completed successfully. Created project {ProjectId}", projectViewModel.Id);
+
+                // 作成したプロジェクトへ自動的に遷移
+                NavigateToProject(projectViewModel);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to add project from sidebar.");
+        }
     }
 }

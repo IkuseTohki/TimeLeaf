@@ -10,6 +10,7 @@ namespace TimeLeaf.ViewModels;
 /// </summary>
 public interface IViewModelFactory
 {
+    HomeViewModel CreateHomeViewModel(ObservableCollection<ProjectViewModel> projects);
     OverviewViewModel CreateOverviewViewModel(ObservableCollection<ProjectViewModel> projects);
     ProjectWorkspaceViewModel CreateProjectWorkspaceViewModel(ProjectViewModel projectViewModel);
     AddProjectViewModel CreateAddProjectViewModel();

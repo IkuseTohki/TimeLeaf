@@ -20,6 +20,11 @@ public class ViewModelFactory : IViewModelFactory
         _serviceProvider = serviceProvider;
     }
 
+    public HomeViewModel CreateHomeViewModel(ObservableCollection<ProjectViewModel> projects)
+    {
+        return new HomeViewModel(projects);
+    }
+
     public OverviewViewModel CreateOverviewViewModel(ObservableCollection<ProjectViewModel> projects)
     {
         return new OverviewViewModel(

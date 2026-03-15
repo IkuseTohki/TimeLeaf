@@ -87,6 +87,7 @@ public class CommentFlowTests
             snackbarServiceMock.Object,
             _osNotificationServiceMock.Object,
             checkDeadlinesUseCaseMock.Object,
+            _dialogServiceMock.Object,
             loggerMock.Object);
     }
 

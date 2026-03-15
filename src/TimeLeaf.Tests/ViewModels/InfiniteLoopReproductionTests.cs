@@ -90,6 +90,7 @@ public class InfiniteLoopReproductionTests
             snackbarServiceMock.Object,
             osNotificationServiceMock.Object,
             checkDeadlinesUseCaseMock.Object,
+            new Mock<LeafKit.UI.Services.IDialogService>().Object,
             _loggerMock.Object);
 
         await Task.Delay(100); // Wait for initialize
@@ -169,6 +170,7 @@ public class InfiniteLoopReproductionTests
             snackbarServiceMock.Object,
             osNotificationServiceMock.Object,
             checkDeadlinesUseCaseMock.Object,
+            new Mock<LeafKit.UI.Services.IDialogService>().Object,
             _loggerMock.Object);
 
         await Task.Delay(100);

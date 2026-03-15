@@ -33,6 +33,7 @@ public class MainViewModelTests
     private Mock<ISnackbarService> _snackbarServiceMock = null!;
     private Mock<IOSNotificationService> _osNotificationServiceMock = null!;
     private Mock<ICheckTaskDeadlinesUseCase> _checkDeadlinesUseCaseMock = null!;
+    private Mock<IDialogService> _dialogServiceMock = null!;
     private Mock<ILogger<MainViewModel>> _loggerMock = null!;
 
     [TestInitialize]
@@ -52,6 +53,7 @@ public class MainViewModelTests
         _snackbarServiceMock = new Mock<ISnackbarService>();
         _osNotificationServiceMock = new Mock<IOSNotificationService>();
         _checkDeadlinesUseCaseMock = new Mock<ICheckTaskDeadlinesUseCase>();
+        _dialogServiceMock = new Mock<IDialogService>();
         _loggerMock = new Mock<ILogger<MainViewModel>>();
 
         _dispatcherServiceMock.Setup(x => x.InvokeAsync(It.IsAny<Action>()))
@@ -63,7 +65,7 @@ public class MainViewModelTests
         _loadUseCaseMock.Setup(x => x.ExecuteAsync()).ReturnsAsync(new List<Project>());
 
         _viewModelFactoryMock.Setup(x => x.CreateOverviewViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>()))
-            .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, _addProjectUseCaseMock.Object, new Mock<LeafKit.UI.Services.IDialogService>().Object, _viewModelFactoryMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
+            .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, _addProjectUseCaseMock.Object, _dialogServiceMock.Object, _viewModelFactoryMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
 
         _viewModelFactoryMock.Setup(x => x.CreateProjectWorkspaceViewModel(It.IsAny<ProjectViewModel>()))
             .Returns((ProjectViewModel pvm) => new ProjectWorkspaceViewModel(pvm, _notificationServiceMock.Object, _viewModelFactoryMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object));
@@ -84,6 +86,7 @@ public class MainViewModelTests
             _snackbarServiceMock.Object,
             _osNotificationServiceMock.Object,
             _checkDeadlinesUseCaseMock.Object,
+            _dialogServiceMock.Object,
             _loggerMock.Object);
     }
 
@@ -168,22 +171,25 @@ public class MainViewModelTests
     }
 
     /// <summary>
-    /// テスト観点: 戻るコマンドを実行した際、画面が OverviewViewModel に切り替わることを確認する。
+    /// テスト観点: 戻るコマンドを実行した際、画面が HomeViewModel に切り替わることを確認する。
     /// </summary>
     [TestMethod]
-    public void NavigateBack_ShouldSetOverviewViewModel()
+    public void NavigateBack_ShouldSetHomeViewModel()
     {
         // Arrange
         var viewModel = CreateViewModel();
 
-        var expectedOverview = new OverviewViewModel(viewModel.Projects, _addProjectUseCaseMock.Object, new Mock<LeafKit.UI.Services.IDialogService>().Object, _viewModelFactoryMock.Object, new Mock<ILogger<OverviewViewModel>>().Object);
-        _viewModelFactoryMock.Setup(x => x.CreateOverviewViewModel(viewModel.Projects)).Returns(expectedOverview);
+        // 一旦別のコンテキストにする（NavigateBack で Home に切り替わることを確認するため）
+        viewModel.NavigationContext = MainNavigationContext.Notifications;
+
+        var expectedHome = new HomeViewModel(viewModel.Projects);
+        _viewModelFactoryMock.Setup(x => x.CreateHomeViewModel(viewModel.Projects)).Returns(expectedHome);
 
         // Act
         viewModel.NavigateBackCommand.Execute(null);
 
         // Assert
-        Assert.AreSame(expectedOverview, viewModel.CurrentViewModel);
-        _viewModelFactoryMock.Verify(x => x.CreateOverviewViewModel(viewModel.Projects), Times.AtLeastOnce);
+        Assert.AreSame(expectedHome, viewModel.CurrentViewModel);
+        _viewModelFactoryMock.Verify(x => x.CreateHomeViewModel(viewModel.Projects), Times.AtLeastOnce);
     }
 }

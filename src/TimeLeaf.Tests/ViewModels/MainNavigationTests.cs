@@ -7,18 +7,20 @@ using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
+using TimeLeaf.Repositories;
 using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
+using TimeLeaf.ViewModels.Workspace;
 using LeafKit.UI.Services;
 
 namespace TimeLeaf.Tests.ViewModels;
 
 [TestClass]
-public class MainViewModelTrayTests
+public class MainNavigationTests
 {
     private Mock<ILoadProjectsUseCase> _loadUseCaseMock = null!;
-    private Mock<ISaveProjectUseCase> _saveUseCaseMock = null!;
+    private Mock<ISaveProjectUseCase> _saveSingleUseCaseMock = null!;
     private Mock<IFindProjectUseCase> _findProjectUseCaseMock = null!;
     private Mock<IProjectSyncService> _syncServiceMock = null!;
     private Mock<IAddProjectUseCase> _addProjectUseCaseMock = null!;
@@ -36,7 +38,7 @@ public class MainViewModelTrayTests
     public void Setup()
     {
         _loadUseCaseMock = new Mock<ILoadProjectsUseCase>();
-        _saveUseCaseMock = new Mock<ISaveProjectUseCase>();
+        _saveSingleUseCaseMock = new Mock<ISaveProjectUseCase>();
         _findProjectUseCaseMock = new Mock<IFindProjectUseCase>();
         _syncServiceMock = new Mock<IProjectSyncService>();
         _addProjectUseCaseMock = new Mock<IAddProjectUseCase>();
@@ -51,6 +53,10 @@ public class MainViewModelTrayTests
         _dialogServiceMock = new Mock<IDialogService>();
         _loggerMock = new Mock<ILogger<MainViewModel>>();
 
+        _dispatcherServiceMock.Setup(x => x.InvokeAsync(It.IsAny<Action>()))
+            .Callback<Action>(a => a())
+            .Returns(Task.CompletedTask);
+
         _loadUseCaseMock.Setup(x => x.ExecuteAsync()).ReturnsAsync(new List<Project>());
     }
 
@@ -58,7 +64,7 @@ public class MainViewModelTrayTests
     {
         return new MainViewModel(
             _loadUseCaseMock.Object,
-            _saveUseCaseMock.Object,
+            _saveSingleUseCaseMock.Object,
             _findProjectUseCaseMock.Object,
             _syncServiceMock.Object,
             _addProjectUseCaseMock.Object,
@@ -74,36 +80,74 @@ public class MainViewModelTrayTests
     }
 
     /// <summary>
-    /// テスト観点: トレイからRequestOpenイベントが発生した際、IsWindowVisibleプロパティがtrueになることを確認する。
+    /// テスト観点: 初期状態のナビゲーションコンテキストが Home であり、CurrentViewModel が HomeViewModel であることを確認する。
     /// </summary>
     [TestMethod]
-    public void RequestOpen_ShouldSetIsWindowVisibleToTrue()
+    public void DefaultNavigationContext_ShouldBeHome_AndSetHomeViewModel()
     {
         // Arrange
-        var viewModel = CreateViewModel();
-        viewModel.IsWindowVisible = false;
+        var expectedHome = new HomeViewModel(new ObservableCollection<ProjectViewModel>());
+        _viewModelFactoryMock.Setup(x => x.CreateHomeViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>())).Returns(expectedHome);
 
         // Act
-        _osNotificationServiceMock.Raise(x => x.RequestOpen += null, EventArgs.Empty);
+        var viewModel = CreateViewModel();
 
         // Assert
-        Assert.IsTrue(viewModel.IsWindowVisible);
+        Assert.AreEqual(MainNavigationContext.Home, viewModel.NavigationContext);
+        Assert.AreSame(expectedHome, viewModel.CurrentViewModel);
     }
 
     /// <summary>
-    /// テスト観点: トレイからRequestExitイベントが発生した際、終了要求フラグ（CanExit）がtrueになることを確認する。
+    /// テスト観点: ナビゲーションコンテキストを Notifications に切り替えた際、CurrentViewModel が ProjectNotificationsViewModel になることを確認する。
     /// </summary>
     [TestMethod]
-    public void RequestExit_ShouldAllowApplicationExit()
+    public void SwitchToNotifications_ShouldSetProjectNotificationsViewModel()
     {
         // Arrange
         var viewModel = CreateViewModel();
-        Assert.IsFalse(viewModel.CanExit, "初期状態では終了不可（隠すだけ）であること");
+        var expectedNotifications = new ProjectNotificationsViewModel(_notificationServiceMock.Object);
+        _viewModelFactoryMock.Setup(x => x.CreateProjectNotificationsViewModel()).Returns(expectedNotifications);
 
         // Act
-        _osNotificationServiceMock.Raise(x => x.RequestExit += null, EventArgs.Empty);
+        viewModel.NavigationContext = MainNavigationContext.Notifications;
 
         // Assert
-        Assert.IsTrue(viewModel.CanExit);
+        Assert.AreEqual(MainNavigationContext.Notifications, viewModel.NavigationContext);
+        Assert.AreSame(expectedNotifications, viewModel.CurrentViewModel);
+    }
+
+    /// <summary>
+    /// テスト観点: サイドバーの初期状態が展開（True）であることを確認する。
+    /// </summary>
+    [TestMethod]
+    public void Sidebar_InitialState_ShouldBeExpanded()
+    {
+        // Act
+        var viewModel = CreateViewModel();
+
+        // Assert
+        Assert.IsTrue(viewModel.IsSidebarExpanded);
+    }
+
+    /// <summary>
+    /// テスト観点: サイドバーの開閉をトグルできることを確認する。
+    /// </summary>
+    [TestMethod]
+    public void ToggleSidebar_ShouldChangeState()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+
+        // Act
+        viewModel.ToggleSidebarCommand.Execute(null);
+
+        // Assert
+        Assert.IsFalse(viewModel.IsSidebarExpanded);
+
+        // Act again
+        viewModel.ToggleSidebarCommand.Execute(null);
+
+        // Assert again
+        Assert.IsTrue(viewModel.IsSidebarExpanded);
     }
 }

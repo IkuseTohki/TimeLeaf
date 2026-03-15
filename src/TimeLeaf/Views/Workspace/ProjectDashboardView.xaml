@@ -3,206 +3,148 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:wvm="clr-namespace:TimeLeaf.ViewModels.Workspace"
-             d:DataContext="{d:DesignInstance wvm:ProjectDashboardViewModel}"
+             xmlns:vm="clr-namespace:TimeLeaf.ViewModels.Workspace"
+             d:DataContext="{d:DesignInstance Type=vm:ProjectDashboardViewModel}"
              d:DesignHeight="600"
              d:DesignWidth="800"
              mc:Ignorable="d">
-    <UserControl.Resources>
-        <Style x:Key="OrganicCardStyle" TargetType="Border">
-            <Setter Property="Background" Value="White" />
-            <Setter Property="CornerRadius" Value="16" />
-            <Setter Property="Padding" Value="24" />
-            <Setter Property="BorderBrush" Value="#E0DDD5" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Effect">
-                <Setter.Value>
-                    <DropShadowEffect BlurRadius="15"
-                                      Direction="-90"
-                                      Opacity="0.05"
-                                      ShadowDepth="5" />
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="LabelStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="11" />
-            <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="Foreground" Value="#4A7c44" />
-            <Setter Property="Margin" Value="0,0,0,12" />
-        </Style>
-    </UserControl.Resources>
-
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <Grid Margin="40">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="350" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+        <StackPanel Margin="48,16,48,48">
+            <!-- プロジェクト説明 -->
+            <Border Margin="0,0,0,32"
+                    Padding="24"
+                    Style="{StaticResource OrganicCardStyle}">
+                <StackPanel>
+                    <TextBlock FontSize="18"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource TextPrimaryBrush}"
+                               Text="プロジェクトについて" />
+                    <TextBlock Margin="0,12,0,0"
+                               FontSize="14"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               LineHeight="22"
+                               Text="{Binding Description}"
+                               TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
 
-            <!-- 左カラム: 樹のビジュアルと目的 -->
-            <StackPanel Grid.Column="0">
-                <!-- 樹のカード -->
-                <Border CornerRadius="24,8,24,8" Style="{StaticResource OrganicCardStyle}">
-                    <StackPanel>
-                        <TextBlock HorizontalAlignment="Left"
-                                   Style="{StaticResource LabelStyle}"
-                                   Text="CURRENT GROWTH" />
-                        <Border Height="200"
-                                Margin="0,0,0,24"
-                                CornerRadius="100,100,20,20">
-                            <Border.Background>
-                                <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
-                                    <GradientStop Offset="0" Color="#E3F2FD" />
-                                    <GradientStop Offset="1" Color="White" />
-                                </LinearGradientBrush>
-                            </Border.Background>
-                            <!-- ここに樹のグラフィックを配置（簡易版） -->
-                            <Canvas Width="80"
-                                    Height="120"
-                                    Margin="0,0,0,20"
-                                    VerticalAlignment="Bottom">
-                                <Rectangle Canvas.Left="34"
-                                           Canvas.Top="100"
-                                           Width="12"
-                                           Height="20"
-                                           Fill="#5D4037" />
-                                <Ellipse Width="80"
-                                         Height="100"
-                                         Fill="#4A7c44" />
-                            </Canvas>
-                        </Border>
-                        <TextBlock FontSize="14"
-                                   Foreground="#706E6B"
-                                   TextAlignment="Center"
-                                   TextWrapping="Wrap">
-                            プロジェクトは順調に育っています。<LineBreak />
-                            現在は全体の<Bold>
-                                <Run Text="{Binding CompletionPercentage, Mode=OneWay, StringFormat={}{0:F0}%}" />
-                            </Bold>
-                            まで成長しました。</TextBlock>
-                    </StackPanel>
-                </Border>
-
-                <!-- プロジェクトの目的 -->
-                <Border Margin="0,24,0,0"
-                        Background="#99FFFFFF"
+            <!-- 統計情報 (Stats) -->
+            <UniformGrid Margin="0,0,0,32" Columns="4">
+                <Border Margin="0,0,16,0"
+                        Padding="24"
                         Style="{StaticResource OrganicCardStyle}">
                     <StackPanel>
-                        <TextBlock Style="{StaticResource LabelStyle}" Text="PROJECT ROOTS (目的)" />
-                        <TextBlock FontSize="14"
-                                   Foreground="#3E3A39"
-                                   LineHeight="24"
-                                   Text="{Binding Description, Mode=OneWay}"
-                                   TextWrapping="Wrap" />
+                        <TextBlock FontSize="13"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   Text="全タスク" />
+                        <TextBlock Margin="0,4,0,0"
+                                   FontSize="24"
+                                   FontWeight="Bold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                   Text="{Binding TotalTaskCount}" />
                     </StackPanel>
                 </Border>
-            </StackPanel>
-
-            <!-- 右カラム: 統計とマイルストーン -->
-            <StackPanel Grid.Column="1" Margin="40,0,0,0">
-                <!-- 統計行 -->
-                <UniformGrid Margin="0,0,0,32" Columns="2">
-                    <Border Margin="0,0,12,0"
-                            Background="#CCFFFFFF"
-                            Style="{StaticResource OrganicCardStyle}">
-                        <StackPanel Orientation="Horizontal">
-                            <Grid Width="64" Height="64">
-                                <Ellipse Stroke="#E8F0E6" StrokeThickness="4" />
-                                <!-- 進捗リング（簡易） -->
-                                <TextBlock HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"
-                                           FontSize="14"
-                                           FontWeight="Bold"
-                                           Text="{Binding CompletionPercentage, Mode=OneWay, StringFormat={}{0:F0}%}" />
-                            </Grid>
-                            <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
-                                <TextBlock FontSize="11"
-                                           FontWeight="Bold"
-                                           Foreground="#4A7c44"
-                                           Text="完了した作業" />
-                                <TextBlock FontSize="18" FontWeight="Bold">
-                                    <Run Text="{Binding CompletedTaskCount, Mode=OneWay}" />
-                                    <Run Text=" / " />
-                                    <Run Text="{Binding TotalTaskCount, Mode=OneWay}" />
-                                </TextBlock>
-                            </StackPanel>
-                        </StackPanel>
-                    </Border>
-
-                    <Border Margin="12,0,0,0"
-                            Background="#CCFFFFFF"
-                            Style="{StaticResource OrganicCardStyle}">
-                        <StackPanel Orientation="Horizontal">
-                            <Grid Width="64" Height="64">
-                                <Ellipse Opacity="0.3"
-                                         Stroke="#FFE082"
-                                         StrokeThickness="4" />
-                                <TextBlock HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"
-                                           FontSize="14"
-                                           FontWeight="Bold"
-                                           Foreground="#F57F17"
-                                           Text="39%" />
-                            </Grid>
-                            <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
-                                <TextBlock FontSize="11"
-                                           FontWeight="Bold"
-                                           Foreground="#4A7c44"
-                                           Text="費やしたエネルギー" />
-                                <TextBlock FontSize="18" FontWeight="Bold">
-                                    <Run Text="{Binding TotalActualCost, Mode=OneWay}" />
-                                    <Run Text="h / " />
-                                    <Run Text="{Binding TotalEstimatedCost, Mode=OneWay}" />
-                                    <Run Text="h" />
-                                </TextBlock>
-                            </StackPanel>
-                        </StackPanel>
-                    </Border>
-                </UniformGrid>
-
-                <!-- マイルストーン -->
-                <Border Background="#CCFFFFFF" Style="{StaticResource OrganicCardStyle}">
+                <Border Margin="0,0,16,0"
+                        Padding="24"
+                        Style="{StaticResource OrganicCardStyle}">
                     <StackPanel>
-                        <TextBlock Style="{StaticResource LabelStyle}" Text="UPCOMING MILESTONES" />
+                        <TextBlock FontSize="13"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   Text="完了済み" />
+                        <TextBlock Margin="0,4,0,0"
+                                   FontSize="24"
+                                   FontWeight="Bold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                   Text="{Binding CompletedTaskCount}" />
+                    </StackPanel>
+                </Border>
+                <Border Margin="0,0,16,0"
+                        Padding="24"
+                        Style="{StaticResource OrganicCardStyle}">
+                    <StackPanel>
+                        <TextBlock FontSize="13"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   Text="進捗率" />
+                        <TextBlock Margin="0,4,0,0"
+                                   FontSize="24"
+                                   FontWeight="Bold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}">
+                            <Run Text="{Binding CompletionPercentage, Mode=OneWay, StringFormat={}{0:F0}}" />
+                            <Run FontSize="14" Text="%" />
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+                <Border Padding="24" Style="{StaticResource OrganicCardStyle}">
+                    <StackPanel>
+                        <TextBlock FontSize="13"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   Text="実績工数" />
+                        <TextBlock Margin="0,4,0,0"
+                                   FontSize="24"
+                                   FontWeight="Bold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}">
+                            <Run Text="{Binding TotalActualCost, Mode=OneWay, StringFormat={}{0:F1}}" />
+                            <Run FontSize="12" Text="h" />
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+            </UniformGrid>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- 左カラム: マイルストーン -->
+                <StackPanel Grid.Column="0" Margin="0,0,32,0">
+                    <TextBlock Margin="0,0,0,16"
+                               FontSize="18"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource TextPrimaryBrush}"
+                               Text="🏳️ マイルストーン" />
+                    <Border Padding="24" Style="{StaticResource OrganicCardStyle}">
                         <ItemsControl ItemsSource="{Binding Milestones}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid Margin="0,0,0,24">
+                                    <Grid Margin="0,0,0,16">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="100" />
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
-                                        <Rectangle Grid.RowSpan="2"
-                                                   Width="2"
-                                                   Margin="0,15,0,-15"
-                                                   HorizontalAlignment="Center"
-                                                   Fill="#4A7c44" />
-                                        <Ellipse Width="10"
-                                                 Height="10"
-                                                 Margin="0,4,0,0"
-                                                 VerticalAlignment="Top"
-                                                 Fill="White"
-                                                 Stroke="#4A7c44"
-                                                 StrokeThickness="2" />
-
-                                        <StackPanel Grid.Column="1" Margin="24,0,0,0">
-                                            <TextBlock FontSize="12"
-                                                       FontWeight="Bold"
-                                                       Foreground="#4A7c44"
-                                                       Text="{Binding Date, StringFormat={}{0:yyyy/MM/dd}}" />
-                                            <TextBlock Margin="0,2,0,0"
-                                                       FontSize="15"
-                                                       FontWeight="SemiBold"
-                                                       Text="{Binding Label}" />
-                                        </StackPanel>
+                                        <TextBlock Foreground="{DynamicResource TextSecondaryBrush}" Text="{Binding Date, StringFormat={}{0:yyyy/MM/dd}}" />
+                                        <TextBlock Grid.Column="1"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                                   Text="{Binding Label}" />
                                     </Grid>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
-                    </StackPanel>
-                </Border>
-            </StackPanel>
-        </Grid>
+                    </Border>
+                </StackPanel>
+
+                <!-- 右カラム: マイルストーン追加（簡易） -->
+                <StackPanel Grid.Column="1">
+                    <TextBlock Margin="0,0,0,16"
+                               FontSize="18"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource TextPrimaryBrush}"
+                               Text="＋ マイルストーン追加" />
+                    <Border Padding="24" Style="{StaticResource OrganicCardStyle}">
+                        <StackPanel>
+                            <DatePicker Margin="0,0,0,12" SelectedDate="{Binding NewMilestoneDate, Mode=TwoWay}" />
+                            <TextBox Margin="0,0,0,12"
+                                     Style="{StaticResource OrganicTextBoxStyle}"
+                                     Tag="名称を入力..."
+                                     Text="{Binding NewMilestoneLabel, UpdateSourceTrigger=PropertyChanged}" />
+                            <Button Command="{Binding AddMilestoneCommand}"
+                                    Content="追加"
+                                    Style="{StaticResource PrimaryButtonStyle}" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
     </ScrollViewer>
 </UserControl>

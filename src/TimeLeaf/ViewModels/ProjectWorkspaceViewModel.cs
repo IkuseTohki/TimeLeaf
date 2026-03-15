@@ -26,16 +26,21 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
     private ObservableObject _currentSubViewModel;
 
     /// <summary>
-    /// サイドバーが展開されているかどうか。
-    /// </summary>
-    [ObservableProperty]
-    private bool _isSidebarExpanded = true;
-
-    /// <summary>
     /// 未読の通知件数。
     /// </summary>
     [ObservableProperty]
     private int _unreadNotificationCount;
+
+    /// <summary>
+    /// ナビゲーション用の項目リスト。
+    /// </summary>
+    public List<NavigationItem> NavigationItems { get; } = new()
+    {
+        new NavigationItem("🏠 Dashboard", "Dashboard"),
+        new NavigationItem("🌿 Tasks", "Tasks"),
+        new NavigationItem("⏳ Timeline", "Timeline"),
+        new NavigationItem("⚙️ Settings", "Settings")
+    };
 
     /// <summary>
     /// 管理対象プロジェクトの名称。
@@ -75,12 +80,6 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
     {
         UnreadNotificationCount = _notificationService.UnreadNotifications.Count;
     }
-
-    /// <summary>
-    /// サイドバーの開閉を切り替えます。
-    /// </summary>
-    [RelayCommand]
-    private void ToggleSidebar() => IsSidebarExpanded = !IsSidebarExpanded;
 
     /// <summary>
     /// 表示するサブビューを切り替えます。
@@ -146,4 +145,10 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
         SwitchSubView("Tasks");
     }
 }
+
+/// <summary>
+/// ナビゲーション項目を表すクラス。
+/// </summary>
+public record NavigationItem(string Label, string Parameter);
+
 
