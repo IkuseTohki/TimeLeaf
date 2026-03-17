@@ -24,6 +24,8 @@
             <converters:BooleanToDoubleConverter x:Key="BooleanToDoubleConverter" />
             <converters:SidebarToggleIconConverter x:Key="SidebarToggleIconConverter" />
             <converters:TaskStatusToBoolConverter x:Key="TaskStatusToBoolConverter" />
+            <converters:TaskStatusToIconConverter x:Key="TaskStatusToIconConverter" />
+            <converters:DeadlineToBrushConverter x:Key="DeadlineToBrushConverter" />
             <converters:PriorityToVisibilityConverter x:Key="PriorityToVisibilityConverter" />
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 

@@ -37,6 +37,13 @@ public partial class ProjectViewModel : ObservableObject
             if (_project.Name != value)
             {
                 _project.UpdateName(value);
+
+                // 全タスクのプロジェクト名を更新
+                foreach (var task in Tasks)
+                {
+                    task.ProjectName = value;
+                }
+
                 OnPropertyChanged(nameof(Name));
                 OnPropertyChanged(nameof(UpdatedAt));
                 OnPropertyChanged(nameof(DisplayLastUpdated));
@@ -231,6 +238,7 @@ public partial class ProjectViewModel : ObservableObject
                 {
                     // 既存: 中身を更新
                     existingVm.UpdateFromModel(taskModel);
+                    existingVm.ProjectName = Name;
 
                     // 並び順が違う場合は移動
                     var currentIndex = Tasks.IndexOf(existingVm);
@@ -243,6 +251,7 @@ public partial class ProjectViewModel : ObservableObject
                 {
                     // 新規: インスタンス作成
                     var newTaskVm = new ProjectTaskViewModel(taskModel);
+                    newTaskVm.ProjectName = Name;
                     newTaskVm.PropertyChanged += OnProjectTaskViewModelPropertyChanged;
                     Tasks.Insert(i, newTaskVm);
                 }

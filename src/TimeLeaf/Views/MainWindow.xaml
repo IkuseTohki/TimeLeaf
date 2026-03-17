@@ -23,6 +23,9 @@
         <DataTemplate DataType="{x:Type vm:HomeViewModel}">
             <views:HomeView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:AllTasksViewModel}">
+            <views:AllTasksView />
+        </DataTemplate>
         <DataTemplate DataType="{x:Type vm:ProjectWorkspaceViewModel}">
             <views:ProjectWorkspaceView />
         </DataTemplate>

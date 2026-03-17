@@ -13,6 +13,9 @@ public partial class ProjectTaskViewModel : ObservableObject
 {
     private ProjectTask _projectTask;
 
+    [ObservableProperty]
+    private string _projectName = string.Empty;
+
     /// <summary>
     /// 基になるProjectTaskエンティティ。
     /// </summary>

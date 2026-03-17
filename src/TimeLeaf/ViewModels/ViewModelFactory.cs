@@ -25,6 +25,11 @@ public class ViewModelFactory : IViewModelFactory
         return new HomeViewModel(projects);
     }
 
+    public AllTasksViewModel CreateAllTasksViewModel(ObservableCollection<ProjectViewModel> projects)
+    {
+        return new AllTasksViewModel(projects);
+    }
+
     public OverviewViewModel CreateOverviewViewModel(ObservableCollection<ProjectViewModel> projects)
     {
         return new OverviewViewModel(

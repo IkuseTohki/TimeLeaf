@@ -48,7 +48,7 @@ public partial class MainViewModel : ObservableObject
                 CurrentViewModel = _viewModelFactory.CreateHomeViewModel(Projects);
                 break;
             case MainNavigationContext.AllTasks:
-                // TODO: AllTasksViewModel が必要
+                CurrentViewModel = _viewModelFactory.CreateAllTasksViewModel(Projects);
                 break;
             case MainNavigationContext.Notifications:
                 CurrentViewModel = _viewModelFactory.CreateProjectNotificationsViewModel();

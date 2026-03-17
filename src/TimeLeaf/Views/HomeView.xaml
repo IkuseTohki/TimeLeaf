@@ -195,7 +195,7 @@
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto" />
                                                 <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="20" /> 
+                                                <RowDefinition Height="20" />
                                                 <!-- 次の項目への繋ぎ（空白行） -->
                                             </Grid.RowDefinitions>
                                             <Grid.ColumnDefinitions>
