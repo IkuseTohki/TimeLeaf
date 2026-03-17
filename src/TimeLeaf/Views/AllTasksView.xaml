@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:converters="clr-namespace:TimeLeaf.ViewModels.Converters"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:lk="clr-namespace:LeafKit.UI.Controls;assembly=LeafKit.UI"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:TimeLeaf.ViewModels"
              d:DataContext="{d:DesignInstance Type=vm:AllTasksViewModel}"
@@ -39,29 +40,13 @@
             <StackPanel HorizontalAlignment="Right"
                         VerticalAlignment="Bottom"
                         Orientation="Horizontal">
-                <Border Width="240"
-                        Margin="0,0,16,0"
-                        Padding="12,8"
-                        Style="{DynamicResource OrganicCardStyle}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock VerticalAlignment="Center"
-                                   FontSize="14"
-                                   Foreground="{DynamicResource TextSecondaryBrush}"
-                                   Text="🔍" />
-                        <TextBox Grid.Column="1"
-                                 Margin="8,0,0,0"
-                                 VerticalAlignment="Center"
-                                 Background="Transparent"
-                                 BorderThickness="0"
-                                 FontSize="13"
-                                 Foreground="{DynamicResource TextPrimaryBrush}"
-                                 Text="{Binding SearchKeyword, UpdateSourceTrigger=PropertyChanged}" />
-                    </Grid>
-                </Border>
+                <lk:ClearableTextBox Width="240"
+                                     Margin="0,0,16,0"
+                                     Background="{DynamicResource SurfaceBaseBrush}"
+                                     BorderBrush="{DynamicResource OutlineBaseBrush}"
+                                     BorderThickness="1"
+                                     Placeholder="🔍 キーワードで検索..."
+                                     Text="{Binding SearchKeyword, UpdateSourceTrigger=PropertyChanged}" />
                 <CheckBox VerticalAlignment="Center"
                           Content="未完了のみ表示"
                           FontSize="13"
