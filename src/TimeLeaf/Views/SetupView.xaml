@@ -5,73 +5,62 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:TimeLeaf.ViewModels"
         Title="TimeLeaf - 初期設定"
-        Width="500"
+        Width="530"
         Height="350"
-        Background="White"
+        Background="{DynamicResource SurfaceBaseBrush}"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         mc:Ignorable="d">
 
-    <Window.Resources>
-        <!-- 簡易スタイル定義 (テーマ読み込み前なのでハードコードまたは簡易定義) -->
-        <Style TargetType="TextBlock">
-            <Setter Property="Foreground" Value="#333" />
-            <Setter Property="FontSize" Value="14" />
-        </Style>
-        <Style TargetType="Button">
-            <Setter Property="Padding" Value="10,5" />
-            <Setter Property="Margin" Value="5" />
-        </Style>
-    </Window.Resources>
+    <StackPanel Margin="24">
+        <!-- Header -->
+        <TextBlock Margin="0,0,0,10"
+                   FontSize="24"
+                   FontWeight="Bold"
+                   Style="{StaticResource FormTitleTextStyle}"
+                   Text="TimeLeafへようこそ" />
 
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+        <TextBlock Margin="0,0,0,10"
+                   Text="プロジェクトデータを保存・同期するフォルダを選択してください。"
+                   TextWrapping="Wrap" />
 
-        <StackPanel Grid.Row="0">
-            <TextBlock Margin="0,0,0,10"
-                       FontSize="24"
-                       FontWeight="Bold"
-                       Text="TimeLeafへようこそ" />
-            <TextBlock Text="プロジェクトデータを保存・同期するフォルダを選択してください。" TextWrapping="Wrap" />
-            <TextBlock Margin="0,5,0,0"
-                       FontSize="12"
-                       Foreground="#666"
-                       Text="共有フォルダ（OneDriveやDropboxなど）を指定すると、チームメンバーとデータを共有できます。" />
-        </StackPanel>
+        <TextBlock Margin="0,5,0,20"
+                   FontSize="12"
+                   Foreground="{DynamicResource TextSecondaryBrush}"
+                   Text="共有フォルダ（OneDriveやDropboxなど）を指定すると、チームメンバーとデータを共有できます。" />
 
-        <StackPanel Grid.Row="1" VerticalAlignment="Center">
-            <TextBlock Margin="0,0,0,5" Text="データ保存場所 (ルートフォルダ):" />
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <TextBox Padding="5"
-                         VerticalContentAlignment="Center"
-                         Text="{Binding StoragePath, UpdateSourceTrigger=PropertyChanged}" />
-                <Button Grid.Column="1"
-                        Command="{Binding BrowseStoragePathCommand}"
-                        Content="参照..." />
-            </Grid>
-            <TextBlock Margin="0,5,0,0"
-                       Foreground="Red"
-                       Text="{Binding ErrorMessage}" />
-        </StackPanel>
+        <!-- Input Area -->
+        <Label Content="データ保存場所 (ルートフォルダ):" Style="{StaticResource FormLabelStyle}" />
 
-        <StackPanel Grid.Row="2"
-                    HorizontalAlignment="Right"
-                    Orientation="Horizontal">
-            <Button Command="{Binding CancelCommand}"
+        <Grid Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBox Margin="0,0,10,0"
+                     Style="{StaticResource FormTextBoxStyle}"
+                     Text="{Binding StoragePath, UpdateSourceTrigger=PropertyChanged}" />
+            <Button Grid.Column="1"
+                    Command="{Binding BrowseStoragePathCommand}"
+                    Content="参照..."
+                    Style="{StaticResource ModernButtonStyle}" />
+        </Grid>
+
+        <TextBlock Margin="0,-15,0,20"
+                   Foreground="Red"
+                   Text="{Binding ErrorMessage}" />
+
+        <!-- Footer -->
+        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+            <Button Margin="0,0,10,0"
+                    Command="{Binding CancelCommand}"
                     Content="キャンセル"
-                    IsCancel="true" />
+                    IsCancel="true"
+                    Style="{StaticResource ModernButtonStyle}" />
             <Button Command="{Binding SaveAndStartCommand}"
                     Content="設定して開始"
-                    FontWeight="Bold"
-                    IsDefault="true" />
+                    IsDefault="true"
+                    Style="{StaticResource PrimaryButtonStyle2}" />
         </StackPanel>
-    </Grid>
+    </StackPanel>
 </Window>
