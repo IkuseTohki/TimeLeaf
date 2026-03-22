@@ -26,4 +26,7 @@ public interface IViewModelFactory
 
     TaskSummaryViewModel CreateTaskSummaryViewModel(ProjectViewModel projectViewModel, ProjectTaskViewModel taskViewModel);
     TaskDetailViewModel CreateTaskDetailViewModel(ProjectViewModel projectViewModel, ProjectTaskViewModel taskViewModel);
+
+    ApplicationSettingsViewModel CreateApplicationSettingsViewModel();
+    ProfileEditViewModel CreateProfileEditViewModel();
 }

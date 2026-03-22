@@ -20,7 +20,8 @@ public class HomeViewModelTests
     {
         var mockIdentity = new Mock<IIdentityService>();
         var mockDialog = new Mock<IDialogService>();
-        return new UserMenuViewModel(mockIdentity.Object, mockDialog.Object);
+        var mockFactory = new Mock<IViewModelFactory>();
+        return new UserMenuViewModel(mockIdentity.Object, mockDialog.Object, mockFactory.Object);
     }
 
     [TestMethod]

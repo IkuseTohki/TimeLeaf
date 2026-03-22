@@ -151,4 +151,12 @@
         </Style.Triggers>
     </Style>
 
+    <!-- アウトライン強調ボタンスタイル -->
+    <Style x:Key="OutlinedButtonStyle"
+           BasedOn="{StaticResource RoundButtonStyle}"
+           TargetType="Button">
+        <Setter Property="BorderThickness" Value="2" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
 </ResourceDictionary>

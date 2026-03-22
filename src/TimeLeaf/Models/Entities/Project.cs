@@ -51,6 +51,16 @@ public class Project
     public ProjectHealth HealthStatus { get; private set; } = ProjectHealth.Healthy;
 
     /// <summary>
+    /// プロジェクトがアーカイブされているかどうか。
+    /// </summary>
+    public bool IsArchived { get; private set; } = false;
+
+    /// <summary>
+    /// プロジェクトがロックされている期限（nullの場合はロックなし）。
+    /// </summary>
+    public DateTime? LockedUntil { get; private set; }
+
+    /// <summary>
     /// プロジェクトのマイルストーン（読み取り専用）。
     /// </summary>
     public IReadOnlyList<Milestone> Milestones => _milestones;
@@ -241,5 +251,46 @@ public class Project
     public void SetUpdatedAt(DateTime updatedAt)
     {
         UpdatedAt = updatedAt;
+    }
+
+    /// <summary>
+    /// プロジェクトをアーカイブ状態にします。
+    /// </summary>
+    public void Archive()
+    {
+        IsArchived = true;
+    }
+
+    /// <summary>
+    /// プロジェクトのアーカイブ状態を解除します。
+    /// </summary>
+    public void Unarchive()
+    {
+        IsArchived = false;
+    }
+
+    /// <summary>
+    /// プロジェクトを指定日時までロックします。
+    /// </summary>
+    public void Lock(DateTime until)
+    {
+        LockedUntil = until;
+    }
+
+    /// <summary>
+    /// プロジェクトのロックを解除します。
+    /// </summary>
+    public void Unlock()
+    {
+        LockedUntil = null;
+    }
+
+    /// <summary>
+    /// ライフサイクル状態を設定します（リポジトリ復元用）。
+    /// </summary>
+    public void SetLifecycleStatus(bool isArchived, DateTime? lockedUntil)
+    {
+        IsArchived = isArchived;
+        LockedUntil = lockedUntil;
     }
 }

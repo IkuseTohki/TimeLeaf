@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TimeLeaf.Models.Entities;
+using TimeLeaf.Repositories;
 using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels.Workspace;
@@ -26,7 +27,7 @@ public class ViewModelFactory : IViewModelFactory
 
     public HomeViewModel CreateHomeViewModel(ObservableCollection<ProjectViewModel> projects)
     {
-        return new HomeViewModel(projects, new UserMenuViewModel(_identityService, _serviceProvider.GetRequiredService<IDialogService>()));
+        return new HomeViewModel(projects, new UserMenuViewModel(_identityService, _serviceProvider.GetRequiredService<IDialogService>(), this));
     }
 
     public AllTasksViewModel CreateAllTasksViewModel(ObservableCollection<ProjectViewModel> projects)
@@ -98,7 +99,12 @@ public class ViewModelFactory : IViewModelFactory
 
     public ProjectSettingsViewModel CreateProjectSettingsViewModel(ProjectViewModel projectViewModel)
     {
-        return new ProjectSettingsViewModel(projectViewModel);
+        return new ProjectSettingsViewModel(
+            projectViewModel,
+            _serviceProvider.GetRequiredService<IProjectRepository>(),
+            _identityService,
+            _serviceProvider.GetRequiredService<INotificationService>(),
+            _serviceProvider.GetRequiredService<IDialogService>());
     }
 
     public ProjectNotificationsViewModel CreateProjectNotificationsViewModel()
@@ -119,5 +125,15 @@ public class ViewModelFactory : IViewModelFactory
             taskViewModel,
             _serviceProvider.GetRequiredService<IAddCommentUseCase>(),
             _serviceProvider.GetRequiredService<ILogger<TaskDetailViewModel>>());
+    }
+
+    public ApplicationSettingsViewModel CreateApplicationSettingsViewModel()
+    {
+        return _serviceProvider.GetRequiredService<ApplicationSettingsViewModel>();
+    }
+
+    public ProfileEditViewModel CreateProfileEditViewModel()
+    {
+        return _serviceProvider.GetRequiredService<ProfileEditViewModel>();
     }
 }

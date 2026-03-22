@@ -4,6 +4,7 @@ using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using TimeLeaf.Models;
 using TimeLeaf.Repositories;
 using TimeLeaf.Repositories.FileSystem;
 using TimeLeaf.Services;
@@ -37,17 +38,6 @@ public partial class App : Application
             .WriteTo.Console()
             .WriteTo.File("logs/timeleaf-.txt", rollingInterval: RollingInterval.Day)
             .CreateLogger();
-
-        try
-        {
-            var services = new ServiceCollection();
-            ConfigureServices(services);
-            _serviceProvider = services.BuildServiceProvider();
-        }
-        catch (Exception ex)
-        {
-            HandleGlobalException(ex, "App Constructor Exception");
-        }
     }
 
     private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
@@ -128,8 +118,89 @@ public partial class App : Application
         }
     }
 
-    private void ConfigureServices(IServiceCollection services)
+    protected override async void OnStartup(StartupEventArgs e)
     {
+        base.OnStartup(e);
+
+        try
+        {
+            Log.Information("Application Starting Up");
+
+            // 1. 設定の読み込みと検証
+            var settingsRepo = new JsonApplicationSettingsRepository();
+            var settings = settingsRepo.Load();
+
+            // ストレージパスが未設定、または無効な場合はセットアップ画面を表示
+            if (string.IsNullOrWhiteSpace(settings.StoragePath) || !Directory.Exists(settings.StoragePath))
+            {
+                Log.Information("StoragePath is invalid or not set. Launching SetupView.");
+
+                var setupVm = new SetupViewModel(settingsRepo);
+                var setupView = new SetupView { DataContext = setupVm };
+
+                // セットアップ画面をモーダル表示
+                // SetupViewModel内で保存が成功し、RequestCloseが呼ばれるとDialogResult=trueになる
+                var result = setupView.ShowDialog();
+
+                if (result != true)
+                {
+                    Log.Information("Setup cancelled by user. Shutting down.");
+                    Shutdown();
+                    return;
+                }
+
+                // 設定を再読み込み
+                settings = settingsRepo.Load();
+            }
+
+            Log.Information("Storage Path Configured: {Path}", settings.StoragePath);
+
+            // 2. サービスの構成
+            var services = new ServiceCollection();
+            ConfigureServices(services, settings, settingsRepo);
+            _serviceProvider = services.BuildServiceProvider();
+
+            // 3. アプリケーション開始
+            var singleInstanceService = _serviceProvider.GetRequiredService<ISingleInstanceService>();
+            const string AppId = "TimeLeaf-App-Instance";
+
+            if (!singleInstanceService.Start(AppId))
+            {
+                Log.Information("Another instance is already running. Notifying and exiting.");
+                singleInstanceService.NotifyFirstInstance(AppId);
+                this.Shutdown();
+                return;
+            }
+
+            // 自分のアイデンティティを同期 (UI 表示前に先行して同期を完了させる)
+            var syncUseCase = _serviceProvider.GetRequiredService<ISyncUserIdentityUseCase>();
+            await syncUseCase.ExecuteAsync();
+
+            // DIコンテナからメインウィンドウを取得
+            var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
+            var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
+
+            // 多重起動通知を受けた際のアクティブ化設定
+            singleInstanceService.LaunchedAnotherInstance += (s, ev) =>
+            {
+                mainViewModel.IsWindowVisible = true;
+            };
+
+            mainWindow.DataContext = mainViewModel;
+            mainWindow.Show();
+        }
+        catch (Exception ex)
+        {
+            HandleGlobalException(ex, "Application Start-up Exception");
+        }
+    }
+
+    private void ConfigureServices(IServiceCollection services, ApplicationSettings settings, IApplicationSettingsRepository settingsRepo)
+    {
+        // 設定リポジトリと設定オブジェクト自体を登録
+        services.AddSingleton(settingsRepo);
+        services.AddSingleton(settings);
+
         // ログの設定
         services.AddLogging(loggingBuilder =>
         {
@@ -138,8 +209,8 @@ public partial class App : Application
         });
 
         // 外部依存の設定
-        // 仕様に基づき、プロジェクトごとのフォルダを管理するルートディレクトリを指定
-        var storagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory ?? string.Empty, "storage");
+        // 仕様に基づき、設定されたルートディレクトリを使用
+        var storagePath = settings.StoragePath;
         var usersPath = Path.Combine(storagePath, "users");
 
         services.AddSingleton<IIdentitySeedRepository>(sp =>
@@ -197,6 +268,8 @@ public partial class App : Application
 
         // ViewModel の登録
         services.AddTransient<MainViewModel>();
+        services.AddTransient<ApplicationSettingsViewModel>();
+        services.AddTransient<ProfileEditViewModel>(); // Ensure this is registered if not already
         services.AddTransient<AddProjectViewModel>();
         services.AddTransient<AddTaskViewModel>();
         // Note: OverviewViewModel と ProjectWorkspaceViewModel はファクトリ経由で生成されるため、直接の Transient 登録は不要だが、
@@ -206,48 +279,6 @@ public partial class App : Application
 
         // View の登録
         services.AddTransient<MainWindow>();
-    }
-
-    protected override async void OnStartup(StartupEventArgs e)
-    {
-        base.OnStartup(e);
-
-        try
-        {
-            Log.Information("Application Starting Up");
-
-            var singleInstanceService = _serviceProvider.GetRequiredService<ISingleInstanceService>();
-            const string AppId = "TimeLeaf-App-Instance";
-
-            if (!singleInstanceService.Start(AppId))
-            {
-                Log.Information("Another instance is already running. Notifying and exiting.");
-                singleInstanceService.NotifyFirstInstance(AppId);
-                this.Shutdown();
-                return;
-            }
-
-            // 自分のアイデンティティを同期 (UI 表示前に先行して同期を完了させる)
-            var syncUseCase = _serviceProvider.GetRequiredService<ISyncUserIdentityUseCase>();
-            await syncUseCase.ExecuteAsync();
-
-            // DIコンテナからメインウィンドウを取得
-            var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
-            var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
-
-            // 多重起動通知を受けた際のアクティブ化設定
-            singleInstanceService.LaunchedAnotherInstance += (s, ev) =>
-            {
-                mainViewModel.IsWindowVisible = true;
-            };
-
-            mainWindow.DataContext = mainViewModel;
-            mainWindow.Show();
-        }
-        catch (Exception ex)
-        {
-            HandleGlobalException(ex, "Application Start-up Exception");
-        }
     }
 
     protected override void OnExit(ExitEventArgs e)

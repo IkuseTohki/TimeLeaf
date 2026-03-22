@@ -1,3 +1,4 @@
+using System.Windows;
 using System.Windows.Controls;
 
 namespace TimeLeaf.Views;
@@ -10,5 +11,14 @@ public partial class HomeView : UserControl
     public HomeView()
     {
         InitializeComponent();
+    }
+
+    private void UserMenuButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.ContextMenu != null)
+        {
+            btn.ContextMenu.PlacementTarget = btn;
+            btn.ContextMenu.IsOpen = true;
+        }
     }
 }

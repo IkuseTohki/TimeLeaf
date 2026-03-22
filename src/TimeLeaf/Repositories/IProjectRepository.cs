@@ -38,4 +38,10 @@ public interface IProjectRepository
     /// <param name="projects">保存対象のプロジェクトリスト。</param>
     /// <param name="userId">操作を実行しているユーザーのID。</param>
     Task SaveAllAsync(IEnumerable<Project> projects, string userId);
+
+    /// <summary>
+    /// 指定されたプロジェクトを物理的に削除します。
+    /// </summary>
+    /// <param name="projectId">削除対象のプロジェクトID。</param>
+    Task DeleteAsync(Guid projectId);
 }

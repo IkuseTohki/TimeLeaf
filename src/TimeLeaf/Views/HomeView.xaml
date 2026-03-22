@@ -34,7 +34,13 @@
                 <Button Padding="8"
                         Background="Transparent"
                         BorderThickness="0"
-                        Command="{Binding UserMenu.EditProfileCommand}">
+                        Click="UserMenuButton_Click">
+                    <Button.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Command="{Binding UserMenu.EditProfileCommand}" Header="プロフィール設定" />
+                            <MenuItem Command="{Binding UserMenu.OpenSettingsCommand}" Header="アプリケーション設定" />
+                        </ContextMenu>
+                    </Button.ContextMenu>
                     <Path Width="24"
                           Height="24"
                           Data="{StaticResource MenuIconGeometry}"

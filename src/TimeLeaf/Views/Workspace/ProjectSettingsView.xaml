@@ -3,13 +3,115 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             d:DesignHeight="450"
+             xmlns:vm="clr-namespace:TimeLeaf.ViewModels.Workspace"
+             d:DataContext="{d:DesignInstance vm:ProjectSettingsViewModel}"
+             d:DesignHeight="600"
              d:DesignWidth="800"
+             Background="{DynamicResource SurfaceLayer1Brush}"
              mc:Ignorable="d">
-    <Grid>
-        <TextBlock HorizontalAlignment="Center"
-                   VerticalAlignment="Center"
-                   FontSize="24"
-                   Text="Settings View" />
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+
+        <!-- Inverse Boolean To Visibility Converter -->
+        <Style x:Key="InverseVisibility" TargetType="FrameworkElement">
+            <Setter Property="Visibility" Value="Collapsed" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsArchived}" Value="False">
+                    <Setter Property="Visibility" Value="Visible" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="NormalVisibility" TargetType="FrameworkElement">
+            <Setter Property="Visibility" Value="Collapsed" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsArchived}" Value="True">
+                    <Setter Property="Visibility" Value="Visible" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="32">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,32">
+            <TextBlock FontSize="24"
+                       FontWeight="Bold"
+                       Foreground="{DynamicResource TextPrimaryBrush}"
+                       Text="プロジェクト設定" />
+            <TextBlock Margin="0,4,0,0"
+                       FontSize="14"
+                       Foreground="{DynamicResource TextSecondaryBrush}"
+                       Text="{Binding ProjectName}" />
+        </StackPanel>
+
+        <!-- Content -->
+        <StackPanel Grid.Row="1"
+                    MaxWidth="600"
+                    HorizontalAlignment="Left">
+
+            <!-- Lifecycle Management -->
+            <GroupBox Margin="0,0,0,32"
+                      Padding="16"
+                      BorderBrush="{DynamicResource SurfaceLayer2Brush}"
+                      Header="ライフサイクル管理">
+                <StackPanel>
+                    <TextBlock Margin="0,0,0,16"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               Text="プロジェクトの状態を変更します。" />
+
+                    <!-- Archive Action -->
+                    <StackPanel Style="{StaticResource InverseVisibility}">
+                        <Button HorizontalAlignment="Left"
+                                Command="{Binding ArchiveCommand}"
+                                Content="プロジェクトをアーカイブする"
+                                Style="{StaticResource OutlinedButtonStyle}" />
+                        <TextBlock Margin="0,4,0,0"
+                                   FontSize="11"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   Text="※ アーカイブするとプロジェクトは読み取り専用になり、通常のリストから非表示になります。" />
+                    </StackPanel>
+
+                    <!-- Unarchive Action -->
+                    <StackPanel Style="{StaticResource NormalVisibility}">
+                        <TextBlock Margin="0,0,0,8"
+                                   FontWeight="Bold"
+                                   Foreground="{DynamicResource BrandPrimaryBrush}"
+                                   Text="このプロジェクトはアーカイブされています。" />
+                        <Button HorizontalAlignment="Left"
+                                Command="{Binding UnarchiveCommand}"
+                                Content="アーカイブを解除する"
+                                Style="{StaticResource PrimaryButtonStyle}" />
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
+
+            <!-- Danger Zone -->
+            <GroupBox Padding="16"
+                      BorderBrush="#FFCDD2"
+                      Header="Danger Zone">
+                <StackPanel>
+                    <TextBlock Margin="0,0,0,8"
+                               FontWeight="Bold"
+                               Foreground="Red"
+                               Text="この操作は元に戻せません。" />
+
+                    <Button Padding="16,8"
+                            HorizontalAlignment="Left"
+                            Background="#FFEBEE"
+                            BorderBrush="#FFCDD2"
+                            Command="{Binding DeleteCommand}"
+                            Content="プロジェクトを削除する"
+                            Foreground="#D32F2F" />
+                </StackPanel>
+            </GroupBox>
+
+        </StackPanel>
     </Grid>
 </UserControl>

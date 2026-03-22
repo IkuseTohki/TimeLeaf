@@ -12,6 +12,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <!-- LeafKit.UI Resources -->
                 <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/ForestColors.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/FormStyles.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/ControlStyles.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/ComponentStyles.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/Icons.xaml" />
@@ -34,6 +35,9 @@
             </DataTemplate>
             <DataTemplate DataType="{x:Type viewModels:ProfileEditViewModel}">
                 <views:ProfileEditView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModels:ApplicationSettingsViewModel}">
+                <views:ApplicationSettingsView />
             </DataTemplate>
             <DataTemplate DataType="{x:Type workspace:TaskDetailViewModel}">
                 <workspaceViews:TaskDetailView />

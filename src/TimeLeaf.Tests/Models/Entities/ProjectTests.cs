@@ -128,4 +128,66 @@ public class ProjectTests
         Assert.IsTrue(project.AssignedUserIds.Contains(newIds[0]));
         Assert.IsTrue(project.AssignedUserIds.Contains(newIds[1]));
     }
+
+    /// <summary>
+    /// テスト観点: プロジェクトのアーカイブおよび解除が正しく動作することを確認する。
+    /// </summary>
+    [TestMethod]
+    public void ArchiveAndUnarchive_ShouldUpdateStatus()
+    {
+        // Arrange
+        var project = new Project();
+        Assert.IsFalse(project.IsArchived, "デフォルトは非アーカイブであること");
+
+        // Act (Archive)
+        project.Archive();
+        // Assert
+        Assert.IsTrue(project.IsArchived, "アーカイブ済みになること");
+
+        // Act (Unarchive)
+        project.Unarchive();
+        // Assert
+        Assert.IsFalse(project.IsArchived, "アーカイブが解除されること");
+    }
+
+    /// <summary>
+    /// テスト観点: プロジェクトのロックおよび解除が正しく動作することを確認する。
+    /// </summary>
+    [TestMethod]
+    public void LockAndUnlock_ShouldUpdateLockedUntil()
+    {
+        // Arrange
+        var project = new Project();
+        var lockUntil = DateTime.UtcNow.AddDays(7);
+        Assert.IsNull(project.LockedUntil, "デフォルトはロックなしであること");
+
+        // Act (Lock)
+        project.Lock(lockUntil);
+        // Assert
+        Assert.AreEqual(lockUntil, project.LockedUntil, "ロック期限がセットされていること");
+
+        // Act (Unlock)
+        project.Unlock();
+        // Assert
+        Assert.IsNull(project.LockedUntil, "ロックが解除されていること");
+    }
+
+    /// <summary>
+    /// テスト観点: SetLifecycleStatus メソッドでライフサイクル状態を一括設定できることを確認する。
+    /// </summary>
+    [TestMethod]
+    public void SetLifecycleStatus_ShouldUpdateProperties()
+    {
+        // Arrange
+        var project = new Project();
+        var isArchived = true;
+        var lockedUntil = DateTime.UtcNow.AddDays(1);
+
+        // Act
+        project.SetLifecycleStatus(isArchived, lockedUntil);
+
+        // Assert
+        Assert.AreEqual(isArchived, project.IsArchived);
+        Assert.AreEqual(lockedUntil, project.LockedUntil);
+    }
 }

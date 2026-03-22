@@ -92,6 +92,13 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                 _logger.LogDebug("Loading project {ProjectId} from {Directory}", meta.ProjectId, dir);
                 // .project から判明している ID を渡して Replay を開始
                 var project = await ReplayProjectAsync(dir, meta.ProjectId, meta.CreatedAt);
+
+                // ライフサイクル状態を適用
+                if (project != null)
+                {
+                    project.SetLifecycleStatus(meta.IsArchived, meta.LockedUntil);
+                }
+
                 return project != null ? new { Project = project, CreatedAt = meta.CreatedAt } : null;
             }
             catch (Exception ex)
@@ -129,6 +136,9 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
 
         var metaPath = Path.Combine(targetDir, ".project");
         DateTime createdAt = DateTime.UtcNow;
+        bool isArchived = false;
+        DateTime? lockedUntil = null;
+
         if (File.Exists(metaPath))
         {
             var metaJson = await File.ReadAllTextAsync(metaPath);
@@ -136,10 +146,17 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
             if (meta != null)
             {
                 createdAt = meta.CreatedAt;
+                isArchived = meta.IsArchived;
+                lockedUntil = meta.LockedUntil;
             }
         }
 
-        return await ReplayProjectAsync(targetDir, projectId, createdAt);
+        var project = await ReplayProjectAsync(targetDir, projectId, createdAt);
+        if (project != null)
+        {
+            project.SetLifecycleStatus(isArchived, lockedUntil);
+        }
+        return project;
     }
 
 
@@ -161,6 +178,38 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         foreach (var project in projects) await SaveAsync(project, userId);
     }
 
+    /// <summary>
+    /// 指定されたプロジェクトを物理的に削除します。
+    /// </summary>
+    public async System.Threading.Tasks.Task DeleteAsync(Guid projectId)
+    {
+        _logger.LogWarning("Deleting project: {ProjectId}", projectId);
+        var projectDirs = Directory.GetDirectories(_baseDirectory);
+        var targetDir = projectDirs.FirstOrDefault(d => Path.GetFileName(d).StartsWith(projectId.ToString()));
+
+        if (targetDir != null && Directory.Exists(targetDir))
+        {
+            try
+            {
+                // ディレクトリごと削除 (再帰的)
+                await System.Threading.Tasks.Task.Run(() => Directory.Delete(targetDir, true));
+                _logger.LogInformation("Deleted project directory: {TargetDir}", targetDir);
+
+                // 変更通知を発火（削除されたことを通知）
+                OnMonitorProjectChanged(projectId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to delete project directory: {TargetDir}", targetDir);
+                throw;
+            }
+        }
+        else
+        {
+            _logger.LogWarning("Project directory not found for deletion: {ProjectId}", projectId);
+        }
+    }
+
     public async System.Threading.Tasks.Task SaveAsync(Project project, string userId)
     {
         _logger.LogInformation("Saving project: {ProjectName} ({ProjectId})", project.Name, project.Id);
@@ -172,11 +221,37 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                 Directory.CreateDirectory(projectDir);
             }
 
+            // .project (Metadata) の保存・更新
             var metaFilePath = Path.Combine(projectDir, ".project");
-            if (!File.Exists(metaFilePath))
+            var newMetadata = new ProjectMetadataDto(
+                project.Id,
+                project.CreatedAt,
+                userId,
+                1,
+                project.IsArchived,
+                project.LockedUntil);
+
+            bool shouldWriteMetadata = true;
+            if (File.Exists(metaFilePath))
             {
-                var metadata = new ProjectMetadataDto(project.Id, project.CreatedAt, userId, 1);
-                await File.WriteAllTextAsync(metaFilePath, _serializer.Serialize(metadata));
+                try
+                {
+                    var existingJson = await File.ReadAllTextAsync(metaFilePath);
+                    var existingMeta = _serializer.Deserialize<ProjectMetadataDto>(existingJson);
+                    if (existingMeta != null && existingMeta == newMetadata)
+                    {
+                        shouldWriteMetadata = false;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Failed to read existing .project file. Overwriting.");
+                }
+            }
+
+            if (shouldWriteMetadata)
+            {
+                await File.WriteAllTextAsync(metaFilePath, _serializer.Serialize(newMetadata));
             }
 
             var changesDir = Path.Combine(projectDir, "changes");
