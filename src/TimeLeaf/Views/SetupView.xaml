@@ -54,7 +54,7 @@
                          VerticalContentAlignment="Center"
                          Text="{Binding StoragePath, UpdateSourceTrigger=PropertyChanged}" />
                 <Button Grid.Column="1"
-                        Click="BrowseButton_Click"
+                        Command="{Binding BrowseStoragePathCommand}"
                         Content="参照..." />
             </Grid>
             <TextBlock Margin="0,5,0,0"
@@ -65,7 +65,7 @@
         <StackPanel Grid.Row="2"
                     HorizontalAlignment="Right"
                     Orientation="Horizontal">
-            <Button Click="CancelButton_Click"
+            <Button Command="{Binding CancelCommand}"
                     Content="キャンセル"
                     IsCancel="true" />
             <Button Command="{Binding SaveAndStartCommand}"

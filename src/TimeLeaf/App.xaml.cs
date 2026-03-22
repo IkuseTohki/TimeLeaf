@@ -135,11 +135,15 @@ public partial class App : Application
             {
                 Log.Information("StoragePath is invalid or not set. Launching SetupView.");
 
-                var setupVm = new SetupViewModel(settingsRepo);
+                var setupVm = new SetupViewModel(settingsRepo, new DialogService());
                 var setupView = new SetupView { DataContext = setupVm };
 
-                // セットアップ画面をモーダル表示
-                // SetupViewModel内で保存が成功し、RequestCloseが呼ばれるとDialogResult=trueになる
+                setupVm.RequestClose += (result) =>
+                {
+                    setupView.DialogResult = result;
+                    setupView.Close();
+                };
+
                 var result = setupView.ShowDialog();
 
                 if (result != true)

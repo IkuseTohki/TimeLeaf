@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:ui="http://schemas.leafkit.com/wpf/ui/behaviors"
              xmlns:vm="clr-namespace:TimeLeaf.ViewModels"
              d:DataContext="{d:DesignInstance Type=vm:HomeViewModel}"
              d:DesignHeight="600"
@@ -32,9 +33,9 @@
                         VerticalAlignment="Top"
                         Orientation="Horizontal">
                 <Button Padding="8"
+                        ui:ContextMenuBehavior.IsOpenOnClick="True"
                         Background="Transparent"
-                        BorderThickness="0"
-                        Click="UserMenuButton_Click">
+                        BorderThickness="0">
                     <Button.ContextMenu>
                         <ContextMenu>
                             <MenuItem Command="{Binding UserMenu.EditProfileCommand}" Header="プロフィール設定" />
