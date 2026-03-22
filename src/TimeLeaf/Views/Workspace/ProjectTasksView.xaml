@@ -58,7 +58,8 @@
                     Background="Transparent"
                     BorderThickness="0"
                     Command="{Binding AddTaskCommand}"
-                    DockPanel.Dock="Top">
+                    DockPanel.Dock="Top"
+                    IsEnabled="{Binding ProjectViewModel.IsAssignedToMe}">
                 <Border Padding="16,8" Style="{StaticResource OrganicCardStyle}">
                     <Grid>
                         <Grid.ColumnDefinitions>

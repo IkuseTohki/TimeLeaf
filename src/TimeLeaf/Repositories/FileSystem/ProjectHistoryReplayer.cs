@@ -89,6 +89,7 @@ internal class ProjectHistoryReplayer
             case "Project_Basic": ApplyProjectBasic(project, json); break;
             case "Project_Description": ApplyProjectDescription(project, json); break;
             case "Project_Milestones": ApplyProjectMilestones(project, json); break;
+            case "Project_Members": ApplyProjectMembers(project, json); break;
             case "Task_Planning": ApplyTaskPlanning(project, taskMap, json); break;
             case "Task_Progress": ApplyTaskProgress(project, taskMap, json); break;
             case "Task_Description": ApplyTaskDescription(project, taskMap, json); break;
@@ -114,6 +115,13 @@ internal class ProjectHistoryReplayer
         var dto = _serializer.Deserialize<ProjectMilestonesDto>(json);
         if (dto == null) return;
         project.ReplayMilestones(dto.Milestones.Select(m => new Milestone { Date = m.Date, Label = m.Label }));
+    }
+
+    private void ApplyProjectMembers(Project project, string json)
+    {
+        var dto = _serializer.Deserialize<ProjectMembersDto>(json);
+        if (dto == null) return;
+        project.ReplayAssignments(dto.AssignedUserIds);
     }
 
     private void ApplyTaskPlanning(Project project, Dictionary<Guid, ProjectTask> taskMap, string json)

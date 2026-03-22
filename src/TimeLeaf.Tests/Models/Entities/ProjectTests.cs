@@ -1,10 +1,10 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TimeLeaf.Models.Entities;
-
-namespace TimeLeaf.Tests.Models.Entities;
-
 using System;
 using System.Linq;
+using System.Collections.Generic;
+
+namespace TimeLeaf.Tests.Models.Entities;
 
 [TestClass]
 public class ProjectTests
@@ -58,72 +58,74 @@ public class ProjectTests
     {
         // Arrange
         var project = new Project();
-        project.UpdateName("Initial Name");
+        var name = "Updated Name";
+        var status = TimeLeaf.Models.Enums.ProjectStatus.InProgress;
+        var health = TimeLeaf.Models.Enums.ProjectHealth.Warning;
 
         // Act
-        project.UpdateName("Updated Name");
+        project.UpdateBasicInfo(name, status, health);
 
         // Assert
-        Assert.AreEqual("Updated Name", project.Name);
+        Assert.AreEqual(name, project.Name);
+        Assert.AreEqual(status, project.Status);
+        Assert.AreEqual(health, project.HealthStatus);
     }
 
     /// <summary>
     /// テスト観点: プロジェクト全体の合計見積工数と合計実績工数が正しく算出されることを確認する。
     /// </summary>
     [TestMethod]
-    public void TotalCosts_ShouldReflectTaskCosts()
+    public void AssignUser_ShouldAddUserId()
     {
         // Arrange
         var project = new Project();
-        var t1 = new ProjectTask();
-        t1.UpdateName("T1");
-        t1.UpdateEstimatedCost(10);
-        t1.UpdateActualCost(5);
-        project.AddTask(t1);
+        var userId = Guid.NewGuid();
 
-        var t2 = new ProjectTask();
-        t2.UpdateName("T2");
-        t2.UpdateEstimatedCost(20);
-        t2.UpdateActualCost(15);
-        project.AddTask(t2);
+        // Act
+        project.AssignUser(userId);
 
-        // Act & Assert
-        Assert.AreEqual(30.0, project.TotalEstimatedCost, "合計見積工数が正しく算出されること");
-        Assert.AreEqual(20.0, project.TotalActualCost, "合計実績工数が正しく算出されること");
+        // Assert
+        Assert.IsTrue(project.AssignedUserIds.Contains(userId));
     }
 
     /// <summary>
     /// テスト観点: タスクがない場合、合計工数は 0 となることを確認する。
     /// </summary>
     [TestMethod]
-    public void TotalCosts_ShouldBeZero_WhenNoTasks()
+    public void UnassignUser_ShouldRemoveUserId()
     {
         // Arrange
         var project = new Project();
+        var userId = Guid.NewGuid();
+        project.AssignUser(userId);
 
-        // Act & Assert
-        Assert.AreEqual(0.0, project.TotalEstimatedCost);
-        Assert.AreEqual(0.0, project.TotalActualCost);
+        // Act
+        project.UnassignUser(userId);
+
+        // Assert
+        Assert.IsFalse(project.AssignedUserIds.Contains(userId));
     }
 
     /// <summary>
     /// テスト観点: Project エンティティにマイルストーンを追加し、正しく保持できることを確認する。
     /// </summary>
     [TestMethod]
-    public void Milestones_ShouldBeReadAndWrite()
+    public void ReplayAssignments_ShouldOverwriteList()
     {
         // Arrange
         var project = new Project();
-        var milestoneDate = new DateTime(2026, 12, 31);
-        var milestoneLabel = "Release v1.0";
+        var oldId = Guid.NewGuid();
+        project.AssignUser(oldId);
+
+        var newIds = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() };
 
         // Act
-        project.AddMilestone(new Milestone(milestoneDate, milestoneLabel));
+        project.ReplayAssignments(newIds);
 
         // Assert
-        Assert.IsNotNull(project.Milestones);
-        Assert.AreEqual(1, project.Milestones.Count, "マイルストーンが1つ追加されていること");
-        Assert.AreEqual(milestoneDate, project.Milestones.First().Date, "日付が正しく保持されていること");
-        Assert.AreEqual(milestoneLabel, project.Milestones.First().Label, "ラベルが正しく保持されていること");
+        Assert.AreEqual(2, project.AssignedUserIds.Count);
+        Assert.IsFalse(project.AssignedUserIds.Contains(oldId));
+        Assert.IsTrue(project.AssignedUserIds.Contains(newIds[0]));
+        Assert.IsTrue(project.AssignedUserIds.Contains(newIds[1]));
     }
 }

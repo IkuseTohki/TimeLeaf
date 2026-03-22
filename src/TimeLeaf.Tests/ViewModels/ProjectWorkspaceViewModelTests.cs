@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -19,6 +17,7 @@ public class ProjectWorkspaceViewModelTests
 {
     private Mock<IViewModelFactory> _viewModelFactoryMock = null!;
     private Mock<INotificationService> _notificationServiceMock = null!;
+    private Mock<ICheckAssignmentUseCase> _checkAssignmentMock = null!;
     private Mock<ILogger<ProjectWorkspaceViewModel>> _loggerMock = null!;
     private ProjectViewModel _projectViewModel = null!;
 
@@ -28,11 +27,16 @@ public class ProjectWorkspaceViewModelTests
         _viewModelFactoryMock = new Mock<IViewModelFactory>();
         _notificationServiceMock = new Mock<INotificationService>();
         _notificationServiceMock.Setup(x => x.UnreadNotifications).Returns(new List<Notification>());
+        _checkAssignmentMock = new Mock<ICheckAssignmentUseCase>();
         _loggerMock = new Mock<ILogger<ProjectWorkspaceViewModel>>();
 
         var project = new Project();
         project.UpdateName("Test Project");
-        _projectViewModel = new ProjectViewModel(project);
+        _projectViewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object);
+
+        // Factory mock setup
+        _viewModelFactoryMock.Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
+            .Returns((Project p) => new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object));
 
         // デフォルトの戻り値を設定
         _viewModelFactoryMock.Setup(x => x.CreateProjectDashboardViewModel(It.IsAny<ProjectViewModel>()))
@@ -50,10 +54,58 @@ public class ProjectWorkspaceViewModelTests
     }
 
     [TestMethod]
+    public void IsUserAssigned_ShouldReflectProjectViewModelStatus()
+    {
+        // Arrange
+        var myId = Guid.NewGuid();
+        var project = new Project();
+        // 自分はまだアサインされていない
+        var projectVm = new ProjectViewModel(project, myId, new Mock<IJoinProjectUseCase>().Object);
+
+        var vm = new ProjectWorkspaceViewModel(projectVm, _notificationServiceMock.Object, _viewModelFactoryMock.Object, _checkAssignmentMock.Object, _loggerMock.Object);
+
+        // Assert
+        Assert.IsFalse(vm.IsUserAssigned);
+
+        // Act: アサインする
+        project.AssignUser(myId);
+        projectVm.SyncFromModel();
+
+        // Assert: 連動して true になる
+        Assert.IsTrue(vm.IsUserAssigned);
+    }
+
+    [TestMethod]
+    public void IsUserAssigned_ShouldNotifyChange_WhenProjectViewModelAssignmentChanges()
+    {
+        // Arrange
+        var myId = Guid.NewGuid();
+        var project = new Project();
+        var projectVm = new ProjectViewModel(project, myId, new Mock<IJoinProjectUseCase>().Object);
+        var vm = new ProjectWorkspaceViewModel(projectVm, _notificationServiceMock.Object, _viewModelFactoryMock.Object, _checkAssignmentMock.Object, _loggerMock.Object);
+
+        bool notified = false;
+        vm.PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName == nameof(ProjectWorkspaceViewModel.IsUserAssigned))
+            {
+                notified = true;
+            }
+        };
+
+        // Act
+        project.AssignUser(myId);
+        projectVm.SyncFromModel();
+
+        // Assert
+        Assert.IsTrue(notified);
+    }
+
+    [TestMethod]
     public void DefaultView_ShouldBeDashboard()
     {
         // Act
-        var vm = new ProjectWorkspaceViewModel(_projectViewModel, _notificationServiceMock.Object, _viewModelFactoryMock.Object, _loggerMock.Object);
+        var vm = new ProjectWorkspaceViewModel(_projectViewModel, _notificationServiceMock.Object, _viewModelFactoryMock.Object, _checkAssignmentMock.Object, _loggerMock.Object);
 
         // Assert
         Assert.IsInstanceOfType(vm.CurrentSubViewModel, typeof(ProjectDashboardViewModel));
@@ -63,7 +115,7 @@ public class ProjectWorkspaceViewModelTests
     public void SwitchToTasks_ShouldUpdateCurrentSubViewModel()
     {
         // Arrange
-        var vm = new ProjectWorkspaceViewModel(_projectViewModel, _notificationServiceMock.Object, _viewModelFactoryMock.Object, _loggerMock.Object);
+        var vm = new ProjectWorkspaceViewModel(_projectViewModel, _notificationServiceMock.Object, _viewModelFactoryMock.Object, _checkAssignmentMock.Object, _loggerMock.Object);
 
         // Act
         vm.SwitchSubViewCommand.Execute("Tasks");
@@ -76,7 +128,7 @@ public class ProjectWorkspaceViewModelTests
     public void OpenTaskDetail_ShouldSwitchSubViewToTaskDetail()
     {
         // Arrange
-        var vm = new ProjectWorkspaceViewModel(_projectViewModel, _notificationServiceMock.Object, _viewModelFactoryMock.Object, _loggerMock.Object);
+        var vm = new ProjectWorkspaceViewModel(_projectViewModel, _notificationServiceMock.Object, _viewModelFactoryMock.Object, _checkAssignmentMock.Object, _loggerMock.Object);
         var task = new ProjectTask { Id = Guid.NewGuid() };
         var taskVm = new ProjectTaskViewModel(task);
         var detailVm = new TaskDetailViewModel(_projectViewModel, taskVm, new Mock<IAddCommentUseCase>().Object, new Mock<ILogger<TaskDetailViewModel>>().Object);

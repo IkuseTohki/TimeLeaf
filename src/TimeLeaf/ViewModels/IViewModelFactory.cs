@@ -14,6 +14,7 @@ public interface IViewModelFactory
     AllTasksViewModel CreateAllTasksViewModel(ObservableCollection<ProjectViewModel> projects);
     OverviewViewModel CreateOverviewViewModel(ObservableCollection<ProjectViewModel> projects);
     ProjectWorkspaceViewModel CreateProjectWorkspaceViewModel(ProjectViewModel projectViewModel);
+    ProjectViewModel CreateProjectViewModel(Project project);
     AddProjectViewModel CreateAddProjectViewModel();
     AddTaskViewModel CreateAddTaskViewModel();
 
@@ -23,6 +24,6 @@ public interface IViewModelFactory
     ProjectSettingsViewModel CreateProjectSettingsViewModel(ProjectViewModel projectViewModel);
     ProjectNotificationsViewModel CreateProjectNotificationsViewModel();
 
-    TaskSummaryViewModel CreateTaskSummaryViewModel(ProjectTaskViewModel taskViewModel);
+    TaskSummaryViewModel CreateTaskSummaryViewModel(ProjectViewModel projectViewModel, ProjectTaskViewModel taskViewModel);
     TaskDetailViewModel CreateTaskDetailViewModel(ProjectViewModel projectViewModel, ProjectTaskViewModel taskViewModel);
 }

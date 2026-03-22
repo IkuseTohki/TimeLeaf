@@ -73,7 +73,7 @@ public partial class OverviewViewModel : ObservableObject
                     addProjectVm.Status,
                     addProjectVm.Health);
 
-                var projectViewModel = new ProjectViewModel(projectEntity);
+                var projectViewModel = _viewModelFactory.CreateProjectViewModel(projectEntity);
                 Projects.Add(projectViewModel);
 
                 _logger.LogInformation("AddProject completed successfully. Created project {ProjectId}", projectViewModel.Id);

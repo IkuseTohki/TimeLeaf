@@ -10,16 +10,23 @@ namespace TimeLeaf.ViewModels.Workspace;
 /// </summary>
 public partial class TaskSummaryViewModel : ObservableObject, LeafKit.UI.Services.IDialogViewModel
 {
+    private readonly ProjectViewModel _projectViewModel;
     private readonly ProjectTaskViewModel _taskViewModel;
 
     public ProjectTaskViewModel Task => _taskViewModel;
 
+    /// <summary>
+    /// 現在のユーザーがプロジェクトにアサインされているかどうか。
+    /// </summary>
+    public bool IsAssignedToMe => _projectViewModel.IsAssignedToMe;
+
     /// <inheritdoc />
     public event Action<bool>? RequestClose;
 
-    public TaskSummaryViewModel(ProjectTaskViewModel taskViewModel)
+    public TaskSummaryViewModel(ProjectViewModel projectViewModel, ProjectTaskViewModel taskViewModel)
     {
-        _taskViewModel = taskViewModel;
+        _projectViewModel = projectViewModel ?? throw new ArgumentNullException(nameof(projectViewModel));
+        _taskViewModel = taskViewModel ?? throw new ArgumentNullException(nameof(taskViewModel));
     }
 
     /// <summary>

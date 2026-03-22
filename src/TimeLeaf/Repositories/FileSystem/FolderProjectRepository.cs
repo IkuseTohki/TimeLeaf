@@ -192,6 +192,9 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
             var milestoneSnapshot = new ProjectMilestonesDto(project.Milestones.Select(m => new MilestoneDto(m.Date, m.Label)).ToList());
             await TrySaveCategoryAsync(project.Id, changesDir, "Project_Milestones", milestoneSnapshot, commitTime, userId);
 
+            var membersSnapshot = new ProjectMembersDto { AssignedUserIds = project.AssignedUserIds.ToList() };
+            await TrySaveCategoryAsync(project.Id, changesDir, "Project_Members", membersSnapshot, commitTime, userId);
+
             // 2. タスク情報の保存 (各タスク 3カテゴリ)
             foreach (var task in project.Tasks)
             {

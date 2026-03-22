@@ -30,9 +30,12 @@ public class ProjectWorkspaceViewModelNavigationTests
 
         var project = new Project();
         project.UpdateName("Nav Test Project");
-        _projectViewModel = new ProjectViewModel(project);
+        _projectViewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object);
 
         // Factory mock setup
+        _viewModelFactoryMock.Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
+            .Returns((Project p) => new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object));
+
         _viewModelFactoryMock.Setup(x => x.CreateProjectDashboardViewModel(It.IsAny<ProjectViewModel>()))
             .Returns((ProjectViewModel pvm) => new ProjectDashboardViewModel(pvm, new Mock<IAddMilestoneUseCase>().Object, new Mock<ILogger<ProjectDashboardViewModel>>().Object));
 
@@ -50,7 +53,8 @@ public class ProjectWorkspaceViewModelNavigationTests
     public void NavigateToProject_ShouldSetProjectWorkspaceViewModel()
     {
         // Arrange
-        var vm = new ProjectWorkspaceViewModel(_projectViewModel, _notificationServiceMock.Object, _viewModelFactoryMock.Object, _loggerMock.Object);
+        var checkAssignmentMock = new Mock<ICheckAssignmentUseCase>();
+        var vm = new ProjectWorkspaceViewModel(_projectViewModel, _notificationServiceMock.Object, _viewModelFactoryMock.Object, checkAssignmentMock.Object, _loggerMock.Object);
 
         // Act
         vm.SwitchSubViewCommand.Execute("Tasks");

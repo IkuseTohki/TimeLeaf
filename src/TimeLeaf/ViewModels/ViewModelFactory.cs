@@ -2,9 +2,11 @@ using System;
 using System.Collections.ObjectModel;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using TimeLeaf.Models.Entities;
 using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels.Workspace;
+using LeafKit.UI.Services;
 
 namespace TimeLeaf.ViewModels;
 
@@ -14,15 +16,17 @@ namespace TimeLeaf.ViewModels;
 public class ViewModelFactory : IViewModelFactory
 {
     private readonly IServiceProvider _serviceProvider;
+    private readonly IIdentityService _identityService;
 
-    public ViewModelFactory(IServiceProvider serviceProvider)
+    public ViewModelFactory(IServiceProvider serviceProvider, IIdentityService identityService)
     {
         _serviceProvider = serviceProvider;
+        _identityService = identityService;
     }
 
     public HomeViewModel CreateHomeViewModel(ObservableCollection<ProjectViewModel> projects)
     {
-        return new HomeViewModel(projects);
+        return new HomeViewModel(projects, new UserMenuViewModel(_identityService, _serviceProvider.GetRequiredService<IDialogService>()));
     }
 
     public AllTasksViewModel CreateAllTasksViewModel(ObservableCollection<ProjectViewModel> projects)
@@ -35,7 +39,7 @@ public class ViewModelFactory : IViewModelFactory
         return new OverviewViewModel(
             projects,
             _serviceProvider.GetRequiredService<IAddProjectUseCase>(),
-            _serviceProvider.GetRequiredService<LeafKit.UI.Services.IDialogService>(),
+            _serviceProvider.GetRequiredService<IDialogService>(),
             this,
             _serviceProvider.GetRequiredService<ILogger<OverviewViewModel>>());
     }
@@ -46,7 +50,16 @@ public class ViewModelFactory : IViewModelFactory
             projectViewModel,
             _serviceProvider.GetRequiredService<INotificationService>(),
             this,
+            _serviceProvider.GetRequiredService<ICheckAssignmentUseCase>(),
             _serviceProvider.GetRequiredService<ILogger<ProjectWorkspaceViewModel>>());
+    }
+
+    public ProjectViewModel CreateProjectViewModel(Project project)
+    {
+        return new ProjectViewModel(
+            project,
+            _identityService.CurrentUserId,
+            _serviceProvider.GetRequiredService<IJoinProjectUseCase>());
     }
 
     public AddProjectViewModel CreateAddProjectViewModel()
@@ -73,7 +86,7 @@ public class ViewModelFactory : IViewModelFactory
             projectViewModel,
             _serviceProvider.GetRequiredService<IAddTaskUseCase>(),
             this,
-            _serviceProvider.GetRequiredService<LeafKit.UI.Services.IDialogService>(),
+            _serviceProvider.GetRequiredService<IDialogService>(),
             _serviceProvider.GetRequiredService<ILogger<ProjectTasksViewModel>>(),
             _serviceProvider.GetRequiredService<ILogger<TaskDetailViewModel>>());
     }
@@ -94,9 +107,9 @@ public class ViewModelFactory : IViewModelFactory
             _serviceProvider.GetRequiredService<INotificationService>());
     }
 
-    public TaskSummaryViewModel CreateTaskSummaryViewModel(ProjectTaskViewModel taskViewModel)
+    public TaskSummaryViewModel CreateTaskSummaryViewModel(ProjectViewModel projectViewModel, ProjectTaskViewModel taskViewModel)
     {
-        return new TaskSummaryViewModel(taskViewModel);
+        return new TaskSummaryViewModel(projectViewModel, taskViewModel);
     }
 
     public TaskDetailViewModel CreateTaskDetailViewModel(ProjectViewModel projectViewModel, ProjectTaskViewModel taskViewModel)

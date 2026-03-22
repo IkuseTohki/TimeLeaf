@@ -34,6 +34,7 @@ public partial class MainViewModel : ObservableObject
     private readonly IOSNotificationService _osNotificationService;
     private readonly ICheckTaskDeadlinesUseCase _checkDeadlinesUseCase;
     private readonly IDialogService _dialogService;
+    private readonly IIdentityService _identityService;
     private readonly ILogger<MainViewModel> _logger;
 
     [ObservableProperty]
@@ -61,6 +62,33 @@ public partial class MainViewModel : ObservableObject
 
     [ObservableProperty]
     private ObservableObject _currentViewModel;
+
+    /// <summary>
+    /// 現在のユーザー名。
+    /// </summary>
+    public string CurrentUserName => _identityService.CurrentUserId == Guid.Empty ? "Guest" : Environment.UserName; // 仮実装
+
+    [RelayCommand]
+    private async System.Threading.Tasks.Task EditProfile()
+    {
+        _logger.LogInformation("EditProfile started.");
+        try
+        {
+            var profileVm = new ProfileEditViewModel(_identityService);
+            await profileVm.LoadAsync();
+            var result = await _dialogService.ShowDialogAsync(profileVm);
+
+            if (result)
+            {
+                OnPropertyChanged(nameof(CurrentUserName));
+                _logger.LogInformation("Profile updated successfully.");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to edit profile.");
+        }
+    }
 
     /// <summary>
     /// サイドバーが展開されているかどうか。
@@ -110,6 +138,7 @@ public partial class MainViewModel : ObservableObject
         IOSNotificationService osNotificationService,
         ICheckTaskDeadlinesUseCase checkDeadlinesUseCase,
         IDialogService dialogService,
+        IIdentityService identityService,
         ILogger<MainViewModel> logger)
     {
         _loadUseCase = loadUseCase;
@@ -125,9 +154,9 @@ public partial class MainViewModel : ObservableObject
         _osNotificationService = osNotificationService;
         _checkDeadlinesUseCase = checkDeadlinesUseCase;
         _dialogService = dialogService;
+        _identityService = identityService;
         _logger = logger;
 
-        // 状態の初期化（バックフィールドを直接初期化することで、コンパイラの非許容チェックを満足させる）
         _navigationContext = MainNavigationContext.Home;
         _currentViewModel = _viewModelFactory.CreateHomeViewModel(Projects);
 
@@ -187,7 +216,7 @@ public partial class MainViewModel : ObservableObject
                 else
                 {
                     _logger.LogDebug("Adding new project {ProjectId} ViewModel from sync.", projectId);
-                    var newProjectViewModel = new ProjectViewModel(updatedProjectEntity);
+                    var newProjectViewModel = _viewModelFactory.CreateProjectViewModel(updatedProjectEntity);
                     Projects.Add(newProjectViewModel);
                 }
 
@@ -218,7 +247,7 @@ public partial class MainViewModel : ObservableObject
                 Projects.Clear();
                 foreach (var projectEntity in projectEntities)
                 {
-                    var projectViewModel = new ProjectViewModel(projectEntity);
+                    var projectViewModel = _viewModelFactory.CreateProjectViewModel(projectEntity);
                     Projects.Add(projectViewModel);
                 }
             });
@@ -302,7 +331,7 @@ public partial class MainViewModel : ObservableObject
                     addProjectVm.Status,
                     addProjectVm.Health);
 
-                var projectViewModel = new ProjectViewModel(projectEntity);
+                var projectViewModel = _viewModelFactory.CreateProjectViewModel(projectEntity);
 
                 await _dispatcherService.InvokeAsync(() =>
                 {

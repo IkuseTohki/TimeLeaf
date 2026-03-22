@@ -11,6 +11,7 @@ namespace TimeLeaf.ViewModels;
 public partial class HomeViewModel : ObservableObject
 {
     public ObservableCollection<ProjectViewModel> Projects { get; }
+    public UserMenuViewModel UserMenu { get; }
 
     [ObservableProperty]
     private int _notStartedCount;
@@ -31,9 +32,10 @@ public partial class HomeViewModel : ObservableObject
     /// </summary>
     public ObservableCollection<MilestoneWithProject> UpcomingMilestones { get; } = new();
 
-    public HomeViewModel(ObservableCollection<ProjectViewModel> projects)
+    public HomeViewModel(ObservableCollection<ProjectViewModel> projects, UserMenuViewModel userMenu)
     {
         Projects = projects;
+        UserMenu = userMenu;
 
         // 初回計算
         UpdateStats();
@@ -79,4 +81,3 @@ public partial class HomeViewModel : ObservableObject
 /// プロジェクト名付きのマイルストーン情報。
 /// </summary>
 public record MilestoneWithProject(string ProjectName, string Label, DateTime Date);
-

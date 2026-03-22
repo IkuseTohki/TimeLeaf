@@ -27,7 +27,7 @@ public class TaskDetailViewModelTests
         project.UpdateName("TestProject");
         var task = new ProjectTask();
         task.UpdateName("TestTask");
-        _projectViewModel = new ProjectViewModel(project);
+        _projectViewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object);
         _taskViewModel = new ProjectTaskViewModel(task);
     }
 
@@ -78,11 +78,15 @@ public class TaskDetailViewModelTests
 [TestClass]
 public class TaskSummaryViewModelTests
 {
+    private ProjectViewModel _projectViewModel = null!;
     private ProjectTaskViewModel _taskViewModel = null!;
 
     [TestInitialize]
     public void Initialize()
     {
+        var project = new Project();
+        project.UpdateName("TestProject");
+        _projectViewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object);
         var task = new ProjectTask();
         task.UpdateName("TestTask");
         _taskViewModel = new ProjectTaskViewModel(task);
@@ -92,7 +96,7 @@ public class TaskSummaryViewModelTests
     public void CloseCommand_WithStringTrue_TriggersRequestCloseWithTrue()
     {
         // Arrange
-        var vm = new TaskSummaryViewModel(_taskViewModel);
+        var vm = new TaskSummaryViewModel(_projectViewModel, _taskViewModel);
         bool? resultReceived = null;
         vm.RequestClose += (res) => resultReceived = res;
 

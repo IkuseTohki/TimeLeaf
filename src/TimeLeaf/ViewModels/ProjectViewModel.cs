@@ -3,8 +3,11 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using TimeLeaf.Models.Entities;
+using TimeLeaf.UseCases;
 
 namespace TimeLeaf.ViewModels;
 
@@ -14,6 +17,7 @@ namespace TimeLeaf.ViewModels;
 public partial class ProjectViewModel : ObservableObject
 {
     private Project _project;
+    private readonly Guid _currentUserId;
 
     /// <summary>
     /// 同期中（外部からの読み込み中）かどうかを示すフラグ。
@@ -185,15 +189,51 @@ public partial class ProjectViewModel : ObservableObject
     public double CompletionPercentage { get => TotalTaskCount == 0 ? 0 : (double)CompletedTaskCount / TotalTaskCount * 100; set { } }
 
     /// <summary>
+    /// 現在のユーザー（自分）がこのプロジェクトにアサインされているかどうか。
+    /// </summary>
+    public bool IsAssignedToMe => _project.AssignedUserIds.Contains(_currentUserId);
+
+    /// <summary>
+    /// プロジェクトに参加するためのユースケース。
+    /// </summary>
+    private readonly IJoinProjectUseCase _joinProjectUseCase;
+
+    /// <summary>
+    /// プロジェクトに参加するコマンド。
+    /// </summary>
+    public IAsyncRelayCommand JoinProjectCommand { get; }
+
+    /// <summary>
     /// コンストラクタ。
     /// </summary>
     /// <param name="project">ラップするProjectエンティティ。</param>
-    public ProjectViewModel(Project project)
+    /// <param name="currentUserId">現在のユーザーID。</param>
+    /// <param name="joinProjectUseCase">プロジェクトに参加するためのユースケース。</param>
+    public ProjectViewModel(Project project, Guid currentUserId, IJoinProjectUseCase joinProjectUseCase)
     {
         _project = project ?? throw new ArgumentNullException(nameof(project));
+        _currentUserId = currentUserId;
+        _joinProjectUseCase = joinProjectUseCase ?? throw new ArgumentNullException(nameof(joinProjectUseCase));
+
+        JoinProjectCommand = new AsyncRelayCommand(ExecuteJoinProjectAsync, () => !IsAssignedToMe);
 
         // 初期データのロード
         SyncFromModel();
+    }
+
+    private async Task ExecuteJoinProjectAsync()
+    {
+        try
+        {
+            await _joinProjectUseCase.ExecuteAsync(_project);
+            // モデルが更新されたので同期（IsAssignedToMe が更新される）
+            SyncFromModel();
+            JoinProjectCommand.NotifyCanExecuteChanged();
+        }
+        catch (Exception)
+        {
+            // TODO: エラー通知
+        }
     }
 
     /// <summary>
@@ -287,6 +327,7 @@ public partial class ProjectViewModel : ObservableObject
         OnPropertyChanged(nameof(TotalActualCost));
         OnPropertyChanged(nameof(DisplayTotalEstimatedCost));
         OnPropertyChanged(nameof(DisplayTotalActualCost));
+        OnPropertyChanged(nameof(IsAssignedToMe));
     }
 
     private void OnProjectTaskViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -311,5 +352,6 @@ public partial class ProjectViewModel : ObservableObject
         OnPropertyChanged(nameof(TotalActualCost));
         OnPropertyChanged(nameof(DisplayTotalEstimatedCost));
         OnPropertyChanged(nameof(DisplayTotalActualCost));
+        OnPropertyChanged(nameof(IsAssignedToMe));
     }
 }

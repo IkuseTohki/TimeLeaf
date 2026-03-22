@@ -43,6 +43,11 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
     };
 
     /// <summary>
+    /// 管理対象プロジェクトの ViewModel。
+    /// </summary>
+    public ProjectViewModel ProjectViewModel => _projectViewModel;
+
+    /// <summary>
     /// 管理対象プロジェクトの名称。
     /// </summary>
     public string ProjectName => _projectViewModel.Name;
@@ -53,18 +58,33 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
     public Guid Id => _projectViewModel.Id;
 
     /// <summary>
+    /// ユーザーがプロジェクトにアサインされているか。
+    /// </summary>
+    public bool IsUserAssigned => _projectViewModel.IsAssignedToMe;
+
+    /// <summary>
     /// コンストラクタ。
     /// </summary>
     public ProjectWorkspaceViewModel(
         ProjectViewModel projectViewModel,
         INotificationService notificationService,
         IViewModelFactory viewModelFactory,
+        ICheckAssignmentUseCase checkAssignment,
         ILogger<ProjectWorkspaceViewModel> logger)
     {
         _projectViewModel = projectViewModel ?? throw new ArgumentNullException(nameof(projectViewModel));
         _notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
         _viewModelFactory = viewModelFactory ?? throw new ArgumentNullException(nameof(viewModelFactory));
-        _logger = logger;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+        // ProjectViewModel の変更（アサイン状態）を監視
+        _projectViewModel.PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName == nameof(ProjectViewModel.IsAssignedToMe))
+            {
+                OnPropertyChanged(nameof(IsUserAssigned));
+            }
+        };
 
         // 初期表示としてダッシュボードを設定
         _currentSubViewModel = _viewModelFactory.CreateProjectDashboardViewModel(_projectViewModel);

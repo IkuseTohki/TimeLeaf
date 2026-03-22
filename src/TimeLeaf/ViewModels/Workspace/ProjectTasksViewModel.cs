@@ -63,7 +63,7 @@ public partial class ProjectTasksViewModel : ObservableObject
 
         if (value != null)
         {
-            TaskSummaryViewModel = _viewModelFactory.CreateTaskSummaryViewModel(value);
+            TaskSummaryViewModel = _viewModelFactory.CreateTaskSummaryViewModel(_projectViewModel, value);
             IsDetailVisible = true;
         }
         else

@@ -32,6 +32,7 @@ public class MainNavigationTests
     private Mock<IOSNotificationService> _osNotificationServiceMock = null!;
     private Mock<ICheckTaskDeadlinesUseCase> _checkDeadlinesUseCaseMock = null!;
     private Mock<IDialogService> _dialogServiceMock = null!;
+    private Mock<IIdentityService> _identityServiceMock = null!;
     private Mock<ILogger<MainViewModel>> _loggerMock = null!;
 
     [TestInitialize]
@@ -51,6 +52,7 @@ public class MainNavigationTests
         _osNotificationServiceMock = new Mock<IOSNotificationService>();
         _checkDeadlinesUseCaseMock = new Mock<ICheckTaskDeadlinesUseCase>();
         _dialogServiceMock = new Mock<IDialogService>();
+        _identityServiceMock = new Mock<IIdentityService>();
         _loggerMock = new Mock<ILogger<MainViewModel>>();
 
         _dispatcherServiceMock.Setup(x => x.InvokeAsync(It.IsAny<Action>()))
@@ -58,6 +60,9 @@ public class MainNavigationTests
             .Returns(Task.CompletedTask);
 
         _loadUseCaseMock.Setup(x => x.ExecuteAsync()).ReturnsAsync(new List<Project>());
+
+        _viewModelFactoryMock.Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
+            .Returns((Project p) => new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object));
     }
 
     private MainViewModel CreateViewModel()
@@ -76,6 +81,7 @@ public class MainNavigationTests
             _osNotificationServiceMock.Object,
             _checkDeadlinesUseCaseMock.Object,
             _dialogServiceMock.Object,
+            _identityServiceMock.Object,
             _loggerMock.Object);
     }
 
@@ -86,7 +92,8 @@ public class MainNavigationTests
     public void DefaultNavigationContext_ShouldBeHome_AndSetHomeViewModel()
     {
         // Arrange
-        var expectedHome = new HomeViewModel(new ObservableCollection<ProjectViewModel>());
+        var userMenu = new UserMenuViewModel(_identityServiceMock.Object, _dialogServiceMock.Object);
+        var expectedHome = new HomeViewModel(new ObservableCollection<ProjectViewModel>(), userMenu);
         _viewModelFactoryMock.Setup(x => x.CreateHomeViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>())).Returns(expectedHome);
 
         // Act

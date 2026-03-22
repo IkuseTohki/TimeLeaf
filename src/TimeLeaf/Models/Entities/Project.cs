@@ -13,6 +13,7 @@ public class Project
 {
     private readonly List<ProjectTask> _tasks = new();
     private readonly List<Milestone> _milestones = new();
+    private readonly List<Guid> _assignedUserIds = new();
 
     /// <summary>
     /// プロジェクトの作成日時。
@@ -58,6 +59,11 @@ public class Project
     /// プロジェクトに紐づくタスクのリスト（読み取り専用）。
     /// </summary>
     public IReadOnlyList<ProjectTask> Tasks => _tasks;
+
+    /// <summary>
+    /// プロジェクトにアサインされているユーザーのID（読み取り専用）。
+    /// </summary>
+    public IReadOnlyList<Guid> AssignedUserIds => _assignedUserIds;
 
     /// <summary>
     /// デフォルトコンストラクタ。
@@ -185,6 +191,40 @@ public class Project
     {
         if (milestone == null) throw new ArgumentNullException(nameof(milestone));
         _milestones.Add(milestone);
+    }
+
+    /// <summary>
+    /// プロジェクトにユーザーをアサインします。
+    /// </summary>
+    public void AssignUser(Guid userId)
+    {
+        if (!_assignedUserIds.Contains(userId))
+        {
+            _assignedUserIds.Add(userId);
+        }
+    }
+
+    /// <summary>
+    /// プロジェクトのユーザーアサインを解除します。
+    /// </summary>
+    public void UnassignUser(Guid userId)
+    {
+        _assignedUserIds.Remove(userId);
+    }
+
+    /// <summary>
+    /// アサイン情報を一括で再設定します（履歴再生用）。
+    /// </summary>
+    public void ReplayAssignments(IEnumerable<Guid> userIds)
+    {
+        _assignedUserIds.Clear();
+        if (userIds != null)
+        {
+            foreach (var id in userIds)
+            {
+                AssignUser(id);
+            }
+        }
     }
 
     /// <summary>

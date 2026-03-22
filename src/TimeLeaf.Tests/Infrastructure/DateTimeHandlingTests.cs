@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Repositories.FileSystem;
+using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
 
 namespace TimeLeaf.Tests.Infrastructure;
@@ -84,7 +86,7 @@ public class DateTimeHandlingTests
     {
         // Arrange
         var project = new Project();
-        var vm = new ProjectViewModel(project);
+        var vm = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object);
         var nowUtc = DateTime.UtcNow;
 
         // Act & Assert

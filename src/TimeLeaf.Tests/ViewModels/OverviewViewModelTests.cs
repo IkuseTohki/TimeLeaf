@@ -37,6 +37,9 @@ public class OverviewViewModelTests
         addProjectVm.Name = projectName;
         addProjectVm.Description = projectDesc;
 
+        viewModelFactoryMock.Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
+            .Returns((Project p) => new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object));
+
         viewModelFactoryMock.Setup(x => x.CreateAddProjectViewModel())
             .Returns(addProjectVm);
 

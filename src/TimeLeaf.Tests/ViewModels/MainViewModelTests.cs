@@ -34,6 +34,8 @@ public class MainViewModelTests
     private Mock<IOSNotificationService> _osNotificationServiceMock = null!;
     private Mock<ICheckTaskDeadlinesUseCase> _checkDeadlinesUseCaseMock = null!;
     private Mock<IDialogService> _dialogServiceMock = null!;
+    private Mock<IIdentityService> _identityServiceMock = null!;
+    private Mock<ICheckAssignmentUseCase> _checkAssignmentMock = null!;
     private Mock<ILogger<MainViewModel>> _loggerMock = null!;
 
     [TestInitialize]
@@ -54,6 +56,8 @@ public class MainViewModelTests
         _osNotificationServiceMock = new Mock<IOSNotificationService>();
         _checkDeadlinesUseCaseMock = new Mock<ICheckTaskDeadlinesUseCase>();
         _dialogServiceMock = new Mock<IDialogService>();
+        _identityServiceMock = new Mock<IIdentityService>();
+        _checkAssignmentMock = new Mock<ICheckAssignmentUseCase>();
         _loggerMock = new Mock<ILogger<MainViewModel>>();
 
         _dispatcherServiceMock.Setup(x => x.InvokeAsync(It.IsAny<Action>()))
@@ -67,8 +71,11 @@ public class MainViewModelTests
         _viewModelFactoryMock.Setup(x => x.CreateOverviewViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>()))
             .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, _addProjectUseCaseMock.Object, _dialogServiceMock.Object, _viewModelFactoryMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
 
+        _viewModelFactoryMock.Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
+            .Returns((Project p) => new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object));
+
         _viewModelFactoryMock.Setup(x => x.CreateProjectWorkspaceViewModel(It.IsAny<ProjectViewModel>()))
-            .Returns((ProjectViewModel pvm) => new ProjectWorkspaceViewModel(pvm, _notificationServiceMock.Object, _viewModelFactoryMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object));
+            .Returns((ProjectViewModel pvm) => new ProjectWorkspaceViewModel(pvm, _notificationServiceMock.Object, _viewModelFactoryMock.Object, _checkAssignmentMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object));
     }
 
     private MainViewModel CreateViewModel()
@@ -87,6 +94,7 @@ public class MainViewModelTests
             _osNotificationServiceMock.Object,
             _checkDeadlinesUseCaseMock.Object,
             _dialogServiceMock.Object,
+            _identityServiceMock.Object,
             _loggerMock.Object);
     }
 
@@ -157,9 +165,9 @@ public class MainViewModelTests
         var viewModel = CreateViewModel();
         var project = new Project();
         project.UpdateName("Test Project");
-        var projectViewModel = new ProjectViewModel(project);
+        var projectViewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object);
 
-        var expectedWorkspace = new ProjectWorkspaceViewModel(projectViewModel, _notificationServiceMock.Object, _viewModelFactoryMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
+        var expectedWorkspace = new ProjectWorkspaceViewModel(projectViewModel, _notificationServiceMock.Object, _viewModelFactoryMock.Object, _checkAssignmentMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
         _viewModelFactoryMock.Setup(x => x.CreateProjectWorkspaceViewModel(projectViewModel)).Returns(expectedWorkspace);
 
         // Act
@@ -182,7 +190,8 @@ public class MainViewModelTests
         // 一旦別のコンテキストにする（NavigateBack で Home に切り替わることを確認するため）
         viewModel.NavigationContext = MainNavigationContext.Notifications;
 
-        var expectedHome = new HomeViewModel(viewModel.Projects);
+        var userMenu = new UserMenuViewModel(_identityServiceMock.Object, _dialogServiceMock.Object);
+        var expectedHome = new HomeViewModel(viewModel.Projects, userMenu);
         _viewModelFactoryMock.Setup(x => x.CreateHomeViewModel(viewModel.Projects)).Returns(expectedHome);
 
         // Act

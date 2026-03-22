@@ -1,7 +1,9 @@
 using System;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using TimeLeaf.Models.Entities;
+using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
 
 namespace TimeLeaf.Tests.ViewModels;
@@ -20,7 +22,7 @@ public class ViewModelModelSyncTests
         var project = new Project();
         project.UpdateName("Old Name");
         project.UpdateDescription("Old Desc");
-        var viewModel = new ProjectViewModel(project);
+        var viewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object);
 
         // Act
         viewModel.Name = "New Name";
@@ -63,7 +65,7 @@ public class ViewModelModelSyncTests
         // Arrange
         var project = new Project();
         project.UpdateName("Test Project");
-        var viewModel = new ProjectViewModel(project);
+        var viewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object);
         var newTask = new ProjectTask();
         newTask.UpdateName("New Task");
 
@@ -90,7 +92,7 @@ public class ViewModelModelSyncTests
         var task = new ProjectTask();
         task.UpdateName("Task 1");
         project.AddTask(task);
-        var viewModel = new ProjectViewModel(project);
+        var viewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object);
 
         // Act
         project.RemoveTask(task.Id);

@@ -1,6 +1,6 @@
 ---
 created: 2026-02-20
-updated: 2026-02-20
+updated: 2026-03-22
 category: System
 sub-category: DataStorage
 ---
@@ -30,6 +30,7 @@ TimeLeafは、ネットワークが遮断された環境下で、複数のユー
       - `yyyyMMdd_HHmmss_fff_{UserID}_Project_Basic.json`
       - `yyyyMMdd_HHmmss_fff_{UserID}_Project_Description.json`
       - `yyyyMMdd_HHmmss_fff_{UserID}_Project_Milestones.json`
+      - `yyyyMMdd_HHmmss_fff_{UserID}_Project_Members.json`
     - **タスク情報の履歴** (サブフォルダ内に配置):
       - `{TaskID}/`
         - `yyyyMMdd_HHmmss_fff_{UserID}_Task_Progress.json`
@@ -77,6 +78,7 @@ TimeLeafは、ネットワークが遮断された環境下で、複数のユー
 | **Project_Basic**       | 名前、ステータス、健全性ステータス | 中       |
 | **Project_Description** | 詳細説明                           | 低       |
 | **Project_Milestones**  | マイルストーンのリスト全体         | 低       |
+| **Project_Members**     | アサインされたユーザーIDのリスト   | 低       |
 
 ### 3.2. タスク・カテゴリ
 

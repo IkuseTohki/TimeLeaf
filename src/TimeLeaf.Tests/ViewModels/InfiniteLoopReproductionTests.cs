@@ -59,6 +59,8 @@ public class InfiniteLoopReproductionTests
         var syncServiceMock = new Mock<IProjectSyncService>();
         var addProjectUseCaseMock = new Mock<IAddProjectUseCase>();
         var viewModelFactoryMock = new Mock<IViewModelFactory>();
+        viewModelFactoryMock.Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
+            .Returns((Project p) => new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object));
         var dispatcherMock = new Mock<IDispatcherService>();
         dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Action>())).Callback<Action>(a => a()).Returns(Task.CompletedTask);
         dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Func<Task>>())).Returns<Func<Task>>(f => f());
@@ -76,6 +78,7 @@ public class InfiniteLoopReproductionTests
         var snackbarServiceMock = new Mock<ISnackbarService>();
         var osNotificationServiceMock = new Mock<IOSNotificationService>();
         var checkDeadlinesUseCaseMock = new Mock<ICheckTaskDeadlinesUseCase>();
+        var identityServiceMock = new Mock<IIdentityService>();
 
         var mainVM = new MainViewModel(
             loadUseCaseMock.Object,
@@ -91,6 +94,7 @@ public class InfiniteLoopReproductionTests
             osNotificationServiceMock.Object,
             checkDeadlinesUseCaseMock.Object,
             new Mock<LeafKit.UI.Services.IDialogService>().Object,
+            identityServiceMock.Object,
             _loggerMock.Object);
 
         await Task.Delay(100); // Wait for initialize
@@ -100,7 +104,8 @@ public class InfiniteLoopReproductionTests
         var addCommentUseCase = new AddCommentUseCase(saveUseCaseMock.Object, _userServiceMock.Object);
         var addMilestoneUseCase = new AddMilestoneUseCase(saveUseCaseMock.Object);
 
-        var workspaceVM = new ProjectWorkspaceViewModel(projectVM, notificationServiceMock.Object, viewModelFactoryMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
+        var checkAssignmentMock = new Mock<ICheckAssignmentUseCase>();
+        var workspaceVM = new ProjectWorkspaceViewModel(projectVM, notificationServiceMock.Object, viewModelFactoryMock.Object, checkAssignmentMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
         var dialogServiceMock = new Mock<LeafKit.UI.Services.IDialogService>();
         var tasksVM = new ProjectTasksViewModel(
             projectVM,
@@ -139,6 +144,8 @@ public class InfiniteLoopReproductionTests
         var syncServiceMock = new Mock<IProjectSyncService>();
         var addProjectUseCaseMock = new Mock<IAddProjectUseCase>();
         var viewModelFactoryMock = new Mock<IViewModelFactory>();
+        viewModelFactoryMock.Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
+            .Returns((Project p) => new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object));
         var dispatcherMock = new Mock<IDispatcherService>();
         dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Action>())).Callback<Action>(a => a()).Returns(Task.CompletedTask);
         dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Func<Task>>())).Returns<Func<Task>>(f => f());
@@ -156,6 +163,7 @@ public class InfiniteLoopReproductionTests
         var snackbarServiceMock = new Mock<ISnackbarService>();
         var osNotificationServiceMock = new Mock<IOSNotificationService>();
         var checkDeadlinesUseCaseMock = new Mock<ICheckTaskDeadlinesUseCase>();
+        var identityServiceMock = new Mock<IIdentityService>();
 
         var mainVM = new MainViewModel(
             loadUseCaseMock.Object,
@@ -171,6 +179,7 @@ public class InfiniteLoopReproductionTests
             osNotificationServiceMock.Object,
             checkDeadlinesUseCaseMock.Object,
             new Mock<LeafKit.UI.Services.IDialogService>().Object,
+            identityServiceMock.Object,
             _loggerMock.Object);
 
         await Task.Delay(100);
@@ -180,7 +189,8 @@ public class InfiniteLoopReproductionTests
         var addCommentUseCase = new AddCommentUseCase(saveUseCaseMock.Object, _userServiceMock.Object);
         var addMilestoneUseCase = new AddMilestoneUseCase(saveUseCaseMock.Object);
 
-        var workspaceVM = new ProjectWorkspaceViewModel(projectVM, notificationServiceMock.Object, viewModelFactoryMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
+        var checkAssignmentMock = new Mock<ICheckAssignmentUseCase>();
+        var workspaceVM = new ProjectWorkspaceViewModel(projectVM, notificationServiceMock.Object, viewModelFactoryMock.Object, checkAssignmentMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
         var dialogServiceMock = new Mock<LeafKit.UI.Services.IDialogService>();
         var tasksVM = new ProjectTasksViewModel(
             projectVM,

@@ -1,0 +1,15 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:lk="clr-namespace:LeafKit.UI.Converters;assembly=LeafKit.UI"
+                    xmlns:tlcv="clr-namespace:TimeLeaf.ViewModels.Converters">
+
+    <tlcv:IntToVisibilityConverter x:Key="IntToVisibilityConverter" />
+    <lk:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    <tlcv:BooleanToDoubleConverter x:Key="BooleanToDoubleConverter" />
+    <tlcv:SidebarToggleIconConverter x:Key="SidebarToggleIconConverter" />
+    <tlcv:TaskStatusToBoolConverter x:Key="TaskStatusToBoolConverter" />
+    <tlcv:TaskStatusToIconConverter x:Key="TaskStatusToIconConverter" />
+    <tlcv:DeadlineToBrushConverter x:Key="DeadlineToBrushConverter" />
+    <tlcv:PriorityToVisibilityConverter x:Key="PriorityToVisibilityConverter" />
+
+</ResourceDictionary>

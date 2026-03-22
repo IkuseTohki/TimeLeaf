@@ -3,15 +3,26 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Models.Enums;
+using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
+using TimeLeaf.Services;
+using LeafKit.UI.Services;
 
 namespace TimeLeaf.Tests.ViewModels;
 
 [TestClass]
 public class HomeViewModelTests
 {
+    private UserMenuViewModel CreateUserMenu()
+    {
+        var mockIdentity = new Mock<IIdentityService>();
+        var mockDialog = new Mock<IDialogService>();
+        return new UserMenuViewModel(mockIdentity.Object, mockDialog.Object);
+    }
+
     [TestMethod]
     public void TaskStats_ShouldReflectAllProjects()
     {
@@ -30,12 +41,12 @@ public class HomeViewModelTests
 
         var projects = new ObservableCollection<ProjectViewModel>
         {
-            new ProjectViewModel(p1),
-            new ProjectViewModel(p2)
+            new ProjectViewModel(p1, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object),
+            new ProjectViewModel(p2, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object)
         };
 
         // Act
-        var viewModel = new HomeViewModel(projects);
+        var viewModel = new HomeViewModel(projects, CreateUserMenu());
 
         // Assert
         Assert.AreEqual(1, viewModel.NotStartedCount);
@@ -60,12 +71,12 @@ public class HomeViewModelTests
 
         var projects = new ObservableCollection<ProjectViewModel>
         {
-            new ProjectViewModel(p1),
-            new ProjectViewModel(p2)
+            new ProjectViewModel(p1, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object),
+            new ProjectViewModel(p2, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object)
         };
 
         // Act
-        var viewModel = new HomeViewModel(projects);
+        var viewModel = new HomeViewModel(projects, CreateUserMenu());
 
         // Assert
         Assert.AreEqual(2, viewModel.UpcomingDeadlines.Count);

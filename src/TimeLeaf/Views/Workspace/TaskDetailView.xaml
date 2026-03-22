@@ -29,7 +29,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Grid>
+        <Grid IsEnabled="{Binding ProjectViewModel.IsAssignedToMe}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <!-- 左側: メインエリア（可変幅） -->

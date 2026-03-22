@@ -27,20 +27,20 @@
                            Text="全プロジェクトの状況を俯瞰しています" />
             </StackPanel>
 
-            <!-- ユーザーアイコン等 -->
+            <!-- ユーザーメニュー -->
             <StackPanel HorizontalAlignment="Right"
                         VerticalAlignment="Top"
                         Orientation="Horizontal">
-                <Border Width="40"
-                        Height="40"
-                        Background="{DynamicResource BrandPrimaryHoverBrush}"
-                        CornerRadius="20">
-                    <TextBlock HorizontalAlignment="Center"
-                               VerticalAlignment="Center"
-                               FontWeight="Bold"
-                               Foreground="White"
-                               Text="KT" />
-                </Border>
+                <Button Padding="8"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Command="{Binding UserMenu.EditProfileCommand}">
+                    <Path Width="24"
+                          Height="24"
+                          Data="{StaticResource MenuIconGeometry}"
+                          Fill="{DynamicResource TextPrimaryBrush}"
+                          Stretch="Uniform" />
+                </Button>
             </StackPanel>
         </Grid>
 

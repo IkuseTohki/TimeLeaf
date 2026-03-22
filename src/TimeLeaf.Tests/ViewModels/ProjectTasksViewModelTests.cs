@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -25,12 +26,14 @@ public class ProjectTasksViewModelTests
     {
         _addTaskUseCaseMock = new Mock<IAddTaskUseCase>();
         _viewModelFactoryMock = new Mock<IViewModelFactory>();
+        _viewModelFactoryMock.Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
+            .Returns((Project p) => new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object));
         _dialogServiceMock = new Mock<IDialogService>();
         _loggerMock = new Mock<ILogger<ProjectTasksViewModel>>();
         _detailLoggerMock = new Mock<ILogger<TaskDetailViewModel>>();
 
         var project = new Project();
-        _projectViewModel = new ProjectViewModel(project);
+        _projectViewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object);
     }
 
     /// <summary>

@@ -60,7 +60,7 @@
         <ScrollViewer Grid.Row="1"
                       Padding="24,16"
                       VerticalScrollBarVisibility="Auto">
-            <StackPanel>
+            <StackPanel IsEnabled="{Binding IsAssignedToMe}">
                 <!-- ステータス (共通コントロール) -->
                 <TextBlock Style="{StaticResource LabelStyle}" Text="現在の状態" />
                 <controls:TaskStatusPicker Margin="0,0,0,20" SelectedStatus="{Binding Task.Status, Mode=TwoWay}" />

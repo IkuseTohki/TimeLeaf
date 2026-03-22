@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Models.Enums;
+using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
 
 namespace TimeLeaf.Tests.ViewModels;
@@ -33,8 +35,8 @@ public class AllTasksViewModelTests
 
         var projects = new ObservableCollection<ProjectViewModel>
         {
-            new ProjectViewModel(p1),
-            new ProjectViewModel(p2)
+            new ProjectViewModel(p1, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object),
+            new ProjectViewModel(p2, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object)
         };
 
         // Act
@@ -63,7 +65,7 @@ public class AllTasksViewModelTests
         t.UpdateName("New Task");
         p.AddTask(t);
 
-        projects.Add(new ProjectViewModel(p));
+        projects.Add(new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object));
 
         // Assert
         Assert.AreEqual(1, viewModel.AllTasks.Count);
@@ -86,7 +88,7 @@ public class AllTasksViewModelTests
         t2.UpdateName("Banana");
         p.AddTask(t2);
 
-        var projects = new ObservableCollection<ProjectViewModel> { new ProjectViewModel(p) };
+        var projects = new ObservableCollection<ProjectViewModel> { new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object) };
         var viewModel = new AllTasksViewModel(projects);
 
         // Act
@@ -115,7 +117,7 @@ public class AllTasksViewModelTests
         t2.UpdateStatus(TimeLeaf.Models.Enums.TaskStatus.Completed);
         p.AddTask(t2);
 
-        var projects = new ObservableCollection<ProjectViewModel> { new ProjectViewModel(p) };
+        var projects = new ObservableCollection<ProjectViewModel> { new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object) };
         var viewModel = new AllTasksViewModel(projects);
 
         // Act & Assert (初期値は True)
@@ -145,7 +147,7 @@ public class AllTasksViewModelTests
         t.UpdateStatus(TimeLeaf.Models.Enums.TaskStatus.InProgress);
         p.AddTask(t);
 
-        var projects = new ObservableCollection<ProjectViewModel> { new ProjectViewModel(p) };
+        var projects = new ObservableCollection<ProjectViewModel> { new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object) };
         var viewModel = new AllTasksViewModel(projects);
         Assert.AreEqual(1, viewModel.AllTasks.Count);
 
@@ -169,7 +171,7 @@ public class AllTasksViewModelTests
         t.UpdateName("Initial Name");
         p.AddTask(t);
 
-        var projects = new ObservableCollection<ProjectViewModel> { new ProjectViewModel(p) };
+        var projects = new ObservableCollection<ProjectViewModel> { new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object) };
         var viewModel = new AllTasksViewModel(projects);
         viewModel.SearchKeyword = "Updated";
         Assert.AreEqual(0, viewModel.AllTasks.Count);

@@ -140,6 +140,16 @@ public partial class App : Application
         // 外部依存の設定
         // 仕様に基づき、プロジェクトごとのフォルダを管理するルートディレクトリを指定
         var storagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory ?? string.Empty, "storage");
+        var usersPath = Path.Combine(storagePath, "users");
+
+        services.AddSingleton<IIdentitySeedRepository>(sp =>
+        {
+            var portableDir = AppDomain.CurrentDomain.BaseDirectory ?? Directory.GetCurrentDirectory();
+            var homeDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".timeleaf");
+            return new FileIdentitySeedRepository(portableDir, homeDir);
+        });
+        services.AddSingleton<IIdentityService, FileBasedIdentityService>();
+        services.AddSingleton<IUserRepository>(sp => new FileSystemUserRepository(usersPath));
 
         services.AddSingleton<ICurrentUserService, WindowsCurrentUserService>();
         services.AddSingleton<IDispatcherService, WpfDispatcherService>();
@@ -178,6 +188,9 @@ public partial class App : Application
         services.AddTransient<IAddCommentUseCase, AddCommentUseCase>();
         services.AddTransient<IAddMilestoneUseCase, AddMilestoneUseCase>();
         services.AddTransient<ICheckTaskDeadlinesUseCase, CheckTaskDeadlinesUseCase>();
+        services.AddTransient<ISyncUserIdentityUseCase, SyncUserIdentityUseCase>();
+        services.AddTransient<IJoinProjectUseCase, JoinProjectUseCase>();
+        services.AddTransient<ICheckAssignmentUseCase, CheckAssignmentUseCase>();
 
         // コーディネーターの登録
         services.AddSingleton<IProjectSaveCoordinator, ProjectSaveCoordinator>();
@@ -195,7 +208,7 @@ public partial class App : Application
         services.AddTransient<MainWindow>();
     }
 
-    protected override void OnStartup(StartupEventArgs e)
+    protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
 
@@ -213,6 +226,10 @@ public partial class App : Application
                 this.Shutdown();
                 return;
             }
+
+            // 自分のアイデンティティを同期 (UI 表示前に先行して同期を完了させる)
+            var syncUseCase = _serviceProvider.GetRequiredService<ISyncUserIdentityUseCase>();
+            await syncUseCase.ExecuteAsync();
 
             // DIコンテナからメインウィンドウを取得
             var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();

@@ -291,4 +291,33 @@ public class FolderProjectRepositoryTests
         var diff = (savedUpdatedAt - loadedProject.UpdatedAt).Duration();
         Assert.IsTrue(diff < TimeSpan.FromSeconds(1), $"最終更新日時が一致すること (Diff: {diff})");
     }
+
+    /// <summary>
+    /// テスト観点: プロジェクトのアサイン情報 (AssignedUserIds) が正しく保存・復元されることを確認する。
+    /// </summary>
+    [TestMethod]
+    public async System.Threading.Tasks.Task SaveAndLoad_ShouldPreserveAssignments()
+    {
+        // Arrange
+        var repository = CreateRepository();
+        var projectId = Guid.NewGuid();
+        var project = new Project { Id = projectId };
+        project.UpdateName("AssignmentTest");
+
+        var user1 = Guid.NewGuid();
+        var user2 = Guid.NewGuid();
+        project.AssignUser(user1);
+        project.AssignUser(user2);
+
+        // Act
+        await repository.SaveAsync(project, "test-user");
+        var loadedProject = await repository.LoadAsync(projectId);
+
+        // Assert
+        Assert.IsNotNull(loadedProject);
+        Assert.IsNotNull(loadedProject.AssignedUserIds);
+        Assert.AreEqual(2, loadedProject.AssignedUserIds.Count, "アサインされたユーザー数が一致すること");
+        Assert.IsTrue(loadedProject.AssignedUserIds.Contains(user1), "ユーザー1が含まれていること");
+        Assert.IsTrue(loadedProject.AssignedUserIds.Contains(user2), "ユーザー2が含まれていること");
+    }
 }
