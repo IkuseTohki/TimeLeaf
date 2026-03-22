@@ -2,6 +2,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace TimeLeaf.ViewModels;
 
@@ -21,6 +22,12 @@ public partial class HomeViewModel : ObservableObject
 
     [ObservableProperty]
     private int _completedThisWeekCount;
+
+    [ObservableProperty]
+    private bool _isUserMenuOpen;
+
+    [RelayCommand]
+    private void ToggleUserMenu() => IsUserMenuOpen = !IsUserMenuOpen;
 
     /// <summary>
     /// 全プロジェクトの期限が近いタスク。

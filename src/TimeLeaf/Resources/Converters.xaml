@@ -11,5 +11,6 @@
     <tlcv:TaskStatusToIconConverter x:Key="TaskStatusToIconConverter" />
     <tlcv:DeadlineToBrushConverter x:Key="DeadlineToBrushConverter" />
     <tlcv:PriorityToVisibilityConverter x:Key="PriorityToVisibilityConverter" />
+    <tlcv:InverseBooleanConverter x:Key="InverseBooleanConverter" />
 
 </ResourceDictionary>

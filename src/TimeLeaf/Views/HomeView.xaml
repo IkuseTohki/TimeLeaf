@@ -1,6 +1,7 @@
 ﻿<UserControl x:Class="TimeLeaf.Views.HomeView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="http://schemas.leafkit.com/wpf/ui/controls"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:ui="http://schemas.leafkit.com/wpf/ui/behaviors"
@@ -32,22 +33,33 @@
             <StackPanel HorizontalAlignment="Right"
                         VerticalAlignment="Top"
                         Orientation="Horizontal">
-                <Button Padding="8"
-                        ui:ContextMenuBehavior.IsOpenOnClick="True"
+                <Button x:Name="UserMenuButton"
+                        Padding="8"
                         Background="Transparent"
-                        BorderThickness="0">
-                    <Button.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem Command="{Binding UserMenu.EditProfileCommand}" Header="プロフィール設定" />
-                            <MenuItem Command="{Binding UserMenu.OpenSettingsCommand}" Header="アプリケーション設定" />
-                        </ContextMenu>
-                    </Button.ContextMenu>
+                        BorderThickness="0"
+                        Command="{Binding ToggleUserMenuCommand}">
                     <Path Width="24"
                           Height="24"
                           Data="{StaticResource MenuIconGeometry}"
                           Fill="{DynamicResource TextPrimaryBrush}"
                           Stretch="Uniform" />
                 </Button>
+                <c:DropdownMenu IsOpen="{Binding IsUserMenuOpen}" PlacementTarget="{Binding ElementName=UserMenuButton}">
+                    <Border Padding="4"
+                            Background="{DynamicResource SurfaceBaseBrush}"
+                            BorderBrush="{DynamicResource OutlineBaseBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8">
+                        <StackPanel MinWidth="160">
+                            <Button Command="{Binding UserMenu.EditProfileCommand}"
+                                    Content="プロフィール設定"
+                                    Style="{DynamicResource MenuButtonStyle}" />
+                            <Button Command="{Binding UserMenu.OpenSettingsCommand}"
+                                    Content="アプリケーション設定"
+                                    Style="{DynamicResource MenuButtonStyle}" />
+                        </StackPanel>
+                    </Border>
+                </c:DropdownMenu>
             </StackPanel>
         </Grid>
 
