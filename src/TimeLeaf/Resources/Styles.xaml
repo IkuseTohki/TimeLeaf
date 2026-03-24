@@ -233,4 +233,56 @@
         <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />
     </Style>
 
+    <!-- Setup View Components -->
+
+    <!-- セットアップ画面：Windowの基本スタイル -->
+    <Style x:Key="SetupWindowStyle" TargetType="Window">
+        <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />
+        <Setter Property="ResizeMode" Value="NoResize" />
+    </Style>
+
+    <!-- セットアップ画面：メインコンテナ（StackPanel）のスタイル -->
+    <Style x:Key="SetupContainerStyle" TargetType="StackPanel">
+        <Setter Property="Margin" Value="24" />
+    </Style>
+
+    <!-- セットアップ画面：見出しテキストのスタイル -->
+    <Style x:Key="SetupHeaderTextStyle"
+           BasedOn="{StaticResource FormTitleTextStyle}"
+           TargetType="TextBlock">
+        <Setter Property="Margin" Value="0,0,0,10" />
+        <Setter Property="FontSize" Value="24" />
+        <Setter Property="FontWeight" Value="Bold" />
+    </Style>
+
+    <!-- セットアップ画面：説明テキストのスタイル -->
+    <Style x:Key="SetupDescriptionTextStyle" TargetType="TextBlock">
+        <Setter Property="Margin" Value="0,0,0,10" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <!-- セットアップ画面：補足説明テキストのスタイル -->
+    <Style x:Key="SetupSubDescriptionTextStyle" TargetType="TextBlock">
+        <Setter Property="Margin" Value="0,5,0,20" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    </Style>
+
+    <!-- セットアップ画面：入力エリア（Grid）のスタイル -->
+    <Style x:Key="SetupInputAreaStyle" TargetType="Grid">
+        <Setter Property="Margin" Value="0,0,0,20" />
+    </Style>
+
+    <!-- セットアップ画面：エラーメッセージのスタイル -->
+    <Style x:Key="SetupErrorMessageStyle" TargetType="TextBlock">
+        <Setter Property="Margin" Value="0,-15,0,20" />
+        <Setter Property="Foreground" Value="{DynamicResource ErrorBrush}" />
+    </Style>
+
+    <!-- セットアップ画面：フッターボタンエリアのスタイル -->
+    <Style x:Key="SetupFooterStyle" TargetType="StackPanel">
+        <Setter Property="HorizontalAlignment" Value="Right" />
+        <Setter Property="Orientation" Value="Horizontal" />
+    </Style>
+
 </ResourceDictionary>
