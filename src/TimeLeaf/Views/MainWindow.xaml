@@ -48,18 +48,9 @@
             <Grid>
                 <DockPanel LastChildFill="True">
                     <!-- ブランドロゴエリア -->
-                    <StackPanel Margin="20,32,20,40"
-                                DockPanel.Dock="Top"
-                                Orientation="Horizontal">
-                        <Path Width="24"
-                              Height="24"
-                              Data="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z"
-                              Fill="{DynamicResource BrandForegroundBrush}" />
-                        <TextBlock Margin="12,0,0,0"
-                                   VerticalAlignment="Center"
-                                   FontSize="18"
-                                   FontWeight="Bold"
-                                   Foreground="{DynamicResource BrandForegroundBrush}"
+                    <StackPanel DockPanel.Dock="Top" Style="{StaticResource SidebarLogoContainerStyle}">
+                        <Path Data="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z" Style="{StaticResource SidebarLogoPathStyle}" />
+                        <TextBlock Style="{StaticResource SidebarLogoTextStyle}"
                                    Text="TimeLeaf"
                                    Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BooleanToVisibilityConverter}}" />
                     </StackPanel>
@@ -112,20 +103,11 @@
 
                             <!-- プロジェクトセクション見出し -->
                             <Grid Margin="24,24,12,8">
-                                <TextBlock VerticalAlignment="Center"
-                                           FontSize="11"
-                                           FontWeight="Bold"
-                                           Foreground="{DynamicResource BrandForegroundBrush}"
-                                           Opacity="0.6"
+                                <TextBlock Style="{StaticResource SidebarMenuHeaderStyle}"
                                            Text="PROJECTS"
                                            Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                                <Button Width="24"
-                                        Height="24"
-                                        Padding="4"
-                                        HorizontalAlignment="Right"
-                                        VerticalAlignment="Center"
-                                        Command="{Binding AddProjectCommand}"
-                                        Style="{StaticResource IconButtonStyle}"
+                                <Button Command="{Binding AddProjectCommand}"
+                                        Style="{StaticResource SidebarAddButtonStyle}"
                                         ToolTip="新規プロジェクト作成">
                                     <TextBlock FontSize="14"
                                                FontWeight="Bold"
@@ -155,13 +137,8 @@
                             </ItemsControl>
 
                             <!-- プロジェクトがない場合の表示 -->
-                            <TextBlock Margin="24,12,24,0"
-                                       FontSize="12"
-                                       FontStyle="Italic"
-                                       Foreground="White"
-                                       Opacity="0.4"
+                            <TextBlock Style="{StaticResource SidebarEmptyStateTextStyle}"
                                        Text="No projects yet."
-                                       TextAlignment="Center"
                                        Visibility="{Binding Projects.Count, Converter={StaticResource IntToVisibilityConverter}, ConverterParameter='Inverse'}" />
 
 
@@ -170,15 +147,9 @@
                 </DockPanel>
 
                 <!-- 折りたたみボタン -->
-                <Button Width="24"
-                        Height="24"
-                        Margin="0,0,-12,32"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Bottom"
-                        Background="{DynamicResource SurfaceBaseBrush}"
-                        Command="{Binding ToggleSidebarCommand}"
+                <Button Command="{Binding ToggleSidebarCommand}"
                         Content="{Binding IsSidebarExpanded, Converter={StaticResource SidebarToggleIconConverter}}"
-                        Style="{StaticResource ModernButtonStyle}" />
+                        Style="{StaticResource SidebarCollapseButtonStyle}" />
             </Grid>
         </Border>
 
