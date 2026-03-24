@@ -44,8 +44,7 @@
         <Border x:Name="SidebarBorder"
                 Grid.Column="0"
                 Width="{Binding IsSidebarExpanded, Converter={StaticResource BooleanToDoubleConverter}, ConverterParameter='220,80'}"
-                Background="{DynamicResource BrandPrimaryBrush}"
-                CornerRadius="0,32,32,0">
+                Style="{DynamicResource OrganicSidebarBorderStyle}">
             <Grid>
                 <DockPanel LastChildFill="True">
                     <!-- ブランドロゴエリア -->
@@ -55,12 +54,12 @@
                         <Path Width="24"
                               Height="24"
                               Data="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z"
-                              Fill="White" />
+                              Fill="{DynamicResource BrandForegroundBrush}" />
                         <TextBlock Margin="12,0,0,0"
                                    VerticalAlignment="Center"
                                    FontSize="18"
                                    FontWeight="Bold"
-                                   Foreground="White"
+                                   Foreground="{DynamicResource BrandForegroundBrush}"
                                    Text="TimeLeaf"
                                    Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BooleanToVisibilityConverter}}" />
                     </StackPanel>
@@ -69,7 +68,7 @@
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <StackPanel>
                             <!-- メインメニュー -->
-                            <Button Command="{Binding NavigateToHomeCommand}" Style="{StaticResource SidebarItemStyle}">
+                            <Button Command="{Binding NavigateToHomeCommand}" Style="{DynamicResource SidebarButtonStyle}">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock FontSize="18" Text="🏠" />
                                     <TextBlock Margin="16,0,0,0"
@@ -78,7 +77,7 @@
                                                Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BooleanToVisibilityConverter}}" />
                                 </StackPanel>
                             </Button>
-                            <Button Command="{Binding NavigateToAllTasksCommand}" Style="{StaticResource SidebarItemStyle}">
+                            <Button Command="{Binding NavigateToAllTasksCommand}" Style="{DynamicResource SidebarButtonStyle}">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock FontSize="18" Text="📋" />
                                     <TextBlock Margin="16,0,0,0"
@@ -87,7 +86,7 @@
                                                Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BooleanToVisibilityConverter}}" />
                                 </StackPanel>
                             </Button>
-                            <Button Command="{Binding NavigateToNotificationsCommand}" Style="{StaticResource SidebarItemStyle}">
+                            <Button Command="{Binding NavigateToNotificationsCommand}" Style="{DynamicResource SidebarButtonStyle}">
                                 <Grid>
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock FontSize="18" Text="🔔" />
@@ -99,7 +98,7 @@
                                     <Border Margin="12,-8,0,0"
                                             HorizontalAlignment="Left"
                                             VerticalAlignment="Top"
-                                            Style="{StaticResource NotificationBadgeStyle}"
+                                            Style="{DynamicResource BadgeStyle}"
                                             Visibility="{Binding UnreadNotificationCount, Converter={StaticResource IntToVisibilityConverter}}">
                                         <TextBlock HorizontalAlignment="Center"
                                                    VerticalAlignment="Center"
@@ -116,7 +115,7 @@
                                 <TextBlock VerticalAlignment="Center"
                                            FontSize="11"
                                            FontWeight="Bold"
-                                           Foreground="White"
+                                           Foreground="{DynamicResource BrandForegroundBrush}"
                                            Opacity="0.6"
                                            Text="PROJECTS"
                                            Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BooleanToVisibilityConverter}}" />
@@ -126,10 +125,11 @@
                                         HorizontalAlignment="Right"
                                         VerticalAlignment="Center"
                                         Command="{Binding AddProjectCommand}"
-                                        Style="{StaticResource SidebarItemStyle}"
+                                        Style="{StaticResource IconButtonStyle}"
                                         ToolTip="新規プロジェクト作成">
                                     <TextBlock FontSize="14"
                                                FontWeight="Bold"
+                                               Foreground="{DynamicResource BrandForegroundBrush}"
                                                Text="+" />
                                 </Button>
                             </Grid>
@@ -140,7 +140,7 @@
                                     <DataTemplate>
                                         <Button Command="{Binding DataContext.NavigateToProjectCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding}"
-                                                Style="{StaticResource SidebarItemStyle}">
+                                                Style="{DynamicResource SidebarButtonStyle}">
                                             <StackPanel Orientation="Horizontal">
                                                 <TextBlock FontSize="12" Text="🌲" />
                                                 <TextBlock Margin="16,0,0,0"
@@ -175,8 +175,10 @@
                         Margin="0,0,-12,32"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Bottom"
+                        Background="{DynamicResource SurfaceBaseBrush}"
                         Command="{Binding ToggleSidebarCommand}"
-                        Content="{Binding IsSidebarExpanded, Converter={StaticResource SidebarToggleIconConverter}}" />
+                        Content="{Binding IsSidebarExpanded, Converter={StaticResource SidebarToggleIconConverter}}"
+                        Style="{StaticResource ModernButtonStyle}" />
             </Grid>
         </Border>
 

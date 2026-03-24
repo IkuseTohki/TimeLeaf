@@ -159,4 +159,13 @@
         <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
 
+    <!-- オーガニックなサイドバー用スタイル (TimeLeaf シグネチャー) -->
+    <Style x:Key="OrganicSidebarBorderStyle"
+           BasedOn="{StaticResource SidebarBorderStyle}"
+           TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource BrandPrimaryBrush}" />
+        <Setter Property="CornerRadius" Value="0,32,32,0" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
 </ResourceDictionary>

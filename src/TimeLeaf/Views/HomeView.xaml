@@ -141,7 +141,7 @@
                                                        Text="{Binding Name}" />
                                             <TextBlock Grid.Column="1"
                                                        Margin="16,0,0,0"
-                                                       Foreground="#E67E22"
+                                                       Foreground="{DynamicResource WarningBrush}"
                                                        Text="{Binding Deadline, StringFormat={}{0:MM/dd}}" />
                                         </Grid>
                                     </DataTemplate>

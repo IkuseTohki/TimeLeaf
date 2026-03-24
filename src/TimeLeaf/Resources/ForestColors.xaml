@@ -1,0 +1,14 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/ForestColors.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <!-- TimeLeaf-specific overrides for Forest theme -->
+    <Color x:Key="ErrorColor">#B03A2E</Color>
+    <Color x:Key="WarningColor">#D35400</Color>
+
+    <SolidColorBrush x:Key="BrandForegroundBrush" Color="White" />
+    <SolidColorBrush x:Key="ErrorBrush" Color="{StaticResource ErrorColor}" />
+    <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource WarningColor}" />
+
+</ResourceDictionary>

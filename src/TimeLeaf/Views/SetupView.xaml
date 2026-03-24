@@ -47,7 +47,7 @@
         </Grid>
 
         <TextBlock Margin="0,-15,0,20"
-                   Foreground="Red"
+                   Foreground="{DynamicResource ErrorBrush}"
                    Text="{Binding ErrorMessage}" />
 
         <!-- Footer -->
