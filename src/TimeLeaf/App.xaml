@@ -17,17 +17,13 @@
                 <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/ComponentStyles.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/ControlStyles.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/FormStyles.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/Icons.xaml" />
+                <ResourceDictionary Source="/Resources/Icons.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/LayoutStyles.xaml" />
                 <!-- App Specific Resources -->
                 <ResourceDictionary Source="/Resources/Styles.xaml" />
                 <!-- Converters -->
                 <ResourceDictionary Source="/Resources/Converters.xaml" />
             </ResourceDictionary.MergedDictionaries>
-
-            <!-- Tree Assets (Sprout) -->
-            <Geometry x:Key="TreeSproutLeafGeometry">M 50,80 Q 60,50 80,40 Q 60,45 50,60 Q 40,45 20,40 Q 40,50 50,80 Z</Geometry>
-            <Geometry x:Key="TreeSproutTrunkGeometry">M 48,80 H 52 V 95 H 48 Z</Geometry>
 
             <!-- DataTemplate for Dialog Contents -->
             <DataTemplate DataType="{x:Type viewModels:AddProjectViewModel}">
