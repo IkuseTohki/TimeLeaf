@@ -407,4 +407,141 @@
         <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
 
+    <!-- Overview View Components -->
+
+    <!-- プロジェクト一覧画面：メインコンテナのスタイル -->
+    <Style x:Key="OverviewContainerStyle" TargetType="Grid">
+        <Setter Property="Margin" Value="40" />
+    </Style>
+
+    <!-- プロジェクト一覧画面：ヘッダーエリアのスタイル -->
+    <Style x:Key="OverviewHeaderStyle" TargetType="DockPanel">
+        <Setter Property="Margin" Value="0,0,0,40" />
+    </Style>
+
+    <!-- プロジェクト一覧画面：タイトルテキストのスタイル -->
+    <Style x:Key="OverviewTitleStyle"
+           BasedOn="{StaticResource ViewHeaderTitleStyle}"
+           TargetType="TextBlock">
+        <Setter Property="FontWeight" Value="Bold" />
+    </Style>
+
+    <!-- プロジェクト一覧画面：プロジェクトカード（Button）のスタイル -->
+    <Style x:Key="ProjectCardButtonStyle"
+           BasedOn="{StaticResource ModernButtonStyle}"
+           TargetType="Button">
+        <Setter Property="Margin" Value="0,0,24,24" />
+    </Style>
+
+    <!-- プロジェクト一覧画面：プロジェクトカード外枠（Border）のスタイル -->
+    <Style x:Key="ProjectCardBorderStyle" TargetType="Border">
+        <Setter Property="Width" Value="300" />
+        <Setter Property="Padding" Value="24" />
+        <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="{DynamicResource ContainerCornerRadius}" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="BorderBrush" Value="{DynamicResource BrandPrimaryBrush}" />
+                <Setter Property="Background" Value="{DynamicResource SurfaceLayer1Brush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- プロジェクト一覧画面：カード内ヘッダー領域のスタイル -->
+    <Style x:Key="ProjectCardHeaderStyle" TargetType="Grid">
+        <Setter Property="Margin" Value="0,0,0,16" />
+    </Style>
+
+    <!-- プロジェクト一覧画面：カード内プロジェクト名のスタイル -->
+    <Style x:Key="ProjectCardNameStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <!-- プロジェクト一覧画面：カード内最終更新日時のスタイル -->
+    <Style x:Key="ProjectCardUpdatedStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    </Style>
+
+    <!-- プロジェクト一覧画面：カード内健康状態バッジの外枠スタイル -->
+    <Style x:Key="ProjectCardHealthBorderStyle" TargetType="Border">
+        <Setter Property="Padding" Value="8,2" />
+        <Setter Property="HorizontalAlignment" Value="Right" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding HealthStatus}" Value="Healthy">
+                <Setter Property="Background" Value="#E8F5E9" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding HealthStatus}" Value="Warning">
+                <Setter Property="Background" Value="#FFFDE7" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding HealthStatus}" Value="Delayed">
+                <Setter Property="Background" Value="#FFEBEE" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- プロジェクト一覧画面：カード内健康状態バッジのテキストスタイル -->
+    <Style x:Key="ProjectCardHealthTextStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="10" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding HealthStatus}" Value="Healthy">
+                <Setter Property="Text" Value="順調" />
+                <Setter Property="Foreground" Value="#2E7D32" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding HealthStatus}" Value="Warning">
+                <Setter Property="Text" Value="注意" />
+                <Setter Property="Foreground" Value="#F57F17" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding HealthStatus}" Value="Delayed">
+                <Setter Property="Text" Value="遅延" />
+                <Setter Property="Foreground" Value="#C62828" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- プロジェクト一覧画面：カード内樹木（Viewbox）のスタイル -->
+    <Style x:Key="ProjectCardTreeContainerStyle" TargetType="Viewbox">
+        <Setter Property="Height" Value="100" />
+        <Setter Property="Margin" Value="0,10" />
+    </Style>
+
+    <!-- プロジェクト一覧画面：カード内樹木の葉（Path）のスタイル -->
+    <Style x:Key="ProjectCardLeafPathStyle" TargetType="Path">
+        <Setter Property="Fill" Value="#27ae60" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding HealthStatus}" Value="Healthy">
+                <Setter Property="Fill" Value="#27ae60" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding HealthStatus}" Value="Warning">
+                <Setter Property="Fill" Value="#f1c40f" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding HealthStatus}" Value="Delayed">
+                <Setter Property="Fill" Value="#e67e22" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- プロジェクト一覧画面：カード内統計情報グリッドのスタイル -->
+    <Style x:Key="ProjectCardStatsGridStyle" TargetType="Grid">
+        <Setter Property="Margin" Value="0,16,0,0" />
+    </Style>
+
+    <!-- プロジェクト一覧画面：カード内統計情報ラベルのスタイル -->
+    <Style x:Key="ProjectCardStatsLabelStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="10" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    </Style>
+
+    <!-- プロジェクト一覧画面：カード内統計情報数値のスタイル -->
+    <Style x:Key="ProjectCardStatsValueStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontWeight" Value="Bold" />
+    </Style>
+
 </ResourceDictionary>
