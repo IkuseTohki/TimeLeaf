@@ -285,4 +285,126 @@
         <Setter Property="Orientation" Value="Horizontal" />
     </Style>
 
+    <!-- Generic View Components (Common across many views) -->
+
+    <!-- 各ビューの最上部ヘッダー領域（Grid）のスタイル -->
+    <Style x:Key="ViewHeaderGridStyle" TargetType="Grid">
+        <Setter Property="Margin" Value="48,32,48,16" />
+    </Style>
+
+    <!-- 各ビューのメインコンテンツ領域（StackPanel）のスタイル -->
+    <Style x:Key="ViewMainContainerStyle" TargetType="StackPanel">
+        <Setter Property="Margin" Value="48,16,48,48" />
+    </Style>
+
+    <!-- ビューヘッダー内のタイトルテキストスタイル -->
+    <Style x:Key="ViewHeaderTitleStyle"
+           BasedOn="{StaticResource FormTitleTextStyle}"
+           TargetType="TextBlock">
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="FontSize" Value="28" />
+    </Style>
+
+    <!-- ビューヘッダー内のサブタイトルテキストスタイル -->
+    <Style x:Key="ViewHeaderSubTitleStyle" TargetType="TextBlock">
+        <Setter Property="Margin" Value="0,8,0,0" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    </Style>
+
+    <!-- Home View Components -->
+
+    <!-- ホーム画面：統計情報（UniformGrid）のスタイル -->
+    <Style x:Key="HomeStatsGridStyle" TargetType="UniformGrid">
+        <Setter Property="Margin" Value="0,0,0,32" />
+    </Style>
+
+    <!-- ホーム画面：統計カード内のラベルテキストスタイル -->
+    <Style x:Key="HomeStatsLabelStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    </Style>
+
+    <!-- ホーム画面：統計カード内の数値テキストスタイル -->
+    <Style x:Key="HomeStatsValueStyle" TargetType="TextBlock">
+        <Setter Property="Margin" Value="0,4,0,0" />
+        <Setter Property="FontSize" Value="24" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    </Style>
+
+    <!-- ホーム画面：カラム（StackPanel）のスタイル -->
+    <Style x:Key="HomeColumnStyle" TargetType="StackPanel">
+        <Setter Property="Margin" Value="0,0,32,0" />
+    </Style>
+
+    <!-- ホーム画面：期限切れタスク項目のスタイル -->
+    <Style x:Key="HomeDeadlineItemStyle" TargetType="Grid">
+        <Setter Property="Margin" Value="0,0,0,12" />
+    </Style>
+
+    <!-- ホーム画面：プロジェクトカード内のタイトルスタイル -->
+    <Style x:Key="HomeProjectCardTitleStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    </Style>
+
+    <!-- ホーム画面：プロジェクトカード内のサブタイトル（状態）スタイル -->
+    <Style x:Key="HomeProjectCardSubTitleStyle" TargetType="TextBlock">
+        <Setter Property="Margin" Value="0,8,0,4" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    </Style>
+
+    <!-- ホーム画面：プロジェクトカード内の進捗バースタイル -->
+    <Style x:Key="HomeProjectProgressBarStyle" TargetType="ProgressBar">
+        <Setter Property="Height" Value="6" />
+        <Setter Property="Background" Value="{DynamicResource SurfaceLayer1Brush}" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandPrimaryBrush}" />
+    </Style>
+
+    <!-- ホーム画面：マイルストーンの日付テキストスタイル -->
+    <Style x:Key="HomeMilestoneDateStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    </Style>
+
+    <!-- ホーム画面：マイルストーンのプロジェクト名テキストスタイル -->
+    <Style x:Key="HomeMilestoneProjectNameStyle" TargetType="TextBlock">
+        <Setter Property="Margin" Value="12,0,0,0" />
+        <Setter Property="VerticalAlignment" Value="Bottom" />
+        <Setter Property="FontSize" Value="10" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandPrimaryBrush}" />
+        <Setter Property="Opacity" Value="0.8" />
+    </Style>
+
+    <!-- ホーム画面：マイルストーンのタイムライン上のドットスタイル -->
+    <Style x:Key="HomeMilestoneTimelineDotStyle" TargetType="Ellipse">
+        <Setter Property="Width" Value="8" />
+        <Setter Property="Height" Value="8" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Fill" Value="{DynamicResource BrandPrimaryBrush}" />
+    </Style>
+
+    <!-- ホーム画面：マイルストーンのタイムラインの縦線スタイル -->
+    <Style x:Key="HomeMilestoneTimelineLineStyle" TargetType="Rectangle">
+        <Setter Property="Width" Value="2" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="Fill" Value="{DynamicResource BrandPrimaryBrush}" />
+        <Setter Property="Opacity" Value="0.2" />
+    </Style>
+
+    <!-- ホーム画面：マイルストーン名（内容）のテキストスタイル -->
+    <Style x:Key="HomeMilestoneLabelStyle" TargetType="TextBlock">
+        <Setter Property="Margin" Value="12,0,0,0" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
 </ResourceDictionary>
