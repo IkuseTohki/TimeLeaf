@@ -24,7 +24,6 @@ public class ProjectWorkspaceViewModelSaveTests
     private Mock<IServiceProvider> _serviceProviderMock = null!;
     private Mock<IProjectRepository> _repositoryMock = null!;
     private Mock<ILogger<MainViewModel>> _mainLoggerMock = null!;
-    private Mock<ILogger<OverviewViewModel>> _overviewLoggerMock = null!;
     private Mock<ILogger<ProjectWorkspaceViewModel>> _workspaceLoggerMock = null!;
     private Mock<ICurrentUserService> _userServiceMock = null!;
     private Mock<IDialogService> _dialogServiceMock = null!;
@@ -34,7 +33,6 @@ public class ProjectWorkspaceViewModelSaveTests
     {
         _repositoryMock = new Mock<IProjectRepository>();
         _mainLoggerMock = new Mock<ILogger<MainViewModel>>();
-        _overviewLoggerMock = new Mock<ILogger<OverviewViewModel>>();
         _workspaceLoggerMock = new Mock<ILogger<ProjectWorkspaceViewModel>>();
         _userServiceMock = new Mock<ICurrentUserService>();
         _serviceProviderMock = new Mock<IServiceProvider>();
@@ -42,8 +40,6 @@ public class ProjectWorkspaceViewModelSaveTests
 
         _serviceProviderMock.Setup(sp => sp.GetService(typeof(ILogger<ProjectWorkspaceViewModel>)))
             .Returns(_workspaceLoggerMock.Object);
-        _serviceProviderMock.Setup(sp => sp.GetService(typeof(ILogger<OverviewViewModel>)))
-            .Returns(_overviewLoggerMock.Object);
         _serviceProviderMock.Setup(sp => sp.GetService(typeof(ICurrentUserService)))
             .Returns(_userServiceMock.Object);
         _serviceProviderMock.Setup(sp => sp.GetService(typeof(IAddProjectUseCase)))
@@ -77,9 +73,6 @@ public class ProjectWorkspaceViewModelSaveTests
 
         viewModelFactoryMock.Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
             .Returns((Project p) => new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object));
-
-        viewModelFactoryMock.Setup(x => x.CreateOverviewViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>()))
-            .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, addProjectUseCaseMock.Object, _dialogServiceMock.Object, viewModelFactoryMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
 
         var dispatcherMock = new Mock<IDispatcherService>();
         dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Action>())).Callback<Action>(a => a()).Returns(Task.CompletedTask);
@@ -159,9 +152,6 @@ public class ProjectWorkspaceViewModelSaveTests
         viewModelFactoryMock.Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
             .Returns((Project p) => new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object));
 
-        viewModelFactoryMock.Setup(x => x.CreateOverviewViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>()))
-            .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, addProjectUseCaseMock.Object, _dialogServiceMock.Object, viewModelFactoryMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
-
         var dispatcherMock = new Mock<IDispatcherService>();
         dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Action>())).Callback<Action>(a => a()).Returns(Task.CompletedTask);
         dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Func<Task>>())).Returns<Func<Task>>(f => f());
@@ -212,9 +202,6 @@ public class ProjectWorkspaceViewModelSaveTests
 
         viewModelFactoryMock.Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
             .Returns((Project p) => new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object));
-
-        viewModelFactoryMock.Setup(x => x.CreateOverviewViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>()))
-            .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, addProjectUseCaseMock.Object, _dialogServiceMock.Object, viewModelFactoryMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
 
         var dispatcherMock = new Mock<IDispatcherService>();
         dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Action>())).Callback<Action>(a => a()).Returns(Task.CompletedTask);

@@ -276,9 +276,8 @@ public partial class App : Application
         services.AddTransient<ProfileEditViewModel>(); // Ensure this is registered if not already
         services.AddTransient<AddProjectViewModel>();
         services.AddTransient<AddTaskViewModel>();
-        // Note: OverviewViewModel と ProjectWorkspaceViewModel はファクトリ経由で生成されるため、直接の Transient 登録は不要だが、
+        // Note: ProjectWorkspaceViewModel はファクトリ経由で生成されるため、直接の Transient 登録は不要だが、
         // ファクトリ内での GetRequiredService 用に登録しておく。
-        services.AddTransient<OverviewViewModel>();
         services.AddTransient<ProjectWorkspaceViewModel>();
 
         // View の登録

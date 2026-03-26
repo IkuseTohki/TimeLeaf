@@ -37,8 +37,6 @@ public class InfiniteLoopReproductionTests
 
         _serviceProviderMock.Setup(sp => sp.GetService(typeof(ILogger<ProjectWorkspaceViewModel>)))
             .Returns(new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
-        _serviceProviderMock.Setup(sp => sp.GetService(typeof(ILogger<OverviewViewModel>)))
-            .Returns(new Mock<ILogger<OverviewViewModel>>().Object);
         _serviceProviderMock.Setup(sp => sp.GetService(typeof(ICurrentUserService)))
             .Returns(_userServiceMock.Object);
         _serviceProviderMock.Setup(sp => sp.GetService(typeof(IServiceProvider)))
@@ -68,9 +66,6 @@ public class InfiniteLoopReproductionTests
         var projectEntity = new Project();
         projectEntity.UpdateName("LoopTest");
         loadUseCaseMock.Setup(r => r.ExecuteAsync()).ReturnsAsync(new List<Project> { projectEntity });
-
-        viewModelFactoryMock.Setup(x => x.CreateOverviewViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>()))
-            .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, addProjectUseCaseMock.Object, new Mock<LeafKit.UI.Services.IDialogService>().Object, viewModelFactoryMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
 
         var saveCoordinator = new ProjectSaveCoordinator(saveUseCaseMock.Object, new Mock<ILogger<ProjectSaveCoordinator>>().Object);
         var notificationServiceMock = new Mock<INotificationService>();
@@ -153,9 +148,6 @@ public class InfiniteLoopReproductionTests
         var projectEntity = new Project();
         projectEntity.UpdateName("ConcurrencyTest");
         loadUseCaseMock.Setup(r => r.ExecuteAsync()).ReturnsAsync(new List<Project> { projectEntity });
-
-        viewModelFactoryMock.Setup(x => x.CreateOverviewViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>()))
-            .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, addProjectUseCaseMock.Object, new Mock<LeafKit.UI.Services.IDialogService>().Object, viewModelFactoryMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
 
         var saveCoordinator = new ProjectSaveCoordinator(saveUseCaseMock.Object, new Mock<ILogger<ProjectSaveCoordinator>>().Object);
         var notificationServiceMock = new Mock<INotificationService>();

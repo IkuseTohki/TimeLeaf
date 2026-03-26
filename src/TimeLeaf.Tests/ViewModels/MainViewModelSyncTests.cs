@@ -40,11 +40,9 @@ public class MainViewModelSyncTests
         var dialogServiceMock = new Mock<IDialogService>();
         _serviceProviderMock = new Mock<IServiceProvider>();
 
-        // ProjectWorkspaceViewModel と OverviewViewModel 用のロガーもモックする
+        // ProjectWorkspaceViewModel 用のロガーもモックする
         _serviceProviderMock.Setup(sp => sp.GetService(typeof(ILogger<ProjectWorkspaceViewModel>)))
             .Returns(new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
-        _serviceProviderMock.Setup(sp => sp.GetService(typeof(ILogger<OverviewViewModel>)))
-            .Returns(new Mock<ILogger<OverviewViewModel>>().Object);
         _serviceProviderMock.Setup(sp => sp.GetService(typeof(IAddProjectUseCase)))
             .Returns(addProjectUseCaseMock.Object);
         _serviceProviderMock.Setup(sp => sp.GetService(typeof(IDialogService)))
@@ -55,9 +53,6 @@ public class MainViewModelSyncTests
         // Factory mock setup
         viewModelFactoryMock.Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
             .Returns((Project p) => new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object));
-
-        viewModelFactoryMock.Setup(x => x.CreateOverviewViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>()))
-            .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, addProjectUseCaseMock.Object, dialogServiceMock.Object, viewModelFactoryMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
 
         var projectId = Guid.NewGuid();
         var initialProject = new Project { Id = projectId };

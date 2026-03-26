@@ -68,9 +68,6 @@ public class MainViewModelTests
 
         _loadUseCaseMock.Setup(x => x.ExecuteAsync()).ReturnsAsync(new List<Project>());
 
-        _viewModelFactoryMock.Setup(x => x.CreateOverviewViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>()))
-            .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, _addProjectUseCaseMock.Object, _dialogServiceMock.Object, _viewModelFactoryMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
-
         _viewModelFactoryMock.Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
             .Returns((Project p) => new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object));
 

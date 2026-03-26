@@ -35,16 +35,6 @@ public class ViewModelFactory : IViewModelFactory
         return new AllTasksViewModel(projects);
     }
 
-    public OverviewViewModel CreateOverviewViewModel(ObservableCollection<ProjectViewModel> projects)
-    {
-        return new OverviewViewModel(
-            projects,
-            _serviceProvider.GetRequiredService<IAddProjectUseCase>(),
-            _serviceProvider.GetRequiredService<IDialogService>(),
-            this,
-            _serviceProvider.GetRequiredService<ILogger<OverviewViewModel>>());
-    }
-
     public ProjectWorkspaceViewModel CreateProjectWorkspaceViewModel(ProjectViewModel projectViewModel)
     {
         return new ProjectWorkspaceViewModel(

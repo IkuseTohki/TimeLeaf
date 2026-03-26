@@ -70,9 +70,6 @@ public class CommentFlowTests
         viewModelFactoryMock.Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
             .Returns((Project p) => new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object));
 
-        viewModelFactoryMock.Setup(x => x.CreateOverviewViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>()))
-            .Returns((ObservableCollection<ProjectViewModel> p) => new OverviewViewModel(p, addProjectUseCaseMock.Object, _dialogServiceMock.Object, viewModelFactoryMock.Object, new Mock<ILogger<OverviewViewModel>>().Object));
-
         viewModelFactoryMock.Setup(x => x.CreateProjectWorkspaceViewModel(It.IsAny<ProjectViewModel>()))
             .Returns((ProjectViewModel pvm) => new ProjectWorkspaceViewModel(pvm, _notificationServiceMock.Object, viewModelFactoryMock.Object, _checkAssignmentMock.Object, _loggerMock.Object));
 
