@@ -16,51 +16,32 @@
         </Grid.ColumnDefinitions>
 
         <!-- メインのタスクボード領域 -->
-        <DockPanel Margin="40,0,24,40">
+        <DockPanel Style="{StaticResource TaskBoardContainerStyle}">
             <!-- ビュー切り替えとヘッダー -->
             <Grid Margin="0,0,0,24" DockPanel.Dock="Top">
                 <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                    <TextBlock VerticalAlignment="Center"
-                               FontSize="20"
-                               FontWeight="Bold"
-                               Foreground="{DynamicResource TextPrimaryBrush}"
-                               Text="作業の森" />
-                    <Border Margin="24,0,0,0"
-                            Padding="4"
-                            Background="{DynamicResource SurfaceLayer1Brush}"
-                            CornerRadius="20">
+                    <TextBlock Style="{StaticResource TaskBoardHeaderTextStyle}" Text="作業の森" />
+                    <Border Style="{StaticResource TaskViewSwitcherStyle}">
                         <StackPanel Orientation="Horizontal">
-                            <Button Padding="16,6"
-                                    Background="{DynamicResource SurfaceBaseBrush}"
-                                    BorderThickness="0"
-                                    Content="リスト"
-                                    Style="{StaticResource RoundButtonStyle}" />
-                            <Button Padding="16,6"
-                                    Background="Transparent"
-                                    BorderThickness="0"
+                            <Button Content="リスト" Style="{StaticResource TaskViewSwitcherButtonStyle}" />
+                            <Button Background="Transparent"
                                     Content="カンバン"
                                     Foreground="{DynamicResource BrandPrimaryHoverBrush}"
-                                    Style="{StaticResource RoundButtonStyle}" />
+                                    Style="{StaticResource TaskViewSwitcherButtonStyle}" />
                         </StackPanel>
                     </Border>
                 </StackPanel>
-                <TextBox Width="200"
-                         Padding="12,6"
-                         HorizontalAlignment="Right"
+                <TextBox HorizontalAlignment="Right"
                          Style="{StaticResource OrganicTextBoxStyle}"
                          Tag="タスクを検索..." />
             </Grid>
 
             <!-- タスク追加入力 -->
-            <Button Margin="0,0,0,16"
-                    Padding="16,12"
-                    HorizontalContentAlignment="Stretch"
-                    Background="Transparent"
-                    BorderThickness="0"
-                    Command="{Binding AddTaskCommand}"
+            <Button Command="{Binding AddTaskCommand}"
                     DockPanel.Dock="Top"
-                    IsEnabled="{Binding ProjectViewModel.IsAssignedToMe}">
-                <Border Padding="16,8" Style="{StaticResource OrganicCardStyle}">
+                    IsEnabled="{Binding ProjectViewModel.IsAssignedToMe}"
+                    Style="{StaticResource AddTaskButtonStyle}">
+                <Border Style="{StaticResource AddTaskCardStyle}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
@@ -77,8 +58,6 @@
                                    Foreground="{DynamicResource TextSecondaryBrush}"
                                    Text="新しいタスクの種をまく..." />
                         <Button Grid.Column="2"
-                                Padding="20,8"
-                                Background="#4A7c44"
                                 Command="{Binding AddTaskCommand}"
                                 Content="追加"
                                 Foreground="White"
@@ -92,12 +71,7 @@
                 <ItemsControl ItemsSource="{Binding Tasks}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border Margin="0,0,0,8"
-                                    Padding="24,16"
-                                    Background="{DynamicResource SurfaceBaseBrush}"
-                                    BorderBrush="{DynamicResource OutlineBaseBrush}"
-                                    BorderThickness="1"
-                                    Cursor="Hand">
+                            <Border Style="{StaticResource TaskItemBorderStyle}">
                                 <Border.InputBindings>
                                     <MouseBinding Command="{Binding DataContext.SelectTaskCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                   CommandParameter="{Binding}"
@@ -106,17 +80,6 @@
                                                   CommandParameter="{Binding}"
                                                   MouseAction="LeftDoubleClick" />
                                 </Border.InputBindings>
-                                <Border.Style>
-                                    <Style TargetType="Border">
-                                        <Setter Property="CornerRadius" Value="12,32,12,32" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                <Setter Property="Background" Value="{DynamicResource SurfaceLayer1Brush}" />
-                                                <Setter Property="BorderBrush" Value="{DynamicResource BrandPrimaryHoverBrush}" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Border.Style>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto" />
@@ -133,21 +96,11 @@
                                                FontWeight="SemiBold"
                                                Text="{Binding Name}" />
                                     <Border Grid.Column="2"
-                                            Margin="0,0,20,0"
-                                            Padding="10,2"
-                                            Background="#FFEBEE"
-                                            CornerRadius="10"
+                                            Style="{StaticResource PriorityBadgeStyle}"
                                             Visibility="{Binding Priority, Converter={StaticResource PriorityToVisibilityConverter}}">
-                                        <TextBlock FontSize="11"
-                                                   FontWeight="Bold"
-                                                   Foreground="#C62828"
-                                                   Text="緊急" />
+                                        <TextBlock Style="{StaticResource PriorityBadgeTextStyle}" Text="緊急" />
                                     </Border>
-                                    <Border Grid.Column="3"
-                                            Width="28"
-                                            Height="28"
-                                            Background="{DynamicResource StateHoverBrush}"
-                                            CornerRadius="14">
+                                    <Border Grid.Column="3" Style="{StaticResource SmallUserAvatarIconStyle}">
                                         <TextBlock HorizontalAlignment="Center"
                                                    VerticalAlignment="Center"
                                                    FontSize="10"
@@ -164,11 +117,7 @@
 
         <!-- タスク詳細パネル (Drawer) -->
         <Border Grid.Column="1"
-                Width="180"
-                Background="{DynamicResource SurfaceBaseBrush}"
-                BorderBrush="{DynamicResource OutlineBaseBrush}"
-                BorderThickness="1,0,0,0"
-                CornerRadius="32,0,0,32"
+                Style="{StaticResource TaskDetailDrawerStyle}"
                 Visibility="{Binding IsDetailVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
             <ContentControl Content="{Binding TaskSummaryViewModel}">
                 <ContentControl.Resources>

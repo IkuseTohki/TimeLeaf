@@ -482,4 +482,103 @@
         <Setter Property="Margin" Value="0,0,16,0" />
     </Style>
 
+    <!-- Task Board (ProjectTasksView) Components -->
+
+    <!-- タスクボード：メインコンテンツ容器のスタイル -->
+    <Style x:Key="TaskBoardContainerStyle" TargetType="DockPanel">
+        <Setter Property="Margin" Value="40,0,24,40" />
+    </Style>
+
+    <!-- タスクボード：ヘッダーテキストのスタイル -->
+    <Style x:Key="TaskBoardHeaderTextStyle" TargetType="TextBlock">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="FontSize" Value="20" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    </Style>
+
+    <!-- タスクボード：ビュー切り替えスイッチ（Border）のスタイル -->
+    <Style x:Key="TaskViewSwitcherStyle" TargetType="Border">
+        <Setter Property="Margin" Value="24,0,0,0" />
+        <Setter Property="Padding" Value="4" />
+        <Setter Property="Background" Value="{DynamicResource SurfaceLayer1Brush}" />
+        <Setter Property="CornerRadius" Value="20" />
+    </Style>
+
+    <!-- タスクボード：ビュー切り替えボタンのスタイル -->
+    <Style x:Key="TaskViewSwitcherButtonStyle"
+           BasedOn="{StaticResource RoundButtonStyle}"
+           TargetType="Button">
+        <Setter Property="Padding" Value="16,6" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <!-- タスクボード：タスク追加ボタン（外側）のスタイル -->
+    <Style x:Key="AddTaskButtonStyle" TargetType="Button">
+        <Setter Property="Margin" Value="0,0,0,16" />
+        <Setter Property="Padding" Value="16,12" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <!-- タスクボード：タスク追加カードのスタイル -->
+    <Style x:Key="AddTaskCardStyle"
+           BasedOn="{StaticResource OrganicCardStyle}"
+           TargetType="Border">
+        <Setter Property="Padding" Value="16,8" />
+    </Style>
+
+    <!-- タスクボード：タスク項目の基本スタイル -->
+    <Style x:Key="TaskItemBorderStyle" TargetType="Border">
+        <Setter Property="Margin" Value="0,0,0,8" />
+        <Setter Property="Padding" Value="24,16" />
+        <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="12,32,12,32" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                <Setter Property="Background" Value="{DynamicResource SurfaceLayer1Brush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource BrandPrimaryHoverBrush}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- タスクボード：優先度バッジのスタイル -->
+    <Style x:Key="PriorityBadgeStyle" TargetType="Border">
+        <Setter Property="Margin" Value="0,0,20,0" />
+        <Setter Property="Padding" Value="10,2" />
+        <Setter Property="Background" Value="#FFEBEE" />
+        <Setter Property="CornerRadius" Value="10" />
+    </Style>
+
+    <!-- タスクボード：優先度バッジテキストのスタイル -->
+    <Style x:Key="PriorityBadgeTextStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="#C62828" />
+    </Style>
+
+    <!-- タスクボード：小型ユーザーアイコン（担当者）のスタイル -->
+    <Style x:Key="SmallUserAvatarIconStyle"
+           BasedOn="{StaticResource UserAvatarIconStyle}"
+           TargetType="Border">
+        <Setter Property="Width" Value="28" />
+        <Setter Property="Height" Value="28" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Background" Value="{DynamicResource StateHoverBrush}" />
+        <Setter Property="CornerRadius" Value="14" />
+    </Style>
+
+    <!-- タスクボード：詳細ドロワー（サイドパネル）のスタイル -->
+    <Style x:Key="TaskDetailDrawerStyle" TargetType="Border">
+        <Setter Property="Width" Value="180" />
+        <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
+        <Setter Property="BorderThickness" Value="1,0,0,0" />
+        <Setter Property="CornerRadius" Value="32,0,0,32" />
+    </Style>
+
 </ResourceDictionary>
