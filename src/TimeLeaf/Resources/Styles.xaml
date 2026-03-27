@@ -581,4 +581,111 @@
         <Setter Property="CornerRadius" Value="32,0,0,32" />
     </Style>
 
+    <!-- ビュー：プレースホルダーテキスト（開発中や空状態）のスタイル -->
+    <Style x:Key="ViewPlaceholderTextStyle" TargetType="TextBlock">
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="FontSize" Value="24" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+        <Setter Property="Opacity" Value="0.5" />
+    </Style>
+
+    <!-- Project Settings View Components -->
+
+    <!-- プロジェクト設定：メインコンテナのスタイル -->
+    <Style x:Key="SettingsContainerStyle" TargetType="StackPanel">
+        <Setter Property="MaxWidth" Value="600" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+    </Style>
+
+    <!-- プロジェクト設定：グループボックスの基本スタイル -->
+    <Style x:Key="SettingsGroupBoxStyle" TargetType="GroupBox">
+        <Setter Property="Margin" Value="0,0,0,32" />
+        <Setter Property="Padding" Value="16" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SurfaceLayer2Brush}" />
+    </Style>
+
+    <!-- プロジェクト設定：危険エリア（Danger Zone）のグループボックススタイル -->
+    <Style x:Key="DangerGroupBoxStyle"
+           BasedOn="{StaticResource SettingsGroupBoxStyle}"
+           TargetType="GroupBox">
+        <Setter Property="BorderBrush" Value="#FFCDD2" />
+        <Setter Property="Foreground" Value="#D32F2F" />
+    </Style>
+
+    <!-- プロジェクト設定：注釈テキストのスタイル -->
+    <Style x:Key="SettingsAnnotationStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <!-- プロジェクト設定：危険な操作ボタンのスタイル -->
+    <Style x:Key="DangerButtonStyle" TargetType="Button">
+        <Setter Property="Padding" Value="16,8" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="Background" Value="#FFEBEE" />
+        <Setter Property="BorderBrush" Value="#FFCDD2" />
+        <Setter Property="Foreground" Value="#D32F2F" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="20">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Project Notifications View Components -->
+
+    <!-- 通知センター：通知カードのスタイル -->
+    <Style x:Key="NotificationCardStyle"
+           BasedOn="{StaticResource OrganicCardStyle}"
+           TargetType="Border">
+        <Setter Property="Margin" Value="0,0,0,12" />
+        <Setter Property="Padding" Value="16" />
+    </Style>
+
+    <!-- 通知センター：タイトルテキストのスタイル -->
+    <Style x:Key="NotificationTitleTextStyle" TargetType="TextBlock">
+        <Setter Property="Margin" Value="0,0,0,4" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandPrimaryBrush}" />
+    </Style>
+
+    <!-- 通知センター：メッセージ本文のテキストスタイル -->
+    <Style x:Key="NotificationMessageTextStyle" TargetType="TextBlock">
+        <Setter Property="Margin" Value="0,0,0,8" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <!-- 通知センター：タイムスタンプのテキストスタイル -->
+    <Style x:Key="NotificationTimestampTextStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    </Style>
+
+    <!-- 通知センター：空状態（通知なし）のコンテナスタイル -->
+    <Style x:Key="NotificationEmptyStateStyle"
+           BasedOn="{StaticResource OrganicCardStyle}"
+           TargetType="Border">
+        <Setter Property="Margin" Value="0,0,0,12" />
+        <Setter Property="Padding" Value="32" />
+    </Style>
+
+    <!-- 通知センター：空状態のアイコンスタイル -->
+    <Style x:Key="NotificationEmptyIconStyle" TargetType="TextBlock">
+        <Setter Property="Margin" Value="0,0,0,16" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="FontSize" Value="48" />
+    </Style>
+
 </ResourceDictionary>

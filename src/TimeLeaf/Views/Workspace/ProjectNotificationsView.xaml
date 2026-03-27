@@ -10,14 +10,6 @@
              d:DesignHeight="450"
              d:DesignWidth="800"
              mc:Ignorable="d">
-    <UserControl.Resources>
-        <Style x:Key="NotificationCardStyle"
-               BasedOn="{StaticResource OrganicCardStyle}"
-               TargetType="Border">
-            <Setter Property="Margin" Value="0,0,0,12" />
-            <Setter Property="Padding" Value="16" />
-        </Style>
-    </UserControl.Resources>
 
     <Grid Margin="48,0,48,48">
         <Grid.RowDefinitions>
@@ -31,26 +23,16 @@
                     Content="すべて既読にする"
                     DockPanel.Dock="Right"
                     Style="{StaticResource OrganicButtonStyle}" />
-            <TextBlock VerticalAlignment="Center"
-                       FontSize="20"
-                       FontWeight="Bold"
-                       Foreground="{DynamicResource TextPrimaryBrush}"
-                       Text="通知センター" />
+            <TextBlock Style="{StaticResource TaskBoardHeaderTextStyle}" Text="通知センター" />
         </DockPanel>
 
         <!-- 通知リスト -->
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel>
                 <!-- 通知がない場合の表示 -->
-                <Border Margin="0,0,0,12"
-                        Padding="32"
-                        Style="{StaticResource OrganicCardStyle}"
-                        Visibility="{Binding UnreadNotifications.Count, Converter={StaticResource IntToVisibilityConverter}, ConverterParameter='Inverse'}">
+                <Border Style="{StaticResource NotificationEmptyStateStyle}" Visibility="{Binding UnreadNotifications.Count, Converter={StaticResource IntToVisibilityConverter}, ConverterParameter='Inverse'}">
                     <StackPanel HorizontalAlignment="Center">
-                        <TextBlock Margin="0,0,0,16"
-                                   HorizontalAlignment="Center"
-                                   FontSize="48"
-                                   Text="🍂" />
+                        <TextBlock Style="{StaticResource NotificationEmptyIconStyle}" Text="🍂" />
                         <TextBlock HorizontalAlignment="Center"
                                    FontSize="16"
                                    Foreground="{DynamicResource TextSecondaryBrush}"
@@ -70,18 +52,9 @@
                                     </Grid.ColumnDefinitions>
 
                                     <StackPanel>
-                                        <TextBlock Margin="0,0,0,4"
-                                                   FontSize="16"
-                                                   FontWeight="Bold"
-                                                   Foreground="{DynamicResource BrandPrimaryBrush}"
-                                                   Text="{Binding Title}" />
-                                        <TextBlock Margin="0,0,0,8"
-                                                   Foreground="{DynamicResource TextPrimaryBrush}"
-                                                   Text="{Binding Message}"
-                                                   TextWrapping="Wrap" />
-                                        <TextBlock FontSize="11"
-                                                   Foreground="{DynamicResource TextSecondaryBrush}"
-                                                   Text="{Binding CreatedAt, StringFormat='{}yyyy/MM/dd HH:mm (UTC)'}" />
+                                        <TextBlock Style="{StaticResource NotificationTitleTextStyle}" Text="{Binding Title}" />
+                                        <TextBlock Style="{StaticResource NotificationMessageTextStyle}" Text="{Binding Message}" />
+                                        <TextBlock Style="{StaticResource NotificationTimestampTextStyle}" Text="{Binding CreatedAt, StringFormat='{}yyyy/MM/dd HH:mm (UTC)'}" />
                                     </StackPanel>
 
                                     <Button Grid.Column="1"
