@@ -37,20 +37,15 @@
         </Grid.RowDefinitions>
 
         <!-- ヘッダー (ProjectWorkspaceView 特有のヘッダー) -->
-        <Grid Margin="48,32,48,16">
+        <Grid Style="{StaticResource ViewHeaderGridStyle}">
             <StackPanel VerticalAlignment="Bottom">
-                <TextBlock FontSize="28"
-                           FontWeight="Bold"
-                           Foreground="{DynamicResource TextPrimaryBrush}">
+                <TextBlock Style="{StaticResource ProjectWorkspaceTitleStyle}">
                     <Run Text="{Binding ProjectName, Mode=OneWay}" />
                     <Run BaselineAlignment="Center"
                          FontSize="12"
                          Text=" 進行中" />
                 </TextBlock>
-                <TextBlock Margin="0,8,0,0"
-                           FontSize="13"
-                           Foreground="{DynamicResource TextSecondaryBrush}"
-                           Text="個別プロジェクトのワークスペースを表示中" />
+                <TextBlock Style="{StaticResource ViewHeaderSubTitleStyle}" Text="個別プロジェクトのワークスペースを表示中" />
             </StackPanel>
 
             <!-- 操作ボタン / 参加バナー -->
@@ -73,26 +68,16 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Button Margin="4,0"
-                                    Padding="12,6"
-                                    Command="{Binding DataContext.SwitchSubViewCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            <Button Command="{Binding DataContext.SwitchSubViewCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                     CommandParameter="{Binding Parameter}"
                                     Content="{Binding Label}"
-                                    Style="{StaticResource OrganicButtonStyle}" />
+                                    Style="{StaticResource ProjectWorkspaceNavigationButtonStyle}" />
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
-                <Border Width="40"
-                        Height="40"
-                        Margin="16,0,0,0"
-                        Background="{StaticResource BrandPrimaryHoverBrush}"
-                        CornerRadius="20">
-                    <TextBlock HorizontalAlignment="Center"
-                               VerticalAlignment="Center"
-                               FontWeight="Bold"
-                               Foreground="White"
-                               Text="KT" />
+                <Border Style="{StaticResource UserAvatarIconStyle}">
+                    <TextBlock Style="{StaticResource UserAvatarInitialStyle}" Text="KT" />
                 </Border>
             </StackPanel>
         </Grid>

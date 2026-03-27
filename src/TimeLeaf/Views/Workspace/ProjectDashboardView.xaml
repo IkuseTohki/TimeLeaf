@@ -9,80 +9,42 @@
              d:DesignWidth="800"
              mc:Ignorable="d">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel Margin="48,16,48,48">
+        <StackPanel Style="{StaticResource ViewMainContainerStyle}">
             <!-- プロジェクト説明 -->
-            <Border Margin="0,0,0,32"
-                    Padding="24"
-                    Style="{StaticResource OrganicCardStyle}">
+            <Border Margin="0,0,0,32" Style="{StaticResource DashboardCardStyle}">
                 <StackPanel>
-                    <TextBlock FontSize="18"
-                               FontWeight="Bold"
-                               Foreground="{DynamicResource TextPrimaryBrush}"
-                               Text="プロジェクトについて" />
-                    <TextBlock Margin="0,12,0,0"
-                               FontSize="14"
-                               Foreground="{DynamicResource TextSecondaryBrush}"
-                               LineHeight="22"
-                               Text="{Binding Description}"
-                               TextWrapping="Wrap" />
+                    <TextBlock Style="{StaticResource DashboardSectionHeaderStyle}" Text="プロジェクトについて" />
+                    <TextBlock Style="{StaticResource DashboardDescriptionTextStyle}" Text="{Binding Description}" />
                 </StackPanel>
             </Border>
 
             <!-- 統計情報 (Stats) -->
             <UniformGrid Margin="0,0,0,32" Columns="4">
-                <Border Margin="0,0,16,0"
-                        Padding="24"
-                        Style="{StaticResource OrganicCardStyle}">
+                <Border Style="{StaticResource DashboardStatsCardStyle}">
                     <StackPanel>
-                        <TextBlock FontSize="13"
-                                   Foreground="{DynamicResource TextSecondaryBrush}"
-                                   Text="全タスク" />
-                        <TextBlock Margin="0,4,0,0"
-                                   FontSize="24"
-                                   FontWeight="Bold"
-                                   Foreground="{DynamicResource TextPrimaryBrush}"
-                                   Text="{Binding TotalTaskCount}" />
+                        <TextBlock Style="{StaticResource StatsLabelStyle}" Text="全タスク" />
+                        <TextBlock Style="{StaticResource StatsValueStyle}" Text="{Binding TotalTaskCount}" />
                     </StackPanel>
                 </Border>
-                <Border Margin="0,0,16,0"
-                        Padding="24"
-                        Style="{StaticResource OrganicCardStyle}">
+                <Border Style="{StaticResource DashboardStatsCardStyle}">
                     <StackPanel>
-                        <TextBlock FontSize="13"
-                                   Foreground="{DynamicResource TextSecondaryBrush}"
-                                   Text="完了済み" />
-                        <TextBlock Margin="0,4,0,0"
-                                   FontSize="24"
-                                   FontWeight="Bold"
-                                   Foreground="{DynamicResource TextPrimaryBrush}"
-                                   Text="{Binding CompletedTaskCount}" />
+                        <TextBlock Style="{StaticResource StatsLabelStyle}" Text="完了済み" />
+                        <TextBlock Style="{StaticResource StatsValueStyle}" Text="{Binding CompletedTaskCount}" />
                     </StackPanel>
                 </Border>
-                <Border Margin="0,0,16,0"
-                        Padding="24"
-                        Style="{StaticResource OrganicCardStyle}">
+                <Border Style="{StaticResource DashboardStatsCardStyle}">
                     <StackPanel>
-                        <TextBlock FontSize="13"
-                                   Foreground="{DynamicResource TextSecondaryBrush}"
-                                   Text="進捗率" />
-                        <TextBlock Margin="0,4,0,0"
-                                   FontSize="24"
-                                   FontWeight="Bold"
-                                   Foreground="{DynamicResource TextPrimaryBrush}">
+                        <TextBlock Style="{StaticResource StatsLabelStyle}" Text="進捗率" />
+                        <TextBlock Style="{StaticResource StatsValueStyle}">
                             <Run Text="{Binding CompletionPercentage, Mode=OneWay, StringFormat={}{0:F0}}" />
                             <Run FontSize="14" Text="%" />
                         </TextBlock>
                     </StackPanel>
                 </Border>
-                <Border Padding="24" Style="{StaticResource OrganicCardStyle}">
+                <Border Style="{StaticResource DashboardCardStyle}">
                     <StackPanel>
-                        <TextBlock FontSize="13"
-                                   Foreground="{DynamicResource TextSecondaryBrush}"
-                                   Text="実績工数" />
-                        <TextBlock Margin="0,4,0,0"
-                                   FontSize="24"
-                                   FontWeight="Bold"
-                                   Foreground="{DynamicResource TextPrimaryBrush}">
+                        <TextBlock Style="{StaticResource StatsLabelStyle}" Text="実績工数" />
+                        <TextBlock Style="{StaticResource StatsValueStyle}">
                             <Run Text="{Binding TotalActualCost, Mode=OneWay, StringFormat={}{0:F1}}" />
                             <Run FontSize="12" Text="h" />
                         </TextBlock>
@@ -98,12 +60,8 @@
 
                 <!-- 左カラム: マイルストーン -->
                 <StackPanel Grid.Column="0" Margin="0,0,32,0">
-                    <TextBlock Margin="0,0,0,16"
-                               FontSize="18"
-                               FontWeight="Bold"
-                               Foreground="{DynamicResource TextPrimaryBrush}"
-                               Text="🏳️ マイルストーン" />
-                    <Border Padding="24" Style="{StaticResource OrganicCardStyle}">
+                    <TextBlock Style="{StaticResource DashboardSectionHeaderStyle}" Text="🏳️ マイルストーン" />
+                    <Border Style="{StaticResource DashboardCardStyle}">
                         <ItemsControl ItemsSource="{Binding Milestones}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
@@ -112,7 +70,7 @@
                                             <ColumnDefinition Width="100" />
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Foreground="{DynamicResource TextSecondaryBrush}" Text="{Binding Date, StringFormat={}{0:yyyy/MM/dd}}" />
+                                        <TextBlock Style="{StaticResource StatsLabelStyle}" Text="{Binding Date, StringFormat={}{0:yyyy/MM/dd}}" />
                                         <TextBlock Grid.Column="1"
                                                    FontWeight="SemiBold"
                                                    Foreground="{DynamicResource TextPrimaryBrush}"
@@ -126,12 +84,8 @@
 
                 <!-- 右カラム: マイルストーン追加（簡易） -->
                 <StackPanel Grid.Column="1">
-                    <TextBlock Margin="0,0,0,16"
-                               FontSize="18"
-                               FontWeight="Bold"
-                               Foreground="{DynamicResource TextPrimaryBrush}"
-                               Text="＋ マイルストーン追加" />
-                    <Border Padding="24" Style="{StaticResource OrganicCardStyle}">
+                    <TextBlock Style="{StaticResource DashboardSectionHeaderStyle}" Text="＋ マイルストーン追加" />
+                    <Border Style="{StaticResource DashboardCardStyle}">
                         <StackPanel>
                             <DatePicker Margin="0,0,0,12" SelectedDate="{Binding NewMilestoneDate, Mode=TwoWay}" />
                             <TextBox Margin="0,0,0,12"

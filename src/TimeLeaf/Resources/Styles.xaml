@@ -319,19 +319,29 @@
         <Setter Property="Margin" Value="0,0,0,32" />
     </Style>
 
-    <!-- ホーム画面：統計カード内のラベルテキストスタイル -->
-    <Style x:Key="HomeStatsLabelStyle" TargetType="TextBlock">
+    <!-- Stats Components (Common across Home and Dashboard) -->
+
+    <Style x:Key="StatsLabelStyle" TargetType="TextBlock">
         <Setter Property="FontSize" Value="13" />
         <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
     </Style>
 
-    <!-- ホーム画面：統計カード内の数値テキストスタイル -->
-    <Style x:Key="HomeStatsValueStyle" TargetType="TextBlock">
+    <Style x:Key="StatsValueStyle" TargetType="TextBlock">
         <Setter Property="Margin" Value="0,4,0,0" />
         <Setter Property="FontSize" Value="24" />
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
     </Style>
+
+    <!-- ホーム画面：統計カード内のラベルテキストスタイル -->
+    <Style x:Key="HomeStatsLabelStyle"
+           BasedOn="{StaticResource StatsLabelStyle}"
+           TargetType="TextBlock" />
+
+    <!-- ホーム画面：統計カード内の数値テキストスタイル -->
+    <Style x:Key="HomeStatsValueStyle"
+           BasedOn="{StaticResource StatsValueStyle}"
+           TargetType="TextBlock" />
 
     <!-- ホーム画面：カラム（StackPanel）のスタイル -->
     <Style x:Key="HomeColumnStyle" TargetType="StackPanel">
@@ -405,6 +415,71 @@
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
         <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <!-- Project Workspace View Components -->
+
+    <!-- プロジェクト名のタイトルスタイル (ViewHeaderTitleStyle をベースに) -->
+    <Style x:Key="ProjectWorkspaceTitleStyle"
+           BasedOn="{StaticResource ViewHeaderTitleStyle}"
+           TargetType="TextBlock" />
+
+    <!-- プロジェクトワークスペース：ナビゲーションボタン（ItemsControl内）のスタイル -->
+    <Style x:Key="ProjectWorkspaceNavigationButtonStyle"
+           BasedOn="{StaticResource OrganicButtonStyle}"
+           TargetType="Button">
+        <Setter Property="Margin" Value="4,0" />
+        <Setter Property="Padding" Value="12,6" />
+    </Style>
+
+    <!-- ユーザーアバター（アイコン）の基本スタイル -->
+    <Style x:Key="UserAvatarIconStyle" TargetType="Border">
+        <Setter Property="Width" Value="40" />
+        <Setter Property="Height" Value="40" />
+        <Setter Property="Margin" Value="16,0,0,0" />
+        <Setter Property="Background" Value="{DynamicResource BrandPrimaryHoverBrush}" />
+        <Setter Property="CornerRadius" Value="20" />
+    </Style>
+
+    <!-- ユーザーアバター内のイニシャルテキストスタイル -->
+    <Style x:Key="UserAvatarInitialStyle" TargetType="TextBlock">
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="White" />
+    </Style>
+
+    <!-- Dashboard View Components -->
+
+    <!-- ダッシュボード：セクション見出しのスタイル -->
+    <Style x:Key="DashboardSectionHeaderStyle" TargetType="TextBlock">
+        <Setter Property="Margin" Value="0,0,0,16" />
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    </Style>
+
+    <!-- ダッシュボード：カードの基本スタイル (OrganicCardStyle + Padding) -->
+    <Style x:Key="DashboardCardStyle"
+           BasedOn="{StaticResource OrganicCardStyle}"
+           TargetType="Border">
+        <Setter Property="Padding" Value="24" />
+    </Style>
+
+    <!-- ダッシュボード：プロジェクト説明テキストのスタイル -->
+    <Style x:Key="DashboardDescriptionTextStyle" TargetType="TextBlock">
+        <Setter Property="Margin" Value="0,12,0,0" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+        <Setter Property="LineHeight" Value="22" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <!-- ダッシュボード：統計情報カードのスタイル (DashboardCardStyle + Margin) -->
+    <Style x:Key="DashboardStatsCardStyle"
+           BasedOn="{StaticResource DashboardCardStyle}"
+           TargetType="Border">
+        <Setter Property="Margin" Value="0,0,16,0" />
     </Style>
 
 </ResourceDictionary>
