@@ -1,11 +1,43 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <!-- 角丸の強いボタンスタイル（オーガニック） -->
-    <Style x:Key="RoundButtonStyle" TargetType="Button">
+    <!-- ====================================================================== -->
+    <!-- Typography Bases (Semantic Font Styles) -->
+    <!-- ====================================================================== -->
+
+    <!-- 大見出し: 各画面の最上部タイトル -->
+    <Style x:Key="TitleBaseStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="28" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    </Style>
+
+    <!-- 中見出し: フォームタイトル、セクション見出し -->
+    <Style x:Key="HeaderBaseStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="20" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    </Style>
+
+    <!-- 標準ラベル: 項目名、ボタンテキスト -->
+    <Style x:Key="LabelBaseStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    </Style>
+
+    <!-- 補足テキスト: 注釈、メタ情報、タイムスタンプ -->
+    <Style x:Key="MetaBaseStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    </Style>
+
+    <!-- ====================================================================== -->
+    <!-- Button Bases & Styles -->
+    <!-- ====================================================================== -->
+
+    <!-- 基本となるオーガニックボタンのテンプレート -->
+    <Style x:Key="BaseButtonStyle" TargetType="Button">
         <Setter Property="Padding" Value="16,8" />
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
-        <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
             <Setter.Value>
@@ -18,7 +50,10 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="{DynamicResource StateHoverBrush}" />
+                            <Setter Property="Opacity" Value="0.8" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -26,31 +61,67 @@
         </Setter>
     </Style>
 
-    <!-- プロジェクト内で多用するオーガニックなボタンスタイル -->
-    <Style x:Key="OrganicButtonStyle" TargetType="Button">
+    <!-- 角丸の強いボタンスタイル（透過背景） -->
+    <Style x:Key="RoundButtonStyle"
+           BasedOn="{StaticResource BaseButtonStyle}"
+           TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource StateHoverBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- オーガニックなボタンスタイル（標準） -->
+    <Style x:Key="OrganicButtonStyle"
+           BasedOn="{StaticResource BaseButtonStyle}"
+           TargetType="Button">
         <Setter Property="Padding" Value="12,6" />
         <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Cursor" Value="Hand" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="20">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="{DynamicResource ButtonHoverBackgroundBrush}" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource ButtonHoverBackgroundBrush}" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
+
+    <!-- 強調ボタンスタイル（ブランドカラー） -->
+    <Style x:Key="PrimaryButtonStyle"
+           BasedOn="{StaticResource BaseButtonStyle}"
+           TargetType="Button">
+        <Setter Property="Background" Value="{DynamicResource BrandPrimaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandForegroundBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="FontWeight" Value="Bold" />
+    </Style>
+
+    <!-- アウトライン強調ボタンスタイル -->
+    <Style x:Key="OutlinedButtonStyle"
+           BasedOn="{StaticResource RoundButtonStyle}"
+           TargetType="Button">
+        <Setter Property="BorderThickness" Value="2" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <!-- 危険な操作ボタンのスタイル -->
+    <Style x:Key="DangerButtonStyle"
+           BasedOn="{StaticResource BaseButtonStyle}"
+           TargetType="Button">
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="Background" Value="#FFEBEE" />
+        <Setter Property="BorderBrush" Value="#FFCDD2" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Foreground" Value="#D32F2F" />
+    </Style>
+
+    <!-- ====================================================================== -->
+    <!-- Common Containers (Cards, Groups) -->
+    <!-- ====================================================================== -->
 
     <!-- オーガニックなカード（Border）スタイル -->
     <Style x:Key="OrganicCardStyle" TargetType="Border">
@@ -68,6 +139,35 @@
         </Setter>
     </Style>
 
+    <!-- 通知バッジ用のスタイル -->
+    <Style x:Key="NotificationBadgeStyle" TargetType="Border">
+        <Setter Property="Background" Value="#E74C3C" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="MinWidth" Value="20" />
+        <Setter Property="Height" Value="20" />
+        <Setter Property="Padding" Value="4,0" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="HorizontalAlignment" Value="Right" />
+    </Style>
+
+    <!-- フォームグループ（GroupBox）の基本スタイル -->
+    <Style x:Key="SettingsGroupBoxStyle" TargetType="GroupBox">
+        <Setter Property="Margin" Value="0,0,0,32" />
+        <Setter Property="Padding" Value="16" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SurfaceLayer2Brush}" />
+    </Style>
+
+    <Style x:Key="DangerGroupBoxStyle"
+           BasedOn="{StaticResource SettingsGroupBoxStyle}"
+           TargetType="GroupBox">
+        <Setter Property="BorderBrush" Value="#FFCDD2" />
+        <Setter Property="Foreground" Value="#D32F2F" />
+    </Style>
+
+    <!-- ====================================================================== -->
+    <!-- Input Components -->
+    <!-- ====================================================================== -->
+
     <!-- オーガニックな入力欄（TextBox）スタイル -->
     <Style x:Key="OrganicTextBoxStyle" TargetType="TextBox">
         <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />
@@ -81,31 +181,55 @@
         </Style.Resources>
     </Style>
 
-    <!-- サイドバー項目用のスタイル -->
-    <Style x:Key="SidebarItemStyle" TargetType="Button">
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Foreground" Value="LightGray" />
-        <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="HorizontalContentAlignment" Value="Left" />
-        <Setter Property="Padding" Value="16,12" />
-        <Setter Property="Margin" Value="8,4" />
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{DynamicResource SidebarHoverBackgroundBrush}" />
-                <Setter Property="Foreground" Value="White" />
-            </Trigger>
-        </Style.Triggers>
+    <!-- 検索用入力欄（ClearableTextBox 等）のスタイル -->
+    <Style x:Key="SearchTextBoxStyle" TargetType="Control">
+        <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
     </Style>
 
-    <!-- 通知バッジ用のスタイル -->
-    <Style x:Key="NotificationBadgeStyle" TargetType="Border">
-        <Setter Property="Background" Value="#E74C3C" />
-        <Setter Property="CornerRadius" Value="10" />
-        <Setter Property="MinWidth" Value="20" />
-        <Setter Property="Height" Value="20" />
-        <Setter Property="Padding" Value="4,0" />
+    <!-- ====================================================================== -->
+    <!-- Navigation (Sidebar) -->
+    <!-- ====================================================================== -->
+
+    <!-- オーガニックなサイドバー用スタイル (TimeLeaf シグネチャー) -->
+    <Style x:Key="OrganicSidebarBorderStyle" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource BrandPrimaryBrush}" />
+        <Setter Property="CornerRadius" Value="0,32,32,0" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <!-- サイドバー：ロゴ・タイトルエリアのコンテナスタイル -->
+    <Style x:Key="SidebarLogoContainerStyle" TargetType="StackPanel">
+        <Setter Property="Margin" Value="20,32,20,40" />
+        <Setter Property="Orientation" Value="Horizontal" />
+    </Style>
+
+    <!-- サイドバー：ロゴ・タイトルエリアのコンテナスタイル -->
+    <Style x:Key="SidebarLogoPathStyle" TargetType="Path">
+        <Setter Property="Width" Value="24" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="Fill" Value="{DynamicResource BrandForegroundBrush}" />
+    </Style>
+
+    <!-- サイドバー：アプリ名（"TimeLeaf"）のテキストスタイル -->
+    <Style x:Key="SidebarLogoTextStyle"
+           BasedOn="{StaticResource HeaderBaseStyle}"
+           TargetType="TextBlock">
+        <Setter Property="Margin" Value="12,0,0,0" />
         <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="HorizontalAlignment" Value="Right" />
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandForegroundBrush}" />
+    </Style>
+
+    <!-- サイドバー：メニューのセクション見出し用スタイル -->
+    <Style x:Key="SidebarMenuHeaderStyle"
+           BasedOn="{StaticResource MetaBaseStyle}"
+           TargetType="TextBlock">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandForegroundBrush}" />
+        <Setter Property="Opacity" Value="0.6" />
     </Style>
 
     <!-- サイドバー用ボタンスタイル -->
@@ -152,54 +276,6 @@
         </Style.Triggers>
     </Style>
 
-    <!-- アウトライン強調ボタンスタイル -->
-    <Style x:Key="OutlinedButtonStyle"
-           BasedOn="{StaticResource RoundButtonStyle}"
-           TargetType="Button">
-        <Setter Property="BorderThickness" Value="2" />
-        <Setter Property="FontWeight" Value="SemiBold" />
-    </Style>
-
-    <!-- オーガニックなサイドバー用スタイル (TimeLeaf シグネチャー) -->
-    <Style x:Key="OrganicSidebarBorderStyle"
-           BasedOn="{StaticResource SidebarBorderStyle}"
-           TargetType="Border">
-        <Setter Property="Background" Value="{DynamicResource BrandPrimaryBrush}" />
-        <Setter Property="CornerRadius" Value="0,32,32,0" />
-        <Setter Property="BorderThickness" Value="0" />
-    </Style>
-
-    <!-- サイドバー：ロゴ・タイトルエリアのコンテナスタイル -->
-    <Style x:Key="SidebarLogoContainerStyle" TargetType="StackPanel">
-        <Setter Property="Margin" Value="20,32,20,40" />
-        <Setter Property="Orientation" Value="Horizontal" />
-    </Style>
-
-    <!-- サイドバー：ロゴアイコン（Path）用のスタイル -->
-    <Style x:Key="SidebarLogoPathStyle" TargetType="Path">
-        <Setter Property="Width" Value="24" />
-        <Setter Property="Height" Value="24" />
-        <Setter Property="Fill" Value="{DynamicResource BrandForegroundBrush}" />
-    </Style>
-
-    <!-- サイドバー：アプリ名（"TimeLeaf"）のテキストスタイル -->
-    <Style x:Key="SidebarLogoTextStyle" TargetType="TextBlock">
-        <Setter Property="Margin" Value="12,0,0,0" />
-        <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="FontSize" Value="18" />
-        <Setter Property="FontWeight" Value="Bold" />
-        <Setter Property="Foreground" Value="{DynamicResource BrandForegroundBrush}" />
-    </Style>
-
-    <!-- サイドバー：メニューのセクション見出し用スタイル -->
-    <Style x:Key="SidebarMenuHeaderStyle" TargetType="TextBlock">
-        <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="FontSize" Value="11" />
-        <Setter Property="FontWeight" Value="Bold" />
-        <Setter Property="Foreground" Value="{DynamicResource BrandForegroundBrush}" />
-        <Setter Property="Opacity" Value="0.6" />
-    </Style>
-
     <!-- サイドバー：新規作成（＋）ボタンのスタイル -->
     <Style x:Key="SidebarAddButtonStyle"
            BasedOn="{StaticResource IconButtonStyle}"
@@ -214,7 +290,6 @@
     <!-- サイドバー：項目がない場合のメッセージテキストスタイル -->
     <Style x:Key="SidebarEmptyStateTextStyle" TargetType="TextBlock">
         <Setter Property="Margin" Value="24,12,24,0" />
-        <Setter Property="FontSize" Value="12" />
         <Setter Property="FontStyle" Value="Italic" />
         <Setter Property="Foreground" Value="White" />
         <Setter Property="Opacity" Value="0.4" />
@@ -223,7 +298,7 @@
 
     <!-- サイドバー：折りたたみボタンのスタイル -->
     <Style x:Key="SidebarCollapseButtonStyle"
-           BasedOn="{StaticResource ModernButtonStyle}"
+           BasedOn="{StaticResource BaseButtonStyle}"
            TargetType="Button">
         <Setter Property="Width" Value="24" />
         <Setter Property="Height" Value="24" />
@@ -231,61 +306,13 @@
         <Setter Property="HorizontalAlignment" Value="Right" />
         <Setter Property="VerticalAlignment" Value="Bottom" />
         <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
     </Style>
 
-    <!-- Setup View Components -->
-
-    <!-- セットアップ画面：Windowの基本スタイル -->
-    <Style x:Key="SetupWindowStyle" TargetType="Window">
-        <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />
-        <Setter Property="ResizeMode" Value="NoResize" />
-    </Style>
-
-    <!-- セットアップ画面：メインコンテナ（StackPanel）のスタイル -->
-    <Style x:Key="SetupContainerStyle" TargetType="StackPanel">
-        <Setter Property="Margin" Value="24" />
-    </Style>
-
-    <!-- セットアップ画面：見出しテキストのスタイル -->
-    <Style x:Key="SetupHeaderTextStyle"
-           BasedOn="{StaticResource FormTitleTextStyle}"
-           TargetType="TextBlock">
-        <Setter Property="Margin" Value="0,0,0,10" />
-        <Setter Property="FontSize" Value="24" />
-        <Setter Property="FontWeight" Value="Bold" />
-    </Style>
-
-    <!-- セットアップ画面：説明テキストのスタイル -->
-    <Style x:Key="SetupDescriptionTextStyle" TargetType="TextBlock">
-        <Setter Property="Margin" Value="0,0,0,10" />
-        <Setter Property="TextWrapping" Value="Wrap" />
-    </Style>
-
-    <!-- セットアップ画面：補足説明テキストのスタイル -->
-    <Style x:Key="SetupSubDescriptionTextStyle" TargetType="TextBlock">
-        <Setter Property="Margin" Value="0,5,0,20" />
-        <Setter Property="FontSize" Value="12" />
-        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
-    </Style>
-
-    <!-- セットアップ画面：入力エリア（Grid）のスタイル -->
-    <Style x:Key="SetupInputAreaStyle" TargetType="Grid">
-        <Setter Property="Margin" Value="0,0,0,20" />
-    </Style>
-
-    <!-- セットアップ画面：エラーメッセージのスタイル -->
-    <Style x:Key="SetupErrorMessageStyle" TargetType="TextBlock">
-        <Setter Property="Margin" Value="0,-15,0,20" />
-        <Setter Property="Foreground" Value="{DynamicResource ErrorBrush}" />
-    </Style>
-
-    <!-- セットアップ画面：フッターボタンエリアのスタイル -->
-    <Style x:Key="SetupFooterStyle" TargetType="StackPanel">
-        <Setter Property="HorizontalAlignment" Value="Right" />
-        <Setter Property="Orientation" Value="Horizontal" />
-    </Style>
-
-    <!-- Generic View Components (Common across many views) -->
+    <!-- ====================================================================== -->
+    <!-- View Layouts (Common across Views) -->
+    <!-- ====================================================================== -->
 
     <!-- 各ビューの最上部ヘッダー領域（Grid）のスタイル -->
     <Style x:Key="ViewHeaderGridStyle" TargetType="Grid">
@@ -304,31 +331,32 @@
 
     <!-- ビューヘッダー内のタイトルテキストスタイル -->
     <Style x:Key="ViewHeaderTitleStyle"
-           BasedOn="{StaticResource FormTitleTextStyle}"
+           BasedOn="{StaticResource TitleBaseStyle}"
            TargetType="TextBlock">
         <Setter Property="Margin" Value="0" />
-        <Setter Property="FontSize" Value="28" />
     </Style>
 
     <!-- ビューヘッダー内のサブタイトルテキストスタイル -->
-    <Style x:Key="ViewHeaderSubTitleStyle" TargetType="TextBlock">
+    <Style x:Key="ViewHeaderSubTitleStyle"
+           BasedOn="{StaticResource LabelBaseStyle}"
+           TargetType="TextBlock">
         <Setter Property="Margin" Value="0,8,0,0" />
-        <Setter Property="FontSize" Value="13" />
-        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+        <Setter Property="FontWeight" Value="Normal" />
     </Style>
 
+    <!-- ====================================================================== -->
     <!-- Home View Components -->
+    <!-- ====================================================================== -->
 
     <!-- ホーム画面：統計情報（UniformGrid）のスタイル -->
     <Style x:Key="HomeStatsGridStyle" TargetType="UniformGrid">
         <Setter Property="Margin" Value="0,0,0,32" />
     </Style>
 
-    <!-- Stats Components (Common across Home and Dashboard) -->
-
-    <Style x:Key="StatsLabelStyle" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="13" />
-        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    <Style x:Key="StatsLabelStyle"
+           BasedOn="{StaticResource LabelBaseStyle}"
+           TargetType="TextBlock">
+        <Setter Property="FontWeight" Value="Normal" />
     </Style>
 
     <Style x:Key="StatsValueStyle" TargetType="TextBlock">
@@ -359,17 +387,18 @@
     </Style>
 
     <!-- ホーム画面：プロジェクトカード内のタイトルスタイル -->
-    <Style x:Key="HomeProjectCardTitleStyle" TargetType="TextBlock">
+    <Style x:Key="HomeProjectCardTitleStyle"
+           BasedOn="{StaticResource HeaderBaseStyle}"
+           TargetType="TextBlock">
         <Setter Property="FontSize" Value="16" />
-        <Setter Property="FontWeight" Value="Bold" />
-        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
     </Style>
 
     <!-- ホーム画面：プロジェクトカード内のサブタイトル（状態）スタイル -->
-    <Style x:Key="HomeProjectCardSubTitleStyle" TargetType="TextBlock">
+    <Style x:Key="HomeProjectCardSubTitleStyle"
+           BasedOn="{StaticResource MetaBaseStyle}"
+           TargetType="TextBlock">
         <Setter Property="Margin" Value="0,8,0,4" />
         <Setter Property="FontSize" Value="12" />
-        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
     </Style>
 
     <!-- ホーム画面：プロジェクトカード内の進捗バースタイル -->
@@ -380,13 +409,14 @@
     </Style>
 
     <!-- ホーム画面：マイルストーンの日付テキストスタイル -->
-    <Style x:Key="HomeMilestoneDateStyle" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="11" />
-        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
-    </Style>
+    <Style x:Key="HomeMilestoneDateStyle"
+           BasedOn="{StaticResource MetaBaseStyle}"
+           TargetType="TextBlock" />
 
     <!-- ホーム画面：マイルストーンのプロジェクト名テキストスタイル -->
-    <Style x:Key="HomeMilestoneProjectNameStyle" TargetType="TextBlock">
+    <Style x:Key="HomeMilestoneProjectNameStyle"
+           BasedOn="{StaticResource MetaBaseStyle}"
+           TargetType="TextBlock">
         <Setter Property="Margin" Value="12,0,0,0" />
         <Setter Property="VerticalAlignment" Value="Bottom" />
         <Setter Property="FontSize" Value="10" />
@@ -413,16 +443,18 @@
     </Style>
 
     <!-- ホーム画面：マイルストーン名（内容）のテキストスタイル -->
-    <Style x:Key="HomeMilestoneLabelStyle" TargetType="TextBlock">
+    <Style x:Key="HomeMilestoneLabelStyle"
+           BasedOn="{StaticResource HeaderBaseStyle}"
+           TargetType="TextBlock">
         <Setter Property="Margin" Value="12,0,0,0" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="FontSize" Value="14" />
-        <Setter Property="FontWeight" Value="Bold" />
-        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
         <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
 
-    <!-- Project Workspace View Components -->
+    <!-- ====================================================================== -->
+    <!-- Project Workspace & Dashboard -->
+    <!-- ====================================================================== -->
 
     <!-- プロジェクト名のタイトルスタイル (ViewHeaderTitleStyle をベースに) -->
     <Style x:Key="ProjectWorkspaceTitleStyle"
@@ -454,14 +486,12 @@
         <Setter Property="Foreground" Value="White" />
     </Style>
 
-    <!-- Dashboard View Components -->
-
     <!-- ダッシュボード：セクション見出しのスタイル -->
-    <Style x:Key="DashboardSectionHeaderStyle" TargetType="TextBlock">
+    <Style x:Key="DashboardSectionHeaderStyle"
+           BasedOn="{StaticResource HeaderBaseStyle}"
+           TargetType="TextBlock">
         <Setter Property="Margin" Value="0,0,0,16" />
         <Setter Property="FontSize" Value="18" />
-        <Setter Property="FontWeight" Value="Bold" />
-        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
     </Style>
 
     <!-- ダッシュボード：カードの基本スタイル (OrganicCardStyle + Padding) -->
@@ -472,10 +502,12 @@
     </Style>
 
     <!-- ダッシュボード：プロジェクト説明テキストのスタイル -->
-    <Style x:Key="DashboardDescriptionTextStyle" TargetType="TextBlock">
+    <Style x:Key="DashboardDescriptionTextStyle"
+           BasedOn="{StaticResource LabelBaseStyle}"
+           TargetType="TextBlock">
         <Setter Property="Margin" Value="0,12,0,0" />
         <Setter Property="FontSize" Value="14" />
-        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+        <Setter Property="FontWeight" Value="Normal" />
         <Setter Property="LineHeight" Value="22" />
         <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
@@ -487,7 +519,9 @@
         <Setter Property="Margin" Value="0,0,16,0" />
     </Style>
 
-    <!-- Task Board (ProjectTasksView) Components -->
+    <!-- ====================================================================== -->
+    <!-- Task Board & Detail Panel -->
+    <!-- ====================================================================== -->
 
     <!-- タスクボード：メインコンテンツ容器のスタイル -->
     <Style x:Key="TaskBoardContainerStyle" TargetType="DockPanel">
@@ -495,11 +529,10 @@
     </Style>
 
     <!-- タスクボード：ヘッダーテキストのスタイル -->
-    <Style x:Key="TaskBoardHeaderTextStyle" TargetType="TextBlock">
+    <Style x:Key="TaskBoardHeaderTextStyle"
+           BasedOn="{StaticResource HeaderBaseStyle}"
+           TargetType="TextBlock">
         <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="FontSize" Value="20" />
-        <Setter Property="FontWeight" Value="Bold" />
-        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
     </Style>
 
     <!-- タスクボード：ビュー切り替えスイッチ（Border）のスタイル -->
@@ -560,8 +593,9 @@
     </Style>
 
     <!-- タスクボード：優先度バッジテキストのスタイル -->
-    <Style x:Key="PriorityBadgeTextStyle" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="11" />
+    <Style x:Key="PriorityBadgeTextStyle"
+           BasedOn="{StaticResource MetaBaseStyle}"
+           TargetType="TextBlock">
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="Foreground" Value="#C62828" />
     </Style>
@@ -586,159 +620,9 @@
         <Setter Property="CornerRadius" Value="32,0,0,32" />
     </Style>
 
-    <!-- ビュー：プレースホルダーテキスト（開発中や空状態）のスタイル -->
-    <Style x:Key="ViewPlaceholderTextStyle" TargetType="TextBlock">
-        <Setter Property="HorizontalAlignment" Value="Center" />
-        <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="FontSize" Value="24" />
-        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
-        <Setter Property="Opacity" Value="0.5" />
-    </Style>
-
-    <!-- Project Settings View Components -->
-
-    <!-- プロジェクト設定：メインコンテナのスタイル -->
-    <Style x:Key="SettingsContainerStyle" TargetType="StackPanel">
-        <Setter Property="MaxWidth" Value="600" />
-        <Setter Property="HorizontalAlignment" Value="Left" />
-    </Style>
-
-    <!-- プロジェクト設定：グループボックスの基本スタイル -->
-    <Style x:Key="SettingsGroupBoxStyle" TargetType="GroupBox">
-        <Setter Property="Margin" Value="0,0,0,32" />
-        <Setter Property="Padding" Value="16" />
-        <Setter Property="BorderBrush" Value="{DynamicResource SurfaceLayer2Brush}" />
-    </Style>
-
-    <!-- プロジェクト設定：危険エリア（Danger Zone）のグループボックススタイル -->
-    <Style x:Key="DangerGroupBoxStyle"
-           BasedOn="{StaticResource SettingsGroupBoxStyle}"
-           TargetType="GroupBox">
-        <Setter Property="BorderBrush" Value="#FFCDD2" />
-        <Setter Property="Foreground" Value="#D32F2F" />
-    </Style>
-
-    <!-- プロジェクト設定：注釈テキストのスタイル -->
-    <Style x:Key="SettingsAnnotationStyle" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="11" />
-        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
-        <Setter Property="TextWrapping" Value="Wrap" />
-    </Style>
-
-    <!-- プロジェクト設定：危険な操作ボタンのスタイル -->
-    <Style x:Key="DangerButtonStyle" TargetType="Button">
-        <Setter Property="Padding" Value="16,8" />
-        <Setter Property="HorizontalAlignment" Value="Left" />
-        <Setter Property="Background" Value="#FFEBEE" />
-        <Setter Property="BorderBrush" Value="#FFCDD2" />
-        <Setter Property="Foreground" Value="#D32F2F" />
-        <Setter Property="Cursor" Value="Hand" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="1"
-                            CornerRadius="20">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
-    <!-- Project Notifications View Components -->
-
-    <!-- 通知センター：通知カードのスタイル -->
-    <Style x:Key="NotificationCardStyle"
-           BasedOn="{StaticResource OrganicCardStyle}"
-           TargetType="Border">
-        <Setter Property="Margin" Value="0,0,0,12" />
-        <Setter Property="Padding" Value="16" />
-    </Style>
-
-    <!-- 通知センター：タイトルテキストのスタイル -->
-    <Style x:Key="NotificationTitleTextStyle" TargetType="TextBlock">
-        <Setter Property="Margin" Value="0,0,0,4" />
-        <Setter Property="FontSize" Value="16" />
-        <Setter Property="FontWeight" Value="Bold" />
-        <Setter Property="Foreground" Value="{DynamicResource BrandPrimaryBrush}" />
-    </Style>
-
-    <!-- 通知センター：メッセージ本文のテキストスタイル -->
-    <Style x:Key="NotificationMessageTextStyle" TargetType="TextBlock">
-        <Setter Property="Margin" Value="0,0,0,8" />
-        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
-        <Setter Property="TextWrapping" Value="Wrap" />
-    </Style>
-
-    <!-- 通知センター：タイムスタンプのテキストスタイル -->
-    <Style x:Key="NotificationTimestampTextStyle" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="11" />
-        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
-    </Style>
-
-    <!-- 通知センター：空状態（通知なし）のコンテナスタイル -->
-    <Style x:Key="NotificationEmptyStateStyle"
-           BasedOn="{StaticResource OrganicCardStyle}"
-           TargetType="Border">
-        <Setter Property="Margin" Value="0,0,0,12" />
-        <Setter Property="Padding" Value="32" />
-    </Style>
-
-    <!-- 通知センター：空状態のアイコンスタイル -->
-    <Style x:Key="NotificationEmptyIconStyle" TargetType="TextBlock">
-        <Setter Property="Margin" Value="0,0,0,16" />
-        <Setter Property="HorizontalAlignment" Value="Center" />
-        <Setter Property="FontSize" Value="48" />
-    </Style>
-
-    <!-- All Tasks View Components -->
-
-    <!-- 全タスク一覧：ステータスアイコンのスタイル -->
-    <Style x:Key="AllTasksStatusIconStyle" TargetType="Border">
-        <Setter Property="Width" Value="36" />
-        <Setter Property="Height" Value="36" />
-        <Setter Property="Background" Value="{DynamicResource SurfaceLayer1Brush}" />
-        <Setter Property="CornerRadius" Value="18" />
-    </Style>
-
-    <!-- 全タスク一覧：タスク名のスタイル -->
-    <Style x:Key="AllTasksTaskNameStyle" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="15" />
-        <Setter Property="FontWeight" Value="Bold" />
-        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
-    </Style>
-
-    <!-- 全タスク一覧：プロジェクトラベルのスタイル -->
-    <Style x:Key="AllTasksProjectLabelStyle" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="11" />
-        <Setter Property="FontWeight" Value="SemiBold" />
-        <Setter Property="Foreground" Value="{DynamicResource BrandPrimaryBrush}" />
-        <Setter Property="Opacity" Value="0.8" />
-    </Style>
-
-    <!-- 全タスク一覧：プロパティ見出しのスタイル -->
-    <Style x:Key="AllTasksPropertyLabelStyle" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="11" />
-        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
-    </Style>
-
-    <!-- 全タスク一覧：プロパティ値のスタイル -->
-    <Style x:Key="AllTasksPropertyValueStyle" TargetType="TextBlock">
-        <Setter Property="Margin" Value="0,2,0,0" />
-        <Setter Property="FontSize" Value="13" />
-        <Setter Property="FontWeight" Value="SemiBold" />
-    </Style>
-
-    <!-- 検索用入力欄（ClearableTextBox 等）のスタイル -->
-    <Style x:Key="SearchTextBoxStyle" TargetType="Control">
-        <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
-        <Setter Property="BorderThickness" Value="1" />
-    </Style>
-
-    <!-- Task Detail / Quick Panel Components -->
+    <!-- ====================================================================== -->
+    <!-- Task Panel / Quick Panel -->
+    <!-- ====================================================================== -->
 
     <!-- タスクパネル：ヘッダー境界のスタイル -->
     <Style x:Key="TaskPanelHeaderStyle" TargetType="Border">
@@ -748,10 +632,10 @@
     </Style>
 
     <!-- タスクパネル：タイトルのスタイル -->
-    <Style x:Key="TaskPanelTitleStyle" TargetType="TextBlock">
+    <Style x:Key="TaskPanelTitleStyle"
+           BasedOn="{StaticResource HeaderBaseStyle}"
+           TargetType="TextBlock">
         <Setter Property="FontSize" Value="18" />
-        <Setter Property="FontWeight" Value="Bold" />
-        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
         <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
 
@@ -766,23 +650,27 @@
     </Style>
 
     <!-- タスクパネル：セクション見出しのスタイル -->
-    <Style x:Key="TaskPanelSectionHeaderStyle" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="13" />
-        <Setter Property="FontWeight" Value="Bold" />
+    <Style x:Key="TaskPanelSectionHeaderStyle"
+           BasedOn="{StaticResource LabelBaseStyle}"
+           TargetType="TextBlock">
         <Setter Property="Foreground" Value="{DynamicResource BrandPrimaryBrush}" />
         <Setter Property="Margin" Value="0,0,0,12" />
     </Style>
 
     <!-- タスクパネル：プロパティ見出し（メタ）のスタイル -->
-    <Style x:Key="TaskPanelMetaLabelStyle" TargetType="TextBlock">
+    <Style x:Key="TaskPanelMetaLabelStyle"
+           BasedOn="{StaticResource MetaBaseStyle}"
+           TargetType="TextBlock">
         <Setter Property="FontSize" Value="10" />
-        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
         <Setter Property="Margin" Value="0,0,0,2" />
     </Style>
 
     <!-- タスクパネル：値表示のスタイル -->
-    <Style x:Key="TaskPanelValueStyle" TargetType="TextBlock">
+    <Style x:Key="TaskPanelValueStyle"
+           BasedOn="{StaticResource LabelBaseStyle}"
+           TargetType="TextBlock">
         <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Normal" />
         <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
         <Setter Property="Margin" Value="0,0,0,16" />
     </Style>
@@ -796,11 +684,15 @@
     </Style>
 
     <!-- タスクパネル：フッターヒントテキストのスタイル -->
-    <Style x:Key="TaskPanelFooterHintStyle" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="11" />
-        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    <Style x:Key="TaskPanelFooterHintStyle"
+           BasedOn="{StaticResource MetaBaseStyle}"
+           TargetType="TextBlock">
         <Setter Property="TextAlignment" Value="Center" />
     </Style>
+
+    <!-- ====================================================================== -->
+    <!-- Comment Components -->
+    <!-- ====================================================================== -->
 
     <!-- タスクパネル：コメントアバターのスタイル -->
     <Style x:Key="TaskCommentAvatarStyle"
@@ -810,8 +702,9 @@
     </Style>
 
     <!-- タスクパネル：コメント投稿者名のスタイル -->
-    <Style x:Key="TaskCommentAuthorStyle" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="11" />
+    <Style x:Key="TaskCommentAuthorStyle"
+           BasedOn="{StaticResource MetaBaseStyle}"
+           TargetType="TextBlock">
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="Foreground" Value="{DynamicResource BrandPrimaryBrush}" />
     </Style>
@@ -833,35 +726,121 @@
         <Setter Property="BorderThickness" Value="1,0,0,0" />
     </Style>
 
-    <!-- Add Task Form Components -->
+    <!-- ====================================================================== -->
+    <!-- Notifications View Components -->
+    <!-- ====================================================================== -->
 
-    <!-- Form Components (Shared across AddTask, AddProject, ProfileEdit, etc.) -->
-
-    <Style x:Key="FormTitleTextStyle" TargetType="TextBlock">
-        <Setter Property="Margin" Value="0,0,0,24" />
-        <Setter Property="FontSize" Value="20" />
-        <Setter Property="FontWeight" Value="SemiBold" />
-        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Style x:Key="NotificationCardStyle"
+           BasedOn="{StaticResource OrganicCardStyle}"
+           TargetType="Border">
+        <Setter Property="Margin" Value="0,0,0,12" />
+        <Setter Property="Padding" Value="16" />
     </Style>
 
-    <Style x:Key="FormLabelTextStyle" TargetType="TextBlock">
+    <Style x:Key="NotificationTitleTextStyle"
+           BasedOn="{StaticResource HeaderBaseStyle}"
+           TargetType="TextBlock">
+        <Setter Property="Margin" Value="0,0,0,4" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandPrimaryBrush}" />
+    </Style>
+
+    <Style x:Key="NotificationMessageTextStyle" TargetType="TextBlock">
         <Setter Property="Margin" Value="0,0,0,8" />
-        <Setter Property="FontSize" Value="13" />
-        <Setter Property="FontWeight" Value="SemiBold" />
-        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
 
+    <Style x:Key="NotificationTimestampTextStyle"
+           BasedOn="{StaticResource MetaBaseStyle}"
+           TargetType="TextBlock" />
+
+    <Style x:Key="NotificationEmptyStateStyle"
+           BasedOn="{StaticResource OrganicCardStyle}"
+           TargetType="Border">
+        <Setter Property="Margin" Value="0,0,0,12" />
+        <Setter Property="Padding" Value="32" />
+    </Style>
+
+    <Style x:Key="NotificationEmptyIconStyle" TargetType="TextBlock">
+        <Setter Property="Margin" Value="0,0,0,16" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="FontSize" Value="48" />
+    </Style>
+
+    <!-- ====================================================================== -->
+    <!-- All Tasks View Components -->
+    <!-- ====================================================================== -->
+
+    <Style x:Key="AllTasksStatusIconStyle" TargetType="Border">
+        <Setter Property="Width" Value="36" />
+        <Setter Property="Height" Value="36" />
+        <Setter Property="Background" Value="{DynamicResource SurfaceLayer1Brush}" />
+        <Setter Property="CornerRadius" Value="18" />
+    </Style>
+
+    <Style x:Key="AllTasksTaskNameStyle"
+           BasedOn="{StaticResource HeaderBaseStyle}"
+           TargetType="TextBlock">
+        <Setter Property="FontSize" Value="15" />
+    </Style>
+
+    <Style x:Key="AllTasksProjectLabelStyle"
+           BasedOn="{StaticResource MetaBaseStyle}"
+           TargetType="TextBlock">
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandPrimaryBrush}" />
+        <Setter Property="Opacity" Value="0.8" />
+    </Style>
+
+    <!-- 全タスク一覧：プロパティ見出しのスタイル -->
+    <Style x:Key="AllTasksPropertyLabelStyle"
+           BasedOn="{StaticResource MetaBaseStyle}"
+           TargetType="TextBlock" />
+
+    <!-- 全タスク一覧：プロパティ値のスタイル -->
+    <Style x:Key="AllTasksPropertyValueStyle"
+           BasedOn="{StaticResource LabelBaseStyle}"
+           TargetType="TextBlock">
+        <Setter Property="Margin" Value="0,2,0,0" />
+    </Style>
+
+    <!-- ====================================================================== -->
+    <!-- Dialog & Form Components -->
+    <!-- ====================================================================== -->
+
+    <Style x:Key="FormTitleTextStyle"
+           BasedOn="{StaticResource HeaderBaseStyle}"
+           TargetType="TextBlock">
+        <Setter Property="Margin" Value="0,0,0,24" />
+    </Style>
+
+    <Style x:Key="FormLabelTextStyle"
+           BasedOn="{StaticResource LabelBaseStyle}"
+           TargetType="TextBlock" />
+
+    <!-- 互換性・エイリアス -->
     <!-- タスク追加：フォームタイトルのスタイル -->
     <Style x:Key="AddTaskFormTitleStyle"
            BasedOn="{StaticResource FormTitleTextStyle}"
            TargetType="TextBlock" />
-
     <!-- タスク追加：ラベルのスタイル -->
     <Style x:Key="AddTaskFormLabelStyle"
            BasedOn="{StaticResource FormLabelTextStyle}"
            TargetType="TextBlock" />
 
-    <!-- Profile Edit View Components -->
+    <!-- プロジェクト設定：メインコンテナのスタイル -->
+    <Style x:Key="SettingsContainerStyle" TargetType="StackPanel">
+        <Setter Property="MaxWidth" Value="600" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+    </Style>
+
+    <!-- プロジェクト設定：注釈テキストのスタイル -->
+    <Style x:Key="SettingsAnnotationStyle"
+           BasedOn="{StaticResource MetaBaseStyle}"
+           TargetType="TextBlock">
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
 
     <!-- プロフィール編集：色プレビューのスタイル -->
     <Style x:Key="ColorPreviewBorderStyle" TargetType="Border">
@@ -872,12 +851,48 @@
         <Setter Property="BorderThickness" Value="1" />
     </Style>
 
-    <!-- Fatal Error View Components -->
+    <!-- ビュー：プレースホルダーテキスト（開発中や空状態）のスタイル -->
+    <Style x:Key="ViewPlaceholderTextStyle"
+           BasedOn="{StaticResource TitleBaseStyle}"
+           TargetType="TextBlock">
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="FontSize" Value="24" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+        <Setter Property="Opacity" Value="0.5" />
+    </Style>
+
+    <!-- セットアップ画面：Windowの基本スタイル -->
+    <Style x:Key="SetupWindowStyle" TargetType="Window">
+        <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />
+        <Setter Property="ResizeMode" Value="NoResize" />
+    </Style>
+
+    <!-- セットアップ画面：メインコンテナ（StackPanel）のスタイル -->
+    <Style x:Key="SetupContainerStyle" TargetType="StackPanel">
+        <Setter Property="Margin" Value="24" />
+    </Style>
+
+    <!-- セットアップ画面：入力エリア（Grid）のスタイル -->
+    <Style x:Key="SetupInputAreaStyle" TargetType="Grid">
+        <Setter Property="Margin" Value="0,0,0,20" />
+    </Style>
+
+    <!-- セットアップ画面：フッターボタンエリアのスタイル -->
+    <Style x:Key="SetupFooterStyle" TargetType="StackPanel">
+        <Setter Property="HorizontalAlignment" Value="Right" />
+        <Setter Property="Orientation" Value="Horizontal" />
+    </Style>
+
+    <!-- ====================================================================== -->
+    <!-- Error View Components -->
+    <!-- ====================================================================== -->
 
     <!-- 致命的エラー：ヘッダーラベルのスタイル -->
-    <Style x:Key="FatalErrorHeaderStyle" TargetType="TextBlock">
+    <Style x:Key="FatalErrorHeaderStyle"
+           BasedOn="{StaticResource HeaderBaseStyle}"
+           TargetType="TextBlock">
         <Setter Property="FontSize" Value="16" />
-        <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="Foreground" Value="{DynamicResource ErrorBrush}" />
         <Setter Property="Margin" Value="0,0,0,12" />
     </Style>
