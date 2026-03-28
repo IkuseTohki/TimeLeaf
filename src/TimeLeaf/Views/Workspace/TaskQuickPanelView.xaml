@@ -9,21 +9,7 @@
              d:DesignHeight="600"
              d:DesignWidth="400"
              mc:Ignorable="d">
-    <UserControl.Resources>
-        <Style x:Key="LabelStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="11" />
-            <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="Foreground" Value="#4A7c44" />
-            <Setter Property="Margin" Value="0,0,0,4" />
-        </Style>
-        <Style x:Key="ValueStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="14" />
-            <Setter Property="Foreground" Value="#3E3A39" />
-            <Setter Property="Margin" Value="0,0,0,16" />
-        </Style>
-    </UserControl.Resources>
-
-    <Grid Background="White">
+    <Grid Background="{DynamicResource SurfaceBaseBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -31,28 +17,18 @@
         </Grid.RowDefinitions>
 
         <!-- ヘッダー (タスク名と閉じるボタン) -->
-        <Border Padding="24,24,24,16"
-                BorderBrush="#EEE"
-                BorderThickness="0,0,0,1">
+        <Border Style="{StaticResource TaskPanelHeaderStyle}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <TextBlock FontSize="18"
-                           FontWeight="Bold"
-                           Foreground="#3E3A39"
-                           Text="{Binding Task.Name}"
-                           TextWrapping="Wrap" />
+                <TextBlock Style="{StaticResource TaskPanelTitleStyle}" Text="{Binding Task.Name}" />
                 <Button Grid.Column="1"
-                        VerticalAlignment="Top"
-                        Background="Transparent"
-                        BorderThickness="0"
                         Command="{Binding CloseCommand}"
                         CommandParameter="True"
                         Content="×"
-                        FontSize="20"
-                        Foreground="#999" />
+                        Style="{StaticResource TaskPanelCloseButtonStyle}" />
             </Grid>
         </Border>
 
@@ -62,27 +38,27 @@
                       VerticalScrollBarVisibility="Auto">
             <StackPanel IsEnabled="{Binding IsAssignedToMe}">
                 <!-- ステータス (共通コントロール) -->
-                <TextBlock Style="{StaticResource LabelStyle}" Text="現在の状態" />
+                <TextBlock Style="{StaticResource TaskPanelSectionHeaderStyle}" Text="現在の状態" />
                 <controls:TaskStatusPicker Margin="0,0,0,20" SelectedStatus="{Binding Task.Status, Mode=TwoWay}" />
 
                 <!-- 優先度 (表示のみ) -->
-                <TextBlock Style="{StaticResource LabelStyle}" Text="優先度" />
-                <TextBlock Style="{StaticResource ValueStyle}" Text="{Binding Task.Priority}" />
+                <TextBlock Style="{StaticResource TaskPanelSectionHeaderStyle}" Text="優先度" />
+                <TextBlock Style="{StaticResource TaskPanelValueStyle}" Text="{Binding Task.Priority}" />
 
-                <Separator Margin="0,0,0,20" Background="#EEE" />
+                <Separator Margin="0,0,0,20" Background="{DynamicResource OutlineBaseBrush}" />
 
                 <!-- スケジュール (予定: 表示のみ) -->
-                <TextBlock Style="{StaticResource LabelStyle}" Text="期限" />
-                <TextBlock Style="{StaticResource ValueStyle}" Text="{Binding Task.Deadline, StringFormat={}{0:yyyy/MM/dd}, TargetNullValue='(未設定)'}" />
+                <TextBlock Style="{StaticResource TaskPanelSectionHeaderStyle}" Text="期限" />
+                <TextBlock Style="{StaticResource TaskPanelValueStyle}" Text="{Binding Task.Deadline, StringFormat={}{0:yyyy/MM/dd}, TargetNullValue='(未設定)'}" />
 
                 <!-- スケジュール (実績: 編集可) -->
-                <TextBlock Style="{StaticResource LabelStyle}" Text="実績開始日" />
+                <TextBlock Style="{StaticResource TaskPanelSectionHeaderStyle}" Text="実績開始日" />
                 <DatePicker Margin="0,0,0,16" SelectedDate="{Binding Task.ActualStartDate, Mode=TwoWay}" />
 
-                <TextBlock Style="{StaticResource LabelStyle}" Text="実績終了日" />
+                <TextBlock Style="{StaticResource TaskPanelSectionHeaderStyle}" Text="実績終了日" />
                 <DatePicker Margin="0,0,0,16" SelectedDate="{Binding Task.ActualEndDate, Mode=TwoWay}" />
 
-                <Separator Margin="0,0,0,20" Background="#EEE" />
+                <Separator Margin="0,0,0,20" Background="{DynamicResource OutlineBaseBrush}" />
 
                 <!-- 工数 (共通コントロール) -->
                 <controls:TaskCostEditor ActualCost="{Binding Task.ActualCost, Mode=TwoWay}"
@@ -92,13 +68,8 @@
         </ScrollViewer>
 
         <!-- フッター (ヒント) -->
-        <Border Grid.Row="2"
-                Padding="24,16"
-                Background="#F9F9F9">
-            <TextBlock FontSize="11"
-                       Foreground="#999"
-                       Text="詳細な編集や対話はダブルクリックで開きます"
-                       TextAlignment="Center" />
+        <Border Grid.Row="2" Style="{StaticResource TaskPanelFooterStyle}">
+            <TextBlock Style="{StaticResource TaskPanelFooterHintStyle}" Text="詳細な編集や対話はダブルクリックで開きます" />
         </Border>
     </Grid>
 </UserControl>

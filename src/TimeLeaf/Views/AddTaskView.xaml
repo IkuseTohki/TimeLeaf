@@ -8,19 +8,11 @@
              d:DataContext="{d:DesignInstance vm:AddTaskViewModel}"
              mc:Ignorable="d">
     <StackPanel Margin="24">
-        <TextBlock Margin="0,0,0,24"
-                   FontSize="20"
-                   FontWeight="SemiBold"
-                   Foreground="{DynamicResource TextPrimaryBrush}"
-                   Text="新しいタスクを枝分かれさせる" />
+        <TextBlock Style="{StaticResource AddTaskFormTitleStyle}" Text="新しいタスクを枝分かれさせる" />
 
         <!-- タスク名 -->
         <StackPanel Margin="0,0,0,16">
-            <TextBlock Margin="0,0,0,8"
-                       FontSize="13"
-                       FontWeight="SemiBold"
-                       Foreground="{DynamicResource TextSecondaryBrush}"
-                       Text="タスク名" />
+            <TextBlock Style="{StaticResource AddTaskFormLabelStyle}" Text="タスク名" />
             <TextBox Height="36"
                      Style="{StaticResource ModernTextBoxStyle}"
                      Tag="例：UIプロトタイプの作成"
@@ -29,11 +21,7 @@
 
         <!-- 概要 -->
         <StackPanel Margin="0,0,0,16">
-            <TextBlock Margin="0,0,0,8"
-                       FontSize="13"
-                       FontWeight="SemiBold"
-                       Foreground="{DynamicResource TextSecondaryBrush}"
-                       Text="詳細" />
+            <TextBlock Style="{StaticResource AddTaskFormLabelStyle}" Text="詳細" />
             <TextBox Height="100"
                      AcceptsReturn="True"
                      Style="{StaticResource ModernTextBoxStyle}"
@@ -51,11 +39,7 @@
 
             <!-- ステータス -->
             <StackPanel Grid.Column="0" Margin="0,0,0,16">
-                <TextBlock Margin="0,0,0,8"
-                           FontSize="13"
-                           FontWeight="SemiBold"
-                           Foreground="{DynamicResource TextSecondaryBrush}"
-                           Text="ステータス" />
+                <TextBlock Style="{StaticResource AddTaskFormLabelStyle}" Text="ステータス" />
                 <ComboBox Height="36"
                           ItemsSource="{Binding TaskStatusValues}"
                           SelectedItem="{Binding Status}" />
@@ -63,11 +47,7 @@
 
             <!-- 優先度 -->
             <StackPanel Grid.Column="2" Margin="0,0,0,16">
-                <TextBlock Margin="0,0,0,8"
-                           FontSize="13"
-                           FontWeight="SemiBold"
-                           Foreground="{DynamicResource TextSecondaryBrush}"
-                           Text="優先度" />
+                <TextBlock Style="{StaticResource AddTaskFormLabelStyle}" Text="優先度" />
                 <ComboBox Height="36"
                           ItemsSource="{Binding TaskPriorityValues}"
                           SelectedItem="{Binding Priority}" />
@@ -83,11 +63,7 @@
 
             <!-- 担当者 -->
             <StackPanel Grid.Column="0" Margin="0,0,0,16">
-                <TextBlock Margin="0,0,0,8"
-                           FontSize="13"
-                           FontWeight="SemiBold"
-                           Foreground="{DynamicResource TextSecondaryBrush}"
-                           Text="担当者" />
+                <TextBlock Style="{StaticResource AddTaskFormLabelStyle}" Text="担当者" />
                 <TextBox Height="36"
                          Style="{StaticResource ModernTextBoxStyle}"
                          Text="{Binding Assignee, UpdateSourceTrigger=PropertyChanged}" />
@@ -95,22 +71,14 @@
 
             <!-- 期限 -->
             <StackPanel Grid.Column="2" Margin="0,0,0,16">
-                <TextBlock Margin="0,0,0,8"
-                           FontSize="13"
-                           FontWeight="SemiBold"
-                           Foreground="{DynamicResource TextSecondaryBrush}"
-                           Text="期限" />
+                <TextBlock Style="{StaticResource AddTaskFormLabelStyle}" Text="期限" />
                 <DatePicker Height="36" SelectedDate="{Binding DueDate}" />
             </StackPanel>
         </Grid>
 
         <!-- 見積工数 -->
         <StackPanel Margin="0,0,0,24">
-            <TextBlock Margin="0,0,0,8"
-                       FontSize="13"
-                       FontWeight="SemiBold"
-                       Foreground="{DynamicResource TextSecondaryBrush}"
-                       Text="見積工数 (h)" />
+            <TextBlock Style="{StaticResource AddTaskFormLabelStyle}" Text="見積工数 (h)" />
             <TextBox Height="36"
                      Style="{StaticResource ModernTextBoxStyle}"
                      Tag="例：1.5"
@@ -127,7 +95,7 @@
             <Button Margin="12,0,0,0"
                     Command="{Binding ConfirmCommand}"
                     Content="作成する"
-                    Style="{StaticResource PrimaryButtonStyle2}" />
+                    Style="{StaticResource PrimaryButtonStyle}" />
         </StackPanel>
     </StackPanel>
 </UserControl>
