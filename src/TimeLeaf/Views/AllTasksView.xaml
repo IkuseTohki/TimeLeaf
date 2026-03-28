@@ -41,78 +41,9 @@
 
         <!-- メインコンテンツ: タスク一覧 -->
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <ItemsControl ItemsSource="{Binding AllTasks}" Style="{StaticResource ViewMainItemsContainerStyle}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <!-- 1タスク1カードのデザイン -->
-                        <Border Margin="0,0,0,16"
-                                Padding="20,16"
-                                Style="{DynamicResource OrganicCardStyle}">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="130" />
-                                    <ColumnDefinition Width="100" />
-                                    <ColumnDefinition Width="100" />
-                                </Grid.ColumnDefinitions>
-
-                                <!-- 状態アイコン -->
-                                <Border Style="{StaticResource AllTasksStatusIconStyle}">
-                                    <TextBlock HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"
-                                               FontSize="18"
-                                               Text="{Binding Status, Converter={StaticResource TaskStatusToIconConverter}}" />
-                                </Border>
-
-                                <!-- タスク名とプロジェクト名 -->
-                                <StackPanel Grid.Column="1"
-                                            Margin="20,0,0,0"
-                                            VerticalAlignment="Center">
-                                    <TextBlock Style="{StaticResource AllTasksTaskNameStyle}" Text="{Binding Name}" />
-                                    <StackPanel Margin="0,4,0,0" Orientation="Horizontal">
-                                        <TextBlock FontSize="11"
-                                                   Foreground="{DynamicResource BrandPrimaryBrush}"
-                                                   Opacity="0.8"
-                                                   Text="🌲 " />
-                                        <TextBlock Style="{StaticResource AllTasksProjectLabelStyle}" Text="{Binding ProjectName}" />
-                                    </StackPanel>
-                                </StackPanel>
-
-                                <!-- 期限 -->
-                                <StackPanel Grid.Column="2"
-                                            Margin="16,0,0,0"
-                                            VerticalAlignment="Center">
-                                    <TextBlock Style="{StaticResource AllTasksPropertyLabelStyle}" Text="📅 期限" />
-                                    <TextBlock Foreground="{Binding Deadline, Converter={StaticResource DeadlineToBrushConverter}}"
-                                               Style="{StaticResource AllTasksPropertyValueStyle}"
-                                               Text="{Binding Deadline, StringFormat={}{0:yyyy/MM/dd}, TargetNullValue='未設定'}" />
-                                </StackPanel>
-
-                                <!-- 優先度 -->
-                                <StackPanel Grid.Column="3"
-                                            Margin="16,0,0,0"
-                                            VerticalAlignment="Center">
-                                    <TextBlock Style="{StaticResource AllTasksPropertyLabelStyle}" Text="⚡ 優先度" />
-                                    <TextBlock Foreground="{DynamicResource TextPrimaryBrush}"
-                                               Style="{StaticResource AllTasksPropertyValueStyle}"
-                                               Text="{Binding Priority}" />
-                                </StackPanel>
-
-                                <!-- 担当者 -->
-                                <StackPanel Grid.Column="4"
-                                            Margin="16,0,0,0"
-                                            VerticalAlignment="Center">
-                                    <TextBlock Style="{StaticResource AllTasksPropertyLabelStyle}" Text="👤 担当" />
-                                    <TextBlock Foreground="{DynamicResource TextPrimaryBrush}"
-                                               Style="{StaticResource AllTasksPropertyValueStyle}"
-                                               Text="{Binding AssigneeName, TargetNullValue='未設定'}" />
-                                </StackPanel>
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+            <ItemsControl ItemsSource="{Binding AllTasks}"
+                          Style="{StaticResource ViewMainItemsContainerStyle}"
+                          Tag="True" />
         </ScrollViewer>
 
         <!-- タスクがない場合の表示（オーバーレイ的に中央配置） -->

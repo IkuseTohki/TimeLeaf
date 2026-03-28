@@ -68,50 +68,7 @@
 
             <!-- タスクリスト -->
             <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <ItemsControl ItemsSource="{Binding Tasks}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Border Style="{StaticResource TaskItemBorderStyle}">
-                                <Border.InputBindings>
-                                    <MouseBinding Command="{Binding DataContext.SelectTaskCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                  CommandParameter="{Binding}"
-                                                  MouseAction="LeftClick" />
-                                    <MouseBinding Command="{Binding DataContext.OpenTaskDetailWindowCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                  CommandParameter="{Binding}"
-                                                  MouseAction="LeftDoubleClick" />
-                                </Border.InputBindings>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <CheckBox Margin="0,0,20,0"
-                                              VerticalAlignment="Center"
-                                              IsChecked="{Binding Status, Converter={StaticResource TaskStatusToBoolConverter}}" />
-                                    <TextBlock Grid.Column="1"
-                                               VerticalAlignment="Center"
-                                               FontSize="15"
-                                               FontWeight="SemiBold"
-                                               Text="{Binding Name}" />
-                                    <Border Grid.Column="2"
-                                            Style="{StaticResource PriorityBadgeStyle}"
-                                            Visibility="{Binding Priority, Converter={StaticResource PriorityToVisibilityConverter}}">
-                                        <TextBlock Style="{StaticResource PriorityBadgeTextStyle}" Text="緊急" />
-                                    </Border>
-                                    <Border Grid.Column="3" Style="{StaticResource SmallUserAvatarIconStyle}">
-                                        <TextBlock HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center"
-                                                   FontSize="10"
-                                                   FontWeight="Bold"
-                                                   Text="KT" />
-                                    </Border>
-                                </Grid>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                <ItemsControl ItemsSource="{Binding Tasks}" Tag="False" />
             </ScrollViewer>
         </DockPanel>
 
