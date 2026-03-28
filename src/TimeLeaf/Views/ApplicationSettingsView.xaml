@@ -10,7 +10,7 @@
              Background="{DynamicResource WindowBackgroundBrush}"
              mc:Ignorable="d">
 
-    <Grid Style="{StaticResource ViewMainContainerStyle}">
+    <Grid Style="{StaticResource ViewHeaderGridStyle}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
