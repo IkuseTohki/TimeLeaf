@@ -8,15 +8,6 @@
         Icon="pack://application:,,,/LeafKit.UI;component/Resources/AppIcon.ico"
         Topmost="True"
         WindowStartupLocation="CenterScreen">
-    <Window.Resources>
-        <Style x:Key="HeaderLabel" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="16" />
-            <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="Foreground" Value="#C62828" />
-            <Setter Property="Margin" Value="0,0,0,12" />
-        </Style>
-    </Window.Resources>
-
     <Grid Margin="32">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -25,28 +16,16 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0">
-            <TextBlock Style="{StaticResource HeaderLabel}" Text="申し訳ありません。予期しないエラーが発生しました。" />
-            <TextBlock Margin="0,0,0,16"
-                       FontSize="13"
-                       Foreground="#706E6B"
-                       Text="以下の情報を開発者に共有していただくことで、問題の解決に役立てることができます。" />
+            <TextBlock Style="{StaticResource FatalErrorHeaderStyle}" Text="申し訳ありません。予期しないエラーが発生しました。" />
+            <TextBlock Style="{StaticResource ViewHeaderSubTitleStyle}" Text="以下の情報を開発者に共有していただくことで、問題の解決に役立てることができます。" />
         </StackPanel>
 
         <Border Grid.Row="1"
-                Background="White"
-                BorderBrush="#E0DDD5"
+                Background="{DynamicResource SurfaceBaseBrush}"
+                BorderBrush="{DynamicResource OutlineBaseBrush}"
                 BorderThickness="1"
                 CornerRadius="8">
-            <TextBox Margin="12"
-                     AcceptsReturn="True"
-                     Background="Transparent"
-                     BorderThickness="0"
-                     FontFamily="Consolas, Meiryo"
-                     FontSize="12"
-                     IsReadOnly="True"
-                     Text="{Binding ErrorDetail, Mode=OneWay}"
-                     TextWrapping="Wrap"
-                     VerticalScrollBarVisibility="Auto" />
+            <TextBox Style="{StaticResource ErrorLogTextBoxStyle}" Text="{Binding ErrorDetail, Mode=OneWay}" />
         </Border>
 
         <StackPanel Grid.Row="2"
@@ -54,31 +33,13 @@
                     HorizontalAlignment="Right"
                     Orientation="Horizontal">
             <Button Margin="0,0,12,0"
-                    Padding="16,8"
-                    Background="#4A7c44"
                     Command="{Binding CopyErrorDetailCommand}"
                     Content="エラー内容をコピー"
-                    FontWeight="Bold"
-                    Foreground="White">
-                <Button.Resources>
-                    <Style TargetType="Border">
-                        <Setter Property="CornerRadius" Value="20" />
-                    </Style>
-                </Button.Resources>
-            </Button>
-            <Button Padding="24,8"
-                    Background="White"
-                    BorderBrush="#E0DDD5"
-                    BorderThickness="1"
-                    Click="CloseButton_Click"
+                    Style="{StaticResource PrimaryButtonStyle}" />
+            <Button Click="CloseButton_Click"
                     Content="閉じる"
-                    IsCancel="True">
-                <Button.Resources>
-                    <Style TargetType="Border">
-                        <Setter Property="CornerRadius" Value="20" />
-                    </Style>
-                </Button.Resources>
-            </Button>
+                    IsCancel="True"
+                    Style="{StaticResource RoundButtonStyle}" />
         </StackPanel>
     </Grid>
 </Window>

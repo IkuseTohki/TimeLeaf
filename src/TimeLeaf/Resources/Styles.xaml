@@ -835,20 +835,63 @@
 
     <!-- Add Task Form Components -->
 
-    <!-- タスク追加：フォームタイトルのスタイル -->
-    <Style x:Key="AddTaskFormTitleStyle" TargetType="TextBlock">
+    <!-- Form Components (Shared across AddTask, AddProject, ProfileEdit, etc.) -->
+
+    <Style x:Key="FormTitleTextStyle" TargetType="TextBlock">
         <Setter Property="Margin" Value="0,0,0,24" />
         <Setter Property="FontSize" Value="20" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
     </Style>
 
-    <!-- タスク追加：ラベルのスタイル -->
-    <Style x:Key="AddTaskFormLabelStyle" TargetType="TextBlock">
+    <Style x:Key="FormLabelTextStyle" TargetType="TextBlock">
         <Setter Property="Margin" Value="0,0,0,8" />
         <Setter Property="FontSize" Value="13" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    </Style>
+
+    <!-- タスク追加：フォームタイトルのスタイル -->
+    <Style x:Key="AddTaskFormTitleStyle"
+           BasedOn="{StaticResource FormTitleTextStyle}"
+           TargetType="TextBlock" />
+
+    <!-- タスク追加：ラベルのスタイル -->
+    <Style x:Key="AddTaskFormLabelStyle"
+           BasedOn="{StaticResource FormLabelTextStyle}"
+           TargetType="TextBlock" />
+
+    <!-- Profile Edit View Components -->
+
+    <!-- プロフィール編集：色プレビューのスタイル -->
+    <Style x:Key="ColorPreviewBorderStyle" TargetType="Border">
+        <Setter Property="Width" Value="40" />
+        <Setter Property="Height" Value="40" />
+        <Setter Property="CornerRadius" Value="20" />
+        <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <!-- Fatal Error View Components -->
+
+    <!-- 致命的エラー：ヘッダーラベルのスタイル -->
+    <Style x:Key="FatalErrorHeaderStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{DynamicResource ErrorBrush}" />
+        <Setter Property="Margin" Value="0,0,0,12" />
+    </Style>
+
+    <!-- 致命的エラー：エラーログ表示用TextBoxのスタイル -->
+    <Style x:Key="ErrorLogTextBoxStyle" TargetType="TextBox">
+        <Setter Property="Margin" Value="12" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="FontFamily" Value="Consolas, Meiryo" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="IsReadOnly" Value="True" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
     </Style>
 
 </ResourceDictionary>

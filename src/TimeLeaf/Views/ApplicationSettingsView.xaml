@@ -10,7 +10,7 @@
              Background="{DynamicResource WindowBackgroundBrush}"
              mc:Ignorable="d">
 
-    <Grid Margin="20">
+    <Grid Style="{StaticResource ViewMainContainerStyle}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -18,43 +18,37 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <Label Content="アプリケーション設定" Style="{DynamicResource FirstSectionHeaderLabelStyle}" />
+        <TextBlock Style="{StaticResource ViewHeaderTitleStyle}" Text="アプリケーション設定" />
 
         <!-- Content -->
-        <StackPanel Grid.Row="1">
+        <StackPanel Grid.Row="1" Style="{StaticResource SettingsContainerStyle}">
             <!-- Storage Settings -->
-            <GroupBox Margin="0,0,0,20"
-                      Padding="10"
-                      Header="データ保存場所">
+            <GroupBox Header="データ保存場所" Style="{StaticResource SettingsGroupBoxStyle}">
                 <StackPanel>
-                    <TextBlock Foreground="{DynamicResource TextSecondaryBrush}" Text="現在の保存先フォルダ:" />
-                    <Grid>
+                    <TextBlock Style="{StaticResource FormLabelTextStyle}" Text="現在の保存先フォルダ:" />
+                    <Grid Margin="0,0,0,8">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <TextBox Margin="0,0,10,0"
-                                 VerticalContentAlignment="Center"
                                  IsReadOnly="True"
+                                 Style="{StaticResource OrganicTextBoxStyle}"
                                  Text="{Binding StoragePath}" />
                         <Button Grid.Column="1"
                                 Command="{Binding ResetStoragePathCommand}"
                                 Content="変更..."
+                                Style="{StaticResource RoundButtonStyle}"
                                 ToolTip="保存場所を変更するには再起動が必要です" />
                     </Grid>
-                    <TextBlock Margin="0,5,0,0"
-                               FontSize="11"
-                               Foreground="{DynamicResource TextSecondaryBrush}"
-                               Text="※変更するとアプリケーションは終了します。次回起動時に再設定を行ってください。" />
+                    <TextBlock Style="{StaticResource SettingsAnnotationStyle}" Text="※変更するとアプリケーションは終了します。次回起動時に再設定を行ってください。" />
                 </StackPanel>
             </GroupBox>
 
             <!-- Appearance Settings -->
-            <GroupBox Margin="0,0,0,20"
-                      Padding="10"
-                      Header="外観">
+            <GroupBox Header="外観" Style="{StaticResource SettingsGroupBoxStyle}">
                 <StackPanel>
-                    <TextBlock Foreground="{DynamicResource TextSecondaryBrush}" Text="テーマ:" />
+                    <TextBlock Style="{StaticResource FormLabelTextStyle}" Text="テーマ:" />
                     <ComboBox Width="200"
                               HorizontalAlignment="Left"
                               SelectedValue="{Binding SelectedTheme}"
@@ -67,10 +61,14 @@
             </GroupBox>
 
             <!-- Notification Settings -->
-            <GroupBox Padding="10" Header="通知">
+            <GroupBox Header="通知" Style="{StaticResource SettingsGroupBoxStyle}">
                 <StackPanel>
-                    <CheckBox Content="OSの通知を利用する (トースト通知)" IsChecked="{Binding EnableOsNotification}" />
-                    <CheckBox Content="アプリ内の通知を利用する (スナックバー)" IsChecked="{Binding EnableAppNotification}" />
+                    <CheckBox Content="OSの通知を利用する (トースト通知)"
+                              IsChecked="{Binding EnableOsNotification}"
+                              Style="{StaticResource FormCheckBoxStyle}" />
+                    <CheckBox Content="アプリ内の通知を利用する (スナックバー)"
+                              IsChecked="{Binding EnableAppNotification}"
+                              Style="{StaticResource FormCheckBoxStyle}" />
                 </StackPanel>
             </GroupBox>
         </StackPanel>

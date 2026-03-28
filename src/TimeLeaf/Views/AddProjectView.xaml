@@ -7,20 +7,12 @@
              Width="440"
              d:DataContext="{d:DesignInstance vm:AddProjectViewModel}"
              mc:Ignorable="d">
-    <StackPanel>
-        <TextBlock Margin="0,0,0,24"
-                   FontSize="20"
-                   FontWeight="SemiBold"
-                   Foreground="{DynamicResource TextPrimaryBrush}"
-                   Text="新規プロジェクトの種をまく" />
+    <StackPanel Margin="24">
+        <TextBlock Style="{StaticResource FormTitleTextStyle}" Text="新規プロジェクトの種をまく" />
 
         <!-- プロジェクト名 -->
         <StackPanel Margin="0,0,0,16">
-            <TextBlock Margin="0,0,0,8"
-                       FontSize="13"
-                       FontWeight="SemiBold"
-                       Foreground="{DynamicResource TextSecondaryBrush}"
-                       Text="プロジェクト名" />
+            <TextBlock Style="{StaticResource FormLabelTextStyle}" Text="プロジェクト名" />
             <TextBox Height="36"
                      Style="{StaticResource ModernTextBoxStyle}"
                      Tag="例：新機能のプロトタイプ作成"
@@ -29,11 +21,7 @@
 
         <!-- 概要 -->
         <StackPanel Margin="0,0,0,16">
-            <TextBlock Margin="0,0,0,8"
-                       FontSize="13"
-                       FontWeight="SemiBold"
-                       Foreground="{DynamicResource TextSecondaryBrush}"
-                       Text="概要" />
+            <TextBlock Style="{StaticResource FormLabelTextStyle}" Text="概要" />
             <TextBox Height="80"
                      AcceptsReturn="True"
                      Style="{StaticResource ModernTextBoxStyle}"
@@ -52,7 +40,7 @@
             <Button Margin="12,0,0,0"
                     Command="{Binding ConfirmCommand}"
                     Content="作成する"
-                    Style="{StaticResource PrimaryButtonStyle2}" />
+                    Style="{StaticResource PrimaryButtonStyle}" />
         </StackPanel>
     </StackPanel>
 </UserControl>
