@@ -12,8 +12,6 @@ namespace TimeLeaf.ViewModels;
 /// </summary>
 public partial class AddProjectViewModel : ObservableObject, IDialogViewModel
 {
-    public event Action<bool>? RequestClose;
-
     [ObservableProperty]
     private string _name = string.Empty;
 
@@ -28,6 +26,11 @@ public partial class AddProjectViewModel : ObservableObject, IDialogViewModel
 
     public IEnumerable<ProjectStatus> ProjectStatusValues => (ProjectStatus[])Enum.GetValues(typeof(ProjectStatus));
     public IEnumerable<ProjectHealth> ProjectHealthValues => (ProjectHealth[])Enum.GetValues(typeof(ProjectHealth));
+
+    /// <summary>
+    /// ダイアログを閉じるよう要求するイベント。
+    /// </summary>
+    public event Action<bool>? RequestClose;
 
     /// <summary>
     /// 作成を確定するコマンド。

@@ -4,49 +4,47 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:TimeLeaf.ViewModels"
+             Width="320"
              d:DataContext="{d:DesignInstance vm:ProfileEditViewModel}"
              mc:Ignorable="d">
-    <Border Padding="24"
-            Background="{DynamicResource SurfaceBaseBrush}"
-            CornerRadius="16">
-        <StackPanel Width="320">
-            <TextBlock Foreground="{DynamicResource BrandPrimaryBrush}"
-                       Style="{StaticResource FormTitleTextStyle}"
-                       Text="プロフィール編集" />
+    <StackPanel Margin="0">
+        <TextBlock Style="{StaticResource FormTitleTextStyle}" Text="プロフィール編集" />
 
-            <TextBlock Style="{StaticResource FormLabelTextStyle}" Text="表示名" />
-            <TextBox Margin="0,0,0,20"
+        <Label Content="表示名" Style="{StaticResource FirstSectionHeaderLabelStyle}" />
+        <TextBox Margin="0,0,0,20"
+                 Style="{StaticResource OrganicTextBoxStyle}"
+                 Text="{Binding DisplayName, UpdateSourceTrigger=PropertyChanged}" />
+
+        <Label Content="テーマカラー" Style="{StaticResource SectionHeaderLabelStyle}" />
+        <Grid Margin="0,0,0,24">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Border Background="{Binding ThemeColor, FallbackValue=Transparent, TargetNullValue=Transparent}" Style="{StaticResource ColorPreviewBorderStyle}" />
+            <TextBox Grid.Column="1"
+                     Margin="12,0,0,0"
+                     VerticalAlignment="Center"
                      Style="{StaticResource OrganicTextBoxStyle}"
-                     Text="{Binding DisplayName, UpdateSourceTrigger=PropertyChanged}" />
+                     Text="{Binding ThemeColor, UpdateSourceTrigger=PropertyChanged}" />
+        </Grid>
 
-            <TextBlock Style="{StaticResource FormLabelTextStyle}" Text="テーマカラー" />
-            <Grid Margin="0,0,0,24">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Border Background="{Binding ThemeColor, FallbackValue=Transparent, TargetNullValue=Transparent}" Style="{StaticResource ColorPreviewBorderStyle}" />
-                <TextBox Grid.Column="1"
-                         Margin="12,0,0,0"
-                         VerticalAlignment="Center"
-                         Style="{StaticResource OrganicTextBoxStyle}"
-                         Text="{Binding ThemeColor, UpdateSourceTrigger=PropertyChanged}" />
-            </Grid>
+        <Label Content="アイコンパス (相対)" Style="{StaticResource SectionHeaderLabelStyle}" />
+        <TextBox Margin="0,0,0,32"
+                 Style="{StaticResource OrganicTextBoxStyle}"
+                 Text="{Binding IconPath, UpdateSourceTrigger=PropertyChanged}" />
 
-            <TextBlock Style="{StaticResource FormLabelTextStyle}" Text="アイコンパス (相対)" />
-            <TextBox Margin="0,0,0,32"
-                     Style="{StaticResource OrganicTextBoxStyle}"
-                     Text="{Binding IconPath, UpdateSourceTrigger=PropertyChanged}" />
-
-            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                <Button Margin="0,0,12,0"
-                        Command="{Binding CancelCommand}"
-                        Content="キャンセル"
-                        Style="{StaticResource OrganicButtonStyle}" />
-                <Button Command="{Binding SaveCommand}"
-                        Content="保存"
-                        Style="{StaticResource PrimaryButtonStyle}" />
-            </StackPanel>
+        <!-- フッターボタン -->
+        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+            <Button Width="90"
+                    Command="{Binding SaveCommand}"
+                    Content="保存"
+                    Style="{StaticResource PrimaryButtonStyle}" />
+            <Button Width="90"
+                    Margin="12,0,0,0"
+                    Command="{Binding CancelCommand}"
+                    Content="キャンセル"
+                    Style="{StaticResource SecondaryButtonStyle}" />
         </StackPanel>
-    </Border>
+    </StackPanel>
 </UserControl>

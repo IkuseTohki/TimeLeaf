@@ -12,11 +12,6 @@ namespace TimeLeaf.ViewModels;
 /// </summary>
 public partial class AddTaskViewModel : ObservableObject, IDialogViewModel
 {
-    /// <summary>
-    /// ダイアログを閉じるよう要求するイベント。
-    /// </summary>
-    public event Action<bool>? RequestClose;
-
     [ObservableProperty]
     private string _name = string.Empty;
 
@@ -47,6 +42,11 @@ public partial class AddTaskViewModel : ObservableObject, IDialogViewModel
     /// 選択可能な優先度のリスト。
     /// </summary>
     public IEnumerable<TaskPriority> TaskPriorityValues => (TaskPriority[])Enum.GetValues(typeof(TaskPriority));
+
+    /// <summary>
+    /// ダイアログを閉じるよう要求するイベント。
+    /// </summary>
+    public event Action<bool>? RequestClose;
 
     /// <summary>
     /// 作成を確定するコマンド。

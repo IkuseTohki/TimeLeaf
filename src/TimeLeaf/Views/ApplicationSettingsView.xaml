@@ -75,16 +75,18 @@
 
         <!-- Footer Buttons -->
         <StackPanel Grid.Row="2"
-                    Margin="0,20,0,0"
+                    Margin="0,16,0,0"
                     HorizontalAlignment="Right"
                     Orientation="Horizontal">
-            <Button Margin="0,0,10,0"
-                    Command="{Binding CancelCommand}"
-                    Content="キャンセル"
-                    Style="{StaticResource OutlinedButtonStyle}" />
-            <Button Command="{Binding SaveCommand}"
+            <Button Width="90"
+                    Command="{Binding SaveCommand}"
                     Content="保存"
                     Style="{StaticResource PrimaryButtonStyle}" />
+            <Button Width="90"
+                    Margin="12,0,0,0"
+                    Command="{Binding CancelCommand}"
+                    Content="キャンセル"
+                    Style="{StaticResource SecondaryButtonStyle}" />
         </StackPanel>
     </Grid>
 </UserControl>

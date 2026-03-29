@@ -7,7 +7,6 @@
              d:DataContext="{d:DesignInstance vm:ProjectSettingsViewModel}"
              d:DesignHeight="600"
              d:DesignWidth="800"
-             Background="{DynamicResource SurfaceLayer1Brush}"
              mc:Ignorable="d">
 
     <UserControl.Resources>

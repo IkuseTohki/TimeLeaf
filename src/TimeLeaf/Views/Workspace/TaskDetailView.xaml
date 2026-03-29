@@ -185,7 +185,7 @@
         <!-- アクション フッター -->
         <Border Grid.Row="1"
                 Padding="24,12"
-                Background="{DynamicResource SurfaceLayer1Brush}"
+                Background="{DynamicResource SurfaceBaseBrush}"
                 BorderBrush="{DynamicResource OutlineBaseBrush}"
                 BorderThickness="0,1,0,0">
             <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">

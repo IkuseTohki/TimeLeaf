@@ -22,7 +22,9 @@ public partial class ProfileEditViewModel : ObservableObject, LeafKit.UI.Service
     [ObservableProperty]
     private string _iconPath = string.Empty;
 
-    /// <inheritdoc />
+    /// <summary>
+    /// ダイアログを閉じるよう要求するイベント。
+    /// </summary>
     public event Action<bool>? RequestClose;
 
     public ProfileEditViewModel(IIdentityService identityService)

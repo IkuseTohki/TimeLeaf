@@ -17,23 +17,11 @@
 
         <!-- メインのタスクボード領域 -->
         <DockPanel Style="{StaticResource TaskBoardContainerStyle}">
-            <!-- ビュー切り替えとヘッダー -->
+            <!-- ヘッダー -->
             <Grid Margin="0,0,0,24" DockPanel.Dock="Top">
                 <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
                     <TextBlock Style="{StaticResource TaskBoardHeaderTextStyle}" Text="作業の森" />
-                    <Border Style="{StaticResource TaskViewSwitcherStyle}">
-                        <StackPanel Orientation="Horizontal">
-                            <Button Content="リスト" Style="{StaticResource TaskViewSwitcherButtonStyle}" />
-                            <Button Background="Transparent"
-                                    Content="カンバン"
-                                    Foreground="{DynamicResource BrandPrimaryHoverBrush}"
-                                    Style="{StaticResource TaskViewSwitcherButtonStyle}" />
-                        </StackPanel>
-                    </Border>
                 </StackPanel>
-                <TextBox HorizontalAlignment="Right"
-                         Style="{StaticResource OrganicTextBoxStyle}"
-                         Tag="タスクを検索..." />
             </Grid>
 
             <!-- タスク追加入力 -->

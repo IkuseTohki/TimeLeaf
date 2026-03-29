@@ -7,6 +7,9 @@
     <Color x:Key="ErrorColor">#B03A2E</Color>
     <Color x:Key="WarningColor">#D35400</Color>
 
+
+    <SolidColorBrush x:Key="ProgressBarBlankBrush" Color="#E8F0E6" />
+
     <SolidColorBrush x:Key="BrandForegroundBrush" Color="White" />
     <SolidColorBrush x:Key="ErrorBrush" Color="{StaticResource ErrorColor}" />
     <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource WarningColor}" />
