@@ -16,11 +16,11 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!-- ヘッダー -->
+        <!-- ヘッダーエリア -->
         <Grid Style="{StaticResource ViewHeaderGridStyle}">
             <StackPanel VerticalAlignment="Bottom">
                 <TextBlock Style="{StaticResource ViewHeaderTitleStyle}" Text="森の広場 (Home)" />
-                <TextBlock Style="{StaticResource ViewHeaderSubTitleStyle}" Text="全プロジェクトの状況を俯瞰しています" />
+                <TextBlock Style="{StaticResource ViewHeaderSubTitleStyle}" Text="全プロジェクトの状況を俯瞰しています。" />
             </StackPanel>
 
             <!-- ユーザーメニュー -->

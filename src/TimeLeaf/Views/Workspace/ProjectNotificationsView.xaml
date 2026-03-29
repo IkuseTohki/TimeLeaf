@@ -3,72 +3,75 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:entities="clr-namespace:TimeLeaf.Models.Entities"
-             xmlns:local="clr-namespace:TimeLeaf.Views.Workspace"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:wvm="clr-namespace:TimeLeaf.ViewModels.Workspace"
              d:DataContext="{d:DesignInstance wvm:ProjectNotificationsViewModel}"
-             d:DesignHeight="450"
+             d:DesignHeight="600"
              d:DesignWidth="800"
              mc:Ignorable="d">
 
-    <Grid Margin="48,0,48,48">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <!-- ヘッダーエリア -->
-        <DockPanel Margin="0,0,0,24" LastChildFill="True">
-            <Button Command="{Binding MarkAllAsReadCommand}"
+        <Grid Style="{StaticResource ViewHeaderGridStyle}">
+            <StackPanel VerticalAlignment="Bottom">
+                <TextBlock Style="{StaticResource ViewHeaderTitleStyle}" Text="通知センター" />
+                <TextBlock Style="{StaticResource ViewHeaderSubTitleStyle}" Text="有効期限切れのタスクを確認できます。" />
+            </StackPanel>
+
+            <Button HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Command="{Binding MarkAllAsReadCommand}"
                     Content="すべて既読にする"
-                    DockPanel.Dock="Right"
                     Style="{StaticResource OrganicButtonStyle}" />
-            <TextBlock Style="{StaticResource TaskBoardHeaderTextStyle}" Text="通知センター" />
-        </DockPanel>
+        </Grid>
 
         <!-- 通知リスト -->
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <StackPanel>
-                <!-- 通知がない場合の表示 -->
-                <Border Style="{StaticResource NotificationEmptyStateStyle}" Visibility="{Binding UnreadNotifications.Count, Converter={StaticResource IntToVisibilityConverter}, ConverterParameter='Inverse'}">
-                    <StackPanel HorizontalAlignment="Center">
-                        <TextBlock Style="{StaticResource NotificationEmptyIconStyle}" Text="🍂" />
-                        <TextBlock HorizontalAlignment="Center"
-                                   FontSize="16"
-                                   Foreground="{DynamicResource TextSecondaryBrush}"
-                                   Text="未読の通知はありません" />
-                    </StackPanel>
-                </Border>
-
-                <!-- 通知一覧 -->
-                <ItemsControl ItemsSource="{Binding UnreadNotifications}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate DataType="{x:Type entities:Notification}">
-                            <Border Style="{StaticResource NotificationCardStyle}">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-
-                                    <StackPanel>
-                                        <TextBlock Style="{StaticResource NotificationTitleTextStyle}" Text="{Binding Title}" />
-                                        <TextBlock Style="{StaticResource NotificationMessageTextStyle}" Text="{Binding Message}" />
-                                        <TextBlock Style="{StaticResource NotificationTimestampTextStyle}" Text="{Binding CreatedAt, StringFormat='{}yyyy/MM/dd HH:mm (UTC)'}" />
-                                    </StackPanel>
-
-                                    <Button Grid.Column="1"
-                                            VerticalAlignment="Top"
-                                            Command="{Binding DataContext.MarkAsReadCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                            CommandParameter="{Binding}"
-                                            Content="既読"
-                                            Style="{StaticResource RoundButtonStyle}" />
-                                </Grid>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </StackPanel>
+            <!-- 通知一覧 -->
+            <ItemsControl ItemsSource="{Binding UnreadNotifications}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type entities:Notification}">
+                        <Border Style="{StaticResource NotificationCardStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource NotificationTitleTextStyle}" Text="{Binding Title}" />
+                                    <TextBlock Style="{StaticResource NotificationMessageTextStyle}" Text="{Binding Message}" />
+                                    <TextBlock Style="{StaticResource NotificationTimestampTextStyle}" Text="{Binding CreatedAt, StringFormat='{}yyyy/MM/dd HH:mm (UTC)'}" />
+                                </StackPanel>
+                                <Button Grid.Column="1"
+                                        Width="50"
+                                        VerticalAlignment="Top"
+                                        Command="{Binding DataContext.MarkAsReadCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                        CommandParameter="{Binding}"
+                                        Content="既読"
+                                        Style="{StaticResource RoundButtonStyle}" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </ScrollViewer>
+
+        <!-- 通知がない場合の表示 -->
+        <Border Grid.Row="1"
+                Style="{StaticResource NotificationEmptyStateStyle}"
+                Visibility="{Binding UnreadNotifications.Count, Converter={StaticResource IntToVisibilityConverter}, ConverterParameter='Inverse'}">
+            <StackPanel HorizontalAlignment="Center">
+                <TextBlock Style="{StaticResource NotificationEmptyIconStyle}" Text="🍂" />
+                <TextBlock HorizontalAlignment="Center"
+                           FontSize="16"
+                           Foreground="{DynamicResource TextSecondaryBrush}"
+                           Text="未読の通知はありません" />
+            </StackPanel>
+        </Border>
     </Grid>
 </UserControl>
