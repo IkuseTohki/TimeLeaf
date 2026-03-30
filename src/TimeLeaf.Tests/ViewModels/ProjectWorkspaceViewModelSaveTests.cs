@@ -96,7 +96,7 @@ public class ProjectWorkspaceViewModelSaveTests
         // MainViewModel から WorkspaceViewModel へ遷移したと仮定
         var addTaskUseCase = new AddTaskUseCase(saveUseCaseMock.Object);
 
-        var workspaceViewModel = new ProjectWorkspaceViewModel(projectViewModel, notificationServiceMock.Object, viewModelFactoryMock.Object, checkAssignmentMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
+        var workspaceViewModel = new ProjectWorkspaceViewModel(projectViewModel, mainViewModel.Projects, notificationServiceMock.Object, viewModelFactoryMock.Object, checkAssignmentMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
         var tasksViewModel = new ProjectTasksViewModel(
             projectViewModel,
             addTaskUseCase,

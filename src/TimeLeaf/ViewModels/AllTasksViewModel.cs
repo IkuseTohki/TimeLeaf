@@ -28,6 +28,11 @@ public partial class AllTasksViewModel : ObservableObject
     private bool _showOnlyIncomplete = true;
 
     /// <summary>
+    /// 特定のプロジェクト（およびオプションでタスク）への遷移が要求されたときに発生します。
+    /// </summary>
+    public event EventHandler<(ProjectViewModel Project, ProjectTaskViewModel? Task)>? RequestNavigation;
+
+    /// <summary>
     /// コンストラクタ。
     /// </summary>
     /// <param name="projects">全プロジェクトのリスト。</param>
@@ -49,6 +54,23 @@ public partial class AllTasksViewModel : ObservableObject
 
         // プロジェクトリストの変更を監視
         _projects.CollectionChanged += OnProjectsCollectionChanged;
+    }
+
+    [RelayCommand]
+    private void SelectTask(ProjectTaskViewModel task)
+    {
+        if (task == null) return;
+        var project = _projects.FirstOrDefault(p => p.Name == task.ProjectName);
+        if (project != null)
+        {
+            RequestNavigation?.Invoke(this, (project, task));
+        }
+    }
+
+    [RelayCommand]
+    private void OpenTaskDetailWindow(ProjectTaskViewModel task)
+    {
+        SelectTask(task);
     }
 
     private void OnProjectsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

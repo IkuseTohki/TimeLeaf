@@ -35,8 +35,8 @@ public class CheckTaskDeadlinesUseCaseTests
 
         var task = new ProjectTask();
         task.UpdateName("Overdue Task");
-        // 期限を昨日に設定
-        task.UpdateSchedule(null, DateTime.UtcNow.AddDays(-1));
+        // 明確に昨日以前（期限切れ）に設定
+        task.UpdateSchedule(null, DateTime.UtcNow.Date.AddDays(-1));
         task.UpdateStatus(TaskStatus.NotStarted);
 
         project.AddTask(task);
@@ -54,6 +54,33 @@ public class CheckTaskDeadlinesUseCaseTests
     }
 
     /// <summary>
+    /// テスト観点: 本日が期限のタスクは、期限切れと判定されない（通知されない）ことを確認する。
+    /// </summary>
+    [TestMethod]
+    public void Execute_WithTaskDueToday_ShouldNotSendNotification()
+    {
+        // Arrange
+        var project = new Project();
+        var task = new ProjectTask();
+        task.UpdateName("Today's Task");
+
+        // 期限を本日の日付（時刻は 00:00:00）に設定
+        var today = DateTime.UtcNow.Date;
+        task.UpdateSchedule(null, today);
+        task.UpdateStatus(TaskStatus.InProgress);
+
+        project.AddTask(task);
+
+        var useCase = new CheckTaskDeadlinesUseCase(_notificationServiceMock.Object);
+
+        // Act
+        useCase.Execute(new[] { project });
+
+        // Assert
+        _notificationServiceMock.Verify(x => x.Notify(It.IsAny<Notification>()), Times.Never, "本日が期限のタスクは通知されるべきではありません。");
+    }
+
+    /// <summary>
     /// テスト観点: 期限内、または完了済みのタスクについては通知が発行されないことを確認する。
     /// </summary>
     [TestMethod]
@@ -63,11 +90,11 @@ public class CheckTaskDeadlinesUseCaseTests
         var project = new Project();
         var task1 = new ProjectTask();
         task1.UpdateName("Future Task");
-        task1.UpdateSchedule(null, DateTime.UtcNow.AddDays(1));
+        task1.UpdateSchedule(null, DateTime.UtcNow.Date.AddDays(1));
 
         var task2 = new ProjectTask();
         task2.UpdateName("Done Task");
-        task2.UpdateSchedule(null, DateTime.UtcNow.AddDays(-1));
+        task2.UpdateSchedule(null, DateTime.UtcNow.Date.AddDays(-1));
         task2.UpdateStatus(TaskStatus.Completed);
 
         project.AddTask(task1);

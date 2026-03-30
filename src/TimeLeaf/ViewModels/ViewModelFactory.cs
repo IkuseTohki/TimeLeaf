@@ -35,10 +35,11 @@ public class ViewModelFactory : IViewModelFactory
         return new AllTasksViewModel(projects);
     }
 
-    public ProjectWorkspaceViewModel CreateProjectWorkspaceViewModel(ProjectViewModel projectViewModel)
+    public ProjectWorkspaceViewModel CreateProjectWorkspaceViewModel(ProjectViewModel projectViewModel, ObservableCollection<ProjectViewModel> projects)
     {
         return new ProjectWorkspaceViewModel(
             projectViewModel,
+            projects,
             _serviceProvider.GetRequiredService<INotificationService>(),
             this,
             _serviceProvider.GetRequiredService<ICheckAssignmentUseCase>(),
@@ -97,10 +98,13 @@ public class ViewModelFactory : IViewModelFactory
             _serviceProvider.GetRequiredService<IDialogService>());
     }
 
-    public ProjectNotificationsViewModel CreateProjectNotificationsViewModel()
+    public NotificationsViewModel CreateNotificationsViewModel(ObservableCollection<ProjectViewModel> projects, Guid? projectIdFilter = null)
     {
-        return new ProjectNotificationsViewModel(
-            _serviceProvider.GetRequiredService<INotificationService>());
+        return new NotificationsViewModel(
+            _serviceProvider.GetRequiredService<INotificationService>(),
+            projects,
+            _serviceProvider.GetRequiredService<ILogger<NotificationsViewModel>>(),
+            projectIdFilter);
     }
 
     public TaskSummaryViewModel CreateTaskSummaryViewModel(ProjectViewModel projectViewModel, ProjectTaskViewModel taskViewModel)

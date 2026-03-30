@@ -26,6 +26,7 @@
                     <ColumnDefinition Width="130" />
                     <ColumnDefinition Width="100" />
                     <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
                 <!-- 状態アイコン -->
@@ -84,6 +85,14 @@
                                Style="{StaticResource AllTasksPropertyValueStyle}"
                                Text="{Binding Assignee, TargetNullValue='未設定'}" />
                 </StackPanel>
+
+                <!-- 開くボタン -->
+                <Button Grid.Column="5"
+                        Margin="16,0,0,0"
+                        Command="{Binding DataContext.OpenTaskDetailWindowCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                        CommandParameter="{Binding}"
+                        Content="開く"
+                        Style="{StaticResource RoundButtonStyle}" />
             </Grid>
         </Border>
 

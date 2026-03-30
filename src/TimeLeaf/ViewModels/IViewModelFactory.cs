@@ -1,6 +1,9 @@
+using System;
 using System.Collections.ObjectModel;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.ViewModels.Workspace;
+
+using Microsoft.Extensions.Logging;
 
 namespace TimeLeaf.ViewModels;
 
@@ -12,7 +15,7 @@ public interface IViewModelFactory
 {
     HomeViewModel CreateHomeViewModel(ObservableCollection<ProjectViewModel> projects);
     AllTasksViewModel CreateAllTasksViewModel(ObservableCollection<ProjectViewModel> projects);
-    ProjectWorkspaceViewModel CreateProjectWorkspaceViewModel(ProjectViewModel projectViewModel);
+    ProjectWorkspaceViewModel CreateProjectWorkspaceViewModel(ProjectViewModel projectViewModel, ObservableCollection<ProjectViewModel> projects);
     ProjectViewModel CreateProjectViewModel(Project project);
     AddProjectViewModel CreateAddProjectViewModel();
     AddTaskViewModel CreateAddTaskViewModel();
@@ -21,7 +24,7 @@ public interface IViewModelFactory
     ProjectTasksViewModel CreateProjectTasksViewModel(ProjectViewModel projectViewModel);
     ProjectTimelineViewModel CreateProjectTimelineViewModel(ProjectViewModel projectViewModel);
     ProjectSettingsViewModel CreateProjectSettingsViewModel(ProjectViewModel projectViewModel);
-    ProjectNotificationsViewModel CreateProjectNotificationsViewModel();
+    NotificationsViewModel CreateNotificationsViewModel(ObservableCollection<ProjectViewModel> projects, Guid? projectIdFilter = null);
 
     TaskSummaryViewModel CreateTaskSummaryViewModel(ProjectViewModel projectViewModel, ProjectTaskViewModel taskViewModel);
     TaskDetailViewModel CreateTaskDetailViewModel(ProjectViewModel projectViewModel, ProjectTaskViewModel taskViewModel);

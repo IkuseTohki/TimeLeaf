@@ -49,10 +49,14 @@ public partial class MainViewModel : ObservableObject
                 CurrentViewModel = _viewModelFactory.CreateHomeViewModel(Projects);
                 break;
             case MainNavigationContext.AllTasks:
-                CurrentViewModel = _viewModelFactory.CreateAllTasksViewModel(Projects);
+                var allTasksVm = _viewModelFactory.CreateAllTasksViewModel(Projects);
+                allTasksVm.RequestNavigation += (s, p) => NavigateToProject(p.Project, p.Task);
+                CurrentViewModel = allTasksVm;
                 break;
             case MainNavigationContext.Notifications:
-                CurrentViewModel = _viewModelFactory.CreateProjectNotificationsViewModel();
+                var notificationsVm = _viewModelFactory.CreateNotificationsViewModel(Projects);
+                notificationsVm.RequestNavigation += (s, p) => NavigateToProject(p.Project, p.Task);
+                CurrentViewModel = notificationsVm;
                 break;
             case MainNavigationContext.ProjectDetail:
                 // ProjectDetail は NavigateToProject 経由で設定される
@@ -287,12 +291,30 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void NavigateToProject(ProjectViewModel projectViewModel)
     {
+        NavigateToProject(projectViewModel, null);
+    }
+
+    /// <summary>
+    /// 指定されたプロジェクト（およびオプションでタスク）へ遷移します。
+    /// </summary>
+    /// <param name="projectViewModel">遷移先プロジェクト。</param>
+    /// <param name="task">遷移時に直接開くタスク（オプション）。</param>
+    public void NavigateToProject(ProjectViewModel projectViewModel, ProjectTaskViewModel? task)
+    {
         if (projectViewModel == null) return;
-        _logger.LogInformation("Navigating to project {ProjectId}", projectViewModel.Id);
+        _logger.LogInformation("Navigating to project {ProjectId} (Task: {TaskId})", projectViewModel.Id, task?.Id);
 
         // Context を先にセットし、その後に ViewModel をセットする
         NavigationContext = MainNavigationContext.ProjectDetail;
-        CurrentViewModel = _viewModelFactory.CreateProjectWorkspaceViewModel(projectViewModel);
+        var workspaceVm = _viewModelFactory.CreateProjectWorkspaceViewModel(projectViewModel, Projects);
+        workspaceVm.ProjectNavigationRequested += (s, p) => NavigateToProject(p.Project, p.Task);
+
+        if (task != null)
+        {
+            workspaceVm.OpenTaskDetail(task);
+        }
+
+        CurrentViewModel = workspaceVm;
     }
 
     [RelayCommand]

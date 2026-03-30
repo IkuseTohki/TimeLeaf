@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -54,7 +55,7 @@ public class ProjectWorkspaceViewModelNavigationTests
     {
         // Arrange
         var checkAssignmentMock = new Mock<ICheckAssignmentUseCase>();
-        var vm = new ProjectWorkspaceViewModel(_projectViewModel, _notificationServiceMock.Object, _viewModelFactoryMock.Object, checkAssignmentMock.Object, _loggerMock.Object);
+        var vm = new ProjectWorkspaceViewModel(_projectViewModel, new ObservableCollection<ProjectViewModel>(), _notificationServiceMock.Object, _viewModelFactoryMock.Object, checkAssignmentMock.Object, _loggerMock.Object);
 
         // Act
         vm.SwitchSubViewCommand.Execute("Tasks");

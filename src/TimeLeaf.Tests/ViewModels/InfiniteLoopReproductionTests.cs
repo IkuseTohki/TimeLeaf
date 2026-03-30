@@ -100,7 +100,7 @@ public class InfiniteLoopReproductionTests
         var addMilestoneUseCase = new AddMilestoneUseCase(saveUseCaseMock.Object);
 
         var checkAssignmentMock = new Mock<ICheckAssignmentUseCase>();
-        var workspaceVM = new ProjectWorkspaceViewModel(projectVM, notificationServiceMock.Object, viewModelFactoryMock.Object, checkAssignmentMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
+        var workspaceVM = new ProjectWorkspaceViewModel(projectVM, mainVM.Projects, notificationServiceMock.Object, viewModelFactoryMock.Object, checkAssignmentMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
         var dialogServiceMock = new Mock<LeafKit.UI.Services.IDialogService>();
         var tasksVM = new ProjectTasksViewModel(
             projectVM,
@@ -182,7 +182,7 @@ public class InfiniteLoopReproductionTests
         var addMilestoneUseCase = new AddMilestoneUseCase(saveUseCaseMock.Object);
 
         var checkAssignmentMock = new Mock<ICheckAssignmentUseCase>();
-        var workspaceVM = new ProjectWorkspaceViewModel(projectVM, notificationServiceMock.Object, viewModelFactoryMock.Object, checkAssignmentMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
+        var workspaceVM = new ProjectWorkspaceViewModel(projectVM, mainVM.Projects, notificationServiceMock.Object, viewModelFactoryMock.Object, checkAssignmentMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
         var dialogServiceMock = new Mock<LeafKit.UI.Services.IDialogService>();
         var tasksVM = new ProjectTasksViewModel(
             projectVM,

@@ -29,8 +29,8 @@
         <DataTemplate DataType="{x:Type vm:ProjectWorkspaceViewModel}">
             <views:ProjectWorkspaceView />
         </DataTemplate>
-        <DataTemplate DataType="{x:Type vmw:ProjectNotificationsViewModel}">
-            <vw:ProjectNotificationsView />
+        <DataTemplate DataType="{x:Type vm:NotificationsViewModel}">
+            <views:NotificationsView />
         </DataTemplate>
     </Window.Resources>
 

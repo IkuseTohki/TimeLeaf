@@ -71,8 +71,8 @@ public class MainViewModelTests
         _viewModelFactoryMock.Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
             .Returns((Project p) => new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object));
 
-        _viewModelFactoryMock.Setup(x => x.CreateProjectWorkspaceViewModel(It.IsAny<ProjectViewModel>()))
-            .Returns((ProjectViewModel pvm) => new ProjectWorkspaceViewModel(pvm, _notificationServiceMock.Object, _viewModelFactoryMock.Object, _checkAssignmentMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object));
+        _viewModelFactoryMock.Setup(x => x.CreateProjectWorkspaceViewModel(It.IsAny<ProjectViewModel>(), It.IsAny<ObservableCollection<ProjectViewModel>>()))
+            .Returns((ProjectViewModel pvm, ObservableCollection<ProjectViewModel> projects) => new ProjectWorkspaceViewModel(pvm, projects, _notificationServiceMock.Object, _viewModelFactoryMock.Object, _checkAssignmentMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object));
     }
 
     private MainViewModel CreateViewModel()
@@ -164,15 +164,15 @@ public class MainViewModelTests
         project.UpdateName("Test Project");
         var projectViewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object);
 
-        var expectedWorkspace = new ProjectWorkspaceViewModel(projectViewModel, _notificationServiceMock.Object, _viewModelFactoryMock.Object, _checkAssignmentMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
-        _viewModelFactoryMock.Setup(x => x.CreateProjectWorkspaceViewModel(projectViewModel)).Returns(expectedWorkspace);
+        var expectedWorkspace = new ProjectWorkspaceViewModel(projectViewModel, viewModel.Projects, _notificationServiceMock.Object, _viewModelFactoryMock.Object, _checkAssignmentMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
+        _viewModelFactoryMock.Setup(x => x.CreateProjectWorkspaceViewModel(projectViewModel, viewModel.Projects)).Returns(expectedWorkspace);
 
         // Act
         viewModel.NavigateToProjectCommand.Execute(projectViewModel);
 
         // Assert
         Assert.AreSame(expectedWorkspace, viewModel.CurrentViewModel);
-        _viewModelFactoryMock.Verify(x => x.CreateProjectWorkspaceViewModel(projectViewModel), Times.Once);
+        _viewModelFactoryMock.Verify(x => x.CreateProjectWorkspaceViewModel(projectViewModel, viewModel.Projects), Times.Once);
     }
 
     /// <summary>
@@ -185,6 +185,9 @@ public class MainViewModelTests
         var viewModel = CreateViewModel();
 
         // 一旦別のコンテキストにする（NavigateBack で Home に切り替わることを確認するため）
+        _viewModelFactoryMock.Setup(x => x.CreateNotificationsViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>(), null))
+            .Returns(new NotificationsViewModel(_notificationServiceMock.Object, viewModel.Projects, new Mock<ILogger<NotificationsViewModel>>().Object));
+
         viewModel.NavigationContext = MainNavigationContext.Notifications;
 
         var userMenu = new UserMenuViewModel(_identityServiceMock.Object, _dialogServiceMock.Object, _viewModelFactoryMock.Object);
@@ -197,5 +200,65 @@ public class MainViewModelTests
         // Assert
         Assert.AreSame(expectedHome, viewModel.CurrentViewModel);
         _viewModelFactoryMock.Verify(x => x.CreateHomeViewModel(viewModel.Projects), Times.AtLeastOnce);
+    }
+
+    /// <summary>
+    /// テスト観点: 全タスク一覧からタスク遷移が要求された際、該当プロジェクトのワークスペースへ遷移し、タスク詳細が開かれることを確認する。
+    /// </summary>
+    [TestMethod]
+    public void AllTasks_RequestNavigation_ShouldNavigateToProjectAndTask()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+        var project = new Project();
+        project.UpdateName("Test Project");
+        var projectViewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object);
+        viewModel.Projects.Add(projectViewModel);
+
+        var task = new ProjectTask();
+        task.UpdateName("Target Task");
+        var taskViewModel = new ProjectTaskViewModel(task);
+        projectViewModel.Tasks.Add(taskViewModel);
+
+        // AllTasksViewModel の実体作成（イベントを飛ばすため）
+        var allTasksVm = new AllTasksViewModel(viewModel.Projects);
+        _viewModelFactoryMock.Setup(x => x.CreateAllTasksViewModel(viewModel.Projects)).Returns(allTasksVm);
+
+        // WorkspaceViewModel の実体作成
+        var workspaceVm = new ProjectWorkspaceViewModel(
+            projectViewModel,
+            viewModel.Projects,
+            _notificationServiceMock.Object,
+            _viewModelFactoryMock.Object,
+            _checkAssignmentMock.Object,
+            new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
+
+        _viewModelFactoryMock.Setup(x => x.CreateProjectWorkspaceViewModel(projectViewModel, viewModel.Projects))
+            .Returns(workspaceVm);
+
+        // TaskDetailViewModel のモック作成
+        var detailVm = new Mock<TaskDetailViewModel>(
+            projectViewModel,
+            taskViewModel,
+            new Mock<IAddCommentUseCase>().Object,
+            new Mock<ILogger<TaskDetailViewModel>>().Object).Object;
+        _viewModelFactoryMock.Setup(x => x.CreateTaskDetailViewModel(projectViewModel, taskViewModel))
+            .Returns(detailVm);
+
+        // Act
+        // 1. AllTasks 画面へ遷移（これにより ViewModel が生成されイベントが購読される）
+        viewModel.NavigationContext = MainNavigationContext.AllTasks;
+
+        // 2. AllTasksViewModel からナビゲーションイベントを発火
+        // task.ProjectName が一致する必要があるため、ViewModel 側のロジックに合わせる
+        taskViewModel.ProjectName = "Test Project";
+        allTasksVm.SelectTaskCommand.Execute(taskViewModel);
+
+        // Assert
+        Assert.AreEqual(MainNavigationContext.ProjectDetail, viewModel.NavigationContext);
+        Assert.AreSame(workspaceVm, viewModel.CurrentViewModel);
+
+        // WorkspaceViewModel の現在のサブビューがタスク詳細になっていることを確認
+        Assert.AreSame(detailVm, workspaceVm.CurrentSubViewModel);
     }
 }

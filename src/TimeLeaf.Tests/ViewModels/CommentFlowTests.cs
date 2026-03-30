@@ -70,9 +70,6 @@ public class CommentFlowTests
         viewModelFactoryMock.Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
             .Returns((Project p) => new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object));
 
-        viewModelFactoryMock.Setup(x => x.CreateProjectWorkspaceViewModel(It.IsAny<ProjectViewModel>()))
-            .Returns((ProjectViewModel pvm) => new ProjectWorkspaceViewModel(pvm, _notificationServiceMock.Object, viewModelFactoryMock.Object, _checkAssignmentMock.Object, _loggerMock.Object));
-
         var saveCoordinator = new ProjectSaveCoordinator(_saveUseCaseMock.Object, new Mock<ILogger<ProjectSaveCoordinator>>().Object);
         var dispatcherMock = new Mock<IDispatcherService>();
         dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Action>())).Callback<Action>(a => a()).Returns(Task.CompletedTask);
@@ -97,6 +94,9 @@ public class CommentFlowTests
             _dialogServiceMock.Object,
             _identityServiceMock.Object,
             loggerMock.Object);
+
+        viewModelFactoryMock.Setup(x => x.CreateProjectWorkspaceViewModel(It.IsAny<ProjectViewModel>(), It.IsAny<ObservableCollection<ProjectViewModel>>()))
+            .Returns((ProjectViewModel pvm, ObservableCollection<ProjectViewModel> projects) => new ProjectWorkspaceViewModel(pvm, projects, _notificationServiceMock.Object, viewModelFactoryMock.Object, _checkAssignmentMock.Object, _loggerMock.Object));
     }
 
     /// <summary>
@@ -151,7 +151,7 @@ public class CommentFlowTests
         viewModelFactoryMock.Setup(x => x.CreateTaskSummaryViewModel(It.IsAny<ProjectViewModel>(), It.IsAny<ProjectTaskViewModel>()))
             .Returns((ProjectViewModel pvm, ProjectTaskViewModel tvm) => new TaskSummaryViewModel(pvm, tvm));
 
-        var workspaceViewModel = new ProjectWorkspaceViewModel(projectViewModel, _notificationServiceMock.Object, viewModelFactoryMock.Object, _checkAssignmentMock.Object, _loggerMock.Object);
+        var workspaceViewModel = new ProjectWorkspaceViewModel(projectViewModel, _mainViewModel.Projects, _notificationServiceMock.Object, viewModelFactoryMock.Object, _checkAssignmentMock.Object, _loggerMock.Object);
         workspaceViewModel.SwitchSubViewCommand.Execute("Tasks");
 
         var targetTask = tasksVM.Tasks.First();

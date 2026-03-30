@@ -34,7 +34,8 @@ public class CheckTaskDeadlinesUseCase : ICheckTaskDeadlinesUseCase
             foreach (var task in project.Tasks)
             {
                 // 未完了かつ期限切れのタスクをチェック
-                if (task.Status != TaskStatus.Completed && task.Deadline.HasValue && task.Deadline.Value < now)
+                // Date プロパティ同士を比較することで、期限日の 23:59:59 までは「期限内」と判定されるようにする
+                if (task.Status != TaskStatus.Completed && task.Deadline.HasValue && task.Deadline.Value.Date < now.Date)
                 {
                     var notification = new Notification(
                         "タスク期限切れ",

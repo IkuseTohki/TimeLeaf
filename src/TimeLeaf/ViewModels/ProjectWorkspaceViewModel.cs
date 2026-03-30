@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
@@ -15,6 +16,7 @@ namespace TimeLeaf.ViewModels;
 public partial class ProjectWorkspaceViewModel : ObservableObject
 {
     private readonly ProjectViewModel _projectViewModel;
+    private readonly System.Collections.ObjectModel.ObservableCollection<ProjectViewModel> _projects;
     private readonly INotificationService _notificationService;
     private readonly IViewModelFactory _viewModelFactory;
     private readonly ILogger<ProjectWorkspaceViewModel> _logger;
@@ -39,7 +41,8 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
         new NavigationItem("🏠 Dashboard", "Dashboard"),
         new NavigationItem("🌿 Tasks", "Tasks"),
         new NavigationItem("⏳ Timeline", "Timeline"),
-        new NavigationItem("⚙️ Settings", "Settings")
+        new NavigationItem("⚙️ Settings", "Settings"),
+        new NavigationItem("🔔 Notifications", "Notifications")
     };
 
     /// <summary>
@@ -63,16 +66,23 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
     public bool IsUserAssigned => _projectViewModel.IsAssignedToMe;
 
     /// <summary>
+    /// 特定のプロジェクト（およびオプションでタスク）への遷移が要求されたときに発生します。
+    /// </summary>
+    public event EventHandler<(ProjectViewModel Project, ProjectTaskViewModel? Task)>? ProjectNavigationRequested;
+
+    /// <summary>
     /// コンストラクタ。
     /// </summary>
     public ProjectWorkspaceViewModel(
         ProjectViewModel projectViewModel,
+        System.Collections.ObjectModel.ObservableCollection<ProjectViewModel> projects,
         INotificationService notificationService,
         IViewModelFactory viewModelFactory,
         ICheckAssignmentUseCase checkAssignment,
         ILogger<ProjectWorkspaceViewModel> logger)
     {
         _projectViewModel = projectViewModel ?? throw new ArgumentNullException(nameof(projectViewModel));
+        _projects = projects ?? throw new ArgumentNullException(nameof(projects));
         _notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
         _viewModelFactory = viewModelFactory ?? throw new ArgumentNullException(nameof(viewModelFactory));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -98,7 +108,13 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
 
     private void UpdateUnreadCount()
     {
-        UnreadNotificationCount = _notificationService.UnreadNotifications.Count;
+        // プロジェクトに関連する通知のみをカウント
+        var project = _projectViewModel;
+        var taskIds = project.Tasks.Select(t => t.Id.ToString()).ToList();
+        var filterStr = project.Id.ToString();
+
+        UnreadNotificationCount = _notificationService.UnreadNotifications.Count(n =>
+            n.RelatedEntityId == filterStr || (n.RelatedEntityId != null && taskIds.Contains(n.RelatedEntityId)));
     }
 
     /// <summary>
@@ -122,9 +138,16 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
             "Tasks" => CreateTasksViewModel(),
             "Timeline" => _viewModelFactory.CreateProjectTimelineViewModel(_projectViewModel),
             "Settings" => _viewModelFactory.CreateProjectSettingsViewModel(_projectViewModel),
-            "Notifications" => _viewModelFactory.CreateProjectNotificationsViewModel(),
+            "Notifications" => CreateNotificationsViewModel(),
             _ => CurrentSubViewModel
         };
+    }
+
+    private NotificationsViewModel CreateNotificationsViewModel()
+    {
+        var vm = _viewModelFactory.CreateNotificationsViewModel(_projects, _projectViewModel.Id);
+        vm.RequestNavigation += (s, p) => ProjectNavigationRequested?.Invoke(this, p);
+        return vm;
     }
 
     private ProjectTasksViewModel CreateTasksViewModel()
@@ -144,7 +167,7 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
     /// </summary>
     /// <param name="task">表示対象のタスクViewModel。</param>
     [RelayCommand]
-    private void OpenTaskDetail(ProjectTaskViewModel task)
+    public void OpenTaskDetail(ProjectTaskViewModel task)
     {
         _logger.LogInformation("Navigating to task detail for {TaskName} within main content area.", task.Name);
         var detailVm = _viewModelFactory.CreateTaskDetailViewModel(_projectViewModel, task);

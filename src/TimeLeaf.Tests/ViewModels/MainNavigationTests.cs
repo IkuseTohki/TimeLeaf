@@ -11,7 +11,6 @@ using TimeLeaf.Repositories;
 using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
-using TimeLeaf.ViewModels.Workspace;
 using LeafKit.UI.Services;
 
 namespace TimeLeaf.Tests.ViewModels;
@@ -105,15 +104,15 @@ public class MainNavigationTests
     }
 
     /// <summary>
-    /// テスト観点: ナビゲーションコンテキストを Notifications に切り替えた際、CurrentViewModel が ProjectNotificationsViewModel になることを確認する。
+    /// テスト観点: ナビゲーションコンテキストを Notifications に切り替えた際、CurrentViewModel が NotificationsViewModel になることを確認する。
     /// </summary>
     [TestMethod]
-    public void SwitchToNotifications_ShouldSetProjectNotificationsViewModel()
+    public void SwitchToNotifications_ShouldSetNotificationsViewModel()
     {
         // Arrange
         var viewModel = CreateViewModel();
-        var expectedNotifications = new ProjectNotificationsViewModel(_notificationServiceMock.Object);
-        _viewModelFactoryMock.Setup(x => x.CreateProjectNotificationsViewModel()).Returns(expectedNotifications);
+        var expectedNotifications = new NotificationsViewModel(_notificationServiceMock.Object, viewModel.Projects, new Mock<ILogger<NotificationsViewModel>>().Object);
+        _viewModelFactoryMock.Setup(x => x.CreateNotificationsViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>(), null)).Returns(expectedNotifications);
 
         // Act
         viewModel.NavigationContext = MainNavigationContext.Notifications;
