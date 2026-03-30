@@ -21,7 +21,7 @@
               Visibility="{Binding IsGlobalContext, Converter={StaticResource BooleanToVisibilityConverter}}">
             <StackPanel VerticalAlignment="Bottom">
                 <TextBlock Style="{StaticResource ViewHeaderTitleStyle}" Text="通知センター" />
-                <TextBlock Style="{StaticResource ViewHeaderSubTitleStyle}" Text="有効期限切れのタスクなどを確認できます。" />
+                <TextBlock Style="{StaticResource ViewHeaderSubTitleStyle}" Text="期限切れのタスクなどを確認できます。" />
             </StackPanel>
 
             <Button HorizontalAlignment="Right"

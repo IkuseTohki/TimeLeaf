@@ -17,42 +17,31 @@
 
         <!-- メインのタスクボード領域 -->
         <DockPanel Style="{StaticResource TaskBoardContainerStyle}">
-            <!-- ヘッダー -->
-            <Grid Margin="0,0,0,24" DockPanel.Dock="Top">
-                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource TaskBoardHeaderTextStyle}" Text="作業の森" />
-                </StackPanel>
-            </Grid>
-
             <!-- タスク追加入力 -->
-            <Button Command="{Binding AddTaskCommand}"
-                    DockPanel.Dock="Top"
-                    IsEnabled="{Binding ProjectViewModel.IsAssignedToMe}"
-                    Style="{StaticResource AddTaskButtonStyle}">
-                <Border Style="{StaticResource AddTaskCardStyle}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Margin="0,0,16,0"
-                                   VerticalAlignment="Center"
-                                   FontSize="20"
-                                   Text="🌱" />
-                        <TextBlock Grid.Column="1"
-                                   VerticalAlignment="Center"
-                                   FontSize="15"
-                                   Foreground="{DynamicResource TextSecondaryBrush}"
-                                   Text="新しいタスクの種をまく..." />
-                        <Button Grid.Column="2"
-                                Command="{Binding AddTaskCommand}"
-                                Content="追加"
-                                Foreground="White"
-                                Style="{StaticResource RoundButtonStyle}" />
-                    </Grid>
-                </Border>
-            </Button>
+            <Grid Margin="0,0,0,12" DockPanel.Dock="Top">
+                <Button Command="{Binding AddTaskCommand}"
+                        DockPanel.Dock="Top"
+                        IsEnabled="{Binding ProjectViewModel.IsAssignedToMe}"
+                        Style="{StaticResource AddTaskButtonStyle}">
+                    <Border Style="{StaticResource AddTaskCardStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Margin="0,0,16,0"
+                                       VerticalAlignment="Center"
+                                       FontSize="20"
+                                       Text="🌱" />
+                            <TextBlock Grid.Column="1"
+                                       VerticalAlignment="Center"
+                                       FontSize="15"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       Text="新しいタスクを追加する..." />
+                        </Grid>
+                    </Border>
+                </Button>
+            </Grid>
 
             <!-- タスクリスト -->
             <ScrollViewer VerticalScrollBarVisibility="Auto">

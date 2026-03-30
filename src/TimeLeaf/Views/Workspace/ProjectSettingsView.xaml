@@ -34,18 +34,11 @@
 
     <Grid Margin="32">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!-- Header -->
-        <StackPanel Grid.Row="0" Margin="0,0,0,32">
-            <TextBlock Style="{StaticResource ViewHeaderTitleStyle}" Text="プロジェクト設定" />
-            <TextBlock Style="{StaticResource ViewHeaderSubTitleStyle}" Text="{Binding ProjectName}" />
-        </StackPanel>
-
         <!-- Content -->
-        <StackPanel Grid.Row="1" Style="{StaticResource SettingsContainerStyle}">
+        <StackPanel Grid.Row="0" Style="{StaticResource SettingsContainerStyle}">
 
             <!-- Lifecycle Management -->
             <GroupBox Header="ライフサイクル管理" Style="{StaticResource SettingsGroupBoxStyle}">

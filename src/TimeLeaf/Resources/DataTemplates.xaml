@@ -87,12 +87,14 @@
                 </StackPanel>
 
                 <!-- 開くボタン -->
-                <Button Grid.Column="5"
+                <Button x:Name="TaskOpenButton"
+                        Grid.Column="5"
                         Margin="16,0,0,0"
                         Command="{Binding DataContext.OpenTaskDetailWindowCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                         CommandParameter="{Binding}"
                         Content="開く"
-                        Style="{StaticResource RoundButtonStyle}" />
+                        Style="{StaticResource RoundButtonStyle}"
+                        Visibility="Visible" />
             </Grid>
         </Border>
 
@@ -100,6 +102,7 @@
             <!-- 親 ItemsControl の Tag プロパティを見て表示を切り替え -->
             <DataTrigger Binding="{Binding Path=Tag, RelativeSource={RelativeSource AncestorType=ItemsControl}}" Value="True">
                 <Setter TargetName="ProjectContextPanel" Property="Visibility" Value="Visible" />
+                <Setter TargetName="TaskOpenButton" Property="Visibility" Value="Collapsed" />
             </DataTrigger>
         </DataTemplate.Triggers>
     </DataTemplate>
