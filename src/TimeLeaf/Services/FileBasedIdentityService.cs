@@ -15,13 +15,15 @@ namespace TimeLeaf.Services;
 public class FileBasedIdentityService : IIdentityService
 {
     private readonly IIdentitySeedRepository _repository;
+    private readonly IUserRepository _userRepository;
     private User? _currentIdentity;
 
     public Guid CurrentUserId => _currentIdentity?.Id ?? Guid.Empty;
 
-    public FileBasedIdentityService(IIdentitySeedRepository repository)
+    public FileBasedIdentityService(IIdentitySeedRepository repository, IUserRepository userRepository)
     {
         _repository = repository;
+        _userRepository = userRepository;
     }
 
     public async Task<User> GetCurrentIdentityAsync()
@@ -32,14 +34,25 @@ public class FileBasedIdentityService : IIdentityService
 
         if (seed != null)
         {
-            _currentIdentity = new User(seed.Id, Environment.UserName, "#2D5A27", "");
+            // IDがある場合はプロフィールをロード
+            _currentIdentity = await _userRepository.GetUserAsync(seed.Id);
+
+            // プロフィールがまだ作成されていない場合は初期状態で作成
+            if (_currentIdentity == null)
+            {
+                _currentIdentity = new User(seed.Id, Environment.UserName, "#2D5A27", "");
+                await _userRepository.SaveUserAsync(_currentIdentity);
+            }
         }
         else
         {
-            // 新規作成
+            // ID自体がない場合は新規作成
             var newId = Guid.NewGuid();
             _currentIdentity = new User(newId, Environment.UserName, "#2D5A27", "");
+
+            // Seedとプロフィールの両方を保存
             await _repository.SaveAsync(new IdentitySeedDto { Id = newId });
+            await _userRepository.SaveUserAsync(_currentIdentity);
         }
         return _currentIdentity;
     }
@@ -48,6 +61,9 @@ public class FileBasedIdentityService : IIdentityService
     {
         var identity = await GetCurrentIdentityAsync();
         identity.UpdateProfile(displayName, themeColor, iconPath);
+
+        // 変更を永続化
+        await _userRepository.SaveUserAsync(identity);
     }
 
     public string? GetIdentityFilePath() => _repository.GetFilePath();

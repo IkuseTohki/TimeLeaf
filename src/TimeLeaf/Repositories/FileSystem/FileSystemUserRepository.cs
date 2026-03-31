@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Repositories.FileSystem.Dtos;
@@ -15,7 +17,13 @@ namespace TimeLeaf.Repositories.FileSystem;
 public class FileSystemUserRepository : IUserRepository
 {
     private readonly string _usersDirectory;
-    private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        WriteIndented = true,
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping, // 日本語をエスケープせずに保存
+        Converters = { new JsonStringEnumConverter() }
+    };
 
     /// <summary>
     /// 指定されたディレクトリを使用してリポジトリを初期化します。

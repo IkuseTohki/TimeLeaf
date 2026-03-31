@@ -223,8 +223,8 @@ public partial class App : Application
             var homeDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".timeleaf");
             return new FileIdentitySeedRepository(portableDir, homeDir);
         });
-        services.AddSingleton<IIdentityService, FileBasedIdentityService>();
         services.AddSingleton<IUserRepository>(sp => new FileSystemUserRepository(usersPath));
+        services.AddSingleton<IIdentityService, FileBasedIdentityService>();
 
         services.AddSingleton<ICurrentUserService, WindowsCurrentUserService>();
         services.AddSingleton<IDispatcherService, WpfDispatcherService>();
