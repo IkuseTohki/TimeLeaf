@@ -82,14 +82,14 @@
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
-                                        <Border Style="{StaticResource TaskCommentAvatarStyle}">
+                                        <Border Background="{Binding AuthorColor}" Style="{StaticResource TaskCommentAvatarStyle}">
                                             <TextBlock FontSize="9"
                                                        Style="{StaticResource UserAvatarInitialStyle}"
                                                        Text="KT" />
                                         </Border>
                                         <StackPanel Grid.Column="1" Margin="12,0,0,0">
                                             <Grid Margin="0,0,0,2">
-                                                <TextBlock Style="{StaticResource TaskCommentAuthorStyle}" Text="{Binding AuthorId}" />
+                                                <TextBlock Style="{StaticResource TaskCommentAuthorStyle}" Text="{Binding AuthorName}" />
                                                 <TextBlock HorizontalAlignment="Right"
                                                            FontSize="9"
                                                            Style="{StaticResource TaskPanelMetaLabelStyle}"

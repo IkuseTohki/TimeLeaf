@@ -17,15 +17,16 @@ namespace TimeLeaf.Tests.Infrastructure;
 public class SurgicalSavingTests
 {
     private string _tempDir = null!;
-    private Mock<ICurrentUserService> _userServiceMock = null!;
+    private Mock<IIdentityService> _identityServiceMock = null!;
     private Mock<ILogger<FolderProjectRepository>> _loggerMock = null!;
+    private readonly Guid _testUserId = Guid.NewGuid();
 
     [TestInitialize]
     public void Setup()
     {
         _tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        _userServiceMock = new Mock<ICurrentUserService>();
-        _userServiceMock.Setup(u => u.GetCurrentUserId()).Returns("test-user");
+        _identityServiceMock = new Mock<IIdentityService>();
+        _identityServiceMock.Setup(u => u.CurrentUserId).Returns(_testUserId);
         _loggerMock = new Mock<ILogger<FolderProjectRepository>>();
     }
 
@@ -61,7 +62,7 @@ public class SurgicalSavingTests
         // Act
         // 拡張予定の個別保存メソッド（仮）を呼び出す想定
         // 現状の SaveAllAsync は全件保存してしまうため、このテストで不合格（Red）にする
-        await repo.SaveAllAsync(new[] { projectA }, "test-user");
+        await repo.SaveAllAsync(new[] { projectA }, _testUserId.ToString());
 
         // Assert
         var projectAFolder = Path.Combine(_tempDir, $"{projectA.Id}_{projectA.Name}");
@@ -86,14 +87,14 @@ public class SurgicalSavingTests
         project.UpdateName("SameName");
 
         // 1回目の保存
-        await repo.SaveAllAsync(new[] { project }, "test-user");
+        await repo.SaveAllAsync(new[] { project }, _testUserId.ToString());
         var projectDir = Directory.GetDirectories(_tempDir).First();
         var changesDir = Path.Combine(projectDir, "changes");
         var initialFileCount = Directory.GetFiles(changesDir).Length;
 
         // Act
         // 2回目の保存（内容は全く同じ）
-        await repo.SaveAllAsync(new[] { project }, "test-user");
+        await repo.SaveAllAsync(new[] { project }, _testUserId.ToString());
 
         // Assert
         var currentFileCount = Directory.GetFiles(changesDir).Length;

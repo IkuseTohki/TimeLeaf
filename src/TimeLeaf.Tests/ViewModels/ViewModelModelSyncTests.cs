@@ -5,12 +5,28 @@ using Moq;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
+using TimeLeaf.Services;
+using TimeLeaf.Repositories;
 
 namespace TimeLeaf.Tests.ViewModels;
 
 [TestClass]
 public class ViewModelModelSyncTests
 {
+    private Mock<IViewModelFactory> _viewModelFactoryMock = null!;
+    private Mock<IUserService> _userServiceMock = null!;
+
+    [TestInitialize]
+    public void Setup()
+    {
+        _viewModelFactoryMock = new Mock<IViewModelFactory>();
+        _userServiceMock = new Mock<IUserService>();
+
+        // ProjectViewModel がタスクを生成する際に使用するファクトリのセットアップ
+        _viewModelFactoryMock.Setup(x => x.CreateProjectTaskViewModel(It.IsAny<ProjectTask>()))
+            .Returns((ProjectTask t) => new ProjectTaskViewModel(t, _userServiceMock.Object));
+    }
+
     /// <summary>
     /// テスト観点: ProjectViewModel のプロパティを変更した際、
     /// 基になる Project エンティティのプロパティが更新されることを確認する。
@@ -22,7 +38,7 @@ public class ViewModelModelSyncTests
         var project = new Project();
         project.UpdateName("Old Name");
         project.UpdateDescription("Old Desc");
-        var viewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object);
+        var viewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
 
         // Act
         viewModel.Name = "New Name";
@@ -44,7 +60,7 @@ public class ViewModelModelSyncTests
         var task = new ProjectTask();
         task.UpdateName("Old Task");
         task.AssignTo("Old User");
-        var viewModel = new ProjectTaskViewModel(task);
+        var viewModel = new ProjectTaskViewModel(task, _userServiceMock.Object);
 
         // Act
         viewModel.Name = "New Task";
@@ -65,7 +81,7 @@ public class ViewModelModelSyncTests
         // Arrange
         var project = new Project();
         project.UpdateName("Test Project");
-        var viewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object);
+        var viewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
         var newTask = new ProjectTask();
         newTask.UpdateName("New Task");
 
@@ -92,7 +108,7 @@ public class ViewModelModelSyncTests
         var task = new ProjectTask();
         task.UpdateName("Task 1");
         project.AddTask(task);
-        var viewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object);
+        var viewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
 
         // Act
         project.RemoveTask(task.Id);

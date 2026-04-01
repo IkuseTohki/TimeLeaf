@@ -22,30 +22,32 @@ public class InfiniteLoopReproductionTests
 {
     private Mock<IServiceProvider> _serviceProviderMock = null!;
     private Mock<IProjectRepository> _repositoryMock = null!;
-    private Mock<ICurrentUserService> _userServiceMock = null!;
+    private Mock<IIdentityService> _identityServiceMock = null!;
     private Mock<ILogger<MainViewModel>> _loggerMock = null!;
+    private Mock<IUserService> _userServiceMock = null!;
+    private readonly Guid _testUserId = Guid.NewGuid();
 
     [TestInitialize]
     public void Setup()
     {
         _repositoryMock = new Mock<IProjectRepository>();
         _repositoryMock.Setup(r => r.LoadAllAsync()).ReturnsAsync(new List<Project>());
-        _userServiceMock = new Mock<ICurrentUserService>();
-        _userServiceMock.Setup(u => u.GetCurrentUserId()).Returns("test-user");
+        _identityServiceMock = new Mock<IIdentityService>();
+        _identityServiceMock.Setup(u => u.CurrentUserId).Returns(_testUserId);
         _loggerMock = new Mock<ILogger<MainViewModel>>();
         _serviceProviderMock = new Mock<IServiceProvider>();
+        _userServiceMock = new Mock<IUserService>();
 
         _serviceProviderMock.Setup(sp => sp.GetService(typeof(ILogger<ProjectWorkspaceViewModel>)))
             .Returns(new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
-        _serviceProviderMock.Setup(sp => sp.GetService(typeof(ICurrentUserService)))
-            .Returns(_userServiceMock.Object);
+        _serviceProviderMock.Setup(sp => sp.GetService(typeof(IIdentityService)))
+            .Returns(_identityServiceMock.Object);
         _serviceProviderMock.Setup(sp => sp.GetService(typeof(IServiceProvider)))
             .Returns(_serviceProviderMock.Object);
     }
 
     /// <summary>
     /// バグ再現テスト: 特定条件下で PropertyChanged がループして保存が無限に走らないことを確認。
-    /// （課題: ViewModel の計算プロパティ変更がさらにモデル変更を誘発して再保存されるループ）
     /// </summary>
     [TestMethod]
     public async Task AddingMultipleTasksWithCost_ShouldNotLoop()
@@ -57,8 +59,12 @@ public class InfiniteLoopReproductionTests
         var syncServiceMock = new Mock<IProjectSyncService>();
         var addProjectUseCaseMock = new Mock<IAddProjectUseCase>();
         var viewModelFactoryMock = new Mock<IViewModelFactory>();
+
         viewModelFactoryMock.Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
-            .Returns((Project p) => new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object));
+            .Returns((Project p) => new ProjectViewModel(p, _testUserId, new Mock<IJoinProjectUseCase>().Object, viewModelFactoryMock.Object));
+        viewModelFactoryMock.Setup(x => x.CreateProjectTaskViewModel(It.IsAny<ProjectTask>()))
+            .Returns((ProjectTask t) => new ProjectTaskViewModel(t, _userServiceMock.Object));
+
         var dispatcherMock = new Mock<IDispatcherService>();
         dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Action>())).Callback<Action>(a => a()).Returns(Task.CompletedTask);
         dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Func<Task>>())).Returns<Func<Task>>(f => f());
@@ -73,7 +79,6 @@ public class InfiniteLoopReproductionTests
         var snackbarServiceMock = new Mock<ISnackbarService>();
         var osNotificationServiceMock = new Mock<IOSNotificationService>();
         var checkDeadlinesUseCaseMock = new Mock<ICheckTaskDeadlinesUseCase>();
-        var identityServiceMock = new Mock<IIdentityService>();
 
         var mainVM = new MainViewModel(
             loadUseCaseMock.Object,
@@ -88,20 +93,19 @@ public class InfiniteLoopReproductionTests
             snackbarServiceMock.Object,
             osNotificationServiceMock.Object,
             checkDeadlinesUseCaseMock.Object,
-            new Mock<LeafKit.UI.Services.IDialogService>().Object,
-            identityServiceMock.Object,
+            new Mock<IDialogService>().Object,
+            _identityServiceMock.Object,
             _loggerMock.Object);
 
         await Task.Delay(100); // Wait for initialize
 
         var projectVM = mainVM.Projects.First();
         var addTaskUseCase = new AddTaskUseCase(saveUseCaseMock.Object);
-        var addCommentUseCase = new AddCommentUseCase(saveUseCaseMock.Object, _userServiceMock.Object);
-        var addMilestoneUseCase = new AddMilestoneUseCase(saveUseCaseMock.Object);
+        var addCommentUseCase = new AddCommentUseCase(saveUseCaseMock.Object, _identityServiceMock.Object);
 
         var checkAssignmentMock = new Mock<ICheckAssignmentUseCase>();
         var workspaceVM = new ProjectWorkspaceViewModel(projectVM, mainVM.Projects, notificationServiceMock.Object, viewModelFactoryMock.Object, checkAssignmentMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
-        var dialogServiceMock = new Mock<LeafKit.UI.Services.IDialogService>();
+        var dialogServiceMock = new Mock<IDialogService>();
         var tasksVM = new ProjectTasksViewModel(
             projectVM,
             addTaskUseCase,
@@ -124,7 +128,7 @@ public class InfiniteLoopReproductionTests
 
         await Task.Delay(500); // Wait for potential async propagation
 
-        // 3. Assert - 保存回数が異常に多くないこと（10回程度なら許容、無限なら数百回になる）
+        // 3. Assert
         var saveCount = saveUseCaseMock.Invocations.Count(i => i.Method.Name == "ExecuteAsync");
         Assert.IsTrue(saveCount < 10, $"Save count is too high ({saveCount}), possible loop detected.");
     }
@@ -139,8 +143,12 @@ public class InfiniteLoopReproductionTests
         var syncServiceMock = new Mock<IProjectSyncService>();
         var addProjectUseCaseMock = new Mock<IAddProjectUseCase>();
         var viewModelFactoryMock = new Mock<IViewModelFactory>();
+
         viewModelFactoryMock.Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
-            .Returns((Project p) => new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object));
+            .Returns((Project p) => new ProjectViewModel(p, _testUserId, new Mock<IJoinProjectUseCase>().Object, viewModelFactoryMock.Object));
+        viewModelFactoryMock.Setup(x => x.CreateProjectTaskViewModel(It.IsAny<ProjectTask>()))
+            .Returns((ProjectTask t) => new ProjectTaskViewModel(t, _userServiceMock.Object));
+
         var dispatcherMock = new Mock<IDispatcherService>();
         dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Action>())).Callback<Action>(a => a()).Returns(Task.CompletedTask);
         dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Func<Task>>())).Returns<Func<Task>>(f => f());
@@ -155,7 +163,6 @@ public class InfiniteLoopReproductionTests
         var snackbarServiceMock = new Mock<ISnackbarService>();
         var osNotificationServiceMock = new Mock<IOSNotificationService>();
         var checkDeadlinesUseCaseMock = new Mock<ICheckTaskDeadlinesUseCase>();
-        var identityServiceMock = new Mock<IIdentityService>();
 
         var mainVM = new MainViewModel(
             loadUseCaseMock.Object,
@@ -170,20 +177,19 @@ public class InfiniteLoopReproductionTests
             snackbarServiceMock.Object,
             osNotificationServiceMock.Object,
             checkDeadlinesUseCaseMock.Object,
-            new Mock<LeafKit.UI.Services.IDialogService>().Object,
-            identityServiceMock.Object,
+            new Mock<IDialogService>().Object,
+            _identityServiceMock.Object,
             _loggerMock.Object);
 
         await Task.Delay(100);
 
         var projectVM = mainVM.Projects.First();
         var addTaskUseCase = new AddTaskUseCase(saveUseCaseMock.Object);
-        var addCommentUseCase = new AddCommentUseCase(saveUseCaseMock.Object, _userServiceMock.Object);
-        var addMilestoneUseCase = new AddMilestoneUseCase(saveUseCaseMock.Object);
+        var addCommentUseCase = new AddCommentUseCase(saveUseCaseMock.Object, _identityServiceMock.Object);
 
         var checkAssignmentMock = new Mock<ICheckAssignmentUseCase>();
         var workspaceVM = new ProjectWorkspaceViewModel(projectVM, mainVM.Projects, notificationServiceMock.Object, viewModelFactoryMock.Object, checkAssignmentMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
-        var dialogServiceMock = new Mock<LeafKit.UI.Services.IDialogService>();
+        var dialogServiceMock = new Mock<IDialogService>();
         var tasksVM = new ProjectTasksViewModel(
             projectVM,
             addTaskUseCase,
@@ -209,7 +215,7 @@ public class InfiniteLoopReproductionTests
 
         await Task.Delay(500);
 
-        // 4. Assert - 両方の追加が反映され、保存が走っていること
+        // 4. Assert
         Assert.AreEqual(2, projectVM.Tasks.Count);
         var saveCount = saveUseCaseMock.Invocations.Count(i => i.Method.Name == "ExecuteAsync");
         Assert.IsTrue(saveCount < 10, $"Save count is too high ({saveCount}), possible loop detected.");

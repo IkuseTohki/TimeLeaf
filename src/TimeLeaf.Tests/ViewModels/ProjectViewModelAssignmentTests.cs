@@ -11,6 +11,14 @@ namespace TimeLeaf.Tests.ViewModels;
 [TestClass]
 public class ProjectViewModelAssignmentTests
 {
+    private Mock<IViewModelFactory> _viewModelFactoryMock = null!;
+
+    [TestInitialize]
+    public void Setup()
+    {
+        _viewModelFactoryMock = new Mock<IViewModelFactory>();
+    }
+
     /// <summary>
     /// テスト観点: 自分のIDがアサインリストに含まれている場合、IsAssignedToMe が True になることを確認する。
     /// </summary>
@@ -23,7 +31,7 @@ public class ProjectViewModelAssignmentTests
         project.AssignUser(myId);
 
         // Act
-        var viewModel = new ProjectViewModel(project, myId, new Mock<IJoinProjectUseCase>().Object);
+        var viewModel = new ProjectViewModel(project, myId, new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
 
         // Assert
         Assert.IsTrue(viewModel.IsAssignedToMe);
@@ -42,7 +50,7 @@ public class ProjectViewModelAssignmentTests
         project.AssignUser(otherId);
 
         // Act
-        var viewModel = new ProjectViewModel(project, myId, new Mock<IJoinProjectUseCase>().Object);
+        var viewModel = new ProjectViewModel(project, myId, new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
 
         // Assert
         Assert.IsFalse(viewModel.IsAssignedToMe);
@@ -58,7 +66,7 @@ public class ProjectViewModelAssignmentTests
         var myId = Guid.NewGuid();
         var project = new Project();
         var mockJoinUseCase = new Mock<IJoinProjectUseCase>();
-        var viewModel = new ProjectViewModel(project, myId, mockJoinUseCase.Object);
+        var viewModel = new ProjectViewModel(project, myId, mockJoinUseCase.Object, _viewModelFactoryMock.Object);
 
         // Act
         await viewModel.JoinProjectCommand.ExecuteAsync(null);

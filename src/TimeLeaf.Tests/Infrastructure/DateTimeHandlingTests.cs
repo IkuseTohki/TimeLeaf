@@ -8,6 +8,8 @@ using TimeLeaf.Models.Entities;
 using TimeLeaf.Repositories.FileSystem;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
+using TimeLeaf.Services;
+using TimeLeaf.Repositories;
 
 namespace TimeLeaf.Tests.Infrastructure;
 
@@ -31,7 +33,6 @@ public class DateTimeHandlingTests
 
         // ファイル名を生成
         var userId = "user1";
-        var guid = Guid.NewGuid();
         var category = "ProjectBasic";
         var fileName = _generator.Generate(localTime, userId, category);
 
@@ -52,7 +53,6 @@ public class DateTimeHandlingTests
         // Arrange
         var timestamp = DateTime.Parse(isoDate, null, DateTimeStyles.RoundtripKind);
         var userId = "user1";
-        var guid = Guid.NewGuid();
         var category = "Category";
 
         // Act
@@ -86,7 +86,8 @@ public class DateTimeHandlingTests
     {
         // Arrange
         var project = new Project();
-        var vm = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object);
+        var viewModelFactoryMock = new Mock<IViewModelFactory>();
+        var vm = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, viewModelFactoryMock.Object);
         var nowUtc = DateTime.UtcNow;
 
         // Act & Assert
@@ -119,7 +120,8 @@ public class DateTimeHandlingTests
     {
         // Arrange
         var task = new ProjectTask();
-        var vm = new ProjectTaskViewModel(task);
+        var userServiceMock = new Mock<IUserService>();
+        var vm = new ProjectTaskViewModel(task, userServiceMock.Object);
         var localDate = new DateTime(2026, 3, 1, 10, 0, 0, DateTimeKind.Local);
 
         // Act
@@ -168,4 +170,3 @@ public class DateTimeHandlingTests
         Assert.AreEqual(15, time.Hour);
     }
 }
-

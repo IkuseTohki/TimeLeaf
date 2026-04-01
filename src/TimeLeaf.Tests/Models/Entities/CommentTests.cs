@@ -14,7 +14,7 @@ public class CommentTests
     public void Constructor_ShouldThrow_ForMissingRequiredFields()
     {
         var taskId = Guid.NewGuid();
-        var authorId = "user1";
+        var authorId = Guid.NewGuid();
         var content = "テストコメント";
 
         // TaskId が Empty
@@ -25,11 +25,11 @@ public class CommentTests
         }
         catch (ArgumentException) { }
 
-        // AuthorId が 空
+        // AuthorId が Empty
         try
         {
-            _ = new Comment { TaskId = taskId, AuthorId = "", Content = content };
-            Assert.Fail("AuthorId が 空 の場合に例外をスローすべき");
+            _ = new Comment { TaskId = taskId, AuthorId = Guid.Empty, Content = content };
+            Assert.Fail("AuthorId が Empty の場合に例外をスローすべき");
         }
         catch (ArgumentException) { }
 

@@ -9,6 +9,7 @@ using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
 using TimeLeaf.ViewModels.Workspace;
+using TimeLeaf.Repositories;
 using LeafKit.UI.Services;
 
 namespace TimeLeaf.Tests.ViewModels;
@@ -20,6 +21,7 @@ public class ProjectWorkspaceViewModelTests
     private Mock<INotificationService> _notificationServiceMock = null!;
     private Mock<ICheckAssignmentUseCase> _checkAssignmentMock = null!;
     private Mock<ILogger<ProjectWorkspaceViewModel>> _loggerMock = null!;
+    private Mock<IUserService> _userServiceMock = null!;
     private ProjectViewModel _projectViewModel = null!;
     private ObservableCollection<ProjectViewModel> _projects = null!;
 
@@ -31,15 +33,19 @@ public class ProjectWorkspaceViewModelTests
         _notificationServiceMock.Setup(x => x.UnreadNotifications).Returns(new List<Notification>());
         _checkAssignmentMock = new Mock<ICheckAssignmentUseCase>();
         _loggerMock = new Mock<ILogger<ProjectWorkspaceViewModel>>();
+        _userServiceMock = new Mock<IUserService>();
         _projects = new ObservableCollection<ProjectViewModel>();
 
         var project = new Project();
         project.UpdateName("Test Project");
-        _projectViewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object);
+        _projectViewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
 
         // Factory mock setup
         _viewModelFactoryMock.Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
-            .Returns((Project p) => new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object));
+            .Returns((Project p) => new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object));
+
+        _viewModelFactoryMock.Setup(x => x.CreateProjectTaskViewModel(It.IsAny<ProjectTask>()))
+            .Returns((ProjectTask t) => new ProjectTaskViewModel(t, _userServiceMock.Object));
 
         // デフォルトの戻り値を設定
         _viewModelFactoryMock.Setup(x => x.CreateProjectDashboardViewModel(It.IsAny<ProjectViewModel>()))
@@ -63,7 +69,7 @@ public class ProjectWorkspaceViewModelTests
         var myId = Guid.NewGuid();
         var project = new Project();
         // 自分はまだアサインされていない
-        var projectVm = new ProjectViewModel(project, myId, new Mock<IJoinProjectUseCase>().Object);
+        var projectVm = new ProjectViewModel(project, myId, new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
 
         var vm = new ProjectWorkspaceViewModel(projectVm, _projects, _notificationServiceMock.Object, _viewModelFactoryMock.Object, _checkAssignmentMock.Object, _loggerMock.Object);
 
@@ -84,7 +90,7 @@ public class ProjectWorkspaceViewModelTests
         // Arrange
         var myId = Guid.NewGuid();
         var project = new Project();
-        var projectVm = new ProjectViewModel(project, myId, new Mock<IJoinProjectUseCase>().Object);
+        var projectVm = new ProjectViewModel(project, myId, new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
         var vm = new ProjectWorkspaceViewModel(projectVm, _projects, _notificationServiceMock.Object, _viewModelFactoryMock.Object, _checkAssignmentMock.Object, _loggerMock.Object);
 
         bool notified = false;
@@ -133,7 +139,7 @@ public class ProjectWorkspaceViewModelTests
         // Arrange
         var vm = new ProjectWorkspaceViewModel(_projectViewModel, _projects, _notificationServiceMock.Object, _viewModelFactoryMock.Object, _checkAssignmentMock.Object, _loggerMock.Object);
         var task = new ProjectTask { Id = Guid.NewGuid() };
-        var taskVm = new ProjectTaskViewModel(task);
+        var taskVm = new ProjectTaskViewModel(task, _userServiceMock.Object);
         var detailVm = new TaskDetailViewModel(_projectViewModel, taskVm, new Mock<IAddCommentUseCase>().Object, new Mock<ILogger<TaskDetailViewModel>>().Object);
 
         _viewModelFactoryMock.Setup(x => x.CreateTaskDetailViewModel(_projectViewModel, taskVm))

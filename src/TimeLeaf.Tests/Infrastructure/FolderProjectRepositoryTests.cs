@@ -19,15 +19,16 @@ namespace TimeLeaf.Tests.Infrastructure;
 public class FolderProjectRepositoryTests
 {
     private string _tempDir = null!;
-    private Mock<ICurrentUserService> _userServiceMock = null!;
+    private Mock<IIdentityService> _identityServiceMock = null!;
     private Mock<ILogger<FolderProjectRepository>> _loggerMock = null!;
+    private readonly Guid _testUserId = Guid.NewGuid();
 
     [TestInitialize]
     public void Setup()
     {
         _tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        _userServiceMock = new Mock<ICurrentUserService>();
-        _userServiceMock.Setup(u => u.GetCurrentUserId()).Returns("test-user");
+        _identityServiceMock = new Mock<IIdentityService>();
+        _identityServiceMock.Setup(u => u.CurrentUserId).Returns(_testUserId);
         _loggerMock = new Mock<ILogger<FolderProjectRepository>>();
     }
 
@@ -69,7 +70,7 @@ public class FolderProjectRepositoryTests
         var projects = new List<Project> { project };
 
         // Act
-        await repository.SaveAllAsync(projects, "test-user");
+        await repository.SaveAllAsync(projects, _testUserId.ToString());
 
         // Assert
         // 1. プロジェクトフォルダの存在確認
@@ -89,7 +90,7 @@ public class FolderProjectRepositoryTests
         var fileName = Path.GetFileName(basicFile);
         var parts = fileName.Split('_');
         Assert.IsTrue(parts.Length >= 5, "ファイル名は少なくとも5つのパーツ（日付, 時刻, ミリ秒, ユーザーID, カテゴリ...）で構成されること");
-        Assert.AreEqual("test-user", parts[3]);
+        Assert.AreEqual(_testUserId.ToString(), parts[3]);
         Assert.IsTrue(parts[4].StartsWith("Project"), "5番目以降のパーツはカテゴリ名であること");
 
         // 4. タスク情報（サブフォルダ）の存在確認
@@ -113,7 +114,7 @@ public class FolderProjectRepositoryTests
         project.UpdateBasicInfo("ReadOnlyTest", ProjectStatus.InProgress, ProjectHealth.Healthy);
 
         // Act
-        await repository.SaveAsync(project, "test-user");
+        await repository.SaveAsync(project, _testUserId.ToString());
 
         // Assert
         var projectDir = Path.Combine(_tempDir, $"{project.Id}_{project.Name}");
@@ -148,7 +149,7 @@ public class FolderProjectRepositoryTests
         project.AddTask(task);
 
         // Act
-        await repository.SaveAsync(project, "test-user");
+        await repository.SaveAsync(project, _testUserId.ToString());
         var loadedProject = await repository.LoadAsync(projectId);
 
         // Assert
@@ -181,7 +182,7 @@ public class FolderProjectRepositoryTests
         project.AddTask(mainTask);
 
         // Act
-        await repository.SaveAsync(project, "test-user");
+        await repository.SaveAsync(project, _testUserId.ToString());
         var loadedProject = await repository.LoadAsync(projectId);
 
         // Assert
@@ -210,7 +211,7 @@ public class FolderProjectRepositoryTests
         project.AddMilestone(new Milestone(mDate, mLabel));
 
         // Act
-        await repository.SaveAsync(project, "test-user");
+        await repository.SaveAsync(project, _testUserId.ToString());
         var loadedProject = await repository.LoadAsync(projectId);
 
         // Assert
@@ -243,7 +244,7 @@ public class FolderProjectRepositoryTests
         project.AddTask(task);
 
         // Act
-        await repository.SaveAsync(project, "test-user");
+        await repository.SaveAsync(project, _testUserId.ToString());
         var loadedProject = await repository.LoadAsync(projectId);
 
         // Assert
@@ -279,7 +280,7 @@ public class FolderProjectRepositoryTests
             null
         );
         // Act
-        await repository.SaveAsync(project, "test-user");
+        await repository.SaveAsync(project, _testUserId.ToString());
         var savedUpdatedAt = project.UpdatedAt; // 保存によって確定した時刻
         var loadedProject = await repository.LoadAsync(projectId);
 
@@ -310,7 +311,7 @@ public class FolderProjectRepositoryTests
         project.AssignUser(user2);
 
         // Act
-        await repository.SaveAsync(project, "test-user");
+        await repository.SaveAsync(project, _testUserId.ToString());
         var loadedProject = await repository.LoadAsync(projectId);
 
         // Assert

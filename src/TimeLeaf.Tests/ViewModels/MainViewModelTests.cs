@@ -21,6 +21,7 @@ namespace TimeLeaf.Tests.ViewModels;
 public class MainViewModelTests
 {
     private Mock<IProjectRepository> _repositoryMock = null!;
+    private Mock<IUserService> _userServiceMock = null!;
     private Mock<ILoadProjectsUseCase> _loadUseCaseMock = null!;
     private Mock<ISaveProjectUseCase> _saveSingleUseCaseMock = null!;
     private Mock<IFindProjectUseCase> _findProjectUseCaseMock = null!;
@@ -42,6 +43,7 @@ public class MainViewModelTests
     public void Setup()
     {
         _repositoryMock = new Mock<IProjectRepository>();
+        _userServiceMock = new Mock<IUserService>();
         _loadUseCaseMock = new Mock<ILoadProjectsUseCase>();
         _saveSingleUseCaseMock = new Mock<ISaveProjectUseCase>();
         _findProjectUseCaseMock = new Mock<IFindProjectUseCase>();
@@ -69,7 +71,10 @@ public class MainViewModelTests
         _loadUseCaseMock.Setup(x => x.ExecuteAsync()).ReturnsAsync(new List<Project>());
 
         _viewModelFactoryMock.Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
-            .Returns((Project p) => new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object));
+            .Returns((Project p) => new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object));
+
+        _viewModelFactoryMock.Setup(x => x.CreateProjectTaskViewModel(It.IsAny<ProjectTask>()))
+            .Returns((ProjectTask t) => new ProjectTaskViewModel(t, _userServiceMock.Object));
 
         _viewModelFactoryMock.Setup(x => x.CreateProjectWorkspaceViewModel(It.IsAny<ProjectViewModel>(), It.IsAny<ObservableCollection<ProjectViewModel>>()))
             .Returns((ProjectViewModel pvm, ObservableCollection<ProjectViewModel> projects) => new ProjectWorkspaceViewModel(pvm, projects, _notificationServiceMock.Object, _viewModelFactoryMock.Object, _checkAssignmentMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object));
@@ -162,7 +167,7 @@ public class MainViewModelTests
         var viewModel = CreateViewModel();
         var project = new Project();
         project.UpdateName("Test Project");
-        var projectViewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object);
+        var projectViewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
 
         var expectedWorkspace = new ProjectWorkspaceViewModel(projectViewModel, viewModel.Projects, _notificationServiceMock.Object, _viewModelFactoryMock.Object, _checkAssignmentMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
         _viewModelFactoryMock.Setup(x => x.CreateProjectWorkspaceViewModel(projectViewModel, viewModel.Projects)).Returns(expectedWorkspace);
@@ -212,12 +217,12 @@ public class MainViewModelTests
         var viewModel = CreateViewModel();
         var project = new Project();
         project.UpdateName("Test Project");
-        var projectViewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object);
+        var projectViewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
         viewModel.Projects.Add(projectViewModel);
 
         var task = new ProjectTask();
         task.UpdateName("Target Task");
-        var taskViewModel = new ProjectTaskViewModel(task);
+        var taskViewModel = new ProjectTaskViewModel(task, _userServiceMock.Object);
         projectViewModel.Tasks.Add(taskViewModel);
 
         // AllTasksViewModel の実体作成（イベントを飛ばすため）

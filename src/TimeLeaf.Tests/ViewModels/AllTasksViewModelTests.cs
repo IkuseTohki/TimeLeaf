@@ -8,12 +8,32 @@ using TimeLeaf.Models.Entities;
 using TimeLeaf.Models.Enums;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
+using TimeLeaf.Services;
+using TimeLeaf.Repositories;
 
 namespace TimeLeaf.Tests.ViewModels;
 
 [TestClass]
 public class AllTasksViewModelTests
 {
+    private Mock<IViewModelFactory> _viewModelFactoryMock = null!;
+    private Mock<IUserService> _userServiceMock = null!;
+
+    [TestInitialize]
+    public void Setup()
+    {
+        _viewModelFactoryMock = new Mock<IViewModelFactory>();
+        _userServiceMock = new Mock<IUserService>();
+
+        _viewModelFactoryMock.Setup(x => x.CreateProjectTaskViewModel(It.IsAny<ProjectTask>()))
+            .Returns((ProjectTask t) => new ProjectTaskViewModel(t, _userServiceMock.Object));
+    }
+
+    private ProjectViewModel CreateProjectViewModel(Project p)
+    {
+        return new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
+    }
+
     /// <summary>
     /// テスト観点: 複数のプロジェクトからタスクが正しく集約されることを確認する。
     /// </summary>
@@ -35,8 +55,8 @@ public class AllTasksViewModelTests
 
         var projects = new ObservableCollection<ProjectViewModel>
         {
-            new ProjectViewModel(p1, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object),
-            new ProjectViewModel(p2, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object)
+            CreateProjectViewModel(p1),
+            CreateProjectViewModel(p2)
         };
 
         // Act
@@ -65,7 +85,7 @@ public class AllTasksViewModelTests
         t.UpdateName("New Task");
         p.AddTask(t);
 
-        projects.Add(new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object));
+        projects.Add(CreateProjectViewModel(p));
 
         // Assert
         Assert.AreEqual(1, viewModel.AllTasks.Count);
@@ -88,7 +108,7 @@ public class AllTasksViewModelTests
         t2.UpdateName("Banana");
         p.AddTask(t2);
 
-        var projects = new ObservableCollection<ProjectViewModel> { new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object) };
+        var projects = new ObservableCollection<ProjectViewModel> { CreateProjectViewModel(p) };
         var viewModel = new AllTasksViewModel(projects);
 
         // Act
@@ -117,7 +137,7 @@ public class AllTasksViewModelTests
         t2.UpdateStatus(TimeLeaf.Models.Enums.TaskStatus.Completed);
         p.AddTask(t2);
 
-        var projects = new ObservableCollection<ProjectViewModel> { new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object) };
+        var projects = new ObservableCollection<ProjectViewModel> { CreateProjectViewModel(p) };
         var viewModel = new AllTasksViewModel(projects);
 
         // Act & Assert (初期値は True)
@@ -147,7 +167,7 @@ public class AllTasksViewModelTests
         t.UpdateStatus(TimeLeaf.Models.Enums.TaskStatus.InProgress);
         p.AddTask(t);
 
-        var projects = new ObservableCollection<ProjectViewModel> { new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object) };
+        var projects = new ObservableCollection<ProjectViewModel> { CreateProjectViewModel(p) };
         var viewModel = new AllTasksViewModel(projects);
         Assert.AreEqual(1, viewModel.AllTasks.Count);
 
@@ -171,7 +191,7 @@ public class AllTasksViewModelTests
         t.UpdateName("Initial Name");
         p.AddTask(t);
 
-        var projects = new ObservableCollection<ProjectViewModel> { new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object) };
+        var projects = new ObservableCollection<ProjectViewModel> { CreateProjectViewModel(p) };
         var viewModel = new AllTasksViewModel(projects);
         viewModel.SearchKeyword = "Updated";
         Assert.AreEqual(0, viewModel.AllTasks.Count);

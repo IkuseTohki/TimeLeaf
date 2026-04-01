@@ -22,30 +22,32 @@ public class CommentFlowTests
 {
     private MainViewModel _mainViewModel = null!;
     private Mock<ISaveProjectUseCase> _saveUseCaseMock = null!;
-    private Mock<ICurrentUserService> _userServiceMock = null!;
+    private Mock<IIdentityService> _identityServiceMock = null!;
     private Mock<IServiceProvider> _serviceProviderMock = null!;
     private Mock<IDialogService> _dialogServiceMock = null!;
     private Mock<INotificationService> _notificationServiceMock = null!;
     private Mock<IOSNotificationService> _osNotificationServiceMock = null!;
-    private Mock<IIdentityService> _identityServiceMock = null!;
     private Mock<ICheckAssignmentUseCase> _checkAssignmentMock = null!;
     private Mock<ILogger<ProjectWorkspaceViewModel>> _loggerMock = null!;
+    private Mock<IUserService> _userServiceMock = null!;
     private ProjectViewModel _projectViewModel = null!;
+    private readonly Guid _testUserId = Guid.NewGuid();
 
     [TestInitialize]
     public void Setup()
     {
         _saveUseCaseMock = new Mock<ISaveProjectUseCase>();
-        _userServiceMock = new Mock<ICurrentUserService>();
-        _userServiceMock.Setup(u => u.GetCurrentUserId()).Returns("test-user");
+        _identityServiceMock = new Mock<IIdentityService>();
+        _identityServiceMock.Setup(u => u.CurrentUserId).Returns(_testUserId);
+
         _serviceProviderMock = new Mock<IServiceProvider>();
         _dialogServiceMock = new Mock<IDialogService>();
         _notificationServiceMock = new Mock<INotificationService>();
         _notificationServiceMock.Setup(x => x.UnreadNotifications).Returns(new List<Notification>());
         _osNotificationServiceMock = new Mock<IOSNotificationService>();
-        _identityServiceMock = new Mock<IIdentityService>();
         _checkAssignmentMock = new Mock<ICheckAssignmentUseCase>();
         _loggerMock = new Mock<ILogger<ProjectWorkspaceViewModel>>();
+        _userServiceMock = new Mock<IUserService>();
 
         var loadUseCaseMock = new Mock<ILoadProjectsUseCase>();
         var findProjectUseCaseMock = new Mock<IFindProjectUseCase>();
@@ -59,16 +61,21 @@ public class CommentFlowTests
         var task = new ProjectTask();
         task.UpdateName("Test Task");
         project.AddTask(task);
-        _projectViewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object);
+
+        // Factory mock setup (CreateProjectViewModel の前にセットアップが必要)
+        viewModelFactoryMock.Setup(x => x.CreateProjectTaskViewModel(It.IsAny<ProjectTask>()))
+            .Returns((ProjectTask t) => new ProjectTaskViewModel(t, _userServiceMock.Object));
+
+        _projectViewModel = new ProjectViewModel(project, _testUserId, new Mock<IJoinProjectUseCase>().Object, viewModelFactoryMock.Object);
 
         loadUseCaseMock.Setup(r => r.ExecuteAsync()).ReturnsAsync(new[] { project });
 
         var addTaskUseCase = new AddTaskUseCase(_saveUseCaseMock.Object);
-        var addCommentUseCase = new AddCommentUseCase(_saveUseCaseMock.Object, _userServiceMock.Object);
+        var addCommentUseCase = new AddCommentUseCase(_saveUseCaseMock.Object, _identityServiceMock.Object);
 
-        // Factory mock setup
+        // ViewModel 自身のファクトリ戻り値設定
         viewModelFactoryMock.Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
-            .Returns((Project p) => new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object));
+            .Returns((Project p) => new ProjectViewModel(p, _testUserId, new Mock<IJoinProjectUseCase>().Object, viewModelFactoryMock.Object));
 
         var saveCoordinator = new ProjectSaveCoordinator(_saveUseCaseMock.Object, new Mock<ILogger<ProjectSaveCoordinator>>().Object);
         var dispatcherMock = new Mock<IDispatcherService>();
@@ -108,7 +115,7 @@ public class CommentFlowTests
         // Arrange
         var projectVM = _mainViewModel.Projects.First();
         var taskVM = projectVM.Tasks.First();
-        var addCommentUseCase = new AddCommentUseCase(_saveUseCaseMock.Object, _userServiceMock.Object);
+        var addCommentUseCase = new AddCommentUseCase(_saveUseCaseMock.Object, _identityServiceMock.Object);
 
         var detailVM = new TaskDetailViewModel(
             projectVM,
@@ -131,34 +138,27 @@ public class CommentFlowTests
         _saveUseCaseMock.Verify(r => r.ExecuteAsync(projectVM.Model), Times.AtLeastOnce);
     }
 
+    /// <summary>
+    /// テスト観点: コレクションのリセット（同期など）が発生した後も、タスクの選択状態が維持されることを確認する。
+    /// </summary>
     [TestMethod]
     public void TaskSelection_ShouldBePreserved_AfterCollectionReset()
     {
         // Arrange
-        var projectViewModel = _mainViewModel.Projects.First();
-        var addTaskUseCase = new AddTaskUseCase(_saveUseCaseMock.Object);
-        var viewModelFactoryMock = new Mock<IViewModelFactory>();
-
+        var projectVM = _mainViewModel.Projects.First();
         var tasksVM = new ProjectTasksViewModel(
-            projectViewModel,
-            addTaskUseCase,
-            viewModelFactoryMock.Object,
-            _dialogServiceMock.Object,
+            projectVM,
+            new Mock<IAddTaskUseCase>().Object,
+            new Mock<IViewModelFactory>().Object,
+            new Mock<IDialogService>().Object,
             new Mock<ILogger<ProjectTasksViewModel>>().Object,
             new Mock<ILogger<TaskDetailViewModel>>().Object);
 
-        viewModelFactoryMock.Setup(x => x.CreateProjectTasksViewModel(It.IsAny<ProjectViewModel>())).Returns(tasksVM);
-        viewModelFactoryMock.Setup(x => x.CreateTaskSummaryViewModel(It.IsAny<ProjectViewModel>(), It.IsAny<ProjectTaskViewModel>()))
-            .Returns((ProjectViewModel pvm, ProjectTaskViewModel tvm) => new TaskSummaryViewModel(pvm, tvm));
-
-        var workspaceViewModel = new ProjectWorkspaceViewModel(projectViewModel, _mainViewModel.Projects, _notificationServiceMock.Object, viewModelFactoryMock.Object, _checkAssignmentMock.Object, _loggerMock.Object);
-        workspaceViewModel.SwitchSubViewCommand.Execute("Tasks");
-
-        var targetTask = tasksVM.Tasks.First();
+        var targetTask = projectVM.Tasks.First();
         tasksVM.SelectedTask = targetTask;
 
-        // Act - コレクションのリセットをシミュレート
-        projectViewModel.SyncFromModel();
+        // Act
+        projectVM.SyncFromModel();
 
         // Assert
         Assert.IsNotNull(tasksVM.SelectedTask, "コレクションリセット後もタスクが選択されていること");

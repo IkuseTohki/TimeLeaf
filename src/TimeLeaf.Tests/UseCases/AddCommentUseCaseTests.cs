@@ -13,14 +13,15 @@ namespace TimeLeaf.Tests.UseCases;
 public class AddCommentUseCaseTests
 {
     private Mock<ISaveProjectUseCase> _saveUseCaseMock = null!;
-    private Mock<ICurrentUserService> _userServiceMock = null!;
+    private Mock<IIdentityService> _identityServiceMock = null!;
+    private readonly Guid _testUserId = Guid.NewGuid();
 
     [TestInitialize]
     public void Setup()
     {
         _saveUseCaseMock = new Mock<ISaveProjectUseCase>();
-        _userServiceMock = new Mock<ICurrentUserService>();
-        _userServiceMock.Setup(u => u.GetCurrentUserId()).Returns("test-user");
+        _identityServiceMock = new Mock<IIdentityService>();
+        _identityServiceMock.Setup(u => u.CurrentUserId).Returns(_testUserId);
     }
 
     /// <summary>
@@ -35,7 +36,7 @@ public class AddCommentUseCaseTests
         var task = new ProjectTask();
         project.AddTask(task);
 
-        var useCase = new AddCommentUseCase(_saveUseCaseMock.Object, _userServiceMock.Object);
+        var useCase = new AddCommentUseCase(_saveUseCaseMock.Object, _identityServiceMock.Object);
         var content = "Test Comment";
 
         // Act
@@ -46,7 +47,7 @@ public class AddCommentUseCaseTests
         Assert.AreEqual(1, task.Comments.Count());
         var addedComment = task.Comments.First();
         Assert.AreEqual(content, addedComment.Content);
-        Assert.AreEqual("test-user", addedComment.AuthorId);
+        Assert.AreEqual(_testUserId, addedComment.AuthorId);
 
         // 2. プロジェクトの保存が呼び出されていること
         _saveUseCaseMock.Verify(s => s.ExecuteAsync(project), Times.Once);

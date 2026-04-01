@@ -9,6 +9,7 @@ using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
 using TimeLeaf.ViewModels.Workspace;
+using TimeLeaf.Repositories;
 using LeafKit.UI.Services;
 
 namespace TimeLeaf.Tests.ViewModels;
@@ -18,6 +19,7 @@ public class ProjectWorkspaceViewModelNavigationTests
 {
     private Mock<IViewModelFactory> _viewModelFactoryMock = null!;
     private Mock<INotificationService> _notificationServiceMock = null!;
+    private Mock<IUserService> _userServiceMock = null!;
     private Mock<ILogger<ProjectWorkspaceViewModel>> _loggerMock = null!;
     private ProjectViewModel _projectViewModel = null!;
 
@@ -27,15 +29,19 @@ public class ProjectWorkspaceViewModelNavigationTests
         _viewModelFactoryMock = new Mock<IViewModelFactory>();
         _notificationServiceMock = new Mock<INotificationService>();
         _notificationServiceMock.Setup(x => x.UnreadNotifications).Returns(new List<Notification>());
+        _userServiceMock = new Mock<IUserService>();
         _loggerMock = new Mock<ILogger<ProjectWorkspaceViewModel>>();
 
         var project = new Project();
         project.UpdateName("Nav Test Project");
-        _projectViewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object);
+        _projectViewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
 
         // Factory mock setup
         _viewModelFactoryMock.Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
-            .Returns((Project p) => new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object));
+            .Returns((Project p) => new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object));
+
+        _viewModelFactoryMock.Setup(x => x.CreateProjectTaskViewModel(It.IsAny<ProjectTask>()))
+            .Returns((ProjectTask t) => new ProjectTaskViewModel(t, _userServiceMock.Object));
 
         _viewModelFactoryMock.Setup(x => x.CreateProjectDashboardViewModel(It.IsAny<ProjectViewModel>()))
             .Returns((ProjectViewModel pvm) => new ProjectDashboardViewModel(pvm, new Mock<IAddMilestoneUseCase>().Object, new Mock<ILogger<ProjectDashboardViewModel>>().Object));

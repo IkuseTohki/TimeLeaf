@@ -224,9 +224,9 @@ public partial class App : Application
             return new FileIdentitySeedRepository(portableDir, homeDir);
         });
         services.AddSingleton<IUserRepository>(sp => new FileSystemUserRepository(usersPath));
+        services.AddSingleton<IUserService, UserService>();
         services.AddSingleton<IIdentityService, FileBasedIdentityService>();
 
-        services.AddSingleton<ICurrentUserService, WindowsCurrentUserService>();
         services.AddSingleton<IDispatcherService, WpfDispatcherService>();
         services.AddSingleton<ISingleInstanceService, SingleInstanceService>();
 

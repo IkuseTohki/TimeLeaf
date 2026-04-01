@@ -17,15 +17,15 @@ namespace TimeLeaf.Tests.Infrastructure;
 public class CommentStorageTests
 {
     private string _tempDir = null!;
-    private Mock<ICurrentUserService> _userServiceMock = null!;
+    private Mock<IIdentityService> _identityServiceMock = null!;
     private Mock<ILogger<FolderProjectRepository>> _loggerMock = null!;
 
     [TestInitialize]
     public void Setup()
     {
         _tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        _userServiceMock = new Mock<ICurrentUserService>();
-        _userServiceMock.Setup(u => u.GetCurrentUserId()).Returns("user-A");
+        _identityServiceMock = new Mock<IIdentityService>();
+        _identityServiceMock.Setup(u => u.CurrentUserId).Returns(Guid.NewGuid());
         _loggerMock = new Mock<ILogger<FolderProjectRepository>>();
     }
 
@@ -60,17 +60,18 @@ public class CommentStorageTests
         task.UpdateName("Task with Comment");
         project.AddTask(task);
 
+        var authorId = Guid.NewGuid();
         var comment = new Comment
         {
             TaskId = task.Id,
-            AuthorId = "user-A",
+            AuthorId = authorId,
             Content = "First Comment",
             CreatedAt = new DateTime(2026, 2, 23, 10, 0, 0)
         };
         task.AddComment(comment);
 
         // Act
-        await repository.SaveAsync(project, "user-A");
+        await repository.SaveAsync(project, authorId.ToString());
         var loadedProject = await repository.LoadAsync(project.Id);
 
         // Assert
@@ -80,7 +81,7 @@ public class CommentStorageTests
         Assert.IsNotNull(loadedTask.Comments);
         Assert.AreEqual(1, loadedTask.Comments.Count);
         Assert.AreEqual("First Comment", loadedTask.Comments[0].Content);
-        Assert.AreEqual("user-A", loadedTask.Comments[0].AuthorId);
+        Assert.AreEqual(authorId, loadedTask.Comments[0].AuthorId);
 
         // 物理ファイルの確認
         var projectDir = Path.Combine(_tempDir, $"{project.Id}_{project.Name}");
@@ -107,13 +108,14 @@ public class CommentStorageTests
         task.UpdateName("Task");
         project.AddTask(task);
 
-        var c1 = new Comment { TaskId = task.Id, AuthorId = "user-A", Content = "C1", CreatedAt = DateTime.UtcNow.AddMinutes(-5) };
-        var c2 = new Comment { TaskId = task.Id, AuthorId = "user-A", Content = "C2", CreatedAt = DateTime.UtcNow };
+        var authorId = Guid.NewGuid();
+        var c1 = new Comment { TaskId = task.Id, AuthorId = authorId, Content = "C1", CreatedAt = DateTime.UtcNow.AddMinutes(-5) };
+        var c2 = new Comment { TaskId = task.Id, AuthorId = authorId, Content = "C2", CreatedAt = DateTime.UtcNow };
         task.AddComment(c1);
         task.AddComment(c2);
 
         // Act
-        await repository.SaveAsync(project, "user-A");
+        await repository.SaveAsync(project, authorId.ToString());
         var loadedProject = await repository.LoadAsync(project.Id);
 
         // Assert

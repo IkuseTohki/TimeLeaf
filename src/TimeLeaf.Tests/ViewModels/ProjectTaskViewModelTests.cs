@@ -1,24 +1,25 @@
 using System;
 using System.ComponentModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Models.Enums;
 using TimeLeaf.ViewModels;
+using TimeLeaf.Services;
+using TimeLeaf.Repositories;
 
 namespace TimeLeaf.Tests.ViewModels;
 
 [TestClass]
 public class ProjectTaskViewModelTests
 {
-    // [TestMethod]
-    // public void Constructor_ShouldThrowArgumentNullException_WhenProjectTaskIsNull()
-    // {
-    //     // Arrange
-    //     ProjectTask projectTask = null!;
-    //
-    //     // Act & Assert
-    //     Assert.ThrowsException<ArgumentNullException>(() => new ProjectTaskViewModel(projectTask), "null ProjectTask でコンストラクタを呼び出した際にArgumentNullExceptionがスローされること");
-    // }
+    private Mock<IUserService> _userServiceMock = null!;
+
+    [TestInitialize]
+    public void Setup()
+    {
+        _userServiceMock = new Mock<IUserService>();
+    }
 
     /// <summary>
     /// テスト観点: Name プロパティを変更した際に、基になる ProjectTask エンティティの Name が更新され、
@@ -30,7 +31,7 @@ public class ProjectTaskViewModelTests
         // Arrange
         var projectTask = new ProjectTask();
         projectTask.UpdateName("Old Task Name");
-        var viewModel = new ProjectTaskViewModel(projectTask);
+        var viewModel = new ProjectTaskViewModel(projectTask, _userServiceMock.Object);
         var newName = "New Task Name";
 
         var receivedEvents = 0;
@@ -60,7 +61,7 @@ public class ProjectTaskViewModelTests
         // Arrange
         var projectTask = new ProjectTask();
         projectTask.UpdateEstimatedCost(10.0);
-        var viewModel = new ProjectTaskViewModel(projectTask);
+        var viewModel = new ProjectTaskViewModel(projectTask, _userServiceMock.Object);
         var newCost = 15.5;
 
         var receivedEvents = 0;
@@ -90,7 +91,7 @@ public class ProjectTaskViewModelTests
         // Arrange
         var projectTask = new ProjectTask();
         projectTask.AssignTo("old-user");
-        var viewModel = new ProjectTaskViewModel(projectTask);
+        var viewModel = new ProjectTaskViewModel(projectTask, _userServiceMock.Object);
         var newUser = "new-user";
 
         var receivedEvents = 0;

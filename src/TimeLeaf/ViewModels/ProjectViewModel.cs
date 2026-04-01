@@ -12,12 +12,14 @@ using TimeLeaf.UseCases;
 namespace TimeLeaf.ViewModels;
 
 /// <summary>
-/// Projectエンティティをラップし、UIバインディングのための通知機能を提供するViewModel。
+/// Projectエンティティをラップし、UIバインディングのための通知機能を提供する ViewModel。
 /// </summary>
 public partial class ProjectViewModel : ObservableObject
 {
     private Project _project;
     private readonly Guid _currentUserId;
+    private readonly IJoinProjectUseCase _joinProjectUseCase;
+    private readonly IViewModelFactory _viewModelFactory;
 
     /// <summary>
     /// 同期中（外部からの読み込み中）かどうかを示すフラグ。
@@ -27,7 +29,7 @@ public partial class ProjectViewModel : ObservableObject
     private bool _isSyncing;
 
     /// <summary>
-    /// 基になるProjectエンティティ。
+    /// 基になる Project エンティティ。
     /// </summary>
     public Project Model => _project;
 
@@ -124,7 +126,7 @@ public partial class ProjectViewModel : ObservableObject
     }
 
     /// <summary>
-    /// UI表示用の最終更新日時文字列。
+    /// UI 表示用の最終更新日時文字列。
     /// </summary>
     public string DisplayLastUpdated
     {
@@ -143,13 +145,12 @@ public partial class ProjectViewModel : ObservableObject
     }
 
     /// <summary>
-    /// プロジェクトのマイルストーン（UI用）。
-    /// TODO: マイルストーンの追加・削除もドメインメソッド経由に変更し、このコレクションを同期させる。
+    /// プロジェクトのマイルストーン（UI 用）。
     /// </summary>
     public ObservableCollection<Milestone> Milestones { get; } = new();
 
     /// <summary>
-    /// プロジェクトに紐づくタスクのリスト（UI用）。
+    /// プロジェクトに紐づくタスクのリスト（UI 用）。
     /// </summary>
     public ObservableCollection<ProjectTaskViewModel> Tasks { get; } = new();
 
@@ -164,12 +165,12 @@ public partial class ProjectViewModel : ObservableObject
     public double TotalActualCost { get => _project.TotalActualCost; set { } }
 
     /// <summary>
-    /// UI表示用の合計見積工数文字列。
+    /// UI 表示用の合計見積工数文字列。
     /// </summary>
     public string DisplayTotalEstimatedCost { get => $"合計見積: {TotalEstimatedCost}"; set { } }
 
     /// <summary>
-    /// UI表示用の合計実績工数文字列。
+    /// UI 表示用の合計実績工数文字列。
     /// </summary>
     public string DisplayTotalActualCost { get => $"合計実績: {TotalActualCost}"; set { } }
 
@@ -194,11 +195,6 @@ public partial class ProjectViewModel : ObservableObject
     public bool IsAssignedToMe => _project.AssignedUserIds.Contains(_currentUserId);
 
     /// <summary>
-    /// プロジェクトに参加するためのユースケース。
-    /// </summary>
-    private readonly IJoinProjectUseCase _joinProjectUseCase;
-
-    /// <summary>
     /// プロジェクトに参加するコマンド。
     /// </summary>
     public IAsyncRelayCommand JoinProjectCommand { get; }
@@ -206,14 +202,16 @@ public partial class ProjectViewModel : ObservableObject
     /// <summary>
     /// コンストラクタ。
     /// </summary>
-    /// <param name="project">ラップするProjectエンティティ。</param>
-    /// <param name="currentUserId">現在のユーザーID。</param>
+    /// <param name="project">ラップする Project エンティティ。</param>
+    /// <param name="currentUserId">現在のユーザー ID。</param>
     /// <param name="joinProjectUseCase">プロジェクトに参加するためのユースケース。</param>
-    public ProjectViewModel(Project project, Guid currentUserId, IJoinProjectUseCase joinProjectUseCase)
+    /// <param name="viewModelFactory">ViewModel を生成するためのファクトリ。</param>
+    public ProjectViewModel(Project project, Guid currentUserId, IJoinProjectUseCase joinProjectUseCase, IViewModelFactory viewModelFactory)
     {
         _project = project ?? throw new ArgumentNullException(nameof(project));
         _currentUserId = currentUserId;
         _joinProjectUseCase = joinProjectUseCase ?? throw new ArgumentNullException(nameof(joinProjectUseCase));
+        _viewModelFactory = viewModelFactory ?? throw new ArgumentNullException(nameof(viewModelFactory));
 
         JoinProjectCommand = new AsyncRelayCommand(ExecuteJoinProjectAsync, () => !IsAssignedToMe);
 
@@ -237,7 +235,7 @@ public partial class ProjectViewModel : ObservableObject
     }
 
     /// <summary>
-    /// モデルの状態を最新のエンティティで更新し、UIに同期します。
+    /// モデルの状態を最新のエンティティで更新し、UI に同期します。
     /// </summary>
     /// <param name="newModel">最新の状態を持つエンティティ。</param>
     public void UpdateFromModel(Project newModel)
@@ -250,7 +248,7 @@ public partial class ProjectViewModel : ObservableObject
     }
 
     /// <summary>
-    /// モデルの状態をUIコレクションに同期します。
+    /// モデルの状態を UI コレクションに同期します。
     /// </summary>
     public void SyncFromModel()
     {
@@ -290,7 +288,7 @@ public partial class ProjectViewModel : ObservableObject
                 else
                 {
                     // 新規: インスタンス作成
-                    var newTaskVm = new ProjectTaskViewModel(taskModel);
+                    var newTaskVm = _viewModelFactory.CreateProjectTaskViewModel(taskModel);
                     newTaskVm.ProjectName = Name;
                     newTaskVm.PropertyChanged += OnProjectTaskViewModelPropertyChanged;
                     Tasks.Insert(i, newTaskVm);

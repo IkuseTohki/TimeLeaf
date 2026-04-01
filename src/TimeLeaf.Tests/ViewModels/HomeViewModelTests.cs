@@ -9,6 +9,7 @@ using TimeLeaf.Models.Enums;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
 using TimeLeaf.Services;
+using TimeLeaf.Repositories;
 using LeafKit.UI.Services;
 
 namespace TimeLeaf.Tests.ViewModels;
@@ -16,12 +17,29 @@ namespace TimeLeaf.Tests.ViewModels;
 [TestClass]
 public class HomeViewModelTests
 {
+    private Mock<IViewModelFactory> _viewModelFactoryMock = null!;
+    private Mock<IUserService> _userServiceMock = null!;
+
+    [TestInitialize]
+    public void Setup()
+    {
+        _viewModelFactoryMock = new Mock<IViewModelFactory>();
+        _userServiceMock = new Mock<IUserService>();
+
+        _viewModelFactoryMock.Setup(x => x.CreateProjectTaskViewModel(It.IsAny<ProjectTask>()))
+            .Returns((ProjectTask t) => new ProjectTaskViewModel(t, _userServiceMock.Object));
+    }
+
     private UserMenuViewModel CreateUserMenu()
     {
         var mockIdentity = new Mock<IIdentityService>();
         var mockDialog = new Mock<IDialogService>();
-        var mockFactory = new Mock<IViewModelFactory>();
-        return new UserMenuViewModel(mockIdentity.Object, mockDialog.Object, mockFactory.Object);
+        return new UserMenuViewModel(mockIdentity.Object, mockDialog.Object, _viewModelFactoryMock.Object);
+    }
+
+    private ProjectViewModel CreateProjectViewModel(Project p)
+    {
+        return new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
     }
 
     [TestMethod]
@@ -42,8 +60,8 @@ public class HomeViewModelTests
 
         var projects = new ObservableCollection<ProjectViewModel>
         {
-            new ProjectViewModel(p1, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object),
-            new ProjectViewModel(p2, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object)
+            CreateProjectViewModel(p1),
+            CreateProjectViewModel(p2)
         };
 
         // Act
@@ -72,8 +90,8 @@ public class HomeViewModelTests
 
         var projects = new ObservableCollection<ProjectViewModel>
         {
-            new ProjectViewModel(p1, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object),
-            new ProjectViewModel(p2, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object)
+            CreateProjectViewModel(p1),
+            CreateProjectViewModel(p2)
         };
 
         // Act

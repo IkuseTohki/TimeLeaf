@@ -16,14 +16,16 @@ public class FileBasedIdentityService : IIdentityService
 {
     private readonly IIdentitySeedRepository _repository;
     private readonly IUserRepository _userRepository;
+    private readonly IUserService _userService;
     private User? _currentIdentity;
 
     public Guid CurrentUserId => _currentIdentity?.Id ?? Guid.Empty;
 
-    public FileBasedIdentityService(IIdentitySeedRepository repository, IUserRepository userRepository)
+    public FileBasedIdentityService(IIdentitySeedRepository repository, IUserRepository userRepository, IUserService userService)
     {
         _repository = repository;
         _userRepository = userRepository;
+        _userService = userService;
     }
 
     public async Task<User> GetCurrentIdentityAsync()
@@ -54,6 +56,10 @@ public class FileBasedIdentityService : IIdentityService
             await _repository.SaveAsync(new IdentitySeedDto { Id = newId });
             await _userRepository.SaveUserAsync(_currentIdentity);
         }
+
+        // UserService のキャッシュにも登録
+        _userService.UpdateCache(_currentIdentity);
+
         return _currentIdentity;
     }
 
@@ -64,8 +70,10 @@ public class FileBasedIdentityService : IIdentityService
 
         // 変更を永続化
         await _userRepository.SaveUserAsync(identity);
+
+        // キャッシュを更新して他所に通知
+        _userService.UpdateCache(identity);
     }
 
     public string? GetIdentityFilePath() => _repository.GetFilePath();
 }
-

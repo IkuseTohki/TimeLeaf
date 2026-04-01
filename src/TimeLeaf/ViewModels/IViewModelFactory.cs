@@ -17,6 +17,7 @@ public interface IViewModelFactory
     AllTasksViewModel CreateAllTasksViewModel(ObservableCollection<ProjectViewModel> projects);
     ProjectWorkspaceViewModel CreateProjectWorkspaceViewModel(ProjectViewModel projectViewModel, ObservableCollection<ProjectViewModel> projects);
     ProjectViewModel CreateProjectViewModel(Project project);
+    ProjectTaskViewModel CreateProjectTaskViewModel(ProjectTask task);
     AddProjectViewModel CreateAddProjectViewModel();
     AddTaskViewModel CreateAddTaskViewModel();
 

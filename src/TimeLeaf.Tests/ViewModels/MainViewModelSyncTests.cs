@@ -12,6 +12,7 @@ using TimeLeaf.Repositories;
 using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
+using TimeLeaf.ViewModels.Workspace;
 
 using LeafKit.UI.Services;
 
@@ -21,6 +22,7 @@ namespace TimeLeaf.Tests.ViewModels;
 public class MainViewModelSyncTests
 {
     private Mock<IServiceProvider> _serviceProviderMock = null!;
+    private Mock<IUserService> _userServiceMock = null!;
 
     /// <summary>
     /// テスト観点: 外部からの変更通知(ProjectChanged)による再ロード時に、
@@ -39,6 +41,7 @@ public class MainViewModelSyncTests
         var loggerMock = new Mock<ILogger<MainViewModel>>();
         var dialogServiceMock = new Mock<IDialogService>();
         _serviceProviderMock = new Mock<IServiceProvider>();
+        _userServiceMock = new Mock<IUserService>();
 
         // ProjectWorkspaceViewModel 用のロガーもモックする
         _serviceProviderMock.Setup(sp => sp.GetService(typeof(ILogger<ProjectWorkspaceViewModel>)))
@@ -52,7 +55,10 @@ public class MainViewModelSyncTests
 
         // Factory mock setup
         viewModelFactoryMock.Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
-            .Returns((Project p) => new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object));
+            .Returns((Project p) => new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, viewModelFactoryMock.Object));
+
+        viewModelFactoryMock.Setup(x => x.CreateProjectTaskViewModel(It.IsAny<ProjectTask>()))
+            .Returns((ProjectTask t) => new ProjectTaskViewModel(t, _userServiceMock.Object));
 
         var projectId = Guid.NewGuid();
         var initialProject = new Project { Id = projectId };
@@ -88,7 +94,7 @@ public class MainViewModelSyncTests
         await System.Threading.Tasks.Task.Delay(500); // OnProjectChanged 内の Dispatcher.InvokeAsync の完了をより長く待つ
 
         // Assert
-        var project = viewModel.Projects.First(pvm => pvm.Id == projectId); // ViewModel を検索
+        var project = viewModel.Projects.First(pvm => pvm.Id == projectId); // ViewModel 繧呈､懃ｴ｢
 
         Assert.AreEqual(1, project.Model.Tasks.Count, "同期によってタスクが1件に更新されていること");
         Assert.AreEqual("Task from Sync", project.Model.Tasks.First().Name, "同期された最新のタスク名が反映されていること");

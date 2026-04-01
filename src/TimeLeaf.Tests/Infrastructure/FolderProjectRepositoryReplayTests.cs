@@ -18,16 +18,17 @@ namespace TimeLeaf.Tests.Infrastructure;
 public class FolderProjectRepositoryReplayTests
 {
     private string _tempDir = null!;
-    private Mock<ICurrentUserService> _userServiceMock = null!;
+    private Mock<IIdentityService> _identityServiceMock = null!;
     private Mock<ILogger<FolderProjectRepository>> _loggerMock = null!;
+    private readonly Guid _testUserId = Guid.NewGuid();
 
     [TestInitialize]
     public void Setup()
     {
         _tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         Directory.CreateDirectory(_tempDir);
-        _userServiceMock = new Mock<ICurrentUserService>();
-        _userServiceMock.Setup(u => u.GetCurrentUserId()).Returns("test-user");
+        _identityServiceMock = new Mock<IIdentityService>();
+        _identityServiceMock.Setup(u => u.CurrentUserId).Returns(_testUserId);
         _loggerMock = new Mock<ILogger<FolderProjectRepository>>();
     }
 
@@ -164,9 +165,10 @@ public class FolderProjectRepositoryReplayTests
 
         // 4. Comment
         var commentId = Guid.NewGuid();
+        var commentAuthorId = Guid.NewGuid();
         var commentFile = generator.Generate(baseTime.AddMinutes(4), "user1", "Comment");
         await File.WriteAllTextAsync(Path.Combine(taskDir, commentFile),
-            JsonSerializer.Serialize(new { Id = commentId, TaskId = taskId, AuthorId = "alice", Content = "Started task" }));
+            JsonSerializer.Serialize(new { Id = commentId, TaskId = taskId, AuthorId = commentAuthorId, Content = "Started task" }));
 
         var serializer = new JsonProjectFileSystemSerializer();
         var monitor = new FileSystemProjectStorageMonitor(_tempDir, new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object);

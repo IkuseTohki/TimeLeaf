@@ -28,16 +28,16 @@ public class Comment
         }
     }
 
-    private readonly string _authorId = string.Empty;
+    private readonly Guid _authorId;
     /// <summary>
     /// 投稿者のユーザーID。
     /// </summary>
-    public string AuthorId
+    public Guid AuthorId
     {
         get => _authorId;
         init
         {
-            if (string.IsNullOrWhiteSpace(value))
+            if (value == Guid.Empty)
                 throw new ArgumentException("AuthorId cannot be empty.", nameof(value));
             _authorId = value;
         }
@@ -77,7 +77,7 @@ public class Comment
     /// パラメータ付きコンストラクタ。
     /// </summary>
     [System.Text.Json.Serialization.JsonConstructor]
-    public Comment(Guid id, Guid taskId, string authorId, DateTime createdAt, string content, List<string>? attachmentLinks)
+    public Comment(Guid id, Guid taskId, Guid authorId, DateTime createdAt, string content, List<string>? attachmentLinks)
     {
         Id = id;
         TaskId = taskId;

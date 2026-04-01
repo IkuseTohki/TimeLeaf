@@ -6,6 +6,8 @@ using TimeLeaf.Models.Entities;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
 using TimeLeaf.ViewModels.Workspace;
+using TimeLeaf.Services;
+using TimeLeaf.Repositories;
 
 namespace TimeLeaf.Tests.ViewModels;
 
@@ -27,8 +29,12 @@ public class TaskDetailViewModelTests
         project.UpdateName("TestProject");
         var task = new ProjectTask();
         task.UpdateName("TestTask");
-        _projectViewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object);
-        _taskViewModel = new ProjectTaskViewModel(task);
+
+        var viewModelFactoryMock = new Mock<IViewModelFactory>();
+        var userServiceMock = new Mock<IUserService>();
+
+        _projectViewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, viewModelFactoryMock.Object);
+        _taskViewModel = new ProjectTaskViewModel(task, userServiceMock.Object);
     }
 
     /// <summary>
@@ -86,10 +92,13 @@ public class TaskSummaryViewModelTests
     {
         var project = new Project();
         project.UpdateName("TestProject");
-        _projectViewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object);
+        var viewModelFactoryMock = new Mock<IViewModelFactory>();
+        var userServiceMock = new Mock<IUserService>();
+
+        _projectViewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, viewModelFactoryMock.Object);
         var task = new ProjectTask();
         task.UpdateName("TestTask");
-        _taskViewModel = new ProjectTaskViewModel(task);
+        _taskViewModel = new ProjectTaskViewModel(task, userServiceMock.Object);
     }
 
     [TestMethod]

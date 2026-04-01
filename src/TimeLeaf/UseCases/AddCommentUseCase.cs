@@ -11,12 +11,12 @@ namespace TimeLeaf.UseCases;
 public class AddCommentUseCase : IAddCommentUseCase
 {
     private readonly ISaveProjectUseCase _saveUseCase;
-    private readonly ICurrentUserService _userService;
+    private readonly IIdentityService _identityService;
 
-    public AddCommentUseCase(ISaveProjectUseCase saveUseCase, ICurrentUserService userService)
+    public AddCommentUseCase(ISaveProjectUseCase saveUseCase, IIdentityService identityService)
     {
         _saveUseCase = saveUseCase;
-        _userService = userService;
+        _identityService = identityService;
     }
 
     public async Task ExecuteAsync(Project project, ProjectTask task, string content)
@@ -27,7 +27,7 @@ public class AddCommentUseCase : IAddCommentUseCase
         var comment = new Comment
         {
             TaskId = task.Id,
-            AuthorId = _userService.GetCurrentUserId(),
+            AuthorId = _identityService.CurrentUserId,
             Content = content,
             CreatedAt = DateTime.UtcNow
         };

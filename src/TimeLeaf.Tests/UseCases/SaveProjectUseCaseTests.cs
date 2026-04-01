@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -12,14 +13,15 @@ namespace TimeLeaf.Tests.UseCases;
 public class SaveProjectUseCaseTests
 {
     private Mock<IProjectRepository> _repositoryMock = null!;
-    private Mock<ICurrentUserService> _userServiceMock = null!;
+    private Mock<IIdentityService> _identityServiceMock = null!;
+    private readonly Guid _testUserId = Guid.NewGuid();
 
     [TestInitialize]
     public void Setup()
     {
         _repositoryMock = new Mock<IProjectRepository>();
-        _userServiceMock = new Mock<ICurrentUserService>();
-        _userServiceMock.Setup(u => u.GetCurrentUserId()).Returns("test-user");
+        _identityServiceMock = new Mock<IIdentityService>();
+        _identityServiceMock.Setup(u => u.CurrentUserId).Returns(_testUserId);
     }
 
     /// <summary>
@@ -31,13 +33,13 @@ public class SaveProjectUseCaseTests
         // Arrange
         var project = new Project();
         project.UpdateName("Single Project");
-        var useCase = new SaveProjectUseCase(_repositoryMock.Object, _userServiceMock.Object);
+        var useCase = new SaveProjectUseCase(_repositoryMock.Object, _identityServiceMock.Object);
 
         // Act
         await useCase.ExecuteAsync(project);
 
         // Assert
-        _repositoryMock.Verify(r => r.SaveAsync(project, "test-user"), Times.Once);
+        _repositoryMock.Verify(r => r.SaveAsync(project, _testUserId.ToString()), Times.Once);
     }
 
     /// <summary>
@@ -53,13 +55,13 @@ public class SaveProjectUseCaseTests
         project2.UpdateName("P2");
         var projects = new[] { project1, project2 };
 
-        var useCase = new SaveProjectUseCase(_repositoryMock.Object, _userServiceMock.Object);
+        var useCase = new SaveProjectUseCase(_repositoryMock.Object, _identityServiceMock.Object);
 
         // Act
         // 注意: この時点ではコンパイルエラーになる可能性があります（Red）
         await ((ISaveProjectUseCase)useCase).ExecuteAsync(projects);
 
         // Assert
-        _repositoryMock.Verify(r => r.SaveAllAsync(projects, "test-user"), Times.Once);
+        _repositoryMock.Verify(r => r.SaveAllAsync(projects, _testUserId.ToString()), Times.Once);
     }
 }

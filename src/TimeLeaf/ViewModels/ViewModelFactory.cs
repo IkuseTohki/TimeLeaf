@@ -18,11 +18,13 @@ public class ViewModelFactory : IViewModelFactory
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IIdentityService _identityService;
+    private readonly IUserService _userService;
 
-    public ViewModelFactory(IServiceProvider serviceProvider, IIdentityService identityService)
+    public ViewModelFactory(IServiceProvider serviceProvider, IIdentityService identityService, IUserService userService)
     {
         _serviceProvider = serviceProvider;
         _identityService = identityService;
+        _userService = userService;
     }
 
     public HomeViewModel CreateHomeViewModel(ObservableCollection<ProjectViewModel> projects)
@@ -51,7 +53,15 @@ public class ViewModelFactory : IViewModelFactory
         return new ProjectViewModel(
             project,
             _identityService.CurrentUserId,
-            _serviceProvider.GetRequiredService<IJoinProjectUseCase>());
+            _serviceProvider.GetRequiredService<IJoinProjectUseCase>(),
+            this);
+    }
+
+    public ProjectTaskViewModel CreateProjectTaskViewModel(ProjectTask task)
+    {
+        return new ProjectTaskViewModel(
+            task,
+            _userService);
     }
 
     public AddProjectViewModel CreateAddProjectViewModel()

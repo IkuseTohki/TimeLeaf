@@ -25,8 +25,10 @@ public class ProjectWorkspaceViewModelSaveTests
     private Mock<IProjectRepository> _repositoryMock = null!;
     private Mock<ILogger<MainViewModel>> _mainLoggerMock = null!;
     private Mock<ILogger<ProjectWorkspaceViewModel>> _workspaceLoggerMock = null!;
-    private Mock<ICurrentUserService> _userServiceMock = null!;
+    private Mock<IIdentityService> _identityServiceMock = null!;
+    private Mock<IUserService> _userServiceMock = null!;
     private Mock<IDialogService> _dialogServiceMock = null!;
+    private readonly Guid _testUserId = Guid.NewGuid();
 
     [TestInitialize]
     public void Setup()
@@ -34,14 +36,16 @@ public class ProjectWorkspaceViewModelSaveTests
         _repositoryMock = new Mock<IProjectRepository>();
         _mainLoggerMock = new Mock<ILogger<MainViewModel>>();
         _workspaceLoggerMock = new Mock<ILogger<ProjectWorkspaceViewModel>>();
-        _userServiceMock = new Mock<ICurrentUserService>();
+        _identityServiceMock = new Mock<IIdentityService>();
+        _identityServiceMock.Setup(u => u.CurrentUserId).Returns(_testUserId);
+        _userServiceMock = new Mock<IUserService>();
         _serviceProviderMock = new Mock<IServiceProvider>();
         _dialogServiceMock = new Mock<IDialogService>();
 
         _serviceProviderMock.Setup(sp => sp.GetService(typeof(ILogger<ProjectWorkspaceViewModel>)))
             .Returns(_workspaceLoggerMock.Object);
-        _serviceProviderMock.Setup(sp => sp.GetService(typeof(ICurrentUserService)))
-            .Returns(_userServiceMock.Object);
+        _serviceProviderMock.Setup(sp => sp.GetService(typeof(IIdentityService)))
+            .Returns(_identityServiceMock.Object);
         _serviceProviderMock.Setup(sp => sp.GetService(typeof(IAddProjectUseCase)))
             .Returns(new Mock<IAddProjectUseCase>().Object);
         _serviceProviderMock.Setup(sp => sp.GetService(typeof(IDialogService)))
@@ -72,7 +76,9 @@ public class ProjectWorkspaceViewModelSaveTests
         loadUseCaseMock.Setup(r => r.ExecuteAsync()).ReturnsAsync(new List<Project> { project });
 
         viewModelFactoryMock.Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
-            .Returns((Project p) => new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object));
+            .Returns((Project p) => new ProjectViewModel(p, _testUserId, new Mock<IJoinProjectUseCase>().Object, viewModelFactoryMock.Object));
+        viewModelFactoryMock.Setup(x => x.CreateProjectTaskViewModel(It.IsAny<ProjectTask>()))
+            .Returns((ProjectTask t) => new ProjectTaskViewModel(t, _userServiceMock.Object));
 
         var dispatcherMock = new Mock<IDispatcherService>();
         dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Action>())).Callback<Action>(a => a()).Returns(Task.CompletedTask);
@@ -84,10 +90,9 @@ public class ProjectWorkspaceViewModelSaveTests
         var snackbarServiceMock = new Mock<ISnackbarService>();
         var osNotificationServiceMock = new Mock<IOSNotificationService>();
         var checkDeadlinesUseCaseMock = new Mock<ICheckTaskDeadlinesUseCase>();
-        var identityServiceMock = new Mock<IIdentityService>();
         var checkAssignmentMock = new Mock<ICheckAssignmentUseCase>();
 
-        var mainViewModel = new MainViewModel(loadUseCaseMock.Object, saveUseCaseMock.Object, findProjectUseCaseMock.Object, syncServiceMock.Object, addProjectUseCaseMock.Object, saveCoordinator, dispatcherMock.Object, viewModelFactoryMock.Object, notificationServiceMock.Object, snackbarServiceMock.Object, osNotificationServiceMock.Object, checkDeadlinesUseCaseMock.Object, _dialogServiceMock.Object, identityServiceMock.Object, _mainLoggerMock.Object);
+        var mainViewModel = new MainViewModel(loadUseCaseMock.Object, saveUseCaseMock.Object, findProjectUseCaseMock.Object, syncServiceMock.Object, addProjectUseCaseMock.Object, saveCoordinator, dispatcherMock.Object, viewModelFactoryMock.Object, notificationServiceMock.Object, snackbarServiceMock.Object, osNotificationServiceMock.Object, checkDeadlinesUseCaseMock.Object, _dialogServiceMock.Object, _identityServiceMock.Object, _mainLoggerMock.Object);
         await System.Threading.Tasks.Task.Delay(100); // InitializeAsync の完了を待つ
 
         // MainViewModel.Projects から該当の ViewModel を取得
@@ -150,7 +155,9 @@ public class ProjectWorkspaceViewModelSaveTests
         loadUseCaseMock.Setup(r => r.ExecuteAsync()).ReturnsAsync(new List<Project> { project });
 
         viewModelFactoryMock.Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
-            .Returns((Project p) => new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object));
+            .Returns((Project p) => new ProjectViewModel(p, _testUserId, new Mock<IJoinProjectUseCase>().Object, viewModelFactoryMock.Object));
+        viewModelFactoryMock.Setup(x => x.CreateProjectTaskViewModel(It.IsAny<ProjectTask>()))
+            .Returns((ProjectTask t) => new ProjectTaskViewModel(t, _userServiceMock.Object));
 
         var dispatcherMock = new Mock<IDispatcherService>();
         dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Action>())).Callback<Action>(a => a()).Returns(Task.CompletedTask);
@@ -162,9 +169,8 @@ public class ProjectWorkspaceViewModelSaveTests
         var snackbarServiceMock = new Mock<ISnackbarService>();
         var osNotificationServiceMock = new Mock<IOSNotificationService>();
         var checkDeadlinesUseCaseMock = new Mock<ICheckTaskDeadlinesUseCase>();
-        var identityServiceMock = new Mock<IIdentityService>();
 
-        var mainViewModel = new MainViewModel(loadUseCaseMock.Object, saveUseCaseMock.Object, findProjectUseCaseMock.Object, syncServiceMock.Object, addProjectUseCaseMock.Object, saveCoordinator, dispatcherMock.Object, viewModelFactoryMock.Object, notificationServiceMock.Object, snackbarServiceMock.Object, osNotificationServiceMock.Object, checkDeadlinesUseCaseMock.Object, _dialogServiceMock.Object, identityServiceMock.Object, _mainLoggerMock.Object);
+        var mainViewModel = new MainViewModel(loadUseCaseMock.Object, saveUseCaseMock.Object, findProjectUseCaseMock.Object, syncServiceMock.Object, addProjectUseCaseMock.Object, saveCoordinator, dispatcherMock.Object, viewModelFactoryMock.Object, notificationServiceMock.Object, snackbarServiceMock.Object, osNotificationServiceMock.Object, checkDeadlinesUseCaseMock.Object, _dialogServiceMock.Object, _identityServiceMock.Object, _mainLoggerMock.Object);
         await System.Threading.Tasks.Task.Delay(100);
 
         var projectViewModel = mainViewModel.Projects.First(p => p.Id == projectId);
@@ -201,7 +207,7 @@ public class ProjectWorkspaceViewModelSaveTests
         loadUseCaseMock.Setup(r => r.ExecuteAsync()).ReturnsAsync(new List<Project> { project });
 
         viewModelFactoryMock.Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
-            .Returns((Project p) => new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object));
+            .Returns((Project p) => new ProjectViewModel(p, _testUserId, new Mock<IJoinProjectUseCase>().Object, viewModelFactoryMock.Object));
 
         var dispatcherMock = new Mock<IDispatcherService>();
         dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Action>())).Callback<Action>(a => a()).Returns(Task.CompletedTask);
@@ -213,9 +219,8 @@ public class ProjectWorkspaceViewModelSaveTests
         var snackbarServiceMock = new Mock<ISnackbarService>();
         var osNotificationServiceMock = new Mock<IOSNotificationService>();
         var checkDeadlinesUseCaseMock = new Mock<ICheckTaskDeadlinesUseCase>();
-        var identityServiceMock = new Mock<IIdentityService>();
 
-        var mainViewModel = new MainViewModel(loadUseCaseMock.Object, saveUseCaseMock.Object, findProjectUseCaseMock.Object, syncServiceMock.Object, addProjectUseCaseMock.Object, saveCoordinator, dispatcherMock.Object, viewModelFactoryMock.Object, notificationServiceMock.Object, snackbarServiceMock.Object, osNotificationServiceMock.Object, checkDeadlinesUseCaseMock.Object, _dialogServiceMock.Object, identityServiceMock.Object, _mainLoggerMock.Object);
+        var mainViewModel = new MainViewModel(loadUseCaseMock.Object, saveUseCaseMock.Object, findProjectUseCaseMock.Object, syncServiceMock.Object, addProjectUseCaseMock.Object, saveCoordinator, dispatcherMock.Object, viewModelFactoryMock.Object, notificationServiceMock.Object, snackbarServiceMock.Object, osNotificationServiceMock.Object, checkDeadlinesUseCaseMock.Object, _dialogServiceMock.Object, _identityServiceMock.Object, _mainLoggerMock.Object);
         await System.Threading.Tasks.Task.Delay(100);
 
         var projectViewModel = mainViewModel.Projects.First(p => p.Id == projectId);

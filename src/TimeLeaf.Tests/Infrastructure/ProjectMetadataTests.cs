@@ -17,15 +17,16 @@ namespace TimeLeaf.Tests.Infrastructure;
 public class ProjectMetadataTests
 {
     private string _tempDir = null!;
-    private Mock<ICurrentUserService> _userServiceMock = null!;
+    private Mock<IIdentityService> _identityServiceMock = null!;
     private Mock<ILogger<FolderProjectRepository>> _loggerMock = null!;
+    private readonly Guid _testUserId = Guid.NewGuid();
 
     [TestInitialize]
     public void Setup()
     {
         _tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        _userServiceMock = new Mock<ICurrentUserService>();
-        _userServiceMock.Setup(u => u.GetCurrentUserId()).Returns("meta-user");
+        _identityServiceMock = new Mock<IIdentityService>();
+        _identityServiceMock.Setup(u => u.CurrentUserId).Returns(_testUserId);
         _loggerMock = new Mock<ILogger<FolderProjectRepository>>();
     }
 
@@ -57,7 +58,7 @@ public class ProjectMetadataTests
         project.UpdateName("MetaTest");
 
         // Act
-        await repo.SaveAsync(project, "meta-user");
+        await repo.SaveAsync(project, _testUserId.ToString());
 
         // Assert
         var projectDir = Directory.GetDirectories(_tempDir).First();
@@ -77,7 +78,7 @@ public class ProjectMetadataTests
         var firstMetaContent = metaJson;
         project.UpdateName("Changed Name");
         await System.Threading.Tasks.Task.Delay(10); // 時間をずらす
-        await repo.SaveAsync(project, "meta-user");
+        await repo.SaveAsync(project, _testUserId.ToString());
 
         var secondMetaContent = await File.ReadAllTextAsync(metaFilePath);
         Assert.AreEqual(firstMetaContent, secondMetaContent, ".project ファイルの内容は不変であること");
@@ -98,14 +99,14 @@ public class ProjectMetadataTests
         // 1つ目のプロジェクト作成
         var p1 = new Project();
         p1.UpdateName("First");
-        await repo.SaveAsync(p1, "meta-user");
+        await repo.SaveAsync(p1, _testUserId.ToString());
 
         await System.Threading.Tasks.Task.Delay(100); // 作成日をずらす
 
         // 2つ目のプロジェクト作成
         var p2 = new Project();
         p2.UpdateName("Second");
-        await repo.SaveAsync(p2, "meta-user");
+        await repo.SaveAsync(p2, _testUserId.ToString());
 
         // Act
         var result = (await repo.LoadAllAsync()).ToList();

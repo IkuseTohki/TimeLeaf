@@ -1,17 +1,24 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.ComponentModel;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Models.Enums;
+using TimeLeaf.Services;
+using TimeLeaf.ViewModels.Workspace;
 
 namespace TimeLeaf.ViewModels;
 
 /// <summary>
 /// ProjectTaskエンティティをラップし、UIバインディングのための通知機能を提供するViewModel。
 /// </summary>
-public partial class ProjectTaskViewModel : ObservableObject
+public partial class ProjectTaskViewModel : ObservableObject, IDisposable
 {
     private ProjectTask _projectTask;
+    private readonly IUserService _userService;
 
     [ObservableProperty]
     private string _projectName = string.Empty;
@@ -49,7 +56,7 @@ public partial class ProjectTaskViewModel : ObservableObject
         }
     }
 
-    public TaskStatus Status
+    public TimeLeaf.Models.Enums.TaskStatus Status
     {
         get => _projectTask.Status;
         set
@@ -58,7 +65,6 @@ public partial class ProjectTaskViewModel : ObservableObject
             {
                 _projectTask.UpdateStatus(value);
                 OnPropertyChanged(nameof(Status));
-                // ステータス変更により開始・終了日が自動設定される可能性があるため通知
                 OnPropertyChanged(nameof(ActualStartDate));
                 OnPropertyChanged(nameof(ActualEndDate));
             }
@@ -175,32 +181,39 @@ public partial class ProjectTaskViewModel : ObservableObject
     /// <summary>
     /// 依存タスクのIDリスト。
     /// </summary>
-    public System.Collections.Generic.List<Guid> Dependencies => _projectTask.Dependencies;
+    public List<Guid> Dependencies => _projectTask.Dependencies;
 
     /// <summary>
     /// タスクに関するコメントのリスト（UI用）。
     /// </summary>
-    public System.Collections.ObjectModel.ObservableCollection<Comment> Comments { get; } = new();
+    public ObservableCollection<CommentViewModel> Comments { get; } = new();
 
     /// <summary>
     /// コンストラクタ。
     /// </summary>
-    /// <param name="projectTask">ラップするProjectTaskエンティティ。</param>
-    public ProjectTaskViewModel(ProjectTask projectTask)
+    public ProjectTaskViewModel(ProjectTask projectTask, IUserService userService)
     {
         _projectTask = projectTask ?? throw new ArgumentNullException(nameof(projectTask));
+        _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         SyncComments();
     }
 
     private void SyncComments()
     {
-        // レコード（値）の不一致がある場合のみ更新
-        if (!Comments.SequenceEqual(_projectTask.Comments))
+        // エンティティ側のコメントと同期（簡易的な実装）
+        if (Comments.Count != _projectTask.Comments.Count)
         {
+            // 既存の ViewModel を破棄（イベント購読解除のため）
+            foreach (var cvm in Comments)
+            {
+                cvm.Dispose();
+            }
             Comments.Clear();
+
             foreach (var comment in _projectTask.Comments)
             {
-                Comments.Add(comment);
+                var commentVm = new CommentViewModel(comment, _userService);
+                Comments.Add(commentVm);
             }
         }
     }
@@ -208,7 +221,6 @@ public partial class ProjectTaskViewModel : ObservableObject
     /// <summary>
     /// モデルの状態を最新のエンティティで更新し、通知を発生させます。
     /// </summary>
-    /// <param name="newModel">最新の状態を持つエンティティ。</param>
     public void UpdateFromModel(ProjectTask newModel)
     {
         if (newModel == null) throw new ArgumentNullException(nameof(newModel));
@@ -230,5 +242,14 @@ public partial class ProjectTaskViewModel : ObservableObject
         OnPropertyChanged(nameof(Assignee));
         OnPropertyChanged(nameof(Dependencies));
         OnPropertyChanged(nameof(Comments));
+    }
+
+    public void Dispose()
+    {
+        foreach (var cvm in Comments)
+        {
+            cvm.Dispose();
+        }
+        Comments.Clear();
     }
 }

@@ -130,6 +130,7 @@ public class ReplayUpdatedAtTests
         var projectId = Guid.NewGuid();
         var taskId = Guid.NewGuid();
         var commentId = Guid.NewGuid();
+        var authorId = Guid.NewGuid();
         var commentTime = new DateTime(2026, 1, 1, 15, 0, 0, DateTimeKind.Utc);
 
         var projectDir = Path.Combine(_tempDir, $"{projectId}_CommentSource");
@@ -145,7 +146,7 @@ public class ReplayUpdatedAtTests
 
         // 2. JSON内に CreatedAt を持たないコメントファイル
         var fileName = new DefaultCommitFileNameGenerator().Generate(commentTime, "user-A", "Comment");
-        var json = "{\"Id\":\"" + commentId + "\", \"TaskId\":\"" + taskId + "\", \"AuthorId\":\"user-A\", \"Content\":\"Hello\", \"AttachmentLinks\":[]}";
+        var json = "{\"Id\":\"" + commentId + "\", \"TaskId\":\"" + taskId + "\", \"AuthorId\":\"" + authorId + "\", \"Content\":\"Hello\", \"AttachmentLinks\":[]}";
         await File.WriteAllTextAsync(Path.Combine(taskDir, fileName), json);
 
         // Act: ロード
@@ -161,7 +162,8 @@ public class ReplayUpdatedAtTests
     }
 
     /// <summary>
-    /// テスト観点: エンティティの各プロパティを変更しただけでは UpdatedAt は更新されず、    /// SaveAsync によるディスクへの保存が成功したタイミングで、
+    /// テスト観点: エンティティの各プロパティを変更しただけでは UpdatedAt は更新されず、
+    /// SaveAsync によるディスクへの保存が成功したタイミングで、
     /// 保存されたタイムスタンプが Project.UpdatedAt に反映されることを確認する。
     /// </summary>
     [TestMethod]
