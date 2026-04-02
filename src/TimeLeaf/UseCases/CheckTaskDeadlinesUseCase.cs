@@ -8,14 +8,6 @@ using TimeLeaf.Models.Enums;
 
 namespace TimeLeaf.UseCases;
 
-/// <summary>
-/// タスクの期限をチェックし、期限切れのタスクについて通知を発行するユースケース。
-/// </summary>
-public interface ICheckTaskDeadlinesUseCase
-{
-    void Execute(IEnumerable<Project> projects);
-}
-
 public class CheckTaskDeadlinesUseCase : ICheckTaskDeadlinesUseCase
 {
     private readonly INotificationService _notificationService;

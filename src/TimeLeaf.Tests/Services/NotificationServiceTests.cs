@@ -44,7 +44,7 @@ public class NotificationServiceTests
         // Arrange
         var taskId = Guid.NewGuid().ToString();
         var title = "タスク期限切れ";
-        
+
         var n1 = new Notification(title, "1回目", taskId);
         var n2 = new Notification(title, "2回目", taskId);
 
