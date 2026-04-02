@@ -1,6 +1,3 @@
-[submodule "LeafKit"]
-	path = LeafKit
-	url = https://github.com/IkuseTohki/LeafKit.UI.git
 [submodule "LeafKit/UI"]
 	path = LeafKit/UI
 	url = https://github.com/IkuseTohki/LeafKit.UI.git
