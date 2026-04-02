@@ -40,7 +40,8 @@ public class CheckTaskDeadlinesUseCase : ICheckTaskDeadlinesUseCase
                     var notification = new Notification(
                         "タスク期限切れ",
                         $"タスク「{task.Name}」の期限を過ぎています。",
-                        task.Id.ToString());
+                        task.Id.ToString(),
+                        task.Id); // タスクIDをそのまま通知IDとしても使用する
 
                     _notificationService.Notify(notification);
                 }

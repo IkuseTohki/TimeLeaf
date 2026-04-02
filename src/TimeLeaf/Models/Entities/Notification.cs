@@ -43,9 +43,10 @@ public class Notification
     /// <param name="title">通知のタイトル。</param>
     /// <param name="message">通知の内容。</param>
     /// <param name="relatedEntityId">関連エンティティのID。</param>
-    public Notification(string title, string message, string? relatedEntityId = null)
+    /// <param name="id">通知の一意なID。指定しない場合は自動生成されます。</param>
+    public Notification(string title, string message, string? relatedEntityId = null, Guid? id = null)
     {
-        Id = Guid.NewGuid();
+        Id = id ?? Guid.NewGuid();
         Title = title;
         Message = message;
         RelatedEntityId = relatedEntityId;
