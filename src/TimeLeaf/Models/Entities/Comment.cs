@@ -46,7 +46,7 @@ public class Comment
     /// <summary>
     /// 投稿日時。
     /// </summary>
-    public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; init; } = DateTime.Now;
 
     private readonly string _content = string.Empty;
     /// <summary>

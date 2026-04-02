@@ -59,7 +59,7 @@ public partial class HomeViewModel : ObservableObject
         InProgressCount = allTasks.Count(t => t.Status == TimeLeaf.Models.Enums.TaskStatus.InProgress);
 
         // 今週完了したタスクの計算（月曜日開始と仮定）
-        var now = DateTime.UtcNow;
+        var now = DateTime.Now;
         var startOfWeek = now.AddDays(-(int)now.DayOfWeek + (int)DayOfWeek.Monday).Date;
         CompletedThisWeekCount = allTasks.Count(t =>
             t.Status == TimeLeaf.Models.Enums.TaskStatus.Completed &&

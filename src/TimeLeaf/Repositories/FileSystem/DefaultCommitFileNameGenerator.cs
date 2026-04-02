@@ -13,10 +13,8 @@ public class DefaultCommitFileNameGenerator : ICommitFileNameGenerator
 
     public string Generate(DateTime timestamp, string userId, string category)
     {
-        var utcTimestamp = timestamp.ToUniversalTime();
-        // TimeFormat 自体が '_' を含んでいないため、
-        // 文字列全体を yyyyMMdd_HHmmss_fff_{userId}_{category}.json にする。
-        return $"{utcTimestamp.ToString(TimeFormat)}_{userId}_{category}.json";
+        // 常に渡された日時のまま（JST前提）文字列化する。
+        return $"{timestamp.ToString(TimeFormat)}_{userId}_{category}.json";
     }
 
     public CommitFileName Parse(string fileName)
@@ -31,8 +29,8 @@ public class DefaultCommitFileNameGenerator : ICommitFileNameGenerator
 
         // タイムスタンプのパース (yyyyMMdd_HHmmss_fff)
         var timeStr = $"{parts[0]}_{parts[1]}_{parts[2]}";
-        // ファイル名はUTCとして保存されているため、明示的にUTCとしてパースする
-        var timestamp = DateTime.ParseExact(timeStr, TimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal);
+        // ファイル名はLocal(JST)として保存されているため、Localとしてパースする
+        var timestamp = DateTime.ParseExact(timeStr, TimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal);
 
         var userId = parts[3];
         // カテゴリは残りのパーツすべて（カテゴリ名に _ が含まれる可能性があるため）

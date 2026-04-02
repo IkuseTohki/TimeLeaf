@@ -83,7 +83,7 @@ public class FileSystemUserRepository : IUserRepository
     public async Task SaveUserAsync(User user)
     {
         var filePath = GetFilePath(user.Id);
-        var dto = UserDto.FromEntity(user, DateTime.UtcNow);
+        var dto = UserDto.FromEntity(user, DateTime.Now);
 
         var json = JsonSerializer.Serialize(dto, JsonOptions);
         await File.WriteAllTextAsync(filePath, json);

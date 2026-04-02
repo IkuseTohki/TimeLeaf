@@ -27,7 +27,7 @@ public class CheckTaskDeadlinesUseCase : ICheckTaskDeadlinesUseCase
 
     public void Execute(IEnumerable<Project> projects)
     {
-        var now = DateTime.UtcNow;
+        var now = DateTime.Now;
 
         foreach (var project in projects)
         {

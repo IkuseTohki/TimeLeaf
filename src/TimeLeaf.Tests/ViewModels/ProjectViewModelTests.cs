@@ -291,9 +291,9 @@ public class ProjectViewModelTests
     public void DisplayLastUpdated_ShouldReturnRelativeTimeStrings_AtBoundaries(int secondsOffset, string expected)
     {
         // Arrange
-        // DateTime.UtcNow の微細な Ticks による誤差を防ぐため、秒単位で丸める
-        var now = DateTime.UtcNow;
-        var baseTime = new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second, DateTimeKind.Utc);
+        // DateTime.Now の微細な Ticks による誤差を防ぐため、秒単位で丸める
+        var now = DateTime.Now;
+        var baseTime = new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second, DateTimeKind.Local);
         var project = new Project();
         project.SetUpdatedAt(baseTime.AddSeconds(-secondsOffset));
         var viewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
@@ -312,7 +312,7 @@ public class ProjectViewModelTests
     public void DisplayLastUpdated_ShouldSwitchToFullDate_At24HoursBoundary()
     {
         // Arrange
-        var targetDate = new DateTime(2026, 1, 1, 12, 34, 0, DateTimeKind.Utc);
+        var targetDate = new DateTime(2026, 1, 1, 12, 34, 0, DateTimeKind.Local);
         var project = new Project();
         project.SetUpdatedAt(targetDate);
         var viewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
@@ -321,7 +321,7 @@ public class ProjectViewModelTests
         var actual = viewModel.DisplayLastUpdated;
 
         // Assert
-        var expected = targetDate.ToLocalTime().ToString("yyyy/MM/dd HH:mm");
+        var expected = targetDate.ToString("yyyy/MM/dd HH:mm");
         Assert.AreEqual(expected, actual);
     }
 
@@ -333,8 +333,8 @@ public class ProjectViewModelTests
     public void DisplayLastUpdated_ShouldHandlePastTimeCorrectlly_RegardlessOfKind()
     {
         // Arrange
-        // 1時間前の時刻を作成 (UTC)
-        var oneHourAgo = DateTime.UtcNow.AddHours(-1);
+        // 1時間前の時刻を作成 (Local)
+        var oneHourAgo = DateTime.Now.AddHours(-1);
 
         var project = new Project();
         project.SetUpdatedAt(oneHourAgo);

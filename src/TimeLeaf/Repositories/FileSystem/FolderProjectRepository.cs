@@ -135,7 +135,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         _logger.LogDebug("Found project directory {TargetDir} for {ProjectId}.", targetDir, projectId);
 
         var metaPath = Path.Combine(targetDir, ".project");
-        DateTime createdAt = DateTime.UtcNow;
+        DateTime createdAt = DateTime.Now;
         bool isArchived = false;
         DateTime? lockedUntil = null;
 
@@ -255,7 +255,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
             }
 
             var changesDir = Path.Combine(projectDir, "changes");
-            var commitTime = DateTime.UtcNow;
+            var commitTime = DateTime.Now;
 
             // 1. プロジェクト情報の保存 (3カテゴリ)
             var basicSnapshot = new ProjectBasicDto(project.Name, project.Status, project.HealthStatus);

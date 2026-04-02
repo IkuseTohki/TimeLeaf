@@ -18,12 +18,12 @@ public class Project
     /// <summary>
     /// プロジェクトの作成日時。
     /// </summary>
-    public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; init; } = DateTime.Now;
 
     /// <summary>
     /// プロジェクトの最終更新日時。
     /// </summary>
-    public DateTime UpdatedAt { get; private set; } = DateTime.UtcNow;
+    public DateTime UpdatedAt { get; private set; } = DateTime.Now;
 
     /// <summary>
     /// プロジェクトを一意に識別するID。
@@ -242,7 +242,7 @@ public class Project
     /// </summary>
     public void RefreshUpdatedAt()
     {
-        UpdatedAt = DateTime.UtcNow;
+        UpdatedAt = DateTime.Now;
     }
 
     /// <summary>

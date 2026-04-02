@@ -49,7 +49,7 @@ public class Notification
         Title = title;
         Message = message;
         RelatedEntityId = relatedEntityId;
-        CreatedAt = DateTime.UtcNow;
+        CreatedAt = DateTime.Now;
         IsRead = false;
     }
 

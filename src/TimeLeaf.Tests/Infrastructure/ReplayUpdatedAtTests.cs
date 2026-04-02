@@ -51,7 +51,7 @@ public class ReplayUpdatedAtTests
     {
         // Arrange: 10日前の日付を持つファイルを直接作成する
         var projectId = Guid.NewGuid();
-        var pastTime = DateTime.UtcNow.AddDays(-10);
+        var pastTime = DateTime.Now.AddDays(-10);
 
         // フォルダ構成の作成
         var projectDir = Path.Combine(_tempDir, $"{projectId}_Test");
@@ -89,8 +89,8 @@ public class ReplayUpdatedAtTests
     {
         // Arrange: 意図的に異なるタイムスタンプを持つ2つのファイルを直接作成する
         var projectId = Guid.NewGuid();
-        var olderTime = new DateTime(2026, 1, 1, 10, 0, 0, DateTimeKind.Utc);
-        var newerTime = new DateTime(2026, 1, 1, 12, 0, 0, DateTimeKind.Utc);
+        var olderTime = new DateTime(2026, 1, 1, 10, 0, 0, DateTimeKind.Local);
+        var newerTime = new DateTime(2026, 1, 1, 12, 0, 0, DateTimeKind.Local);
 
         var projectDir = Path.Combine(_tempDir, $"{projectId}_MetadataSource");
         var changesDir = Path.Combine(projectDir, "changes");
@@ -131,7 +131,7 @@ public class ReplayUpdatedAtTests
         var taskId = Guid.NewGuid();
         var commentId = Guid.NewGuid();
         var authorId = Guid.NewGuid();
-        var commentTime = new DateTime(2026, 1, 1, 15, 0, 0, DateTimeKind.Utc);
+        var commentTime = new DateTime(2026, 1, 1, 15, 0, 0, DateTimeKind.Local);
 
         var projectDir = Path.Combine(_tempDir, $"{projectId}_CommentSource");
         var changesDir = Path.Combine(projectDir, "changes");
@@ -182,9 +182,9 @@ public class ReplayUpdatedAtTests
         Assert.AreEqual(originalUpdatedAt, project.UpdatedAt, "保存前は最終更新日時は変更されないこと");
 
         // Act: 保存
-        var startTime = DateTime.UtcNow;
+        var startTime = DateTime.Now;
         await _repository.SaveAsync(project, "user-A");
-        var endTime = DateTime.UtcNow;
+        var endTime = DateTime.Now;
 
         // Assert (Post-Save): 保存成功後に、保存時のタイムスタンプで更新されていること
         Assert.AreNotEqual(originalUpdatedAt, project.UpdatedAt, "保存後に最終更新日時は更新されるべき");

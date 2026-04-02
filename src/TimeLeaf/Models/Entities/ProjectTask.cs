@@ -140,12 +140,12 @@ public class ProjectTask
 
         if (status == TaskStatus.InProgress && ActualStartDate == null)
         {
-            ActualStartDate = DateTime.UtcNow;
+            ActualStartDate = DateTime.Now;
         }
         else if (status == TaskStatus.Completed && ActualEndDate == null)
         {
-            ActualEndDate = DateTime.UtcNow;
-            if (ActualStartDate == null) ActualStartDate = DateTime.UtcNow; // 未開始のまま完了した場合は開始日も埋める
+            ActualEndDate = DateTime.Now;
+            if (ActualStartDate == null) ActualStartDate = DateTime.Now; // 未開始のまま完了した場合は開始日も埋める
         }
     }
 

@@ -105,7 +105,7 @@ public partial class ProjectViewModel : ObservableObject
     private void RefreshUpdatedAt()
     {
         if (IsSyncing) return;
-        UpdatedAt = DateTime.UtcNow;
+        UpdatedAt = DateTime.Now;
     }
 
     /// <summary>
@@ -118,7 +118,7 @@ public partial class ProjectViewModel : ObservableObject
         {
             if (_project.UpdatedAt != value)
             {
-                _project.SetUpdatedAt(value.ToUniversalTime());
+                _project.SetUpdatedAt(value);
                 OnPropertyChanged(nameof(UpdatedAt));
                 OnPropertyChanged(nameof(DisplayLastUpdated));
             }
@@ -132,15 +132,14 @@ public partial class ProjectViewModel : ObservableObject
     {
         get
         {
-            var utcNow = DateTime.UtcNow;
-            var diff = utcNow - UpdatedAt.ToUniversalTime();
-            var localUpdatedAt = UpdatedAt.ToLocalTime();
+            var now = DateTime.Now;
+            var diff = now - UpdatedAt;
 
-            if (diff.TotalSeconds < 0) return localUpdatedAt.ToString("yyyy/MM/dd HH:mm");
+            if (diff.TotalSeconds < 0) return UpdatedAt.ToString("yyyy/MM/dd HH:mm");
             if (diff.TotalSeconds < 60) return "たった今";
             if (diff.TotalMinutes < 60) return $"{(int)diff.TotalMinutes}分前";
             if (diff.TotalHours < 24) return $"{(int)diff.TotalHours}時間前";
-            return localUpdatedAt.ToString("yyyy/MM/dd HH:mm");
+            return UpdatedAt.ToString("yyyy/MM/dd HH:mm");
         }
     }
 

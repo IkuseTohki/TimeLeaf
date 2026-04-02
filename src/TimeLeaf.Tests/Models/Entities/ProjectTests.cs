@@ -190,4 +190,15 @@ public class ProjectTests
         Assert.AreEqual(isArchived, project.IsArchived);
         Assert.AreEqual(lockedUntil, project.LockedUntil);
     }
+
+    [TestMethod]
+    public void DateTime_ShouldBeLocalByDefault()
+    {
+        // テスト観点: Projectの作成日時と更新日時がLocal (JST想定) であることを確認する
+        var project = new Project();
+        project.UpdateName("Test Project");
+
+        Assert.AreEqual(DateTimeKind.Local, project.CreatedAt.Kind, "CreatedAt は Local であるべき");
+        Assert.AreEqual(DateTimeKind.Local, project.UpdatedAt.Kind, "UpdatedAt は Local であるべき");
+    }
 }

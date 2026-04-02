@@ -29,7 +29,7 @@ public class AddCommentUseCase : IAddCommentUseCase
             TaskId = task.Id,
             AuthorId = _identityService.CurrentUserId,
             Content = content,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.Now
         };
 
         task.AddComment(comment);

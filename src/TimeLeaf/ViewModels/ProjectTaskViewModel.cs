@@ -91,7 +91,7 @@ public partial class ProjectTaskViewModel : ObservableObject, IDisposable
         {
             if (_projectTask.ScheduledStartDate != value)
             {
-                _projectTask.UpdateSchedule(value?.ToUniversalTime(), _projectTask.Deadline);
+                _projectTask.UpdateSchedule(value, _projectTask.Deadline);
                 OnPropertyChanged(nameof(ScheduledStartDate));
             }
         }
@@ -104,7 +104,7 @@ public partial class ProjectTaskViewModel : ObservableObject, IDisposable
         {
             if (_projectTask.Deadline != value)
             {
-                _projectTask.UpdateSchedule(_projectTask.ScheduledStartDate, value?.ToUniversalTime());
+                _projectTask.UpdateSchedule(_projectTask.ScheduledStartDate, value);
                 OnPropertyChanged(nameof(Deadline));
             }
         }
@@ -117,7 +117,7 @@ public partial class ProjectTaskViewModel : ObservableObject, IDisposable
         {
             if (_projectTask.ActualStartDate != value)
             {
-                _projectTask.UpdateActualDates(value?.ToUniversalTime(), _projectTask.ActualEndDate);
+                _projectTask.UpdateActualDates(value, _projectTask.ActualEndDate);
                 OnPropertyChanged(nameof(ActualStartDate));
             }
         }
@@ -130,7 +130,7 @@ public partial class ProjectTaskViewModel : ObservableObject, IDisposable
         {
             if (_projectTask.ActualEndDate != value)
             {
-                _projectTask.UpdateActualDates(_projectTask.ActualStartDate, value?.ToUniversalTime());
+                _projectTask.UpdateActualDates(_projectTask.ActualStartDate, value);
                 OnPropertyChanged(nameof(ActualEndDate));
             }
         }

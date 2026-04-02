@@ -39,9 +39,9 @@ public class DateTimeHandlingTests
         // パース
         var parsed = _generator.Parse(fileName);
 
-        // 検証: パースされた時刻をローカル時刻に変換したとき、元の時刻と一致すべき
-        Assert.AreEqual(localTime.ToUniversalTime(), parsed.Timestamp, "ファイル名からパースされた時刻はUTC基準で一致すべき");
-        Assert.AreEqual(localTime, parsed.Timestamp.ToLocalTime(), "ローカル時刻に変換した際に元の入力と一致すべき");
+        // 検証: パースされた時刻がそのままLocal時刻として一致すべき
+        Assert.AreEqual(DateTimeKind.Local, parsed.Timestamp.Kind, "パースされた時刻はLocalであるべき");
+        Assert.AreEqual(localTime, parsed.Timestamp, "パースされた時刻が元の入力と一致すべき");
     }
 
     [TestMethod]
@@ -88,31 +88,31 @@ public class DateTimeHandlingTests
         var project = new Project();
         var viewModelFactoryMock = new Mock<IViewModelFactory>();
         var vm = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, viewModelFactoryMock.Object);
-        var nowUtc = DateTime.UtcNow;
+        var nowLocal = DateTime.Now;
 
         // Act & Assert
 
-        // 1. たった今 (UTC)
-        vm.UpdatedAt = nowUtc.AddSeconds(-5);
+        // 1. たった今 (Local)
+        vm.UpdatedAt = nowLocal.AddSeconds(-5);
         Assert.AreEqual("たった今", vm.DisplayLastUpdated);
 
         // 2. 5分前
-        vm.UpdatedAt = nowUtc.AddMinutes(-5);
+        vm.UpdatedAt = nowLocal.AddMinutes(-5);
         Assert.AreEqual("5分前", vm.DisplayLastUpdated);
 
         // 3. 2時間前
-        vm.UpdatedAt = nowUtc.AddHours(-2);
+        vm.UpdatedAt = nowLocal.AddHours(-2);
         Assert.AreEqual("2時間前", vm.DisplayLastUpdated);
 
         // 4. 昨日 (24時間以上前)
-        var yesterday = nowUtc.AddHours(-25);
+        var yesterday = nowLocal.AddHours(-25);
         vm.UpdatedAt = yesterday;
-        Assert.AreEqual(yesterday.ToLocalTime().ToString("yyyy/MM/dd HH:mm"), vm.DisplayLastUpdated);
+        Assert.AreEqual(yesterday.ToString("yyyy/MM/dd HH:mm"), vm.DisplayLastUpdated);
 
         // 5. 未来の日時 (同期ズレなどで発生しうる)
-        var future = nowUtc.AddMinutes(1);
+        var future = nowLocal.AddMinutes(1);
         vm.UpdatedAt = future;
-        Assert.AreEqual(future.ToLocalTime().ToString("yyyy/MM/dd HH:mm"), vm.DisplayLastUpdated);
+        Assert.AreEqual(future.ToString("yyyy/MM/dd HH:mm"), vm.DisplayLastUpdated);
     }
 
     [TestMethod]
@@ -128,11 +128,11 @@ public class DateTimeHandlingTests
         vm.ScheduledStartDate = localDate;
 
         // Assert
-        // ドメインモデルに渡された値がUTC基準で正しいか確認
+        // ドメインモデルに渡された値が正しいか確認
         Assert.IsNotNull(task.ScheduledStartDate);
-        Assert.AreEqual(localDate.ToUniversalTime(), task.ScheduledStartDate.Value.ToUniversalTime());
-        // 内部的にUTCとして保持されていることが望ましい
-        Assert.AreEqual(DateTimeKind.Utc, task.ScheduledStartDate.Value.Kind, "ドメイン層ではUTCとして保持されるべき");
+        Assert.AreEqual(localDate, task.ScheduledStartDate.Value);
+        // 内部的にLocalとして保持されている
+        Assert.AreEqual(DateTimeKind.Local, task.ScheduledStartDate.Value.Kind, "ドメイン層ではLocalとして保持されるべき");
     }
 
     [TestMethod]

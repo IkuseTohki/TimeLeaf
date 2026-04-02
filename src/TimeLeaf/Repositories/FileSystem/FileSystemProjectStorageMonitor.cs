@@ -42,7 +42,7 @@ public class FileSystemProjectStorageMonitor : IProjectStorageMonitor
 
     public void MarkFileAsJustWritten(string fileName)
     {
-        _justWrittenFiles[fileName] = DateTime.UtcNow;
+        _justWrittenFiles[fileName] = DateTime.Now;
     }
 
     private void OnFileCreated(object sender, FileSystemEventArgs e)
@@ -51,7 +51,7 @@ public class FileSystemProjectStorageMonitor : IProjectStorageMonitor
         if (_justWrittenFiles.TryGetValue(fileName, out var writeTime))
         {
             // 書き込みから1秒以内のイベントは無視する
-            if (DateTime.UtcNow - writeTime < TimeSpan.FromSeconds(1))
+            if (DateTime.Now - writeTime < TimeSpan.FromSeconds(1))
             {
                 _logger.LogDebug("Ignoring file change event for our own write (within 1s): {FileName}", fileName);
                 return;
@@ -89,7 +89,7 @@ public class FileSystemProjectStorageMonitor : IProjectStorageMonitor
 
     private void CleanupIgnoreList()
     {
-        var now = DateTime.UtcNow;
+        var now = DateTime.Now;
         var toRemove = _justWrittenFiles.Where(kv => now - kv.Value > TimeSpan.FromSeconds(10)).Select(kv => kv.Key).ToList();
         foreach (var key in toRemove)
         {
