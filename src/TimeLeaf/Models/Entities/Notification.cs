@@ -28,7 +28,7 @@ public class Notification
     public string? RelatedEntityId { get; }
 
     /// <summary>
-    /// 通知の発生時刻（UTC）。
+    /// 通知の発生時刻。
     /// </summary>
     public DateTime CreatedAt { get; }
 

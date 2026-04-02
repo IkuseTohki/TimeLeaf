@@ -37,7 +37,7 @@ public partial class NotificationViewModel : ObservableObject
     public string? RelatedEntityId => _entity.RelatedEntityId;
 
     /// <summary>
-    /// 通知の発生時刻（UTC）。
+    /// 通知の発生時刻。
     /// </summary>
     public DateTime CreatedAt => _entity.CreatedAt;
 

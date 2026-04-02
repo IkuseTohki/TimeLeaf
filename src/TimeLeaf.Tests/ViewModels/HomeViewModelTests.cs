@@ -79,13 +79,13 @@ public class HomeViewModelTests
         var p1 = new Project();
         var t1 = new ProjectTask();
         t1.UpdateName("Task 1");
-        t1.UpdateSchedule(null, DateTime.UtcNow.AddDays(1));
+        t1.UpdateSchedule(null, DateTime.Now.AddDays(1));
         p1.AddTask(t1);
 
         var p2 = new Project();
         var t2 = new ProjectTask();
         t2.UpdateName("Task 2");
-        t2.UpdateSchedule(null, DateTime.UtcNow.AddDays(2));
+        t2.UpdateSchedule(null, DateTime.Now.AddDays(2));
         p2.AddTask(t2);
 
         var projects = new ObservableCollection<ProjectViewModel>

@@ -16,7 +16,7 @@ public class UserDtoTests
     {
         // Arrange
         var user = new User(Guid.NewGuid(), "田中 太郎", "#FF0000", "user1.png");
-        var updatedAt = DateTime.UtcNow;
+        var updatedAt = DateTime.Now;
 
         // Act
         var dto = UserDto.FromEntity(user, updatedAt);
@@ -42,7 +42,7 @@ public class UserDtoTests
             DisplayName = "佐藤 次郎",
             ThemeColor = "#00FF00",
             IconPath = "user2.png",
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.Now
         };
 
         // Act

@@ -36,7 +36,7 @@ public class CheckTaskDeadlinesUseCaseTests
         var task = new ProjectTask();
         task.UpdateName("Overdue Task");
         // 明確に昨日以前（期限切れ）に設定
-        task.UpdateSchedule(null, DateTime.UtcNow.Date.AddDays(-1));
+        task.UpdateSchedule(null, DateTime.Now.Date.AddDays(-1));
         task.UpdateStatus(TaskStatus.NotStarted);
 
         project.AddTask(task);
@@ -65,7 +65,7 @@ public class CheckTaskDeadlinesUseCaseTests
         task.UpdateName("Today's Task");
 
         // 期限を本日の日付（時刻は 00:00:00）に設定
-        var today = DateTime.UtcNow.Date;
+        var today = DateTime.Now.Date;
         task.UpdateSchedule(null, today);
         task.UpdateStatus(TaskStatus.InProgress);
 
@@ -90,11 +90,11 @@ public class CheckTaskDeadlinesUseCaseTests
         var project = new Project();
         var task1 = new ProjectTask();
         task1.UpdateName("Future Task");
-        task1.UpdateSchedule(null, DateTime.UtcNow.Date.AddDays(1));
+        task1.UpdateSchedule(null, DateTime.Now.Date.AddDays(1));
 
         var task2 = new ProjectTask();
         task2.UpdateName("Done Task");
-        task2.UpdateSchedule(null, DateTime.UtcNow.Date.AddDays(-1));
+        task2.UpdateSchedule(null, DateTime.Now.Date.AddDays(-1));
         task2.UpdateStatus(TaskStatus.Completed);
 
         project.AddTask(task1);

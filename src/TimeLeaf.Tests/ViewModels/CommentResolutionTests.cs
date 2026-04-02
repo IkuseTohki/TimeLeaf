@@ -39,7 +39,7 @@ public class CommentResolutionTests
             TaskId = task.Id,
             AuthorId = userId,
             Content = "テストコメント",
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.Now
         };
         task.AddComment(comment);
 

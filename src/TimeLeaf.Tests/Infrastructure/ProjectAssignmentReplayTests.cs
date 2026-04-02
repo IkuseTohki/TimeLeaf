@@ -51,13 +51,13 @@ public class ProjectAssignmentReplayTests
         var assignedUser2 = Guid.NewGuid();
         var dto = new ProjectMembersDto { AssignedUserIds = new List<Guid> { assignedUser1, assignedUser2 } };
 
-        var fileName = _fileNameGenerator.Generate(DateTime.UtcNow, userId, "Project_Members");
+        var fileName = _fileNameGenerator.Generate(DateTime.Now, userId, "Project_Members");
         await File.WriteAllTextAsync(Path.Combine(_changesDir, fileName), _serializer.Serialize(dto));
 
         var replayer = new ProjectHistoryReplayer(_serializer, _fileNameGenerator, NullLogger.Instance, new());
 
         // Act
-        var project = await replayer.ReplayAsync(_changesDir, projectId, DateTime.UtcNow);
+        var project = await replayer.ReplayAsync(_changesDir, projectId, DateTime.Now);
 
         // Assert
         Assert.AreEqual(2, project.AssignedUserIds.Count);

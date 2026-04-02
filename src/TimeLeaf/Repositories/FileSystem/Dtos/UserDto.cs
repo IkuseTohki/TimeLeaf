@@ -29,7 +29,7 @@ public class UserDto
     public string IconPath { get; set; } = string.Empty;
 
     /// <summary>
-    /// プロフィールの最終更新日時（UTC）。
+    /// プロフィールの最終更新日時。
     /// </summary>
     public DateTime UpdatedAt { get; set; }
 

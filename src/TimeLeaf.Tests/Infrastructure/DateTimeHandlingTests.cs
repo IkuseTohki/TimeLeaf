@@ -60,7 +60,7 @@ public class DateTimeHandlingTests
         var parsed = _generator.Parse(fileName);
 
         // Assert
-        Assert.AreEqual(timestamp.ToUniversalTime(), parsed.Timestamp, comment);
+        Assert.AreEqual(timestamp, parsed.Timestamp, comment);
     }
 
     [TestMethod]

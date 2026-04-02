@@ -40,7 +40,7 @@ TimeLeafは、ネットワークが制限された環境下でのデータ同期
 | **DisplayName** | String   | 画面に表示されるユーザー名。                                  |
 | **ThemeColor**  | String   | ユーザーを識別するための16進数カラーコード（例: `#2D5A27`）。 |
 | **IconPath**    | String   | アイコン画像ファイルへの相対パス（例: `{GUID}.png`）。        |
-| **UpdatedAt**   | DateTime | プロフィールが最後に更新された日時（UTC）。                   |
+| **UpdatedAt**   | DateTime | プロフィールが最後に更新された日時（JST）。                   |
 
 ## 4. プロジェクト・メタデータ (.project)
 

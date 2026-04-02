@@ -158,7 +158,7 @@ public class ProjectTests
     {
         // Arrange
         var project = new Project();
-        var lockUntil = DateTime.UtcNow.AddDays(7);
+        var lockUntil = DateTime.Now.AddDays(7);
         Assert.IsNull(project.LockedUntil, "デフォルトはロックなしであること");
 
         // Act (Lock)
@@ -181,7 +181,7 @@ public class ProjectTests
         // Arrange
         var project = new Project();
         var isArchived = true;
-        var lockedUntil = DateTime.UtcNow.AddDays(1);
+        var lockedUntil = DateTime.Now.AddDays(1);
 
         // Act
         project.SetLifecycleStatus(isArchived, lockedUntil);

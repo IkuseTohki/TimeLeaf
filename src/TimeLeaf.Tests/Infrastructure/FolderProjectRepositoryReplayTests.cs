@@ -99,7 +99,7 @@ public class FolderProjectRepositoryReplayTests
         var changesDir = Path.Combine(projectDir, "changes");
         Directory.CreateDirectory(changesDir);
 
-        var baseTime = DateTime.UtcNow;
+        var baseTime = DateTime.Now;
         var metaFile = Path.Combine(projectDir, ".project");
         await File.WriteAllTextAsync(metaFile,
             JsonSerializer.Serialize(new { ProjectId = projectId, CreatedAt = baseTime, SchemaVersion = 1 }));
