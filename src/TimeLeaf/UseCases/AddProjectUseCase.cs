@@ -1,32 +1,30 @@
+using System;
+using System.Threading.Tasks;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Models.Enums;
-using TimeLeaf.Repositories;
 using TimeLeaf.Services;
-using System.Threading.Tasks;
 
 namespace TimeLeaf.UseCases;
 
 /// <summary>
-/// 新しいプロジェクトを作成し、永続化するユースケース。
+/// 新規プロジェクトを追加するユースケース。
 /// </summary>
 public class AddProjectUseCase : IAddProjectUseCase
 {
-    private readonly ISaveProjectUseCase _saveUseCase;
+    private readonly IProjectService _projectService;
 
-    public AddProjectUseCase(ISaveProjectUseCase saveUseCase)
+    public AddProjectUseCase(IProjectService projectService)
     {
-        _saveUseCase = saveUseCase;
+        _projectService = projectService ?? throw new ArgumentNullException(nameof(projectService));
     }
 
     public async Task<Project> ExecuteAsync(string name, string description, ProjectStatus status, ProjectHealth health)
     {
         var project = new Project();
-        project.UpdateName(name);
+        project.UpdateBasicInfo(name, status, health);
         project.UpdateDescription(description);
-        project.UpdateStatus(status);
-        project.UpdateHealth(health);
 
-        await _saveUseCase.ExecuteAsync(project);
+        await _projectService.SaveProjectAsync(project);
         return project;
     }
 }

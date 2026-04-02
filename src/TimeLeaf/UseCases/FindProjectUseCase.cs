@@ -1,24 +1,25 @@
 using System;
 using System.Threading.Tasks;
 using TimeLeaf.Models.Entities;
-using TimeLeaf.Repositories;
+using TimeLeaf.Services;
 
 namespace TimeLeaf.UseCases;
 
 /// <summary>
-/// 特定のIDを持つプロジェクトを1件取得するユースケース。
+/// 特定のプロジェクトを検索・取得するユースケース。
+/// IProjectService を介してキャッシュ（またはリポジトリ）から取得します。
 /// </summary>
 public class FindProjectUseCase : IFindProjectUseCase
 {
-    private readonly IProjectRepository _repository;
+    private readonly IProjectService _projectService;
 
-    public FindProjectUseCase(IProjectRepository repository)
+    public FindProjectUseCase(IProjectService projectService)
     {
-        _repository = repository;
+        _projectService = projectService ?? throw new ArgumentNullException(nameof(projectService));
     }
 
     public async Task<Project?> ExecuteAsync(Guid projectId)
     {
-        return await _repository.LoadAsync(projectId);
+        return await _projectService.GetProjectAsync(projectId);
     }
 }

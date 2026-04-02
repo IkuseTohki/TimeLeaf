@@ -1,33 +1,31 @@
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TimeLeaf.Models.Entities;
-using TimeLeaf.Repositories;
 using TimeLeaf.Services;
 
 namespace TimeLeaf.UseCases;
 
 /// <summary>
-/// 単一のプロジェクトを保存するユースケース。
+/// プロジェクトを保存するユースケース。
+/// IProjectService を介して永続化とキャッシュ更新を行います。
 /// </summary>
 public class SaveProjectUseCase : ISaveProjectUseCase
 {
-    private readonly IProjectRepository _repository;
-    private readonly IIdentityService _identityService;
+    private readonly IProjectService _projectService;
 
-    public SaveProjectUseCase(IProjectRepository repository, IIdentityService identityService)
+    public SaveProjectUseCase(IProjectService projectService)
     {
-        _repository = repository;
-        _identityService = identityService;
+        _projectService = projectService ?? throw new ArgumentNullException(nameof(projectService));
     }
 
-    public async System.Threading.Tasks.Task ExecuteAsync(Project project)
+    public async Task ExecuteAsync(Project project)
     {
-        var userId = _identityService.CurrentUserId.ToString();
-        await _repository.SaveAsync(project, userId);
+        await _projectService.SaveProjectAsync(project);
     }
 
-    public async System.Threading.Tasks.Task ExecuteAsync(System.Collections.Generic.IEnumerable<Project> projects)
+    public async Task ExecuteAsync(IEnumerable<Project> projects)
     {
-        var userId = _identityService.CurrentUserId.ToString();
-        await _repository.SaveAllAsync(projects, userId);
+        await _projectService.SaveAllAsync(projects);
     }
 }

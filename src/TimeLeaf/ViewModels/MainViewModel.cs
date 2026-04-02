@@ -24,7 +24,7 @@ public partial class MainViewModel : ObservableObject
     private readonly ILoadProjectsUseCase _loadUseCase;
     private readonly ISaveProjectUseCase _saveSingleUseCase;
     private readonly IFindProjectUseCase _findProjectUseCase;
-    private readonly IProjectSyncService _syncService;
+    private readonly IProjectService _projectService;
     private readonly IAddProjectUseCase _addProjectUseCase;
     private readonly IProjectSaveCoordinator _saveCoordinator;
     private readonly IDispatcherService _dispatcherService;
@@ -132,7 +132,7 @@ public partial class MainViewModel : ObservableObject
         ILoadProjectsUseCase loadUseCase,
         ISaveProjectUseCase saveSingleUseCase,
         IFindProjectUseCase findProjectUseCase,
-        IProjectSyncService syncService,
+        IProjectService projectService,
         IAddProjectUseCase addProjectUseCase,
         IProjectSaveCoordinator saveCoordinator,
         IDispatcherService dispatcherService,
@@ -148,7 +148,7 @@ public partial class MainViewModel : ObservableObject
         _loadUseCase = loadUseCase;
         _saveSingleUseCase = saveSingleUseCase;
         _findProjectUseCase = findProjectUseCase;
-        _syncService = syncService;
+        _projectService = projectService;
         _addProjectUseCase = addProjectUseCase;
         _saveCoordinator = saveCoordinator;
         _dispatcherService = dispatcherService;
@@ -166,8 +166,10 @@ public partial class MainViewModel : ObservableObject
 
         _logger.LogInformation("MainViewModel Initializing");
 
-        // 外部変更（同期）の監視をサービス経由で行う
-        _syncService.ProjectChanged += OnProjectChanged;
+        // 外部変更および内部状態更新の監視をサービス経由で行う
+        _projectService.ProjectAdded += OnProjectAdded;
+        _projectService.ProjectUpdated += OnProjectUpdated;
+        _projectService.ProjectRemoved += OnProjectRemoved;
 
         // 通知センターとの同期
         _notificationService.UnreadCountChanged += (s, e) => UpdateUnreadCount();
@@ -199,37 +201,46 @@ public partial class MainViewModel : ObservableObject
         UnreadNotificationCount = _notificationService.UnreadNotifications.Count;
     }
 
-    private void OnProjectChanged(Guid projectId)
+    private void OnProjectAdded(Project project)
     {
-        _logger.LogInformation("Project changed event received for {ProjectId}", projectId);
+        _ = _dispatcherService.InvokeAsync(() =>
+        {
+            if (!Projects.Any(p => p.Id == project.Id))
+            {
+                var vm = _viewModelFactory.CreateProjectViewModel(project);
+                Projects.Add(vm);
+            }
+        });
+    }
 
-        _ = _dispatcherService.InvokeAsync(async () =>
+    private void OnProjectUpdated(Project project)
+    {
+        _logger.LogInformation("Project updated event received for {ProjectId}", project.Id);
+
+        _ = _dispatcherService.InvokeAsync(() =>
         {
             _saveCoordinator.IsEnabled = false;
             try
             {
-                var updatedProjectEntity = await _findProjectUseCase.ExecuteAsync(projectId);
-                if (updatedProjectEntity == null) return;
-
-                var existingViewModel = Projects.FirstOrDefault(pvm => pvm.Id == projectId);
+                var existingViewModel = Projects.FirstOrDefault(pvm => pvm.Id == project.Id);
                 if (existingViewModel != null)
                 {
-                    _logger.LogDebug("Updating existing project {ProjectId} ViewModel via differential sync.", projectId);
-                    existingViewModel.UpdateFromModel(updatedProjectEntity);
+                    _logger.LogDebug("Updating existing project {ProjectId} ViewModel via differential sync.", project.Id);
+                    existingViewModel.UpdateFromModel(project);
                 }
                 else
                 {
-                    _logger.LogDebug("Adding new project {ProjectId} ViewModel from sync.", projectId);
-                    var newProjectViewModel = _viewModelFactory.CreateProjectViewModel(updatedProjectEntity);
+                    // まだリストにない場合は追加
+                    var newProjectViewModel = _viewModelFactory.CreateProjectViewModel(project);
                     Projects.Add(newProjectViewModel);
                 }
 
-                // 同期後に期限チェックを実行
+                // 更新後に期限チェックを実行
                 _checkDeadlinesUseCase.Execute(Projects.Select(p => p.Model));
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to update project {ProjectId} on change event.", projectId);
+                _logger.LogError(ex, "Failed to update project {ProjectId} on change event.", project.Id);
             }
             finally
             {
@@ -238,12 +249,25 @@ public partial class MainViewModel : ObservableObject
         });
     }
 
+    private void OnProjectRemoved(Guid projectId)
+    {
+        _ = _dispatcherService.InvokeAsync(() =>
+        {
+            var vm = Projects.FirstOrDefault(p => p.Id == projectId);
+            if (vm != null)
+            {
+                Projects.Remove(vm);
+            }
+        });
+    }
+
     private async System.Threading.Tasks.Task InitializeAsync()
     {
-        _logger.LogInformation("Loading initial projects");
+        _logger.LogInformation("Loading initial projects via ProjectService");
         _saveCoordinator.IsEnabled = false;
         try
         {
+            // ユースケース経由でサービスのロードを叩く
             var projectEntities = await _loadUseCase.ExecuteAsync();
 
             await _dispatcherService.InvokeAsync(() =>
@@ -347,23 +371,19 @@ public partial class MainViewModel : ObservableObject
             {
                 _logger.LogDebug("Adding project: {Name}", addProjectVm.Name);
 
-                var projectEntity = await _addProjectUseCase.ExecuteAsync(
+                // ユースケースを実行（内部で ProjectService.SaveProjectAsync が呼ばれ、イベントが飛んでくる）
+                await _addProjectUseCase.ExecuteAsync(
                     addProjectVm.Name,
                     addProjectVm.Description,
                     addProjectVm.Status,
                     addProjectVm.Health);
 
-                var projectViewModel = _viewModelFactory.CreateProjectViewModel(projectEntity);
+                _logger.LogInformation("AddProject execution requested.");
 
-                await _dispatcherService.InvokeAsync(() =>
-                {
-                    Projects.Add(projectViewModel);
-                });
-
-                _logger.LogInformation("AddProject completed successfully. Created project {ProjectId}", projectViewModel.Id);
-
-                // 作成したプロジェクトへ自動的に遷移
-                NavigateToProject(projectViewModel);
+                // Note: Projects コレクションへの追加は OnProjectAdded イベントによって自動で行われるため、
+                // ここでの明示的な Projects.Add は不要になります。
+                // 遷移が必要な場合は、追加された VM を探すか、イベント経由で通知を受け取る仕組みが必要ですが、
+                // 一旦はイベントによる自動追加を優先します。
             }
         }
         catch (Exception ex)

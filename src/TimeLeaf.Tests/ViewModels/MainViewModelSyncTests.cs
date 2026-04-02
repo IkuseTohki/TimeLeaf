@@ -35,7 +35,7 @@ public class MainViewModelSyncTests
         var loadUseCaseMock = new Mock<ILoadProjectsUseCase>();
         var saveUseCaseMock = new Mock<ISaveProjectUseCase>();
         var findProjectUseCaseMock = new Mock<IFindProjectUseCase>();
-        var syncServiceMock = new Mock<IProjectSyncService>();
+        var projectServiceMock = new Mock<IProjectService>();
         var addProjectUseCaseMock = new Mock<IAddProjectUseCase>();
         var viewModelFactoryMock = new Mock<IViewModelFactory>();
         var loggerMock = new Mock<ILogger<MainViewModel>>();
@@ -78,7 +78,7 @@ public class MainViewModelSyncTests
         var identityServiceMock = new Mock<IIdentityService>();
 
         var saveCoordinator = new ProjectSaveCoordinator(saveUseCaseMock.Object, new Mock<ILogger<ProjectSaveCoordinator>>().Object);
-        var viewModel = new MainViewModel(loadUseCaseMock.Object, saveUseCaseMock.Object, findProjectUseCaseMock.Object, syncServiceMock.Object, addProjectUseCaseMock.Object, saveCoordinator, dispatcherMock.Object, viewModelFactoryMock.Object, notificationServiceMock.Object, snackbarServiceMock.Object, osNotificationServiceMock.Object, checkDeadlinesUseCaseMock.Object, dialogServiceMock.Object, identityServiceMock.Object, loggerMock.Object);
+        var viewModel = new MainViewModel(loadUseCaseMock.Object, saveUseCaseMock.Object, findProjectUseCaseMock.Object, projectServiceMock.Object, addProjectUseCaseMock.Object, saveCoordinator, dispatcherMock.Object, viewModelFactoryMock.Object, notificationServiceMock.Object, snackbarServiceMock.Object, osNotificationServiceMock.Object, checkDeadlinesUseCaseMock.Object, dialogServiceMock.Object, identityServiceMock.Object, loggerMock.Object);
         await System.Threading.Tasks.Task.Delay(100); // InitializeAsync の完了を待つ
 
         // ロードされる「最新」の状態を準備（別のタスクがある状態）
@@ -90,7 +90,7 @@ public class MainViewModelSyncTests
         findProjectUseCaseMock.Setup(r => r.ExecuteAsync(projectId)).ReturnsAsync(updatedProject);
 
         // Act
-        syncServiceMock.Raise(r => r.ProjectChanged += null, projectId);
+        projectServiceMock.Raise(r => r.ProjectUpdated += null, updatedProject);
         await System.Threading.Tasks.Task.Delay(500); // OnProjectChanged 内の Dispatcher.InvokeAsync の完了をより長く待つ
 
         // Assert

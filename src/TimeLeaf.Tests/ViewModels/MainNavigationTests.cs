@@ -21,7 +21,7 @@ public class MainNavigationTests
     private Mock<ILoadProjectsUseCase> _loadUseCaseMock = null!;
     private Mock<ISaveProjectUseCase> _saveSingleUseCaseMock = null!;
     private Mock<IFindProjectUseCase> _findProjectUseCaseMock = null!;
-    private Mock<IProjectSyncService> _syncServiceMock = null!;
+    private Mock<IProjectService> _projectServiceMock = null!;
     private Mock<IAddProjectUseCase> _addProjectUseCaseMock = null!;
     private Mock<IProjectSaveCoordinator> _saveCoordinatorMock = null!;
     private Mock<IDispatcherService> _dispatcherServiceMock = null!;
@@ -41,7 +41,7 @@ public class MainNavigationTests
         _loadUseCaseMock = new Mock<ILoadProjectsUseCase>();
         _saveSingleUseCaseMock = new Mock<ISaveProjectUseCase>();
         _findProjectUseCaseMock = new Mock<IFindProjectUseCase>();
-        _syncServiceMock = new Mock<IProjectSyncService>();
+        _projectServiceMock = new Mock<IProjectService>();
         _addProjectUseCaseMock = new Mock<IAddProjectUseCase>();
         _saveCoordinatorMock = new Mock<IProjectSaveCoordinator>();
         _dispatcherServiceMock = new Mock<IDispatcherService>();
@@ -75,7 +75,7 @@ public class MainNavigationTests
             _loadUseCaseMock.Object,
             _saveSingleUseCaseMock.Object,
             _findProjectUseCaseMock.Object,
-            _syncServiceMock.Object,
+            _projectServiceMock.Object,
             _addProjectUseCaseMock.Object,
             _saveCoordinatorMock.Object,
             _dispatcherServiceMock.Object,

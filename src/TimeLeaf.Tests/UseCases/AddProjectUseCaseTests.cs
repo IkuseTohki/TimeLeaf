@@ -1,9 +1,9 @@
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using System.Threading.Tasks;
 using TimeLeaf.Models.Entities;
-using TimeLeaf.Models.Enums;
-using TimeLeaf.Repositories;
 using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 
@@ -12,36 +12,38 @@ namespace TimeLeaf.Tests.UseCases;
 [TestClass]
 public class AddProjectUseCaseTests
 {
+    private Mock<IProjectService> _projectServiceMock = null!;
+
+    [TestInitialize]
+    public void Setup()
+    {
+        _projectServiceMock = new Mock<IProjectService>();
+    }
+
     /// <summary>
-    /// テスト観点: AddProjectUseCase が、渡されたパラメータで Project を生成し、
-    /// IProjectRepository の SaveAsync を正しく呼び出すことを確認する。
+    /// テスト観点: AddProjectUseCase が、指定された内容でプロジェクトを作成し、保存することを確認する。
     /// </summary>
     [TestMethod]
-    public async System.Threading.Tasks.Task ExecuteAsync_ShouldCreateAndSaveProject()
+    public async Task ExecuteAsync_ShouldCreateAndSaveProject()
     {
         // Arrange
-        var saveUseCaseMock = new Mock<ISaveProjectUseCase>();
-        var useCase = new AddProjectUseCase(saveUseCaseMock.Object);
-
-        var name = "Test Project";
-        var description = "Test Description";
-        var status = ProjectStatus.InProgress;
-        var health = (ProjectHealth)3;
+        var useCase = new AddProjectUseCase(_projectServiceMock.Object);
+        var name = "New Project";
+        var description = "Description";
+        var status = TimeLeaf.Models.Enums.ProjectStatus.InProgress;
+        var health = TimeLeaf.Models.Enums.ProjectHealth.Healthy;
 
         // Act
-        var createdProject = await useCase.ExecuteAsync(name, description, status, health);
+        var project = await useCase.ExecuteAsync(name, description, status, health);
 
         // Assert
-        // 1. ISaveProjectUseCase の ExecuteAsync が1回だけ呼び出されたことを確認
-        saveUseCaseMock.Verify(s => s.ExecuteAsync(It.Is<Project>(p =>
-            p.Name == name &&
-            p.Description == description &&
-            p.Status == status &&
-            p.HealthStatus == health
-        )), Times.Once);
+        Assert.IsNotNull(project);
+        Assert.AreEqual(name, project.Name);
+        Assert.AreEqual(description, project.Description);
+        Assert.AreEqual(status, project.Status);
+        Assert.AreEqual(health, project.HealthStatus);
 
-        // 2. 返されたプロジェクトのプロパティが正しいことを確認
-        Assert.IsNotNull(createdProject);
-        Assert.AreEqual(name, createdProject.Name);
+        // サービスの保存が呼び出されていること
+        _projectServiceMock.Verify(s => s.SaveProjectAsync(It.Is<Project>(p => p.Id == project.Id)), Times.Once);
     }
 }

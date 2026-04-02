@@ -1,10 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
-using TimeLeaf.Repositories;
 using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 
@@ -13,34 +13,32 @@ namespace TimeLeaf.Tests.UseCases;
 [TestClass]
 public class LoadProjectsUseCaseTests
 {
-    private Mock<IProjectRepository> _repositoryMock = null!;
+    private Mock<IProjectService> _projectServiceMock = null!;
 
     [TestInitialize]
     public void Setup()
     {
-        _repositoryMock = new Mock<IProjectRepository>();
+        _projectServiceMock = new Mock<IProjectService>();
     }
 
     /// <summary>
-    /// テスト観点: ユースケースを実行した際、リポジトリから取得したプロジェクトリストが返されることを確認する。
+    /// テスト観点: LoadProjectsUseCase がサービスを介してプロジェクト一覧を取得することを確認する。
     /// </summary>
     [TestMethod]
-    public async System.Threading.Tasks.Task ExecuteAsync_ShouldReturnProjectsFromRepository()
+    public async Task ExecuteAsync_ShouldCallLoadAndReturnAllProjects()
     {
         // Arrange
-        var p1 = new Project();
-        p1.UpdateName("P1");
-        var expectedProjects = new List<Project> { p1 };
-        _repositoryMock.Setup(r => r.LoadAllAsync()).ReturnsAsync(expectedProjects);
-        var useCase = new LoadProjectsUseCase(_repositoryMock.Object);
+        var projects = new List<Project> { new Project(), new Project() };
+        _projectServiceMock.Setup(s => s.AllProjects).Returns(projects);
+
+        var useCase = new LoadProjectsUseCase(_projectServiceMock.Object);
 
         // Act
         var result = await useCase.ExecuteAsync();
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual(1, result.Count());
-        Assert.AreEqual("P1", result.First().Name);
-        _repositoryMock.Verify(r => r.LoadAllAsync(), Times.Once);
+        _projectServiceMock.Verify(s => s.LoadAllAsync(), Times.Once);
+        Assert.AreEqual(2, result.Count());
+        Assert.AreSame(projects, result);
     }
 }

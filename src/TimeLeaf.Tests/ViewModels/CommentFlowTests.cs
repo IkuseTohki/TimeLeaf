@@ -51,7 +51,7 @@ public class CommentFlowTests
 
         var loadUseCaseMock = new Mock<ILoadProjectsUseCase>();
         var findProjectUseCaseMock = new Mock<IFindProjectUseCase>();
-        var syncServiceMock = new Mock<IProjectSyncService>();
+        var projectServiceMock = new Mock<IProjectService>();
         var addProjectUseCaseMock = new Mock<IAddProjectUseCase>();
         var viewModelFactoryMock = new Mock<IViewModelFactory>();
         var loggerMock = new Mock<ILogger<MainViewModel>>();
@@ -89,7 +89,7 @@ public class CommentFlowTests
             loadUseCaseMock.Object,
             _saveUseCaseMock.Object,
             findProjectUseCaseMock.Object,
-            syncServiceMock.Object,
+            projectServiceMock.Object,
             addProjectUseCaseMock.Object,
             saveCoordinator,
             dispatcherMock.Object,

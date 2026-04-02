@@ -56,7 +56,7 @@ public class InfiniteLoopReproductionTests
         var saveUseCaseMock = new Mock<ISaveProjectUseCase>();
         var loadUseCaseMock = new Mock<ILoadProjectsUseCase>();
         var findProjectUseCaseMock = new Mock<IFindProjectUseCase>();
-        var syncServiceMock = new Mock<IProjectSyncService>();
+        var projectServiceMock = new Mock<IProjectService>();
         var addProjectUseCaseMock = new Mock<IAddProjectUseCase>();
         var viewModelFactoryMock = new Mock<IViewModelFactory>();
 
@@ -84,7 +84,7 @@ public class InfiniteLoopReproductionTests
             loadUseCaseMock.Object,
             saveUseCaseMock.Object,
             findProjectUseCaseMock.Object,
-            syncServiceMock.Object,
+            projectServiceMock.Object,
             addProjectUseCaseMock.Object,
             saveCoordinator,
             dispatcherMock.Object,
@@ -101,7 +101,6 @@ public class InfiniteLoopReproductionTests
 
         var projectVM = mainVM.Projects.First();
         var addTaskUseCase = new AddTaskUseCase(saveUseCaseMock.Object);
-        var addCommentUseCase = new AddCommentUseCase(saveUseCaseMock.Object, _identityServiceMock.Object);
 
         var checkAssignmentMock = new Mock<ICheckAssignmentUseCase>();
         var workspaceVM = new ProjectWorkspaceViewModel(projectVM, mainVM.Projects, notificationServiceMock.Object, viewModelFactoryMock.Object, checkAssignmentMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
@@ -140,7 +139,7 @@ public class InfiniteLoopReproductionTests
         var saveUseCaseMock = new Mock<ISaveProjectUseCase>();
         var loadUseCaseMock = new Mock<ILoadProjectsUseCase>();
         var findProjectUseCaseMock = new Mock<IFindProjectUseCase>();
-        var syncServiceMock = new Mock<IProjectSyncService>();
+        var projectServiceMock = new Mock<IProjectService>();
         var addProjectUseCaseMock = new Mock<IAddProjectUseCase>();
         var viewModelFactoryMock = new Mock<IViewModelFactory>();
 
@@ -168,7 +167,7 @@ public class InfiniteLoopReproductionTests
             loadUseCaseMock.Object,
             saveUseCaseMock.Object,
             findProjectUseCaseMock.Object,
-            syncServiceMock.Object,
+            projectServiceMock.Object,
             addProjectUseCaseMock.Object,
             saveCoordinator,
             dispatcherMock.Object,
@@ -185,7 +184,6 @@ public class InfiniteLoopReproductionTests
 
         var projectVM = mainVM.Projects.First();
         var addTaskUseCase = new AddTaskUseCase(saveUseCaseMock.Object);
-        var addCommentUseCase = new AddCommentUseCase(saveUseCaseMock.Object, _identityServiceMock.Object);
 
         var checkAssignmentMock = new Mock<ICheckAssignmentUseCase>();
         var workspaceVM = new ProjectWorkspaceViewModel(projectVM, mainVM.Projects, notificationServiceMock.Object, viewModelFactoryMock.Object, checkAssignmentMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);

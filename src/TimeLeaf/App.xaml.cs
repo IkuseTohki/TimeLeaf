@@ -248,7 +248,7 @@ public partial class App : Application
         services.AddSingleton<IDialogService, DialogService>();
 
         // アプリケーションサービスの登録
-        services.AddSingleton<IProjectSyncService, ProjectSyncService>();
+        services.AddSingleton<IProjectService, ProjectService>();
         services.AddSingleton<INotificationService, NotificationService>();
         services.AddSingleton<ISnackbarService, SnackbarService>();
         services.AddSingleton<IOSNotificationService, WindowsNotificationService>();
