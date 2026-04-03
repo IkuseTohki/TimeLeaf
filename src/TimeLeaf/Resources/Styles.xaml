@@ -461,12 +461,39 @@
            BasedOn="{StaticResource ViewHeaderTitleStyle}"
            TargetType="TextBlock" />
 
-    <!-- プロジェクトワークスペース：ナビゲーションボタン（ItemsControl内）のスタイル -->
-    <Style x:Key="ProjectWorkspaceNavigationButtonStyle"
-           BasedOn="{StaticResource OrganicButtonStyle}"
-           TargetType="Button">
-        <Setter Property="Margin" Value="4,0" />
-        <Setter Property="Padding" Value="12,6" />
+    <!-- プロジェクト状態（進行中など）のテキストスタイル -->
+    <Style x:Key="ProjectStatusTextStyle" TargetType="Run">
+        <Setter Property="BaselineAlignment" Value="Center" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    </Style>
+
+    <!-- プロジェクトワークスペース：タブ形式のナビゲーションボタンスタイル -->
+    <Style x:Key="ProjectWorkspaceTabNavigationButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0,0,0,2" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="Padding" Value="0,8" />
+        <Setter Property="Margin" Value="0,0,24,0" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource BrandPrimaryBrush}" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <!-- ユーザーアバター（アイコン）の基本スタイル -->

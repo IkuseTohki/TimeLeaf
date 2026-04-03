@@ -22,11 +22,11 @@
         <DataTemplate DataType="{x:Type wvm:ProjectTimelineViewModel}">
             <wv:ProjectTimelineView />
         </DataTemplate>
-        <DataTemplate DataType="{x:Type wvm:ProjectSettingsViewModel}">
-            <wv:ProjectSettingsView />
-        </DataTemplate>
         <DataTemplate DataType="{x:Type vm:NotificationsViewModel}">
             <views:NotificationsView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type wvm:ProjectSettingsViewModel}">
+            <wv:ProjectSettingsView />
         </DataTemplate>
     </UserControl.Resources>
 
@@ -42,11 +42,11 @@
             <StackPanel VerticalAlignment="Bottom">
                 <TextBlock Style="{StaticResource ProjectWorkspaceTitleStyle}">
                     <Run Text="{Binding ProjectName, Mode=OneWay}" />
-                    <Run BaselineAlignment="Center"
-                         FontSize="12"
-                         Text=" 進行中" />
+                    <Run Style="{StaticResource ProjectStatusTextStyle}" Text=" 進行中" />
                 </TextBlock>
-                <TextBlock Style="{StaticResource ViewHeaderSubTitleStyle}" Text="個別プロジェクトのワークスペースを表示中" />
+                <TextBlock Margin="0,4,0,16"
+                           Style="{StaticResource ViewHeaderSubTitleStyle}"
+                           Text="個別プロジェクトのワークスペースを表示中" />
             </StackPanel>
 
             <!-- 操作ボタン / 参加バナー -->
@@ -60,7 +60,7 @@
                         Style="{StaticResource PrimaryButtonStyle}"
                         Visibility="{Binding IsUserAssigned, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Inverse}" />
 
-                <!-- サブメニュー (参加時) -->
+                <!-- タブナビゲーション -->
                 <ItemsControl ItemsSource="{Binding NavigationItems}" Visibility="{Binding IsUserAssigned, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -69,17 +69,26 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Button Command="{Binding DataContext.SwitchSubViewCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            <Button x:Name="NavButton"
+                                    Command="{Binding DataContext.SwitchSubViewCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                     CommandParameter="{Binding Parameter}"
                                     Content="{Binding Label}"
-                                    Style="{StaticResource ProjectWorkspaceNavigationButtonStyle}" />
+                                    Style="{StaticResource ProjectWorkspaceTabNavigationButtonStyle}" />
+                            <DataTemplate.Triggers>
+                                <DataTrigger Value="True">
+                                    <DataTrigger.Binding>
+                                        <MultiBinding Converter="{StaticResource EqualityToBooleanConverter}">
+                                            <Binding Path="Parameter" />
+                                            <Binding Path="DataContext.CurrentViewName" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                                        </MultiBinding>
+                                    </DataTrigger.Binding>
+                                    <Setter TargetName="NavButton" Property="Foreground" Value="{DynamicResource BrandPrimaryBrush}" />
+                                    <Setter TargetName="NavButton" Property="BorderBrush" Value="{DynamicResource BrandPrimaryBrush}" />
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
-
-                <Border Style="{StaticResource UserAvatarIconStyle}">
-                    <TextBlock Style="{StaticResource UserAvatarInitialStyle}" Text="KT" />
-                </Border>
             </StackPanel>
         </Grid>
 

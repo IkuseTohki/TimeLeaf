@@ -22,6 +22,12 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
     private readonly ILogger<ProjectWorkspaceViewModel> _logger;
 
     /// <summary>
+    /// 現在表示中のサブビューの名前。
+    /// </summary>
+    [ObservableProperty]
+    private string _currentViewName = "Dashboard";
+
+    /// <summary>
     /// 現在表示中のサブビューのViewModel。
     /// </summary>
     [ObservableProperty]
@@ -38,11 +44,11 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
     /// </summary>
     public List<NavigationItem> NavigationItems { get; } = new()
     {
-        new NavigationItem("🏠 Dashboard", "Dashboard"),
-        new NavigationItem("🌿 Tasks", "Tasks"),
-        new NavigationItem("⏳ Timeline", "Timeline"),
-        new NavigationItem("⚙️ Settings", "Settings"),
-        new NavigationItem("🔔 Notifications", "Notifications")
+        new NavigationItem("Dashboard", "Dashboard"),
+        new NavigationItem("Tasks", "Tasks"),
+        new NavigationItem("Timeline", "Timeline"),
+        new NavigationItem("Notifications", "Notifications"),
+        new NavigationItem("Settings", "Settings")
     };
 
     /// <summary>
@@ -132,6 +138,7 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
             oldTasksVm.TaskDetailRequested -= OnTaskDetailRequested;
         }
 
+        CurrentViewName = viewName;
         CurrentSubViewModel = viewName switch
         {
             "Dashboard" => _viewModelFactory.CreateProjectDashboardViewModel(_projectViewModel),
@@ -175,6 +182,7 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
         // 閉じる要求（戻る要求）をハンドル
         detailVm.RequestClose += (result) => CloseTaskDetail();
 
+        CurrentViewName = "Tasks";
         CurrentSubViewModel = detailVm;
     }
 
