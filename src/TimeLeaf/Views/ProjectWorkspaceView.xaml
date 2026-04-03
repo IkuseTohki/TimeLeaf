@@ -44,7 +44,7 @@
                     <Run Text="{Binding ProjectName, Mode=OneWay}" />
                     <Run Style="{StaticResource ProjectStatusTextStyle}" Text=" 進行中" />
                 </TextBlock>
-                <TextBlock Margin="0,4,0,16"
+                <TextBlock Margin="0,4,0,4"
                            Style="{StaticResource ViewHeaderSubTitleStyle}"
                            Text="個別プロジェクトのワークスペースを表示中" />
             </StackPanel>

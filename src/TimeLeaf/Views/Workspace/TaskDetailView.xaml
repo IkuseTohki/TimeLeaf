@@ -25,36 +25,30 @@
             </Grid.ColumnDefinitions>
 
             <!-- 左側: メインコンテンツ (縦に 1.タイトル, 2.説明, 3.対話) -->
-            <Grid Grid.Column="0" Margin="32,24">
+            <Grid Grid.Column="0" Margin="32,12">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <!-- 1. タイトル -->
-                    <RowDefinition Height="1.2*" />
+                    <RowDefinition Height="Auto" />
                     <!-- 2. 詳細説明 -->
                     <RowDefinition Height="Auto" />
                     <!-- セパレーター -->
-                    <RowDefinition Height="2*" />
-                    <!-- 3. ディスカッション -->
+                    <RowDefinition Height="*" />
+                    <!-- 3. ディスカッション (ここだけ残りのスペースを埋める) -->
                 </Grid.RowDefinitions>
 
                 <!-- 1. タスクタイトル -->
-                <TextBox Grid.Row="0"
-                         Margin="0,0,0,24"
-                         FontSize="24"
-                         FontWeight="Bold"
-                         Style="{StaticResource OrganicTextBoxStyle}"
-                         Text="{Binding Task.Name, UpdateSourceTrigger=PropertyChanged}" />
+                <c:EditableLabel Grid.Row="0"
+                                 Margin="4,0,0,24"
+                                 FontSize="24"
+                                 FontWeight="ExtraBold"
+                                 Text="{Binding Task.Name, UpdateSourceTrigger=PropertyChanged}" />
 
                 <!-- 2. ROOTS (詳細説明) -->
-                <DockPanel Grid.Row="1" Margin="0,0,0,24">
-                    <TextBlock DockPanel.Dock="Top"
-                               Style="{StaticResource TaskPanelSectionHeaderStyle}"
-                               Text="ROOTS (詳細説明)" />
-                    <TextBox AcceptsReturn="True"
-                             Style="{StaticResource OrganicTextBoxStyle}"
-                             Text="{Binding Task.Description, UpdateSourceTrigger=PropertyChanged}"
-                             TextWrapping="Wrap" />
-                </DockPanel>
+                <c:EditableTextBlock Grid.Row="1"
+                                     Margin="0,0,0,32"
+                                     Header="Overview"
+                                     Text="{Binding Task.Description, UpdateSourceTrigger=PropertyChanged}" />
 
                 <Separator Grid.Row="2"
                            Margin="0,0,0,24"
