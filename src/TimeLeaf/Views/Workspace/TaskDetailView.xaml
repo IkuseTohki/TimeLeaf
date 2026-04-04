@@ -142,7 +142,9 @@
 
                         <StackPanel Margin="0,0,0,16">
                             <TextBlock Style="{StaticResource TaskPanelMetaLabelStyle}" Text="優先度" />
-                            <ComboBox ItemsSource="{Binding Task.PriorityValues}" SelectedItem="{Binding Task.Priority, Mode=TwoWay}" />
+                            <ComboBox ItemsSource="{Binding Task.PriorityValues}"
+                                      SelectedItem="{Binding Task.Priority, Mode=TwoWay}"
+                                      Style="{DynamicResource CompactFormComboBoxStyle}" />
                         </StackPanel>
 
                         <StackPanel Margin="0,0,0,16">

@@ -52,7 +52,8 @@
                     <ComboBox Width="200"
                               HorizontalAlignment="Left"
                               SelectedValue="{Binding SelectedTheme}"
-                              SelectedValuePath="Content">
+                              SelectedValuePath="Content"
+                              Style="{DynamicResource CompactFormComboBoxStyle}">
                         <ComboBoxItem Content="Forest" IsSelected="True" />
                         <ComboBoxItem Content="Light" />
                         <ComboBoxItem Content="Dark" />

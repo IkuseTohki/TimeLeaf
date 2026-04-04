@@ -12,15 +12,15 @@
             <ResourceDictionary.MergedDictionaries>
                 <!-- Colors (Themes) -->
                 <ResourceDictionary Source="/Resources/ForestColors.xaml" />
+                <ResourceDictionary Source="/Resources/Icons.xaml" />
 
                 <!-- LeafKit.UI Resources -->
-                <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/ComponentStyles.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/ControlStyles.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/ComponentStyles.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/FormStyles.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/LayoutStyles.xaml" />
 
                 <!-- App Specific Resources -->
-                <ResourceDictionary Source="/Resources/Icons.xaml" />
                 <ResourceDictionary Source="/Resources/Converters.xaml" />
                 <ResourceDictionary Source="/Resources/Styles.xaml" />
                 <ResourceDictionary Source="/Resources/DataTemplates.xaml" />

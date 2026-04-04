@@ -41,14 +41,16 @@
                 <Label Content="ステータス" Style="{StaticResource SectionHeaderLabelStyle}" />
                 <ComboBox Height="36"
                           ItemsSource="{Binding TaskStatusValues}"
-                          SelectedItem="{Binding Status}" />
+                          SelectedItem="{Binding Status}"
+                          Style="{DynamicResource CompactFormComboBoxStyle}" />
             </StackPanel>
 
             <StackPanel Grid.Row="0" Grid.Column="2">
                 <Label Content="優先度" Style="{StaticResource SectionHeaderLabelStyle}" />
                 <ComboBox Height="36"
                           ItemsSource="{Binding TaskPriorityValues}"
-                          SelectedItem="{Binding Priority}" />
+                          SelectedItem="{Binding Priority}"
+                          Style="{DynamicResource CompactFormComboBoxStyle}" />
             </StackPanel>
 
             <StackPanel Grid.Row="1" Grid.Column="0">

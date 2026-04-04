@@ -178,10 +178,17 @@ public partial class ProjectTaskViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     private bool _isSelected;
 
-    /// <summary>
-    /// 依存タスクのIDリスト。
-    /// </summary>
     public List<Guid> Dependencies => _projectTask.Dependencies;
+
+    /// <summary>
+    /// 優先度の全選択肢。
+    /// </summary>
+    public IEnumerable<TaskPriority> PriorityValues => Enum.GetValues(typeof(TaskPriority)).Cast<TaskPriority>();
+
+    /// <summary>
+    /// ステータスの全選択肢。
+    /// </summary>
+    public IEnumerable<TimeLeaf.Models.Enums.TaskStatus> StatusValues => Enum.GetValues(typeof(TimeLeaf.Models.Enums.TaskStatus)).Cast<TimeLeaf.Models.Enums.TaskStatus>();
 
     /// <summary>
     /// タスクに関するコメントのリスト（UI用）。
