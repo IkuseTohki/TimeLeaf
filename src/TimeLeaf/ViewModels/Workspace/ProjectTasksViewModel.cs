@@ -7,6 +7,8 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 using TimeLeaf.Models.Enums;
 using TimeLeaf.UseCases;
+using TimeLeaf.Repositories;
+using TimeLeaf.Models.Entities;
 
 namespace TimeLeaf.ViewModels.Workspace;
 
@@ -17,6 +19,7 @@ public partial class ProjectTasksViewModel : ObservableObject
 {
     private readonly ProjectViewModel _projectViewModel;
     private readonly IAddTaskUseCase _addTaskUseCase;
+    private readonly IUserRepository _userRepository;
     private readonly IViewModelFactory _viewModelFactory;
     private readonly LeafKit.UI.Services.IDialogService _dialogService;
     private readonly ILogger<ProjectTasksViewModel> _logger;
@@ -41,6 +44,7 @@ public partial class ProjectTasksViewModel : ObservableObject
     public ProjectTasksViewModel(
         ProjectViewModel projectViewModel,
         IAddTaskUseCase addTaskUseCase,
+        IUserRepository userRepository,
         IViewModelFactory viewModelFactory,
         LeafKit.UI.Services.IDialogService dialogService,
         ILogger<ProjectTasksViewModel> logger,
@@ -48,6 +52,7 @@ public partial class ProjectTasksViewModel : ObservableObject
     {
         _projectViewModel = projectViewModel;
         _addTaskUseCase = addTaskUseCase;
+        _userRepository = userRepository;
         _viewModelFactory = viewModelFactory;
         _dialogService = dialogService;
         _logger = logger;
@@ -96,12 +101,22 @@ public partial class ProjectTasksViewModel : ObservableObject
 
         try
         {
-            var addTaskVm = _viewModelFactory.CreateAddTaskViewModel();
+            // プロジェクトのアサイン済みユーザーをロード
+            var teammates = new List<User>();
+            foreach (var userId in _projectViewModel.Model.AssignedUserIds)
+            {
+                var user = await _userRepository.GetUserAsync(userId);
+                if (user != null) teammates.Add(user);
+            }
+
+            var addTaskVm = _viewModelFactory.CreateAddTaskViewModel(teammates);
             var result = await _dialogService.ShowDialogAsync(addTaskVm);
 
             if (result)
             {
                 _logger.LogDebug("Adding task: {Name}", addTaskVm.Name);
+
+                var assigneeName = (addTaskVm.Assignee as User)?.DisplayName ?? string.Empty;
 
                 await _addTaskUseCase.ExecuteAsync(
                     _projectViewModel.Model,
@@ -115,7 +130,7 @@ public partial class ProjectTasksViewModel : ObservableObject
                     null, // actualEndDate
                     addTaskVm.EstimatedWorkHours ?? 0,
                     0,    // actualCost
-                    addTaskVm.Assignee ?? string.Empty
+                    assigneeName
                 );
 
                 _projectViewModel.SyncFromModel();

@@ -19,7 +19,7 @@ public interface IViewModelFactory
     ProjectViewModel CreateProjectViewModel(Project project);
     ProjectTaskViewModel CreateProjectTaskViewModel(ProjectTask task);
     AddProjectViewModel CreateAddProjectViewModel();
-    AddTaskViewModel CreateAddTaskViewModel();
+    AddTaskViewModel CreateAddTaskViewModel(System.Collections.Generic.IEnumerable<User>? teammates = null);
 
     ProjectDashboardViewModel CreateProjectDashboardViewModel(ProjectViewModel projectViewModel);
     ProjectTasksViewModel CreateProjectTasksViewModel(ProjectViewModel projectViewModel);

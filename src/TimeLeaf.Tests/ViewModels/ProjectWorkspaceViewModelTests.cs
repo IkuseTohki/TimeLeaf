@@ -56,6 +56,7 @@ public class ProjectWorkspaceViewModelTests
             .Returns((ProjectViewModel p) => new ProjectTasksViewModel(
                 p,
                 new Mock<IAddTaskUseCase>().Object,
+                new Mock<IUserRepository>().Object,
                 _viewModelFactoryMock.Object,
                 new Mock<IDialogService>().Object,
                 new Mock<ILogger<ProjectTasksViewModel>>().Object,

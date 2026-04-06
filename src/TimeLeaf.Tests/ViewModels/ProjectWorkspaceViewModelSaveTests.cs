@@ -105,6 +105,7 @@ public class ProjectWorkspaceViewModelSaveTests
         var tasksViewModel = new ProjectTasksViewModel(
             projectViewModel,
             addTaskUseCase,
+            new Mock<IUserRepository>().Object,
             viewModelFactoryMock.Object,
             _dialogServiceMock.Object,
             new Mock<ILogger<ProjectTasksViewModel>>().Object,
@@ -117,7 +118,7 @@ public class ProjectWorkspaceViewModelSaveTests
         // Act
         var taskName = "New Task to Save";
         var addTaskViewModel = new AddTaskViewModel { Name = taskName };
-        viewModelFactoryMock.Setup(x => x.CreateAddTaskViewModel()).Returns(addTaskViewModel);
+        viewModelFactoryMock.Setup(x => x.CreateAddTaskViewModel(It.IsAny<IEnumerable<User>>())).Returns(addTaskViewModel);
         _dialogServiceMock.Setup(x => x.ShowDialogAsync(addTaskViewModel)).ReturnsAsync(true);
 
         await tasksViewModel.AddTaskCommand.ExecuteAsync(null);

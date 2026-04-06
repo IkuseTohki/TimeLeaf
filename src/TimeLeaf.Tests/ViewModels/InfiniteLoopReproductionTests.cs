@@ -108,6 +108,7 @@ public class InfiniteLoopReproductionTests
         var tasksVM = new ProjectTasksViewModel(
             projectVM,
             addTaskUseCase,
+            new Mock<IUserRepository>().Object,
             viewModelFactoryMock.Object,
             dialogServiceMock.Object,
             new Mock<ILogger<ProjectTasksViewModel>>().Object,
@@ -118,7 +119,7 @@ public class InfiniteLoopReproductionTests
 
         // 2. Act - Add a task with estimated cost
         var addTaskViewModel1 = new AddTaskViewModel { Name = "Task 1" };
-        viewModelFactoryMock.Setup(x => x.CreateAddTaskViewModel()).Returns(addTaskViewModel1);
+        viewModelFactoryMock.Setup(x => x.CreateAddTaskViewModel(It.IsAny<IEnumerable<User>>())).Returns(addTaskViewModel1);
         dialogServiceMock.Setup(x => x.ShowDialogAsync(addTaskViewModel1)).ReturnsAsync(true);
 
         await tasksVM.AddTaskCommand.ExecuteAsync(null);
@@ -191,6 +192,7 @@ public class InfiniteLoopReproductionTests
         var tasksVM = new ProjectTasksViewModel(
             projectVM,
             addTaskUseCase,
+            new Mock<IUserRepository>().Object,
             viewModelFactoryMock.Object,
             dialogServiceMock.Object,
             new Mock<ILogger<ProjectTasksViewModel>>().Object,
@@ -201,13 +203,13 @@ public class InfiniteLoopReproductionTests
 
         // 2. Act - Add 1st task
         var addTaskViewModel1 = new AddTaskViewModel { Name = "Task 1" };
-        viewModelFactoryMock.Setup(x => x.CreateAddTaskViewModel()).Returns(addTaskViewModel1);
+        viewModelFactoryMock.Setup(x => x.CreateAddTaskViewModel(It.IsAny<IEnumerable<User>>())).Returns(addTaskViewModel1);
         dialogServiceMock.Setup(x => x.ShowDialogAsync(addTaskViewModel1)).ReturnsAsync(true);
         await tasksVM.AddTaskCommand.ExecuteAsync(null);
 
         // 3. Act - Add 2nd task immediately
         var addTaskViewModel2 = new AddTaskViewModel { Name = "Task 2" };
-        viewModelFactoryMock.Setup(x => x.CreateAddTaskViewModel()).Returns(addTaskViewModel2);
+        viewModelFactoryMock.Setup(x => x.CreateAddTaskViewModel(It.IsAny<IEnumerable<User>>())).Returns(addTaskViewModel2);
         dialogServiceMock.Setup(x => x.ShowDialogAsync(addTaskViewModel2)).ReturnsAsync(true);
         await tasksVM.AddTaskCommand.ExecuteAsync(null);
 

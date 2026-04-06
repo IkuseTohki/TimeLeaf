@@ -25,7 +25,10 @@ public partial class AddTaskViewModel : ObservableObject, IDialogViewModel
     private TaskPriority _priority = TaskPriority.Medium;
 
     [ObservableProperty]
-    private string? _assignee;
+    private object? _assignee;
+
+    [ObservableProperty]
+    private System.Collections.Generic.IEnumerable<object> _teammates = System.Array.Empty<object>();
 
     [ObservableProperty]
     private DateTime? _dueDate;

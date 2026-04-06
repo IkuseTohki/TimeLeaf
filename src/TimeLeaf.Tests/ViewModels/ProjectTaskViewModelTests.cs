@@ -172,7 +172,7 @@ public class ProjectTaskViewModelTests
         Assert.AreEqual("Updated Name", viewModel.Name);
         Assert.AreEqual(TaskPriority.High, viewModel.Priority);
         Assert.AreEqual(TimeLeaf.Models.Enums.TaskStatus.InProgress, viewModel.Status);
-        
+
         // 多数のプロパティが通知されるはず
         Assert.IsTrue(notifiedProperties.Count >= 10);
         CollectionAssert.Contains(notifiedProperties, nameof(viewModel.Name));

@@ -59,6 +59,7 @@ public class ProjectTasksViewModelTests
         var vm = new ProjectTasksViewModel(
             _projectViewModel,
             _addTaskUseCaseMock.Object,
+            new Mock<IUserRepository>().Object,
             _viewModelFactoryMock.Object,
             _dialogServiceMock.Object,
             _loggerMock.Object,

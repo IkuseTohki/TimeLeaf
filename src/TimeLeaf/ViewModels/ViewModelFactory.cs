@@ -69,9 +69,14 @@ public class ViewModelFactory : IViewModelFactory
         return _serviceProvider.GetRequiredService<AddProjectViewModel>();
     }
 
-    public AddTaskViewModel CreateAddTaskViewModel()
+    public AddTaskViewModel CreateAddTaskViewModel(System.Collections.Generic.IEnumerable<User>? teammates = null)
     {
-        return _serviceProvider.GetRequiredService<AddTaskViewModel>();
+        var vm = _serviceProvider.GetRequiredService<AddTaskViewModel>();
+        if (teammates != null)
+        {
+            vm.Teammates = teammates;
+        }
+        return vm;
     }
 
     public ProjectDashboardViewModel CreateProjectDashboardViewModel(ProjectViewModel projectViewModel)
@@ -87,6 +92,7 @@ public class ViewModelFactory : IViewModelFactory
         return new ProjectTasksViewModel(
             projectViewModel,
             _serviceProvider.GetRequiredService<IAddTaskUseCase>(),
+            _serviceProvider.GetRequiredService<IUserRepository>(),
             this,
             _serviceProvider.GetRequiredService<IDialogService>(),
             _serviceProvider.GetRequiredService<ILogger<ProjectTasksViewModel>>(),
