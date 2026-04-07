@@ -17,6 +17,7 @@ namespace TimeLeaf.Tests.ViewModels;
 public class ProjectTasksViewModelTests
 {
     private Mock<IAddTaskUseCase> _addTaskUseCaseMock = null!;
+    private Mock<IGetProjectMembersUseCase> _getProjectMembersUseCaseMock = null!;
     private Mock<IViewModelFactory> _viewModelFactoryMock = null!;
     private Mock<IUserService> _userServiceMock = null!;
     private Mock<IDialogService> _dialogServiceMock = null!;
@@ -28,6 +29,7 @@ public class ProjectTasksViewModelTests
     public void Initialize()
     {
         _addTaskUseCaseMock = new Mock<IAddTaskUseCase>();
+        _getProjectMembersUseCaseMock = new Mock<IGetProjectMembersUseCase>();
         _viewModelFactoryMock = new Mock<IViewModelFactory>();
         _userServiceMock = new Mock<IUserService>();
 
@@ -59,7 +61,7 @@ public class ProjectTasksViewModelTests
         var vm = new ProjectTasksViewModel(
             _projectViewModel,
             _addTaskUseCaseMock.Object,
-            new Mock<IUserRepository>().Object,
+            _getProjectMembersUseCaseMock.Object,
             _viewModelFactoryMock.Object,
             _dialogServiceMock.Object,
             _loggerMock.Object,

@@ -5,6 +5,9 @@
 
     <tlcv:IntToVisibilityConverter x:Key="IntToVisibilityConverter" />
     <lk:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    <lk:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
+    <lk:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+    <lk:StringToBrushConverter x:Key="StringToBrushConverter" />
     <tlcv:BooleanToDoubleConverter x:Key="BooleanToDoubleConverter" />
     <tlcv:SidebarToggleIconConverter x:Key="SidebarToggleIconConverter" />
     <tlcv:TaskStatusToBoolConverter x:Key="TaskStatusToBoolConverter" />

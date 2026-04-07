@@ -50,7 +50,7 @@ public class ProjectWorkspaceViewModelNavigationTests
             .Returns((ProjectViewModel pvm) => new ProjectTasksViewModel(
                 pvm,
                 new Mock<IAddTaskUseCase>().Object,
-                new Mock<IUserRepository>().Object,
+                new Mock<IGetProjectMembersUseCase>().Object,
                 _viewModelFactoryMock.Object,
                 new Mock<IDialogService>().Object,
                 new Mock<ILogger<ProjectTasksViewModel>>().Object,

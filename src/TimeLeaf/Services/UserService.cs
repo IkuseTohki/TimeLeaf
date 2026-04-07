@@ -10,7 +10,7 @@ namespace TimeLeaf.Services;
 /// IUserService の実装クラス。
 /// ユーザー情報のメモリキャッシュ管理と、変更通知を行います。
 /// </summary>
-public class UserService : IUserService
+public class UserService : IUserService, IDisposable
 {
     private readonly IUserRepository _userRepository;
     private readonly ConcurrentDictionary<Guid, User> _cache = new();
@@ -20,6 +20,19 @@ public class UserService : IUserService
     public UserService(IUserRepository userRepository)
     {
         _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
+
+        // リポジトリの変更通知を購読
+        _userRepository.UserChanged += OnRepositoryUserChanged;
+    }
+
+    private async void OnRepositoryUserChanged(object? sender, Guid userId)
+    {
+        // ファイルが更新されたら再取得してキャッシュを更新
+        var updatedUser = await _userRepository.GetUserAsync(userId);
+        if (updatedUser != null)
+        {
+            UpdateCache(updatedUser);
+        }
     }
 
     public async Task<User?> GetUserAsync(Guid userId)
@@ -51,5 +64,10 @@ public class UserService : IUserService
 
         // 変更を通知
         UserChanged?.Invoke(user);
+    }
+
+    public void Dispose()
+    {
+        _userRepository.UserChanged -= OnRepositoryUserChanged;
     }
 }

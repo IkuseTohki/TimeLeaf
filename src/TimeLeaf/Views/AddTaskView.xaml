@@ -10,37 +10,6 @@
              d:DataContext="{d:DesignInstance vm:AddTaskViewModel}"
              mc:Ignorable="d">
     <UserControl.Resources>
-        <conv:StringToBrushConverter x:Key="StringToBrushConverter" />
-        <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
-        <conv:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
-
-        <!-- アバター表示用共通テンプレート -->
-        <ControlTemplate x:Key="PersonAvatarTemplate" TargetType="ContentControl">
-            <Grid>
-                <!-- 背景色（テーマカラー） -->
-                <Border x:Name="ColorCircle"
-                        Background="{Binding ThemeColor, Converter={StaticResource StringToBrushConverter}}"
-                        CornerRadius="16" />
-
-                <!-- アイコン画像（存在する場合） -->
-                <Border ClipToBounds="True" CornerRadius="16">
-                    <Image x:Name="AvatarImage"
-                           Source="{Binding IconPath}"
-                           Stretch="UniformToFill"
-                           Visibility="{Binding IconPath, Converter={StaticResource NullToVisibilityConverter}}" />
-                </Border>
-
-                <!-- イニシャル表示（画像がない場合のフォールバック） -->
-                <TextBlock HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           FontSize="12"
-                           FontWeight="Bold"
-                           Foreground="White"
-                           Text="{Binding DisplayName[0]}"
-                           Visibility="{Binding Visibility, ElementName=AvatarImage, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
-            </Grid>
-        </ControlTemplate>
-
         <!-- セレクター用アイテムテンプレート -->
         <DataTemplate x:Key="TeammateItemTemplate">
             <Grid Margin="4,2">

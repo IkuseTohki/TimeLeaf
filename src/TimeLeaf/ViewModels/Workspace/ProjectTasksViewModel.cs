@@ -19,7 +19,7 @@ public partial class ProjectTasksViewModel : ObservableObject
 {
     private readonly ProjectViewModel _projectViewModel;
     private readonly IAddTaskUseCase _addTaskUseCase;
-    private readonly IUserRepository _userRepository;
+    private readonly IGetProjectMembersUseCase _getProjectMembersUseCase;
     private readonly IViewModelFactory _viewModelFactory;
     private readonly LeafKit.UI.Services.IDialogService _dialogService;
     private readonly ILogger<ProjectTasksViewModel> _logger;
@@ -44,7 +44,7 @@ public partial class ProjectTasksViewModel : ObservableObject
     public ProjectTasksViewModel(
         ProjectViewModel projectViewModel,
         IAddTaskUseCase addTaskUseCase,
-        IUserRepository userRepository,
+        IGetProjectMembersUseCase getProjectMembersUseCase,
         IViewModelFactory viewModelFactory,
         LeafKit.UI.Services.IDialogService dialogService,
         ILogger<ProjectTasksViewModel> logger,
@@ -52,7 +52,7 @@ public partial class ProjectTasksViewModel : ObservableObject
     {
         _projectViewModel = projectViewModel;
         _addTaskUseCase = addTaskUseCase;
-        _userRepository = userRepository;
+        _getProjectMembersUseCase = getProjectMembersUseCase;
         _viewModelFactory = viewModelFactory;
         _dialogService = dialogService;
         _logger = logger;
@@ -102,12 +102,7 @@ public partial class ProjectTasksViewModel : ObservableObject
         try
         {
             // プロジェクトのアサイン済みユーザーをロード
-            var teammates = new List<User>();
-            foreach (var userId in _projectViewModel.Model.AssignedUserIds)
-            {
-                var user = await _userRepository.GetUserAsync(userId);
-                if (user != null) teammates.Add(user);
-            }
+            var teammates = await _getProjectMembersUseCase.ExecuteAsync(_projectViewModel.Model);
 
             var addTaskVm = _viewModelFactory.CreateAddTaskViewModel(teammates);
             var result = await _dialogService.ShowDialogAsync(addTaskVm);
@@ -116,7 +111,7 @@ public partial class ProjectTasksViewModel : ObservableObject
             {
                 _logger.LogDebug("Adding task: {Name}", addTaskVm.Name);
 
-                var assigneeName = (addTaskVm.Assignee as User)?.DisplayName ?? string.Empty;
+                var assigneeName = addTaskVm.Assignee?.DisplayName ?? string.Empty;
 
                 await _addTaskUseCase.ExecuteAsync(
                     _projectViewModel.Model,

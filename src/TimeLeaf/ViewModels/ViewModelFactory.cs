@@ -74,7 +74,7 @@ public class ViewModelFactory : IViewModelFactory
         var vm = _serviceProvider.GetRequiredService<AddTaskViewModel>();
         if (teammates != null)
         {
-            vm.Teammates = teammates;
+            vm.Teammates = new ObservableCollection<User>(teammates);
         }
         return vm;
     }
@@ -92,7 +92,7 @@ public class ViewModelFactory : IViewModelFactory
         return new ProjectTasksViewModel(
             projectViewModel,
             _serviceProvider.GetRequiredService<IAddTaskUseCase>(),
-            _serviceProvider.GetRequiredService<IUserRepository>(),
+            _serviceProvider.GetRequiredService<IGetProjectMembersUseCase>(),
             this,
             _serviceProvider.GetRequiredService<IDialogService>(),
             _serviceProvider.GetRequiredService<ILogger<ProjectTasksViewModel>>(),

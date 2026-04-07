@@ -58,24 +58,31 @@ public class UserServiceTests
     }
 
     [TestMethod]
-    public void UpdateCache_CachesUserAndFiresEvent()
+    public async Task RepositoryUserChanged_ShouldTriggerReloadAndServiceEvent()
     {
         // Arrange
-        /* テスト観点: UpdateCacheを呼び出した際、キャッシュが更新され、UserChangedイベントが発火されることを確認する。 */
+        /* テスト観点: IUserRepository で UserChanged が発生した際、UserService が最新情報を再ロードし、
+           自身も UserChanged イベントを発行することを確認する。 */
         var userId = Guid.NewGuid();
-        var user = new User(userId, "Updated User", "#FFFFFF", "");
-        User? eventArgs = null;
-        _userService.UserChanged += (u) => eventArgs = u;
+        var updatedUser = new User(userId, "Updated User", "#00FF00", "new_icon.png");
 
-        // Act
-        _userService.UpdateCache(user);
+        _userRepositoryMock.Setup(r => r.GetUserAsync(userId)).ReturnsAsync(updatedUser);
+
+        User? raisedUser = null;
+        _userService.UserChanged += (u) => raisedUser = u;
+
+        // Act - リポジトリのイベントをシミュレート
+        _userRepositoryMock.Raise(r => r.UserChanged += null, null, userId);
+
+        // 非同期の再ロードを待機
+        await Task.Delay(100);
 
         // Assert
-        Assert.AreEqual(user, eventArgs);
+        Assert.IsNotNull(raisedUser, "UserService のイベントが発行されること");
+        Assert.AreEqual("Updated User", raisedUser.DisplayName);
 
-        // キャッシュされているか確認
-        var cachedUser = _userService.GetUserAsync(userId).Result;
-        Assert.AreEqual(user, cachedUser);
-        _userRepositoryMock.Verify(r => r.GetUserAsync(It.IsAny<Guid>()), Times.Never);
+        // キャッシュも更新されているはず
+        var cached = await _userService.GetUserAsync(userId);
+        Assert.AreEqual("Updated User", cached?.DisplayName);
     }
 }

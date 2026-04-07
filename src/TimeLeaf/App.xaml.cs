@@ -266,6 +266,7 @@ public partial class App : Application
         services.AddTransient<ISyncUserIdentityUseCase, SyncUserIdentityUseCase>();
         services.AddTransient<IJoinProjectUseCase, JoinProjectUseCase>();
         services.AddTransient<ICheckAssignmentUseCase, CheckAssignmentUseCase>();
+        services.AddTransient<IGetProjectMembersUseCase, GetProjectMembersUseCase>();
 
         // コーディネーターの登録
         services.AddSingleton<IProjectSaveCoordinator, ProjectSaveCoordinator>();

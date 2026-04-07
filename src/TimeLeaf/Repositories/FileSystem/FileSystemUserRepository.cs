@@ -17,6 +17,7 @@ namespace TimeLeaf.Repositories.FileSystem;
 public class FileSystemUserRepository : IUserRepository
 {
     private readonly string _usersDirectory;
+    private readonly FileSystemWatcher _watcher;
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -24,6 +25,11 @@ public class FileSystemUserRepository : IUserRepository
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping, // 日本語をエスケープせずに保存
         Converters = { new JsonStringEnumConverter() }
     };
+
+    /// <summary>
+    /// ユーザープロフィールが変更されたときに発生します。
+    /// </summary>
+    public event EventHandler<Guid>? UserChanged;
 
     /// <summary>
     /// 指定されたディレクトリを使用してリポジトリを初期化します。
@@ -36,6 +42,24 @@ public class FileSystemUserRepository : IUserRepository
         {
             Directory.CreateDirectory(_usersDirectory);
         }
+
+        // フォルダ監視の初期化
+        _watcher = new FileSystemWatcher(_usersDirectory, "*.json")
+        {
+            NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.CreationTime
+        };
+        _watcher.Changed += OnFileChanged;
+        _watcher.Created += OnFileChanged;
+        _watcher.EnableRaisingEvents = true;
+    }
+
+    private void OnFileChanged(object sender, FileSystemEventArgs e)
+    {
+        var fileName = Path.GetFileNameWithoutExtension(e.Name);
+        if (Guid.TryParse(fileName, out var userId))
+        {
+            UserChanged?.Invoke(this, userId);
+        }
     }
 
     /// <inheritdoc />
@@ -47,9 +71,20 @@ public class FileSystemUserRepository : IUserRepository
             return null;
         }
 
-        using var stream = File.OpenRead(filePath);
-        var dto = await JsonSerializer.DeserializeAsync<UserDto>(stream, JsonOptions);
-        return dto?.ToEntity();
+        // ファイルが他プロセスによって書き込み中の可能性があるため、
+        // 読み取り共有モードで開き、必要に応じてリトライを行うなどの堅牢性が望ましいが、
+        // まずは単純な実装とする。
+        try
+        {
+            using var stream = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            var dto = await JsonSerializer.DeserializeAsync<UserDto>(stream, JsonOptions);
+            return dto?.ToEntity();
+        }
+        catch (IOException)
+        {
+            // 書き込み中などの一時的なエラー
+            return null;
+        }
     }
 
     /// <inheritdoc />
@@ -62,7 +97,7 @@ public class FileSystemUserRepository : IUserRepository
         {
             try
             {
-                using var stream = File.OpenRead(file);
+                using var stream = File.Open(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 var dto = await JsonSerializer.DeserializeAsync<UserDto>(stream, JsonOptions);
                 if (dto != null)
                 {
@@ -71,7 +106,7 @@ public class FileSystemUserRepository : IUserRepository
             }
             catch
             {
-                // 不正なJSONファイルはスキップ
+                // 不正なJSONファイルやロック中のファイルはスキップ
                 continue;
             }
         }
@@ -92,5 +127,16 @@ public class FileSystemUserRepository : IUserRepository
     private string GetFilePath(Guid userId)
     {
         return Path.Combine(_usersDirectory, $"{userId}.json");
+    }
+
+    /// <summary>
+    /// リソースを破棄します。
+    /// </summary>
+    public void Dispose()
+    {
+        _watcher.EnableRaisingEvents = false;
+        _watcher.Changed -= OnFileChanged;
+        _watcher.Created -= OnFileChanged;
+        _watcher.Dispose();
     }
 }

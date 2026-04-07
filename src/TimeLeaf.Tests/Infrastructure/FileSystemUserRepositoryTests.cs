@@ -3,7 +3,9 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Threading;
 using TimeLeaf.Models.Entities;
+using TimeLeaf.Repositories;
 using TimeLeaf.Repositories.FileSystem;
 
 namespace TimeLeaf.Tests.Infrastructure;
@@ -51,6 +53,43 @@ public class FileSystemUserRepositoryTests
         Assert.AreEqual(user.DisplayName, loadedUser.DisplayName);
         Assert.AreEqual(user.ThemeColor, loadedUser.ThemeColor);
         Assert.AreEqual(user.IconPath, loadedUser.IconPath);
+    }
+
+    /// <summary>
+    /// テスト観点: ファイルシステム上のユーザーファイルが更新された際に、リポジトリが UserChanged イベントを発行することを確認する。
+    /// </summary>
+    [TestMethod]
+    public async Task FileUpdate_ShouldRaiseUserChangedEvent()
+    {
+        // Arrange
+        var repository = new FileSystemUserRepository(_usersDir);
+        var userId = Guid.NewGuid();
+        var user = new User(userId, "Original Name", "#FF0000", "user1.png");
+        await repository.SaveUserAsync(user);
+
+        var eventRaised = false;
+        Guid? changedUserId = null;
+        repository.UserChanged += (s, e) =>
+        {
+            eventRaised = true;
+            changedUserId = e;
+        };
+
+        // Act - ファイルを直接書き換えて外部からの更新をシミュレート
+        var filePath = Path.Combine(_usersDir, $"{userId}.json");
+        var updatedJson = File.ReadAllText(filePath).Replace("Original Name", "Updated Name");
+
+        // Windows のファイルシステムの遅延やロックを考慮しつつ書き込み
+        File.WriteAllText(filePath, updatedJson);
+
+        // Assert - 非同期イベントを待機
+        for (int i = 0; i < 10 && !eventRaised; i++)
+        {
+            await Task.Delay(100);
+        }
+
+        Assert.IsTrue(eventRaised, "ユーザー情報の変更イベントが発行されること");
+        Assert.AreEqual(userId, changedUserId, "変更されたユーザーのIDが正しいこと");
     }
 
     /// <summary>

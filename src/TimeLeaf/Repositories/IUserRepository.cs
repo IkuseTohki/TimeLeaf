@@ -8,8 +8,13 @@ namespace TimeLeaf.Repositories;
 /// <summary>
 /// ユーザー情報の永続化を担当するリポジトリのインターフェース。
 /// </summary>
-public interface IUserRepository
+public interface IUserRepository : IDisposable
 {
+    /// <summary>
+    /// ユーザープロフィールが変更されたときに発生します。
+    /// </summary>
+    event EventHandler<Guid> UserChanged;
+
     /// <summary>
     /// ユーザープロフィールを取得します。
     /// </summary>

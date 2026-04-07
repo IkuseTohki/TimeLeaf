@@ -105,7 +105,7 @@ public class ProjectWorkspaceViewModelSaveTests
         var tasksViewModel = new ProjectTasksViewModel(
             projectViewModel,
             addTaskUseCase,
-            new Mock<IUserRepository>().Object,
+            new Mock<IGetProjectMembersUseCase>().Object,
             viewModelFactoryMock.Object,
             _dialogServiceMock.Object,
             new Mock<ILogger<ProjectTasksViewModel>>().Object,

@@ -1,17 +1,24 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LeafKit.UI.Services;
 using TimeLeaf.Models.Enums;
+using TimeLeaf.Models.Entities;
+
+using System.Collections.ObjectModel;
+using TimeLeaf.Services;
 
 namespace TimeLeaf.ViewModels;
 
 /// <summary>
 /// タスクを追加するための ViewModel です。
 /// </summary>
-public partial class AddTaskViewModel : ObservableObject, IDialogViewModel
+public partial class AddTaskViewModel : ObservableObject, IDialogViewModel, IDisposable
 {
+    private readonly IUserService? _userService;
+
     [ObservableProperty]
     private string _name = string.Empty;
 
@@ -25,16 +32,55 @@ public partial class AddTaskViewModel : ObservableObject, IDialogViewModel
     private TaskPriority _priority = TaskPriority.Medium;
 
     [ObservableProperty]
-    private object? _assignee;
+    private User? _assignee;
 
     [ObservableProperty]
-    private System.Collections.Generic.IEnumerable<object> _teammates = System.Array.Empty<object>();
+    private ObservableCollection<User> _teammates = new();
 
     [ObservableProperty]
     private DateTime? _dueDate;
 
     [ObservableProperty]
     private double? _estimatedWorkHours;
+
+    public AddTaskViewModel()
+    {
+        // デザイナー用デフォルトコンストラクタ
+    }
+
+    public AddTaskViewModel(IUserService userService)
+    {
+        _userService = userService;
+        if (_userService != null)
+        {
+            _userService.UserChanged += OnUserChanged;
+        }
+    }
+
+    private void OnUserChanged(User updatedUser)
+    {
+        // 候補リスト内のユーザーを更新
+        var existing = Teammates.FirstOrDefault(u => u.Id == updatedUser.Id);
+        if (existing != null)
+        {
+            var index = Teammates.IndexOf(existing);
+            Teammates[index] = updatedUser;
+        }
+
+        // 選択中の担当者が更新された場合も差し替え
+        if (Assignee?.Id == updatedUser.Id)
+        {
+            Assignee = updatedUser;
+        }
+    }
+
+    public void Dispose()
+    {
+        if (_userService != null)
+        {
+            _userService.UserChanged -= OnUserChanged;
+        }
+    }
 
     /// <summary>
     /// 選択可能なステータスのリスト。
