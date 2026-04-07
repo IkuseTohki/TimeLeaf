@@ -116,7 +116,9 @@
                 <!-- 開くボタン -->
                 <Button x:Name="TaskOpenButton"
                         Grid.Column="5"
+                        MinHeight="{StaticResource ButtonHeightSmall}"
                         Margin="16,0,0,0"
+                        Padding="8,2"
                         Command="{Binding DataContext.OpenTaskDetailWindowCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                         CommandParameter="{Binding}"
                         Content="開く"

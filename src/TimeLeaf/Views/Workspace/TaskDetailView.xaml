@@ -120,7 +120,9 @@
                                      Tag="メッセージを送信..."
                                      Text="{Binding NewCommentContent, UpdateSourceTrigger=PropertyChanged}" />
                             <Button Grid.Column="1"
+                                    MinHeight="{StaticResource ButtonHeightSmall}"
                                     Margin="12,0,0,0"
+                                    Padding="8,2"
                                     Command="{Binding AddCommentCommand}"
                                     Content="送信"
                                     Style="{StaticResource PrimaryButtonStyle}" />
@@ -186,7 +188,8 @@
                 BorderBrush="{DynamicResource OutlineBaseBrush}"
                 BorderThickness="0,1,0,0">
             <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                <Button Padding="20,6"
+                <Button MinWidth="100"
+                        Padding="20,6"
                         Command="{Binding CloseCommand}"
                         CommandParameter="True"
                         Content="保存して閉じる"

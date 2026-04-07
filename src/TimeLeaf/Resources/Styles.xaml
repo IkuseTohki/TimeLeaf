@@ -1,4 +1,14 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- ====================================================================== -->
+    <!-- Constants & Measures -->
+    <!-- ====================================================================== -->
+    <sys:Double x:Key="ButtonHeightMedium">32</sys:Double>
+    <sys:Double x:Key="ButtonHeightSmall">24</sys:Double>
+    <sys:Double x:Key="ButtonHeightLarge">40</sys:Double>
+    <sys:Double x:Key="InputHeightMedium">36</sys:Double>
 
     <!-- ====================================================================== -->
     <!-- Typography Bases (Semantic Font Styles) -->
@@ -37,12 +47,15 @@
 
     <!-- 基本となるオーガニックボタンのテンプレート -->
     <Style x:Key="BaseButtonStyle" TargetType="Button">
-        <Setter Property="Padding" Value="16,8" />
+        <Setter Property="MinHeight" Value="{StaticResource ButtonHeightMedium}" />
+        <Setter Property="Padding" Value="16,4" />
+        <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border Background="{TemplateBinding Background}"
+                    <Border Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="20">
@@ -59,6 +72,50 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <!-- 小サイズボタン -->
+    <Style x:Key="SmallButtonStyle"
+           BasedOn="{StaticResource BaseButtonStyle}"
+           TargetType="Button">
+        <Setter Property="MinHeight" Value="{StaticResource ButtonHeightSmall}" />
+        <Setter Property="Padding" Value="12,2" />
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="12">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Opacity" Value="0.8" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- 大サイズボタン -->
+    <Style x:Key="LargeButtonStyle"
+           BasedOn="{StaticResource BaseButtonStyle}"
+           TargetType="Button">
+        <Setter Property="MinHeight" Value="{StaticResource ButtonHeightLarge}" />
+        <Setter Property="Padding" Value="24,8" />
+        <Setter Property="FontSize" Value="15" />
+        <Style.Resources>
+            <Style TargetType="Border">
+                <Setter Property="CornerRadius" Value="24" />
+            </Style>
+        </Style.Resources>
     </Style>
 
     <!-- 角丸の強いボタンスタイル（透過背景） -->
@@ -79,7 +136,6 @@
     <Style x:Key="OrganicButtonStyle"
            BasedOn="{StaticResource BaseButtonStyle}"
            TargetType="Button">
-        <Setter Property="Padding" Value="12,6" />
         <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
         <Setter Property="BorderThickness" Value="1" />
@@ -170,10 +226,12 @@
 
     <!-- オーガニックな入力欄（TextBox）スタイル -->
     <Style x:Key="OrganicTextBoxStyle" TargetType="TextBox">
+        <Setter Property="MinHeight" Value="{StaticResource InputHeightMedium}" />
         <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="Padding" Value="12,0" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
         <Style.Resources>
             <Style TargetType="Border">
                 <Setter Property="CornerRadius" Value="20" />

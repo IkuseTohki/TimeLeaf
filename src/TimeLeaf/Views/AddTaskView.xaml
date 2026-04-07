@@ -75,8 +75,7 @@
         <TextBlock Style="{StaticResource FormTitleTextStyle}" Text="タスク作成" />
 
         <Label Content="タスク名" Style="{StaticResource FirstSectionHeaderLabelStyle}" />
-        <TextBox Height="36"
-                 Style="{StaticResource ModernTextBoxStyle}"
+        <TextBox Style="{StaticResource ModernTextBoxStyle}"
                  Tag="例：UIプロトタイプの作成"
                  Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
 
@@ -102,16 +101,14 @@
             <!-- ステータス -->
             <StackPanel Grid.Row="0" Grid.Column="0">
                 <Label Content="ステータス" Style="{StaticResource SectionHeaderLabelStyle}" />
-                <ComboBox Height="36"
-                          ItemsSource="{Binding TaskStatusValues}"
+                <ComboBox ItemsSource="{Binding TaskStatusValues}"
                           SelectedItem="{Binding Status}"
                           Style="{DynamicResource CompactFormComboBoxStyle}" />
             </StackPanel>
 
             <StackPanel Grid.Row="0" Grid.Column="2">
                 <Label Content="優先度" Style="{StaticResource SectionHeaderLabelStyle}" />
-                <ComboBox Height="36"
-                          ItemsSource="{Binding TaskPriorityValues}"
+                <ComboBox ItemsSource="{Binding TaskPriorityValues}"
                           SelectedItem="{Binding Priority}"
                           Style="{DynamicResource CompactFormComboBoxStyle}" />
             </StackPanel>
@@ -133,8 +130,7 @@
         </Grid>
 
         <Label Content="見積工数 (h)" Style="{StaticResource SectionHeaderLabelStyle}" />
-        <TextBox Height="36"
-                 Style="{StaticResource ModernTextBoxStyle}"
+        <TextBox Style="{StaticResource ModernTextBoxStyle}"
                  Tag="例：1.5"
                  Text="{Binding EstimatedWorkHours, UpdateSourceTrigger=PropertyChanged}" />
 

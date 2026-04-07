@@ -36,6 +36,7 @@
                                  Style="{StaticResource OrganicTextBoxStyle}"
                                  Text="{Binding StoragePath}" />
                         <Button Grid.Column="1"
+                                MinWidth="60"
                                 Command="{Binding ResetStoragePathCommand}"
                                 Content="変更..."
                                 Style="{StaticResource RoundButtonStyle}"

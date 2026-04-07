@@ -11,8 +11,7 @@
         <TextBlock Style="{StaticResource FormTitleTextStyle}" Text="プロジェクト作成" />
 
         <Label Content="プロジェクト名" Style="{StaticResource FirstSectionHeaderLabelStyle}" />
-        <TextBox Height="36"
-                 Style="{StaticResource ModernTextBoxStyle}"
+        <TextBox Style="{StaticResource ModernTextBoxStyle}"
                  Tag="例：新機能のプロトタイプ作成"
                  Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
 
