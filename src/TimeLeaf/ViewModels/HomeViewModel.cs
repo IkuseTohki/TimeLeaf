@@ -26,8 +26,26 @@ public partial class HomeViewModel : ObservableObject
     [ObservableProperty]
     private bool _isUserMenuOpen;
 
+    private DateTime _lastClosedTime = DateTime.MinValue;
+
     [RelayCommand]
-    private void ToggleUserMenu() => IsUserMenuOpen = !IsUserMenuOpen;
+    private void ToggleUserMenu()
+    {
+        // ポップアップが自律的に閉じた（外部クリック等）直後のクリックによる再オープンを防止
+        if (!IsUserMenuOpen && (DateTime.Now - _lastClosedTime).TotalMilliseconds < 150)
+        {
+            return;
+        }
+        IsUserMenuOpen = !IsUserMenuOpen;
+    }
+
+    partial void OnIsUserMenuOpenChanged(bool value)
+    {
+        if (!value)
+        {
+            _lastClosedTime = DateTime.Now;
+        }
+    }
 
     /// <summary>
     /// 全プロジェクトの期限が近いタスク。
@@ -43,6 +61,9 @@ public partial class HomeViewModel : ObservableObject
     {
         Projects = projects;
         UserMenu = userMenu;
+
+        // 閉じ要求（項目クリック等）を購読
+        UserMenu.CloseRequested += () => IsUserMenuOpen = false;
 
         // 初回計算
         UpdateStats();

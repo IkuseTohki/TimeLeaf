@@ -29,14 +29,19 @@
                         Orientation="Horizontal">
                 <Button x:Name="UserMenuButton"
                         Command="{Binding ToggleUserMenuCommand}"
-                        Style="{DynamicResource IconButtonStyle}">
-                    <Path Width="20"
-                          Height="20"
-                          Data="{StaticResource MenuIconGeometry}"
-                          Fill="{DynamicResource TextPrimaryBrush}"
-                          Stretch="Uniform" />
+                        Style="{StaticResource NaturalUserMenuButtonStyle}">
+                    <StackPanel Orientation="Horizontal">
+                        <!-- アバター (イニシャル) -->
+                        <Border Style="{StaticResource UserMenuAvatarBorderStyle}">
+                            <TextBlock Style="{StaticResource UserMenuInitialTextStyle}" Text="{Binding UserMenu.UserInitial}" />
+                        </Border>
+                        <!-- ユーザー名 -->
+                        <TextBlock Style="{StaticResource UserMenuNameTextStyle}" Text="{Binding UserMenu.UserName}" />
+                        <!-- 矢印アイコン -->
+                        <Path Style="{StaticResource UserMenuArrowPathStyle}" />
+                    </StackPanel>
                 </Button>
-                <c:DropdownMenu IsOpen="{Binding IsUserMenuOpen}" PlacementTarget="{Binding ElementName=UserMenuButton}">
+                <c:DropdownMenu IsOpen="{Binding IsUserMenuOpen, Mode=TwoWay}" PlacementTarget="{Binding ElementName=UserMenuButton}">
                     <StackPanel MinWidth="180" Margin="4">
                         <Button Command="{Binding UserMenu.EditProfileCommand}"
                                 Content="プロフィール設定"

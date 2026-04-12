@@ -34,7 +34,7 @@ public class HomeViewModelTests
     {
         var mockIdentity = new Mock<IIdentityService>();
         var mockDialog = new Mock<IDialogService>();
-        return new UserMenuViewModel(mockIdentity.Object, mockDialog.Object, _viewModelFactoryMock.Object);
+        return new UserMenuViewModel(mockIdentity.Object, _userServiceMock.Object, mockDialog.Object, _viewModelFactoryMock.Object);
     }
 
     private ProjectViewModel CreateProjectViewModel(Project p)

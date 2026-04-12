@@ -29,7 +29,7 @@ public class ViewModelFactory : IViewModelFactory
 
     public HomeViewModel CreateHomeViewModel(ObservableCollection<ProjectViewModel> projects)
     {
-        return new HomeViewModel(projects, new UserMenuViewModel(_identityService, _serviceProvider.GetRequiredService<IDialogService>(), this));
+        return new HomeViewModel(projects, new UserMenuViewModel(_identityService, _userService, _serviceProvider.GetRequiredService<IDialogService>(), this));
     }
 
     public AllTasksViewModel CreateAllTasksViewModel(ObservableCollection<ProjectViewModel> projects)

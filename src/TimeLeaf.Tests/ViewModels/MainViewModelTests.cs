@@ -195,7 +195,7 @@ public class MainViewModelTests
 
         viewModel.NavigationContext = MainNavigationContext.Notifications;
 
-        var userMenu = new UserMenuViewModel(_identityServiceMock.Object, _dialogServiceMock.Object, _viewModelFactoryMock.Object);
+        var userMenu = new UserMenuViewModel(_identityServiceMock.Object, _userServiceMock.Object, _dialogServiceMock.Object, _viewModelFactoryMock.Object);
         var expectedHome = new HomeViewModel(viewModel.Projects, userMenu);
         _viewModelFactoryMock.Setup(x => x.CreateHomeViewModel(viewModel.Projects)).Returns(expectedHome);
 

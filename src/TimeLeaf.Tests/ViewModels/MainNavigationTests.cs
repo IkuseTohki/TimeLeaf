@@ -96,7 +96,7 @@ public class MainNavigationTests
     public void DefaultNavigationContext_ShouldBeHome_AndSetHomeViewModel()
     {
         // Arrange
-        var userMenu = new UserMenuViewModel(_identityServiceMock.Object, _dialogServiceMock.Object, _viewModelFactoryMock.Object);
+        var userMenu = new UserMenuViewModel(_identityServiceMock.Object, _userServiceMock.Object, _dialogServiceMock.Object, _viewModelFactoryMock.Object);
         var expectedHome = new HomeViewModel(new ObservableCollection<ProjectViewModel>(), userMenu);
         _viewModelFactoryMock.Setup(x => x.CreateHomeViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>())).Returns(expectedHome);
 
