@@ -45,8 +45,7 @@
         <!-- グローバル・サイドバー -->
         <Border x:Name="SidebarBorder"
                 Grid.Column="0"
-                Width="{Binding IsSidebarExpanded, Converter={StaticResource BooleanToDoubleConverter}, ConverterParameter='200,72'}"
-                Style="{DynamicResource OrganicSidebarBorderStyle}">
+                Style="{StaticResource SidebarBorderStyle}">
             <Grid>
                 <DockPanel LastChildFill="True">
                     <!-- ブランドロゴエリア -->
@@ -150,13 +149,15 @@
                         </StackPanel>
                     </ScrollViewer>
                 </DockPanel>
-
-                <!-- 折りたたみボタン -->
-                <Button Command="{Binding ToggleSidebarCommand}"
-                        Content="{Binding IsSidebarExpanded, Converter={StaticResource SidebarToggleIconConverter}}"
-                        Style="{StaticResource SidebarCollapseButtonStyle}" />
             </Grid>
         </Border>
+
+        <!-- 折りたたみボタン (SidebarBorderの外に配置することでクリッピングを回避し、全域でクリックを有効化) -->
+        <Button Grid.Column="0"
+                Panel.ZIndex="10"
+                Command="{Binding ToggleSidebarCommand}"
+                Content="{Binding IsSidebarExpanded, Converter={StaticResource SidebarToggleIconConverter}}"
+                Style="{StaticResource SidebarCollapseButtonStyle}" />
 
         <!-- メインコンテンツ領域 -->
         <Grid Grid.Column="1">
