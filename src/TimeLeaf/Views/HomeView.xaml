@@ -59,31 +59,31 @@
             <StackPanel Style="{StaticResource ViewMainContainerStyle}">
                 <!-- 統計情報 (Stats) -->
                 <UniformGrid Columns="4" Style="{StaticResource HomeStatsGridStyle}">
-                    <Border Margin="0,0,16,0"
-                            Padding="24"
+                    <Border Margin="0,0,12,0"
+                            Padding="{StaticResource CardPadding}"
                             Style="{StaticResource SurfaceCardStyle}">
                         <StackPanel>
                             <TextBlock Style="{StaticResource HomeStatsLabelStyle}" Text="未着手のタスク" />
                             <TextBlock Style="{StaticResource HomeStatsValueStyle}" Text="{Binding NotStartedCount}" />
                         </StackPanel>
                     </Border>
-                    <Border Margin="0,0,16,0"
-                            Padding="24"
+                    <Border Margin="0,0,12,0"
+                            Padding="{StaticResource CardPadding}"
                             Style="{StaticResource SurfaceCardStyle}">
                         <StackPanel>
                             <TextBlock Style="{StaticResource HomeStatsLabelStyle}" Text="進行中" />
                             <TextBlock Style="{StaticResource HomeStatsValueStyle}" Text="{Binding InProgressCount}" />
                         </StackPanel>
                     </Border>
-                    <Border Margin="0,0,16,0"
-                            Padding="24"
+                    <Border Margin="0,0,12,0"
+                            Padding="{StaticResource CardPadding}"
                             Style="{StaticResource SurfaceCardStyle}">
                         <StackPanel>
                             <TextBlock Style="{StaticResource HomeStatsLabelStyle}" Text="今週の完了" />
                             <TextBlock Style="{StaticResource HomeStatsValueStyle}" Text="{Binding CompletedThisWeekCount}" />
                         </StackPanel>
                     </Border>
-                    <Border Padding="24" Style="{StaticResource SurfaceCardStyle}">
+                    <Border Padding="{StaticResource CardPadding}" Style="{StaticResource SurfaceCardStyle}">
                         <StackPanel>
                             <TextBlock Style="{StaticResource HomeStatsLabelStyle}" Text="森の健全性" />
                             <TextBlock Foreground="{DynamicResource BrandPrimaryBrush}"
@@ -102,8 +102,8 @@
                     <!-- 左カラム -->
                     <StackPanel Grid.Column="0" Style="{StaticResource HomeColumnStyle}">
                         <Label Content="🚨 期限が近いタスク" Style="{DynamicResource SectionHeaderLabelStyle}" />
-                        <Border Margin="0,0,0,32"
-                                Padding="24"
+                        <Border Margin="0,0,0,20"
+                                Padding="{StaticResource CardPadding}"
                                 Style="{StaticResource SurfaceCardStyle}">
                             <ItemsControl ItemsSource="{Binding UpcomingDeadlines}">
                                 <ItemsControl.ItemTemplate>
@@ -117,7 +117,7 @@
                                                        Foreground="{DynamicResource TextPrimaryBrush}"
                                                        Text="{Binding Name}" />
                                             <TextBlock Grid.Column="1"
-                                                       Margin="16,0,0,0"
+                                                       Margin="12,0,0,0"
                                                        Foreground="{DynamicResource WarningBrush}"
                                                        Text="{Binding Deadline, StringFormat={}{0:MM/dd}}" />
                                         </Grid>
@@ -135,8 +135,8 @@
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Margin="0,0,12,12"
-                                            Padding="20"
+                                    <Border Margin="0,0,8,8"
+                                            Padding="{StaticResource CardPadding}"
                                             Style="{StaticResource SurfaceCardStyle}">
                                         <StackPanel>
                                             <TextBlock Style="{StaticResource HomeProjectCardTitleStyle}" Text="{Binding Name}" />
@@ -151,9 +151,9 @@
 
                     <!-- 右カラム -->
                     <StackPanel Grid.Column="1">
-                        <Label Content="🏁 マイルストーン" Style="{DynamicResource SectionHeaderLabelStyle}" />
-                        <Border Margin="0,0,0,32"
-                                Padding="24,24,24,8"
+                        <Label Content="🏳️ マイルストーン" Style="{DynamicResource SectionHeaderLabelStyle}" />
+                        <Border Margin="0,0,0,20"
+                                Padding="16,16,16,4"
                                 Style="{StaticResource SurfaceCardStyle}">
                             <ItemsControl ItemsSource="{Binding UpcomingMilestones}">
                                 <ItemsControl.ItemTemplate>
@@ -162,11 +162,11 @@
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto" />
                                                 <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="20" />
+                                                <RowDefinition Height="16" />
                                                 <!-- 次の項目への繋ぎ（空白行） -->
                                             </Grid.RowDefinitions>
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="24" />
+                                                <ColumnDefinition Width="20" />
                                                 <ColumnDefinition Width="*" />
                                             </Grid.ColumnDefinitions>
 
@@ -178,7 +178,7 @@
                                             <!-- 1行目: 日付(曜日) プロジェクト名 -->
                                             <StackPanel Grid.Row="0"
                                                         Grid.Column="1"
-                                                        Margin="12,0,0,2"
+                                                        Margin="8,0,0,2"
                                                         Orientation="Horizontal">
                                                 <TextBlock Style="{StaticResource HomeMilestoneDateStyle}" Text="{Binding Date, StringFormat={}{0:MM/dd (ddd)}}" />
                                                 <TextBlock Style="{StaticResource HomeMilestoneProjectNameStyle}" Text="{Binding ProjectName}" />
@@ -202,7 +202,7 @@
 
 
                         <Label Content="🍃 ざわめき" Style="{DynamicResource SectionHeaderLabelStyle}" />
-                        <Border Padding="24" Style="{StaticResource SurfaceCardStyle}">
+                        <Border Padding="{StaticResource CardPadding}" Style="{StaticResource SurfaceCardStyle}">
                             <TextBlock FontStyle="Italic"
                                        Foreground="{DynamicResource TextSecondaryBrush}"
                                        Text="同期履歴から最新のアクティビティを表示します（準備中）"

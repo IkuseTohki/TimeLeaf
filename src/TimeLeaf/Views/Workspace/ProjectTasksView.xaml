@@ -18,7 +18,7 @@
         <!-- メインのタスクボード領域 -->
         <DockPanel Style="{StaticResource TaskBoardContainerStyle}">
             <!-- タスク追加入力 -->
-            <Grid Margin="0,0,0,12" DockPanel.Dock="Top">
+            <Grid Margin="0,0,0,8" DockPanel.Dock="Top">
                 <Button Command="{Binding AddTaskCommand}"
                         DockPanel.Dock="Top"
                         IsEnabled="{Binding ProjectViewModel.IsAssignedToMe}"
@@ -29,13 +29,13 @@
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Margin="0,0,16,0"
+                            <TextBlock Margin="0,0,12,0"
                                        VerticalAlignment="Center"
-                                       FontSize="20"
+                                       FontSize="16"
                                        Text="🌱" />
                             <TextBlock Grid.Column="1"
                                        VerticalAlignment="Center"
-                                       FontSize="15"
+                                       FontSize="13"
                                        Foreground="{DynamicResource TextSecondaryBrush}"
                                        Text="新しいタスクを追加する..." />
                         </Grid>

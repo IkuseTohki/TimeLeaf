@@ -35,18 +35,18 @@
 
         <!-- メインコンテンツ (実績入力) -->
         <ScrollViewer Grid.Row="1"
-                      Padding="24,16"
+                      Padding="16,12"
                       VerticalScrollBarVisibility="Auto">
             <StackPanel IsEnabled="{Binding IsAssignedToMe}">
                 <!-- ステータス (共通コントロール) -->
                 <TextBlock Style="{StaticResource TaskPanelSectionHeaderStyle}" Text="現在の状態" />
-                <controls:TaskStatusPicker Margin="0,0,0,20" SelectedStatus="{Binding Task.Status, Mode=TwoWay}" />
+                <controls:TaskStatusPicker Margin="0,0,0,16" SelectedStatus="{Binding Task.Status, Mode=TwoWay}" />
 
                 <!-- 優先度 (表示のみ) -->
                 <TextBlock Style="{StaticResource TaskPanelSectionHeaderStyle}" Text="優先度" />
                 <TextBlock Style="{StaticResource TaskPanelValueStyle}" Text="{Binding Task.Priority}" />
 
-                <Separator Margin="0,0,0,20" Background="{DynamicResource OutlineBaseBrush}" />
+                <Separator Margin="0,0,0,16" Background="{DynamicResource OutlineBaseBrush}" />
 
                 <!-- スケジュール (予定: 表示のみ) -->
                 <TextBlock Style="{StaticResource TaskPanelSectionHeaderStyle}" Text="期限" />
@@ -54,16 +54,16 @@
 
                 <!-- スケジュール (実績: 編集可) -->
                 <TextBlock Style="{StaticResource TaskPanelSectionHeaderStyle}" Text="実績開始日" />
-                <c:LeafDatePicker Margin="0,0,0,16"
+                <c:LeafDatePicker Margin="0,0,0,12"
                                   Placeholder="Actual start"
                                   SelectedDate="{Binding Task.ActualStartDate, Mode=TwoWay}" />
 
                 <TextBlock Style="{StaticResource TaskPanelSectionHeaderStyle}" Text="実績終了日" />
-                <c:LeafDatePicker Margin="0,0,0,16"
+                <c:LeafDatePicker Margin="0,0,0,12"
                                   Placeholder="Actual end"
                                   SelectedDate="{Binding Task.ActualEndDate, Mode=TwoWay}" />
 
-                <Separator Margin="0,0,0,20" Background="{DynamicResource OutlineBaseBrush}" />
+                <Separator Margin="0,0,0,16" Background="{DynamicResource OutlineBaseBrush}" />
 
                 <!-- 工数 (共通コントロール) -->
                 <controls:TaskCostEditor ActualCost="{Binding Task.ActualCost, Mode=TwoWay}"

@@ -4,7 +4,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:TimeLeaf.ViewModels"
-             Width="440"
+             Width="{StaticResource DialogWidthMedium}"
              d:DataContext="{d:DesignInstance vm:AddProjectViewModel}"
              mc:Ignorable="d">
     <StackPanel Margin="0">
@@ -16,7 +16,7 @@
                  Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
 
         <Label Content="概要" Style="{StaticResource SectionHeaderLabelStyle}" />
-        <TextBox Height="80"
+        <TextBox Height="{StaticResource MultilineInputHeightSmall}"
                  AcceptsReturn="True"
                  Style="{StaticResource ModernTextBoxStyle}"
                  Tag="プロジェクトの目的や背景を記入してください..."
@@ -24,15 +24,15 @@
                  TextWrapping="Wrap" />
 
         <!-- フッターボタン -->
-        <StackPanel Margin="0,16,0,0"
+        <StackPanel Margin="{StaticResource FormFooterMargin}"
                     HorizontalAlignment="Right"
                     Orientation="Horizontal">
-            <Button Width="90"
+            <Button Width="80"
                     Command="{Binding ConfirmCommand}"
                     Content="作成する"
                     Style="{StaticResource PrimaryButtonStyle}" />
-            <Button Width="90"
-                    Margin="12,0,0,0"
+            <Button Width="80"
+                    Margin="{StaticResource ButtonLeftMargin}"
                     Command="{Binding CancelCommand}"
                     Content="キャンセル"
                     Style="{StaticResource SecondaryButtonStyle}" />

@@ -12,7 +12,7 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Style="{StaticResource ViewMainContainerStyle}">
             <!-- プロジェクト説明 -->
-            <Border Margin="0,0,0,32" Style="{StaticResource DashboardCardStyle}">
+            <Border Margin="0,0,0,20" Style="{StaticResource DashboardCardStyle}">
                 <StackPanel>
                     <TextBlock Style="{StaticResource DashboardSectionHeaderStyle}" Text="プロジェクトについて" />
                     <TextBlock Style="{StaticResource DashboardDescriptionTextStyle}" Text="{Binding Description}" />
@@ -20,7 +20,7 @@
             </Border>
 
             <!-- 統計情報 (Stats) -->
-            <UniformGrid Margin="0,0,0,32" Columns="4">
+            <UniformGrid Margin="0,0,0,20" Columns="4">
                 <Border Style="{StaticResource DashboardStatsCardStyle}">
                     <StackPanel>
                         <TextBlock Style="{StaticResource StatsLabelStyle}" Text="全タスク" />
@@ -38,7 +38,7 @@
                         <TextBlock Style="{StaticResource StatsLabelStyle}" Text="進捗率" />
                         <TextBlock Style="{StaticResource StatsValueStyle}">
                             <Run Text="{Binding CompletionPercentage, Mode=OneWay, StringFormat={}{0:F0}}" />
-                            <Run FontSize="14" Text="%" />
+                            <Run FontSize="12" Text="%" />
                         </TextBlock>
                     </StackPanel>
                 </Border>
@@ -47,7 +47,7 @@
                         <TextBlock Style="{StaticResource StatsLabelStyle}" Text="実績工数" />
                         <TextBlock Style="{StaticResource StatsValueStyle}">
                             <Run Text="{Binding TotalActualCost, Mode=OneWay, StringFormat={}{0:F1}}" />
-                            <Run FontSize="12" Text="h" />
+                            <Run FontSize="10" Text="h" />
                         </TextBlock>
                     </StackPanel>
                 </Border>
@@ -60,15 +60,15 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- 左カラム: マイルストーン -->
-                <StackPanel Grid.Column="0" Margin="0,0,32,0">
+                <StackPanel Grid.Column="0" Margin="0,0,24,0">
                     <TextBlock Style="{StaticResource DashboardSectionHeaderStyle}" Text="🏳️ マイルストーン" />
                     <Border Style="{StaticResource DashboardCardStyle}">
                         <ItemsControl ItemsSource="{Binding Milestones}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid Margin="0,0,0,16">
+                                    <Grid Margin="0,0,0,12">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="100" />
+                                            <ColumnDefinition Width="80" />
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Style="{StaticResource StatsLabelStyle}" Text="{Binding Date, StringFormat={}{0:yyyy/MM/dd}}" />
@@ -88,10 +88,10 @@
                     <TextBlock Style="{StaticResource DashboardSectionHeaderStyle}" Text="＋ マイルストーン追加" />
                     <Border Style="{StaticResource DashboardCardStyle}">
                         <StackPanel>
-                            <c:LeafDatePicker Margin="0,0,0,12"
+                            <c:LeafDatePicker Margin="0,0,0,8"
                                               Placeholder="Pick milestone date"
                                               SelectedDate="{Binding NewMilestoneDate, Mode=TwoWay}" />
-                            <TextBox Margin="0,0,0,12"
+                            <TextBox Margin="0,0,0,8"
                                      Style="{StaticResource OrganicTextBoxStyle}"
                                      Tag="名称を入力..."
                                      Text="{Binding NewMilestoneLabel, UpdateSourceTrigger=PropertyChanged}" />
