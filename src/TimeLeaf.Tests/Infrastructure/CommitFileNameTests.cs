@@ -62,7 +62,7 @@ public class CommitFileNameTests
         {
             _generator.Generate(baseTime.AddMilliseconds(200), "user1", "Cat"),
             _generator.Generate(baseTime.AddMilliseconds(100), "user1", "Cat"),
-            _generator.Generate(baseTime.AddMilliseconds(150), "user1", "Cat")
+            _generator.Generate(baseTime.AddMilliseconds(150), "user1", "Cat"),
         };
 
         // Act

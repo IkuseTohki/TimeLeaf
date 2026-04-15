@@ -6,9 +6,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Models.Enums;
-using TimeLeaf.ViewModels;
-using TimeLeaf.Services;
 using TimeLeaf.Repositories;
+using TimeLeaf.Services;
+using TimeLeaf.ViewModels;
 
 namespace TimeLeaf.Tests.ViewModels;
 
@@ -79,7 +79,11 @@ public class ProjectTaskViewModelTests
         viewModel.EstimatedCost = newCost;
 
         // Assert
-        Assert.AreEqual(newCost, projectTask.EstimatedCost, "基になるProjectTaskエンティティのEstimatedCostが更新されること");
+        Assert.AreEqual(
+            newCost,
+            projectTask.EstimatedCost,
+            "基になるProjectTaskエンティティのEstimatedCostが更新されること"
+        );
         Assert.AreEqual(1, receivedEvents, "EstimatedCostプロパティの変更時にPropertyChangedイベントが発火すること");
     }
 
@@ -96,10 +100,18 @@ public class ProjectTaskViewModelTests
 
         // Act & Assert
         var expectedPriorities = Enum.GetValues(typeof(TaskPriority));
-        CollectionAssert.AreEquivalent(expectedPriorities, viewModel.PriorityValues.ToArray(), "PriorityValues がすべての優先度を返すこと");
+        CollectionAssert.AreEquivalent(
+            expectedPriorities,
+            viewModel.PriorityValues.ToArray(),
+            "PriorityValues がすべての優先度を返すこと"
+        );
 
         var expectedStatuses = Enum.GetValues(typeof(TimeLeaf.Models.Enums.TaskStatus));
-        CollectionAssert.AreEquivalent(expectedStatuses, viewModel.StatusValues.ToArray(), "StatusValues がすべてのステータスを返すこと");
+        CollectionAssert.AreEquivalent(
+            expectedStatuses,
+            viewModel.StatusValues.ToArray(),
+            "StatusValues がすべてのステータスを返すこと"
+        );
     }
 
     /// <summary>
@@ -113,7 +125,11 @@ public class ProjectTaskViewModelTests
         var viewModel = new ProjectTaskViewModel(projectTask, _userServiceMock.Object);
         var newDesc = "Updated Description";
         var received = false;
-        viewModel.PropertyChanged += (s, e) => { if (e.PropertyName == nameof(viewModel.Description)) received = true; };
+        viewModel.PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName == nameof(viewModel.Description))
+                received = true;
+        };
 
         // Act
         viewModel.Description = newDesc;

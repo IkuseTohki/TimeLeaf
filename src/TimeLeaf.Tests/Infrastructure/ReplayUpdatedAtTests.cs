@@ -25,9 +25,13 @@ public class ReplayUpdatedAtTests
         var loggerMock = new Mock<ILogger<FolderProjectRepository>>();
         var serializer = new JsonProjectFileSystemSerializer();
         var generator = new DefaultCommitFileNameGenerator();
-        var monitor = new FileSystemProjectStorageMonitor(_tempDir, new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object);
+        var monitor = new FileSystemProjectStorageMonitor(
+            _tempDir,
+            new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object
+        );
         _repository = new FolderProjectRepository(_tempDir, monitor, serializer, generator, loggerMock.Object);
     }
+
     [TestCleanup]
     public void Cleanup()
     {
@@ -59,7 +63,10 @@ public class ReplayUpdatedAtTests
         Directory.CreateDirectory(changesDir);
 
         // .project ファイル
-        var meta = "{\"ProjectId\":\"" + projectId + "\", \"CreatedAt\":\"2026-01-01T00:00:00Z\", \"CreatedBy\":\"test\", \"SchemaVersion\":1}";
+        var meta =
+            "{\"ProjectId\":\""
+            + projectId
+            + "\", \"CreatedAt\":\"2026-01-01T00:00:00Z\", \"CreatedBy\":\"test\", \"SchemaVersion\":1}";
         await File.WriteAllTextAsync(Path.Combine(projectDir, ".project"), meta);
 
         // 過去の日時を持つ履歴ファイル
@@ -75,13 +82,15 @@ public class ReplayUpdatedAtTests
 
         // 許容誤差（パースの精度）
         var diff = (loadedProject.UpdatedAt - pastTime).Duration();
-        Assert.IsTrue(diff < TimeSpan.FromSeconds(1),
-            $"UpdatedAt should be {pastTime}, but was {loadedProject.UpdatedAt} (Diff: {diff})");
+        Assert.IsTrue(
+            diff < TimeSpan.FromSeconds(1),
+            $"UpdatedAt should be {pastTime}, but was {loadedProject.UpdatedAt} (Diff: {diff})"
+        );
     }
 
     /// <summary>
     /// テスト観点: JSONデータ本体に更新日時が含まれていない状態でロード（Replay）した際、
-    /// 最後に適用された履歴ファイル（ファイル名）のタイムスタンプが 
+    /// 最後に適用された履歴ファイル（ファイル名）のタイムスタンプが
     /// Project.UpdatedAt として正しく設定されることを確認する。
     /// </summary>
     [TestMethod]
@@ -96,7 +105,12 @@ public class ReplayUpdatedAtTests
         var changesDir = Path.Combine(projectDir, "changes");
         Directory.CreateDirectory(changesDir);
 
-        await File.WriteAllTextAsync(Path.Combine(projectDir, ".project"), "{\"ProjectId\":\"" + projectId + "\", \"CreatedAt\":\"2026-01-01T00:00:00Z\", \"CreatedBy\":\"test\", \"SchemaVersion\":1}");
+        await File.WriteAllTextAsync(
+            Path.Combine(projectDir, ".project"),
+            "{\"ProjectId\":\""
+                + projectId
+                + "\", \"CreatedAt\":\"2026-01-01T00:00:00Z\", \"CreatedBy\":\"test\", \"SchemaVersion\":1}"
+        );
 
         // 1. 10:00 のタイムスタンプを持つファイル
         var file1 = new DefaultCommitFileNameGenerator().Generate(olderTime, "user-A", "Project_Basic");
@@ -106,7 +120,10 @@ public class ReplayUpdatedAtTests
         var file2 = new DefaultCommitFileNameGenerator().Generate(newerTime, "user-A", "Task_Progress");
         var taskDir = Path.Combine(changesDir, Guid.NewGuid().ToString());
         Directory.CreateDirectory(taskDir);
-        await File.WriteAllTextAsync(Path.Combine(taskDir, file2), "{\"Id\":\"" + Guid.NewGuid() + "\", \"Status\":\"InProgress\"}");
+        await File.WriteAllTextAsync(
+            Path.Combine(taskDir, file2),
+            "{\"Id\":\"" + Guid.NewGuid() + "\", \"Status\":\"InProgress\"}"
+        );
 
         // Act: ロード
         var loadedProject = await _repository.LoadAsync(projectId);
@@ -115,8 +132,11 @@ public class ReplayUpdatedAtTests
         Assert.IsNotNull(loadedProject);
 
         // 最終更新日時は「最後（最新）のファイル」である 12:00 になっているべき
-        Assert.AreEqual(newerTime, loadedProject.UpdatedAt,
-            "最終更新日時は最新の履歴ファイルのタイムスタンプから復元されるべき");
+        Assert.AreEqual(
+            newerTime,
+            loadedProject.UpdatedAt,
+            "最終更新日時は最新の履歴ファイルのタイムスタンプから復元されるべき"
+        );
     }
 
     /// <summary>
@@ -138,15 +158,34 @@ public class ReplayUpdatedAtTests
         var taskDir = Path.Combine(changesDir, taskId.ToString());
         Directory.CreateDirectory(taskDir);
 
-        await File.WriteAllTextAsync(Path.Combine(projectDir, ".project"), "{\"ProjectId\":\"" + projectId + "\", \"CreatedAt\":\"2026-01-01T00:00:00Z\", \"CreatedBy\":\"test\", \"SchemaVersion\":1}");
+        await File.WriteAllTextAsync(
+            Path.Combine(projectDir, ".project"),
+            "{\"ProjectId\":\""
+                + projectId
+                + "\", \"CreatedAt\":\"2026-01-01T00:00:00Z\", \"CreatedBy\":\"test\", \"SchemaVersion\":1}"
+        );
 
         // 1. タスクが必要なので作成
-        var taskFile = new DefaultCommitFileNameGenerator().Generate(commentTime.AddMinutes(-1), "user-A", "Task_Planning");
-        await File.WriteAllTextAsync(Path.Combine(taskDir, taskFile), "{\"Id\":\"" + taskId + "\", \"Name\":\"Test Task\"}");
+        var taskFile = new DefaultCommitFileNameGenerator().Generate(
+            commentTime.AddMinutes(-1),
+            "user-A",
+            "Task_Planning"
+        );
+        await File.WriteAllTextAsync(
+            Path.Combine(taskDir, taskFile),
+            "{\"Id\":\"" + taskId + "\", \"Name\":\"Test Task\"}"
+        );
 
         // 2. JSON内に CreatedAt を持たないコメントファイル
         var fileName = new DefaultCommitFileNameGenerator().Generate(commentTime, "user-A", "Comment");
-        var json = "{\"Id\":\"" + commentId + "\", \"TaskId\":\"" + taskId + "\", \"AuthorId\":\"" + authorId + "\", \"Content\":\"Hello\", \"AttachmentLinks\":[]}";
+        var json =
+            "{\"Id\":\""
+            + commentId
+            + "\", \"TaskId\":\""
+            + taskId
+            + "\", \"AuthorId\":\""
+            + authorId
+            + "\", \"Content\":\"Hello\", \"AttachmentLinks\":[]}";
         await File.WriteAllTextAsync(Path.Combine(taskDir, fileName), json);
 
         // Act: ロード
@@ -157,8 +196,11 @@ public class ReplayUpdatedAtTests
         Assert.IsNotNull(comment, "コメントがロードされていること");
 
         // ファイル名の 15:00 が復元されているべき
-        Assert.AreEqual(commentTime, comment.CreatedAt,
-            "コメントの作成日時はファイル名のタイムスタンプから復元されるべき");
+        Assert.AreEqual(
+            commentTime,
+            comment.CreatedAt,
+            "コメントの作成日時はファイル名のタイムスタンプから復元されるべき"
+        );
     }
 
     /// <summary>
@@ -188,7 +230,9 @@ public class ReplayUpdatedAtTests
 
         // Assert (Post-Save): 保存成功後に、保存時のタイムスタンプで更新されていること
         Assert.AreNotEqual(originalUpdatedAt, project.UpdatedAt, "保存後に最終更新日時は更新されるべき");
-        Assert.IsTrue(project.UpdatedAt >= startTime && project.UpdatedAt <= endTime,
-            $"UpdatedAt ({project.UpdatedAt}) は保存期間中 ({startTime}～{endTime}) の時刻であるべき");
+        Assert.IsTrue(
+            project.UpdatedAt >= startTime && project.UpdatedAt <= endTime,
+            $"UpdatedAt ({project.UpdatedAt}) は保存期間中 ({startTime}～{endTime}) の時刻であるべき"
+        );
     }
 }

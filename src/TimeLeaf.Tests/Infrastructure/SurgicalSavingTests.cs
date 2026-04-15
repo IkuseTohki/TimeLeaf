@@ -8,8 +8,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Repositories;
-using TimeLeaf.Services;
 using TimeLeaf.Repositories.FileSystem;
+using TimeLeaf.Services;
 
 namespace TimeLeaf.Tests.Infrastructure;
 
@@ -52,7 +52,10 @@ public class SurgicalSavingTests
         // Arrange
         var serializer = new JsonProjectFileSystemSerializer();
         var generator = new DefaultCommitFileNameGenerator();
-        var monitor = new FileSystemProjectStorageMonitor(_tempDir, new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object);
+        var monitor = new FileSystemProjectStorageMonitor(
+            _tempDir,
+            new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object
+        );
         var repo = new FolderProjectRepository(_tempDir, monitor, serializer, generator, _loggerMock.Object);
         var projectA = new Project();
         projectA.UpdateName("ProjectA");
@@ -81,7 +84,10 @@ public class SurgicalSavingTests
         // Arrange
         var serializer = new JsonProjectFileSystemSerializer();
         var generator = new DefaultCommitFileNameGenerator();
-        var monitor = new FileSystemProjectStorageMonitor(_tempDir, new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object);
+        var monitor = new FileSystemProjectStorageMonitor(
+            _tempDir,
+            new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object
+        );
         var repo = new FolderProjectRepository(_tempDir, monitor, serializer, generator, _loggerMock.Object);
         var project = new Project();
         project.UpdateName("SameName");
@@ -98,6 +104,10 @@ public class SurgicalSavingTests
 
         // Assert
         var currentFileCount = Directory.GetFiles(changesDir).Length;
-        Assert.AreEqual(initialFileCount, currentFileCount, "内容が変わっていないため、新しいファイルは生成されないべき");
+        Assert.AreEqual(
+            initialFileCount,
+            currentFileCount,
+            "内容が変わっていないため、新しいファイルは生成されないべき"
+        );
     }
 }

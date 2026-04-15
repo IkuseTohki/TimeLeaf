@@ -39,7 +39,7 @@ public class CommentResolutionTests
             TaskId = task.Id,
             AuthorId = userId,
             Content = "テストコメント",
-            CreatedAt = DateTime.Now
+            CreatedAt = DateTime.Now,
         };
         task.AddComment(comment);
 
@@ -52,7 +52,11 @@ public class CommentResolutionTests
 
         // Assert
         var commentVm = viewModel.Comments.First();
-        Assert.AreEqual(displayName, commentVm.AuthorName, "コメントの表示名がリポジトリから取得した名前に更新されていること");
+        Assert.AreEqual(
+            displayName,
+            commentVm.AuthorName,
+            "コメントの表示名がリポジトリから取得した名前に更新されていること"
+        );
     }
 
     /// <summary>
@@ -70,7 +74,7 @@ public class CommentResolutionTests
         {
             TaskId = task.Id,
             AuthorId = userId,
-            Content = "テストコメント"
+            Content = "テストコメント",
         };
         task.AddComment(comment);
 
@@ -80,7 +84,11 @@ public class CommentResolutionTests
 
         // Assert
         var commentVm = viewModel.Comments.First();
-        Assert.AreEqual("Unknown User", commentVm.AuthorName, "ユーザーが見つからない場合はデフォルトの表示名であること");
+        Assert.AreEqual(
+            "Unknown User",
+            commentVm.AuthorName,
+            "ユーザーが見つからない場合はデフォルトの表示名であること"
+        );
     }
 
     /// <summary>
@@ -95,7 +103,12 @@ public class CommentResolutionTests
         _userServiceMock.Setup(r => r.GetUserAsync(userId)).ReturnsAsync((User)null!);
 
         var task = new ProjectTask();
-        var comment = new Comment { TaskId = task.Id, AuthorId = userId, Content = "Hello" };
+        var comment = new Comment
+        {
+            TaskId = task.Id,
+            AuthorId = userId,
+            Content = "Hello",
+        };
         task.AddComment(comment);
 
         using var viewModel = new ProjectTaskViewModel(task, _userServiceMock.Object);
@@ -107,7 +120,11 @@ public class CommentResolutionTests
         _userServiceMock.Raise(s => s.UserChanged += null, updatedUser);
 
         // Assert: 即座に（またはイベント伝播後に）反映される
-        Assert.AreEqual("後から来たユーザー", viewModel.Comments.First().AuthorName, "イベント購読により表示名が更新されること");
+        Assert.AreEqual(
+            "後から来たユーザー",
+            viewModel.Comments.First().AuthorName,
+            "イベント購読により表示名が更新されること"
+        );
         Assert.AreEqual("#00FF00", viewModel.Comments.First().AuthorColor);
     }
 }

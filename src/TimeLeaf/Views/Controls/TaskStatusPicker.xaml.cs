@@ -9,12 +9,12 @@ namespace TimeLeaf.Views.Controls;
 /// </summary>
 public partial class TaskStatusPicker : UserControl
 {
-    public static readonly DependencyProperty SelectedStatusProperty =
-        DependencyProperty.Register(
-            nameof(SelectedStatus),
-            typeof(TaskStatus),
-            typeof(TaskStatusPicker),
-            new FrameworkPropertyMetadata(TaskStatus.NotStarted, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+    public static readonly DependencyProperty SelectedStatusProperty = DependencyProperty.Register(
+        nameof(SelectedStatus),
+        typeof(TaskStatus),
+        typeof(TaskStatusPicker),
+        new FrameworkPropertyMetadata(TaskStatus.NotStarted, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)
+    );
 
     /// <summary>
     /// 現在選択されているステータスを取得または設定します。

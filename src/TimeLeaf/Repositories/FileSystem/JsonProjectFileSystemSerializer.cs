@@ -14,15 +14,17 @@ public class JsonProjectFileSystemSerializer : IProjectFileSystemSerializer
         PropertyNameCaseInsensitive = true,
         WriteIndented = true,
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping, // 日本語をエスケープせずに保存
-        Converters = { new JsonStringEnumConverter() } // Enum を文字列で保存
+        Converters = { new JsonStringEnumConverter() }, // Enum を文字列で保存
     };
 
-    public string Serialize<T>(T dto) where T : class
+    public string Serialize<T>(T dto)
+        where T : class
     {
         return JsonSerializer.Serialize(dto, _options);
     }
 
-    public T? Deserialize<T>(string data) where T : class
+    public T? Deserialize<T>(string data)
+        where T : class
     {
         return JsonSerializer.Deserialize<T>(data, _options);
     }

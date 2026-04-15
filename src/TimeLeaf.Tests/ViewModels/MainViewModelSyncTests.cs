@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using LeafKit.UI.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -13,8 +14,6 @@ using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
 using TimeLeaf.ViewModels.Workspace;
-
-using LeafKit.UI.Services;
 
 namespace TimeLeaf.Tests.ViewModels;
 
@@ -44,20 +43,30 @@ public class MainViewModelSyncTests
         _userServiceMock = new Mock<IUserService>();
 
         // ProjectWorkspaceViewModel 用のロガーもモックする
-        _serviceProviderMock.Setup(sp => sp.GetService(typeof(ILogger<ProjectWorkspaceViewModel>)))
+        _serviceProviderMock
+            .Setup(sp => sp.GetService(typeof(ILogger<ProjectWorkspaceViewModel>)))
             .Returns(new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
-        _serviceProviderMock.Setup(sp => sp.GetService(typeof(IAddProjectUseCase)))
+        _serviceProviderMock
+            .Setup(sp => sp.GetService(typeof(IAddProjectUseCase)))
             .Returns(addProjectUseCaseMock.Object);
-        _serviceProviderMock.Setup(sp => sp.GetService(typeof(IDialogService)))
-            .Returns(dialogServiceMock.Object);
-        _serviceProviderMock.Setup(sp => sp.GetService(typeof(IServiceProvider)))
-            .Returns(_serviceProviderMock.Object);
+        _serviceProviderMock.Setup(sp => sp.GetService(typeof(IDialogService))).Returns(dialogServiceMock.Object);
+        _serviceProviderMock.Setup(sp => sp.GetService(typeof(IServiceProvider))).Returns(_serviceProviderMock.Object);
 
         // Factory mock setup
-        viewModelFactoryMock.Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
-            .Returns((Project p) => new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, viewModelFactoryMock.Object));
+        viewModelFactoryMock
+            .Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
+            .Returns(
+                (Project p) =>
+                    new ProjectViewModel(
+                        p,
+                        Guid.NewGuid(),
+                        new Mock<IJoinProjectUseCase>().Object,
+                        viewModelFactoryMock.Object
+                    )
+            );
 
-        viewModelFactoryMock.Setup(x => x.CreateProjectTaskViewModel(It.IsAny<ProjectTask>()))
+        viewModelFactoryMock
+            .Setup(x => x.CreateProjectTaskViewModel(It.IsAny<ProjectTask>()))
             .Returns((ProjectTask t) => new ProjectTaskViewModel(t, _userServiceMock.Object));
 
         var projectId = Guid.NewGuid();
@@ -67,7 +76,10 @@ public class MainViewModelSyncTests
         loadUseCaseMock.Setup(r => r.ExecuteAsync()).ReturnsAsync(new List<Project> { initialProject });
 
         var dispatcherMock = new Mock<IDispatcherService>();
-        dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Action>())).Callback<Action>(a => a()).Returns(Task.CompletedTask);
+        dispatcherMock
+            .Setup(x => x.InvokeAsync(It.IsAny<Action>()))
+            .Callback<Action>(a => a())
+            .Returns(Task.CompletedTask);
         dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Func<Task>>())).Returns<Func<Task>>(f => f());
 
         var notificationServiceMock = new Mock<INotificationService>();
@@ -77,8 +89,27 @@ public class MainViewModelSyncTests
         var checkDeadlinesUseCaseMock = new Mock<ICheckTaskDeadlinesUseCase>();
         var identityServiceMock = new Mock<IIdentityService>();
 
-        var saveCoordinator = new ProjectSaveCoordinator(saveUseCaseMock.Object, new Mock<ILogger<ProjectSaveCoordinator>>().Object);
-        var viewModel = new MainViewModel(loadUseCaseMock.Object, saveUseCaseMock.Object, findProjectUseCaseMock.Object, projectServiceMock.Object, addProjectUseCaseMock.Object, saveCoordinator, dispatcherMock.Object, viewModelFactoryMock.Object, notificationServiceMock.Object, snackbarServiceMock.Object, osNotificationServiceMock.Object, checkDeadlinesUseCaseMock.Object, dialogServiceMock.Object, identityServiceMock.Object, loggerMock.Object);
+        var saveCoordinator = new ProjectSaveCoordinator(
+            saveUseCaseMock.Object,
+            new Mock<ILogger<ProjectSaveCoordinator>>().Object
+        );
+        var viewModel = new MainViewModel(
+            loadUseCaseMock.Object,
+            saveUseCaseMock.Object,
+            findProjectUseCaseMock.Object,
+            projectServiceMock.Object,
+            addProjectUseCaseMock.Object,
+            saveCoordinator,
+            dispatcherMock.Object,
+            viewModelFactoryMock.Object,
+            notificationServiceMock.Object,
+            snackbarServiceMock.Object,
+            osNotificationServiceMock.Object,
+            checkDeadlinesUseCaseMock.Object,
+            dialogServiceMock.Object,
+            identityServiceMock.Object,
+            loggerMock.Object
+        );
         await System.Threading.Tasks.Task.Delay(100); // InitializeAsync の完了を待つ
 
         // ロードされる「最新」の状態を準備（別のタスクがある状態）
@@ -97,6 +128,10 @@ public class MainViewModelSyncTests
         var project = viewModel.Projects.First(pvm => pvm.Id == projectId); // ViewModel 繧呈､懃ｴ｢
 
         Assert.AreEqual(1, project.Model.Tasks.Count, "同期によってタスクが1件に更新されていること");
-        Assert.AreEqual("Task from Sync", project.Model.Tasks.First().Name, "同期された最新のタスク名が反映されていること");
+        Assert.AreEqual(
+            "Task from Sync",
+            project.Model.Tasks.First().Name,
+            "同期された最新のタスク名が反映されていること"
+        );
     }
 }

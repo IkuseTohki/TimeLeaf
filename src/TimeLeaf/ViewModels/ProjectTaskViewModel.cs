@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.ComponentModel;
+using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using TimeLeaf.Models.Entities;
@@ -188,7 +188,8 @@ public partial class ProjectTaskViewModel : ObservableObject, IDisposable
     /// <summary>
     /// ステータスの全選択肢。
     /// </summary>
-    public IEnumerable<TimeLeaf.Models.Enums.TaskStatus> StatusValues => Enum.GetValues(typeof(TimeLeaf.Models.Enums.TaskStatus)).Cast<TimeLeaf.Models.Enums.TaskStatus>();
+    public IEnumerable<TimeLeaf.Models.Enums.TaskStatus> StatusValues =>
+        Enum.GetValues(typeof(TimeLeaf.Models.Enums.TaskStatus)).Cast<TimeLeaf.Models.Enums.TaskStatus>();
 
     /// <summary>
     /// タスクに関するコメントのリスト（UI用）。
@@ -230,8 +231,10 @@ public partial class ProjectTaskViewModel : ObservableObject, IDisposable
     /// </summary>
     public void UpdateFromModel(ProjectTask newModel)
     {
-        if (newModel == null) throw new ArgumentNullException(nameof(newModel));
-        if (newModel.Id != _projectTask.Id) throw new ArgumentException("Cannot update ViewModel with a different Task ID.");
+        if (newModel == null)
+            throw new ArgumentNullException(nameof(newModel));
+        if (newModel.Id != _projectTask.Id)
+            throw new ArgumentException("Cannot update ViewModel with a different Task ID.");
 
         _projectTask = newModel;
         SyncComments();

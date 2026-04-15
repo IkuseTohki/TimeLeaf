@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using LeafKit.UI.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -11,7 +12,6 @@ using TimeLeaf.Repositories;
 using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
-using LeafKit.UI.Services;
 
 namespace TimeLeaf.Tests.ViewModels;
 
@@ -58,10 +58,20 @@ public class MainViewModelTrayTests
 
         _loadUseCaseMock.Setup(x => x.ExecuteAsync()).ReturnsAsync(new List<Project>());
 
-        _viewModelFactoryMock.Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
-            .Returns((Project p) => new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object));
+        _viewModelFactoryMock
+            .Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
+            .Returns(
+                (Project p) =>
+                    new ProjectViewModel(
+                        p,
+                        Guid.NewGuid(),
+                        new Mock<IJoinProjectUseCase>().Object,
+                        _viewModelFactoryMock.Object
+                    )
+            );
 
-        _viewModelFactoryMock.Setup(x => x.CreateProjectTaskViewModel(It.IsAny<ProjectTask>()))
+        _viewModelFactoryMock
+            .Setup(x => x.CreateProjectTaskViewModel(It.IsAny<ProjectTask>()))
             .Returns((ProjectTask t) => new ProjectTaskViewModel(t, _userServiceMock.Object));
     }
 
@@ -82,7 +92,8 @@ public class MainViewModelTrayTests
             _checkDeadlinesUseCaseMock.Object,
             _dialogServiceMock.Object,
             _identityServiceMock.Object,
-            _loggerMock.Object);
+            _loggerMock.Object
+        );
     }
 
     /// <summary>

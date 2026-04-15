@@ -20,7 +20,7 @@ public class TaskStatusToIconConverter : IValueConverter
                 TaskStatus.InProgress => "🔵",
                 TaskStatus.InReview => "🟡",
                 TaskStatus.Completed => "🟢",
-                _ => "❓"
+                _ => "❓",
             };
         }
         return "❓";

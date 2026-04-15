@@ -1,12 +1,12 @@
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Threading.Tasks;
+using System.Windows;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using LeafKit.UI.Services;
+using TimeLeaf.Models.Entities;
 using TimeLeaf.Repositories;
 using TimeLeaf.Services;
-using TimeLeaf.Models.Entities;
-using LeafKit.UI.Services;
-using System.Windows;
 
 namespace TimeLeaf.ViewModels.Workspace;
 
@@ -26,7 +26,8 @@ public partial class ProjectSettingsViewModel : ObservableObject
         IProjectRepository projectRepository,
         IIdentityService identityService,
         INotificationService notificationService,
-        IDialogService dialogService)
+        IDialogService dialogService
+    )
     {
         _projectViewModel = projectViewModel;
         _projectRepository = projectRepository;
@@ -45,14 +46,21 @@ public partial class ProjectSettingsViewModel : ObservableObject
             "プロジェクトをアーカイブしますか？\nアーカイブすると変更ができなくなり、一覧で非表示になります（アーカイブフィルタで表示可能）。",
             "アーカイブの確認",
             MessageBoxButton.YesNo,
-            MessageBoxImage.Question);
+            MessageBoxImage.Question
+        );
 
         if (result == MessageBoxResult.Yes)
         {
             _projectViewModel.Model.Archive();
             await _projectRepository.SaveAsync(_projectViewModel.Model, _identityService.CurrentUserId.ToString());
             OnPropertyChanged(nameof(IsArchived));
-            _notificationService.Notify(new Notification("プロジェクト更新", "プロジェクトをアーカイブしました。", _projectViewModel.Id.ToString()));
+            _notificationService.Notify(
+                new Notification(
+                    "プロジェクト更新",
+                    "プロジェクトをアーカイブしました。",
+                    _projectViewModel.Id.ToString()
+                )
+            );
         }
     }
 
@@ -62,7 +70,13 @@ public partial class ProjectSettingsViewModel : ObservableObject
         _projectViewModel.Model.Unarchive();
         await _projectRepository.SaveAsync(_projectViewModel.Model, _identityService.CurrentUserId.ToString());
         OnPropertyChanged(nameof(IsArchived));
-        _notificationService.Notify(new Notification("プロジェクト更新", "プロジェクトのアーカイブを解除しました。", _projectViewModel.Id.ToString()));
+        _notificationService.Notify(
+            new Notification(
+                "プロジェクト更新",
+                "プロジェクトのアーカイブを解除しました。",
+                _projectViewModel.Id.ToString()
+            )
+        );
     }
 
     [RelayCommand]
@@ -73,12 +87,15 @@ public partial class ProjectSettingsViewModel : ObservableObject
             $"本当にプロジェクト「{ProjectName}」を削除しますか？\nこの操作は取り消せません。プロジェクトフォルダごと完全に削除されます。",
             "プロジェクト削除の確認",
             MessageBoxButton.YesNo,
-            MessageBoxImage.Warning);
+            MessageBoxImage.Warning
+        );
 
         if (result == MessageBoxResult.Yes)
         {
             await _projectRepository.DeleteAsync(_projectViewModel.Model.Id);
-            _notificationService.Notify(new Notification("プロジェクト削除", "プロジェクトを削除しました。", string.Empty));
+            _notificationService.Notify(
+                new Notification("プロジェクト削除", "プロジェクトを削除しました。", string.Empty)
+            );
 
             // ホームに戻る等のナビゲーションが必要だが、
             // ProjectChangedイベントにより上位でリロードが走り、

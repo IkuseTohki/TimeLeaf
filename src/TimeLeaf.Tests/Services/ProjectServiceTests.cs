@@ -24,10 +24,7 @@ public class ProjectServiceTests
         _identityServiceMock = new Mock<IIdentityService>();
         _loggerMock = new Mock<ILogger<ProjectService>>();
 
-        _projectService = new ProjectService(
-            _repositoryMock.Object,
-            _identityServiceMock.Object,
-            _loggerMock.Object);
+        _projectService = new ProjectService(_repositoryMock.Object, _identityServiceMock.Object, _loggerMock.Object);
     }
 
     [TestMethod]

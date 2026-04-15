@@ -1,10 +1,10 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Repositories.FileSystem;
 using TimeLeaf.Repositories.FileSystem.Dtos;
@@ -49,7 +49,10 @@ public class ProjectAssignmentReplayTests
         var userId = "user1";
         var assignedUser1 = Guid.NewGuid();
         var assignedUser2 = Guid.NewGuid();
-        var dto = new ProjectMembersDto { AssignedUserIds = new List<Guid> { assignedUser1, assignedUser2 } };
+        var dto = new ProjectMembersDto
+        {
+            AssignedUserIds = new List<Guid> { assignedUser1, assignedUser2 },
+        };
 
         var fileName = _fileNameGenerator.Generate(DateTime.Now, userId, "Project_Members");
         await File.WriteAllTextAsync(Path.Combine(_changesDir, fileName), _serializer.Serialize(dto));

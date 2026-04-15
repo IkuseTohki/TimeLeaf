@@ -11,4 +11,5 @@ internal record TaskProgressDto(
     TimeLeaf.Models.Enums.TaskStatus Status,
     DateTime? ActualStartDate,
     DateTime? ActualEndDate,
-    double ActualCost);
+    double ActualCost
+);

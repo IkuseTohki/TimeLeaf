@@ -28,5 +28,5 @@ public enum MainNavigationContext
     /// <summary>
     /// 個別プロジェクトの詳細（ワークスペース）
     /// </summary>
-    ProjectDetail
+    ProjectDetail,
 }

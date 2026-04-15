@@ -1,6 +1,9 @@
 using System;
 using System.IO;
 using System.Windows;
+using LeafKit.Services;
+using LeafKit.System.Services;
+using LeafKit.UI.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -11,9 +14,6 @@ using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
 using TimeLeaf.Views;
-using LeafKit.Services;
-using LeafKit.System.Services;
-using LeafKit.UI.Services;
 
 namespace TimeLeaf;
 
@@ -40,7 +40,10 @@ public partial class App : Application
             .CreateLogger();
     }
 
-    private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+    private void App_DispatcherUnhandledException(
+        object sender,
+        System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e
+    )
     {
         HandleGlobalException(e.Exception, "UI Thread Dispatcher Exception");
         e.Handled = true;
@@ -51,7 +54,10 @@ public partial class App : Application
         HandleGlobalException(e.ExceptionObject as Exception, "AppDomain Unhandled Exception");
     }
 
-    private void TaskScheduler_UnobservedTaskException(object? sender, System.Threading.Tasks.UnobservedTaskExceptionEventArgs e)
+    private void TaskScheduler_UnobservedTaskException(
+        object? sender,
+        System.Threading.Tasks.UnobservedTaskExceptionEventArgs e
+    )
     {
         HandleGlobalException(e.Exception, "TaskScheduler Unobserved Exception");
         e.SetObserved();
@@ -59,7 +65,8 @@ public partial class App : Application
 
     private void HandleGlobalException(Exception? ex, string type)
     {
-        if (ex == null) return;
+        if (ex == null)
+            return;
 
         // すでにエラーダイアログが表示されている場合は何もしない（ログのみ）
         lock (typeof(App))
@@ -76,9 +83,8 @@ public partial class App : Application
         Log.Fatal(ex, "Critical Unhandled Error [{Type}]: {Message}", type, ex.Message);
         Log.CloseAndFlush();
 
-        var detail = $"【エラーの種類】: {type}\n" +
-                     $"【メッセージ】: {ex.Message}\n\n" +
-                     $"【スタックトレース】:\n{ex}";
+        var detail =
+            $"【エラーの種類】: {type}\n" + $"【メッセージ】: {ex.Message}\n\n" + $"【スタックトレース】:\n{ex}";
 
         void ShowErrorWindow()
         {
@@ -91,12 +97,13 @@ public partial class App : Application
             {
                 // XAMLパースエラーなどで FatalErrorWindow 自体が表示できない場合の最終手段
                 MessageBox.Show(
-                    $"致命的なエラーが発生しました。さらに、エラーダイアログの表示にも失敗しました。\n\n" +
-                    $"元のエラー: {ex.Message}\n\n" +
-                    $"表示エラー: {fallbackEx.Message}",
+                    $"致命的なエラーが発生しました。さらに、エラーダイアログの表示にも失敗しました。\n\n"
+                        + $"元のエラー: {ex.Message}\n\n"
+                        + $"表示エラー: {fallbackEx.Message}",
                     "TimeLeaf 致命的なエラー",
                     MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                    MessageBoxImage.Error
+                );
             }
             finally
             {
@@ -199,7 +206,11 @@ public partial class App : Application
         }
     }
 
-    private void ConfigureServices(IServiceCollection services, ApplicationSettings settings, IApplicationSettingsRepository settingsRepo)
+    private void ConfigureServices(
+        IServiceCollection services,
+        ApplicationSettings settings,
+        IApplicationSettingsRepository settingsRepo
+    )
     {
         // 設定リポジトリと設定オブジェクト自体を登録
         services.AddSingleton(settingsRepo);
@@ -233,16 +244,18 @@ public partial class App : Application
         // 永続化層のコンポーネント登録
         services.AddSingleton<IProjectFileSystemSerializer, JsonProjectFileSystemSerializer>();
         services.AddSingleton<ICommitFileNameGenerator, DefaultCommitFileNameGenerator>();
-        services.AddSingleton<IProjectStorageMonitor>(sp =>
-            new FileSystemProjectStorageMonitor(storagePath, sp.GetRequiredService<ILogger<FileSystemProjectStorageMonitor>>()));
+        services.AddSingleton<IProjectStorageMonitor>(sp => new FileSystemProjectStorageMonitor(
+            storagePath,
+            sp.GetRequiredService<ILogger<FileSystemProjectStorageMonitor>>()
+        ));
 
-        services.AddSingleton<IProjectRepository>(sp =>
-            new FolderProjectRepository(
-                storagePath,
-                sp.GetRequiredService<IProjectStorageMonitor>(),
-                sp.GetRequiredService<IProjectFileSystemSerializer>(),
-                sp.GetRequiredService<ICommitFileNameGenerator>(),
-                sp.GetRequiredService<ILogger<FolderProjectRepository>>()));
+        services.AddSingleton<IProjectRepository>(sp => new FolderProjectRepository(
+            storagePath,
+            sp.GetRequiredService<IProjectStorageMonitor>(),
+            sp.GetRequiredService<IProjectFileSystemSerializer>(),
+            sp.GetRequiredService<ICommitFileNameGenerator>(),
+            sp.GetRequiredService<ILogger<FolderProjectRepository>>()
+        ));
 
         // LeafKit.UI サービスの登録
         services.AddSingleton<IDialogService, DialogService>();
@@ -293,4 +306,3 @@ public partial class App : Application
         base.OnExit(e);
     }
 }
-

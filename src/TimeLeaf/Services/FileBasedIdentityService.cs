@@ -21,7 +21,11 @@ public class FileBasedIdentityService : IIdentityService
 
     public Guid CurrentUserId => _currentIdentity?.Id ?? Guid.Empty;
 
-    public FileBasedIdentityService(IIdentitySeedRepository repository, IUserRepository userRepository, IUserService userService)
+    public FileBasedIdentityService(
+        IIdentitySeedRepository repository,
+        IUserRepository userRepository,
+        IUserService userService
+    )
     {
         _repository = repository;
         _userRepository = userRepository;
@@ -30,7 +34,8 @@ public class FileBasedIdentityService : IIdentityService
 
     public async Task<User> GetCurrentIdentityAsync()
     {
-        if (_currentIdentity != null) return _currentIdentity;
+        if (_currentIdentity != null)
+            return _currentIdentity;
 
         var seed = await _repository.LoadAsync();
 

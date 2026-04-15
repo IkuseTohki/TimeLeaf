@@ -1,16 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using LeafKit.UI.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
+using TimeLeaf.Repositories;
 using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
 using TimeLeaf.ViewModels.Workspace;
-using TimeLeaf.Repositories;
-using LeafKit.UI.Services;
 
 namespace TimeLeaf.Tests.ViewModels;
 
@@ -38,29 +38,57 @@ public class ProjectWorkspaceViewModelTests
 
         var project = new Project();
         project.UpdateName("Test Project");
-        _projectViewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
+        _projectViewModel = new ProjectViewModel(
+            project,
+            Guid.NewGuid(),
+            new Mock<IJoinProjectUseCase>().Object,
+            _viewModelFactoryMock.Object
+        );
 
         // Factory mock setup
-        _viewModelFactoryMock.Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
-            .Returns((Project p) => new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object));
+        _viewModelFactoryMock
+            .Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
+            .Returns(
+                (Project p) =>
+                    new ProjectViewModel(
+                        p,
+                        Guid.NewGuid(),
+                        new Mock<IJoinProjectUseCase>().Object,
+                        _viewModelFactoryMock.Object
+                    )
+            );
 
-        _viewModelFactoryMock.Setup(x => x.CreateProjectTaskViewModel(It.IsAny<ProjectTask>()))
+        _viewModelFactoryMock
+            .Setup(x => x.CreateProjectTaskViewModel(It.IsAny<ProjectTask>()))
             .Returns((ProjectTask t) => new ProjectTaskViewModel(t, _userServiceMock.Object));
 
         // デフォルトの戻り値を設定
-        _viewModelFactoryMock.Setup(x => x.CreateProjectDashboardViewModel(It.IsAny<ProjectViewModel>()))
-            .Returns((ProjectViewModel p) => new ProjectDashboardViewModel(p, new Mock<IAddMilestoneUseCase>().Object, new Mock<ILogger<ProjectDashboardViewModel>>().Object));
+        _viewModelFactoryMock
+            .Setup(x => x.CreateProjectDashboardViewModel(It.IsAny<ProjectViewModel>()))
+            .Returns(
+                (ProjectViewModel p) =>
+                    new ProjectDashboardViewModel(
+                        p,
+                        new Mock<IAddMilestoneUseCase>().Object,
+                        new Mock<ILogger<ProjectDashboardViewModel>>().Object
+                    )
+            );
 
         var detailLoggerMock = new Mock<ILogger<TaskDetailViewModel>>();
-        _viewModelFactoryMock.Setup(x => x.CreateProjectTasksViewModel(It.IsAny<ProjectViewModel>()))
-            .Returns((ProjectViewModel p) => new ProjectTasksViewModel(
-                p,
-                new Mock<IAddTaskUseCase>().Object,
-                new Mock<IGetProjectMembersUseCase>().Object,
-                _viewModelFactoryMock.Object,
-                new Mock<IDialogService>().Object,
-                new Mock<ILogger<ProjectTasksViewModel>>().Object,
-                detailLoggerMock.Object));
+        _viewModelFactoryMock
+            .Setup(x => x.CreateProjectTasksViewModel(It.IsAny<ProjectViewModel>()))
+            .Returns(
+                (ProjectViewModel p) =>
+                    new ProjectTasksViewModel(
+                        p,
+                        new Mock<IAddTaskUseCase>().Object,
+                        new Mock<IGetProjectMembersUseCase>().Object,
+                        _viewModelFactoryMock.Object,
+                        new Mock<IDialogService>().Object,
+                        new Mock<ILogger<ProjectTasksViewModel>>().Object,
+                        detailLoggerMock.Object
+                    )
+            );
     }
 
     [TestMethod]
@@ -70,9 +98,21 @@ public class ProjectWorkspaceViewModelTests
         var myId = Guid.NewGuid();
         var project = new Project();
         // 自分はまだアサインされていない
-        var projectVm = new ProjectViewModel(project, myId, new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
+        var projectVm = new ProjectViewModel(
+            project,
+            myId,
+            new Mock<IJoinProjectUseCase>().Object,
+            _viewModelFactoryMock.Object
+        );
 
-        var vm = new ProjectWorkspaceViewModel(projectVm, _projects, _notificationServiceMock.Object, _viewModelFactoryMock.Object, _checkAssignmentMock.Object, _loggerMock.Object);
+        var vm = new ProjectWorkspaceViewModel(
+            projectVm,
+            _projects,
+            _notificationServiceMock.Object,
+            _viewModelFactoryMock.Object,
+            _checkAssignmentMock.Object,
+            _loggerMock.Object
+        );
 
         // Assert
         Assert.IsFalse(vm.IsUserAssigned);
@@ -91,8 +131,20 @@ public class ProjectWorkspaceViewModelTests
         // Arrange
         var myId = Guid.NewGuid();
         var project = new Project();
-        var projectVm = new ProjectViewModel(project, myId, new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
-        var vm = new ProjectWorkspaceViewModel(projectVm, _projects, _notificationServiceMock.Object, _viewModelFactoryMock.Object, _checkAssignmentMock.Object, _loggerMock.Object);
+        var projectVm = new ProjectViewModel(
+            project,
+            myId,
+            new Mock<IJoinProjectUseCase>().Object,
+            _viewModelFactoryMock.Object
+        );
+        var vm = new ProjectWorkspaceViewModel(
+            projectVm,
+            _projects,
+            _notificationServiceMock.Object,
+            _viewModelFactoryMock.Object,
+            _checkAssignmentMock.Object,
+            _loggerMock.Object
+        );
 
         bool notified = false;
         vm.PropertyChanged += (s, e) =>
@@ -115,7 +167,14 @@ public class ProjectWorkspaceViewModelTests
     public void DefaultView_ShouldBeDashboard()
     {
         // Act
-        var vm = new ProjectWorkspaceViewModel(_projectViewModel, _projects, _notificationServiceMock.Object, _viewModelFactoryMock.Object, _checkAssignmentMock.Object, _loggerMock.Object);
+        var vm = new ProjectWorkspaceViewModel(
+            _projectViewModel,
+            _projects,
+            _notificationServiceMock.Object,
+            _viewModelFactoryMock.Object,
+            _checkAssignmentMock.Object,
+            _loggerMock.Object
+        );
 
         // Assert
         Assert.IsInstanceOfType(vm.CurrentSubViewModel, typeof(ProjectDashboardViewModel));
@@ -125,7 +184,14 @@ public class ProjectWorkspaceViewModelTests
     public void SwitchToTasks_ShouldUpdateCurrentSubViewModel()
     {
         // Arrange
-        var vm = new ProjectWorkspaceViewModel(_projectViewModel, _projects, _notificationServiceMock.Object, _viewModelFactoryMock.Object, _checkAssignmentMock.Object, _loggerMock.Object);
+        var vm = new ProjectWorkspaceViewModel(
+            _projectViewModel,
+            _projects,
+            _notificationServiceMock.Object,
+            _viewModelFactoryMock.Object,
+            _checkAssignmentMock.Object,
+            _loggerMock.Object
+        );
 
         // Act
         vm.SwitchSubViewCommand.Execute("Tasks");
@@ -138,13 +204,24 @@ public class ProjectWorkspaceViewModelTests
     public void OpenTaskDetail_ShouldSwitchSubViewToTaskDetail()
     {
         // Arrange
-        var vm = new ProjectWorkspaceViewModel(_projectViewModel, _projects, _notificationServiceMock.Object, _viewModelFactoryMock.Object, _checkAssignmentMock.Object, _loggerMock.Object);
+        var vm = new ProjectWorkspaceViewModel(
+            _projectViewModel,
+            _projects,
+            _notificationServiceMock.Object,
+            _viewModelFactoryMock.Object,
+            _checkAssignmentMock.Object,
+            _loggerMock.Object
+        );
         var task = new ProjectTask { Id = Guid.NewGuid() };
         var taskVm = new ProjectTaskViewModel(task, _userServiceMock.Object);
-        var detailVm = new TaskDetailViewModel(_projectViewModel, taskVm, new Mock<IAddCommentUseCase>().Object, new Mock<ILogger<TaskDetailViewModel>>().Object);
+        var detailVm = new TaskDetailViewModel(
+            _projectViewModel,
+            taskVm,
+            new Mock<IAddCommentUseCase>().Object,
+            new Mock<ILogger<TaskDetailViewModel>>().Object
+        );
 
-        _viewModelFactoryMock.Setup(x => x.CreateTaskDetailViewModel(_projectViewModel, taskVm))
-            .Returns(detailVm);
+        _viewModelFactoryMock.Setup(x => x.CreateTaskDetailViewModel(_projectViewModel, taskVm)).Returns(detailVm);
 
         // Act
         vm.OpenTaskDetailCommand.Execute(taskVm);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using LeafKit.UI.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -11,7 +12,6 @@ using TimeLeaf.Repositories;
 using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
-using LeafKit.UI.Services;
 
 namespace TimeLeaf.Tests.ViewModels;
 
@@ -56,16 +56,27 @@ public class MainNavigationTests
         _loggerMock = new Mock<ILogger<MainViewModel>>();
         _userServiceMock = new Mock<IUserService>();
 
-        _dispatcherServiceMock.Setup(x => x.InvokeAsync(It.IsAny<Action>()))
+        _dispatcherServiceMock
+            .Setup(x => x.InvokeAsync(It.IsAny<Action>()))
             .Callback<Action>(a => a())
             .Returns(Task.CompletedTask);
 
         _loadUseCaseMock.Setup(x => x.ExecuteAsync()).ReturnsAsync(new List<Project>());
 
-        _viewModelFactoryMock.Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
-            .Returns((Project p) => new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object));
+        _viewModelFactoryMock
+            .Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
+            .Returns(
+                (Project p) =>
+                    new ProjectViewModel(
+                        p,
+                        Guid.NewGuid(),
+                        new Mock<IJoinProjectUseCase>().Object,
+                        _viewModelFactoryMock.Object
+                    )
+            );
 
-        _viewModelFactoryMock.Setup(x => x.CreateProjectTaskViewModel(It.IsAny<ProjectTask>()))
+        _viewModelFactoryMock
+            .Setup(x => x.CreateProjectTaskViewModel(It.IsAny<ProjectTask>()))
             .Returns((ProjectTask t) => new ProjectTaskViewModel(t, _userServiceMock.Object));
     }
 
@@ -86,7 +97,8 @@ public class MainNavigationTests
             _checkDeadlinesUseCaseMock.Object,
             _dialogServiceMock.Object,
             _identityServiceMock.Object,
-            _loggerMock.Object);
+            _loggerMock.Object
+        );
     }
 
     /// <summary>
@@ -96,9 +108,16 @@ public class MainNavigationTests
     public void DefaultNavigationContext_ShouldBeHome_AndSetHomeViewModel()
     {
         // Arrange
-        var userMenu = new UserMenuViewModel(_identityServiceMock.Object, _userServiceMock.Object, _dialogServiceMock.Object, _viewModelFactoryMock.Object);
+        var userMenu = new UserMenuViewModel(
+            _identityServiceMock.Object,
+            _userServiceMock.Object,
+            _dialogServiceMock.Object,
+            _viewModelFactoryMock.Object
+        );
         var expectedHome = new HomeViewModel(new ObservableCollection<ProjectViewModel>(), userMenu);
-        _viewModelFactoryMock.Setup(x => x.CreateHomeViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>())).Returns(expectedHome);
+        _viewModelFactoryMock
+            .Setup(x => x.CreateHomeViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>()))
+            .Returns(expectedHome);
 
         // Act
         var viewModel = CreateViewModel();
@@ -116,8 +135,14 @@ public class MainNavigationTests
     {
         // Arrange
         var viewModel = CreateViewModel();
-        var expectedNotifications = new NotificationsViewModel(_notificationServiceMock.Object, viewModel.Projects, new Mock<ILogger<NotificationsViewModel>>().Object);
-        _viewModelFactoryMock.Setup(x => x.CreateNotificationsViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>(), null)).Returns(expectedNotifications);
+        var expectedNotifications = new NotificationsViewModel(
+            _notificationServiceMock.Object,
+            viewModel.Projects,
+            new Mock<ILogger<NotificationsViewModel>>().Object
+        );
+        _viewModelFactoryMock
+            .Setup(x => x.CreateNotificationsViewModel(It.IsAny<ObservableCollection<ProjectViewModel>>(), null))
+            .Returns(expectedNotifications);
 
         // Act
         viewModel.NavigationContext = MainNavigationContext.Notifications;

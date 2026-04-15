@@ -4,9 +4,9 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
+using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
-using TimeLeaf.Services;
 
 namespace TimeLeaf.Tests.ViewModels;
 
@@ -23,7 +23,8 @@ public class ProjectViewModelTests
         _userServiceMock = new Mock<IUserService>();
 
         // ProjectViewModel がタスクを生成する際に使用するファクトリのセットアップ
-        _viewModelFactoryMock.Setup(x => x.CreateProjectTaskViewModel(It.IsAny<ProjectTask>()))
+        _viewModelFactoryMock
+            .Setup(x => x.CreateProjectTaskViewModel(It.IsAny<ProjectTask>()))
             .Returns((ProjectTask t) => new ProjectTaskViewModel(t, _userServiceMock.Object));
     }
 
@@ -37,7 +38,12 @@ public class ProjectViewModelTests
         // Arrange
         var project = new Project();
         project.UpdateName("Old Name");
-        var viewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
+        var viewModel = new ProjectViewModel(
+            project,
+            Guid.NewGuid(),
+            new Mock<IJoinProjectUseCase>().Object,
+            _viewModelFactoryMock.Object
+        );
         var newName = "New Name";
 
         var receivedEvents = 0;
@@ -67,7 +73,12 @@ public class ProjectViewModelTests
         // Arrange
         var project = new Project();
         project.UpdateDescription("Old Description");
-        var viewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
+        var viewModel = new ProjectViewModel(
+            project,
+            Guid.NewGuid(),
+            new Mock<IJoinProjectUseCase>().Object,
+            _viewModelFactoryMock.Object
+        );
         var newDescription = "New Description";
 
         var receivedEvents = 0;
@@ -83,7 +94,11 @@ public class ProjectViewModelTests
         viewModel.Description = newDescription;
 
         // Assert
-        Assert.AreEqual(newDescription, project.Description, "基になるProjectエンティティのDescriptionが更新されること");
+        Assert.AreEqual(
+            newDescription,
+            project.Description,
+            "基になるProjectエンティティのDescriptionが更新されること"
+        );
         Assert.AreEqual(1, receivedEvents, "Descriptionプロパティの変更時にPropertyChangedイベントが発火すること");
     }
 
@@ -96,7 +111,12 @@ public class ProjectViewModelTests
     {
         // Arrange
         var project = new Project();
-        var viewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
+        var viewModel = new ProjectViewModel(
+            project,
+            Guid.NewGuid(),
+            new Mock<IJoinProjectUseCase>().Object,
+            _viewModelFactoryMock.Object
+        );
         var task = new ProjectTask();
         task.UpdateEstimatedCost(10);
         task.UpdateActualCost(5);
@@ -121,8 +141,16 @@ public class ProjectViewModelTests
         viewModel.SyncFromModel();
 
         // Assert
-        Assert.AreEqual(1, receivedEstimatedCostEvents, "タスク追加時にTotalEstimatedCostのPropertyChangedイベントが発火すること");
-        Assert.AreEqual(1, receivedActualCostEvents, "タスク追加時にTotalActualCostのPropertyChangedイベントが発火すること");
+        Assert.AreEqual(
+            1,
+            receivedEstimatedCostEvents,
+            "タスク追加時にTotalEstimatedCostのPropertyChangedイベントが発火すること"
+        );
+        Assert.AreEqual(
+            1,
+            receivedActualCostEvents,
+            "タスク追加時にTotalActualCostのPropertyChangedイベントが発火すること"
+        );
     }
 
     /// <summary>
@@ -138,7 +166,12 @@ public class ProjectViewModelTests
         task.UpdateEstimatedCost(10);
         task.UpdateActualCost(5);
         var existingTaskViewModel = new ProjectTaskViewModel(task, _userServiceMock.Object);
-        var viewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
+        var viewModel = new ProjectViewModel(
+            project,
+            Guid.NewGuid(),
+            new Mock<IJoinProjectUseCase>().Object,
+            _viewModelFactoryMock.Object
+        );
         project.AddTask(existingTaskViewModel.Model);
         viewModel.SyncFromModel();
 
@@ -161,8 +194,16 @@ public class ProjectViewModelTests
         viewModel.SyncFromModel();
 
         // Assert
-        Assert.AreEqual(1, receivedEstimatedCostEvents, "タスク削除時にTotalEstimatedCostのPropertyChangedイベントが発火すること");
-        Assert.AreEqual(1, receivedActualCostEvents, "タスク削除時にTotalActualCostのPropertyChangedイベントが発火すること");
+        Assert.AreEqual(
+            1,
+            receivedEstimatedCostEvents,
+            "タスク削除時にTotalEstimatedCostのPropertyChangedイベントが発火すること"
+        );
+        Assert.AreEqual(
+            1,
+            receivedActualCostEvents,
+            "タスク削除時にTotalActualCostのPropertyChangedイベントが発火すること"
+        );
     }
 
     /// <summary>
@@ -173,7 +214,12 @@ public class ProjectViewModelTests
     {
         // Arrange
         var project = new Project();
-        var viewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
+        var viewModel = new ProjectViewModel(
+            project,
+            Guid.NewGuid(),
+            new Mock<IJoinProjectUseCase>().Object,
+            _viewModelFactoryMock.Object
+        );
 
         // Act & Assert
         Assert.AreEqual(0.0, viewModel.TotalEstimatedCost, "タスクがない場合、合計見積工数は0であること");
@@ -198,7 +244,12 @@ public class ProjectViewModelTests
         project.AddTask(task1);
         project.AddTask(task2);
 
-        var viewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
+        var viewModel = new ProjectViewModel(
+            project,
+            Guid.NewGuid(),
+            new Mock<IJoinProjectUseCase>().Object,
+            _viewModelFactoryMock.Object
+        );
         var taskViewModel1 = viewModel.Tasks.First(t => t.Id == task1.Id);
 
         var receivedEstimatedCostEvents = 0;
@@ -221,8 +272,16 @@ public class ProjectViewModelTests
 
         // Assert
         // EstimatedCost で 1回、ActualCost で 1回、合計 2回ずつ発火するはず
-        Assert.AreEqual(2, receivedEstimatedCostEvents, "タスクの個別のコスト変更によりTotalEstimatedCostのPropertyChangedイベントが発火すること");
-        Assert.AreEqual(2, receivedActualCostEvents, "タスクの個別のコスト変更によりTotalActualCostのPropertyChangedイベントが発火すること");
+        Assert.AreEqual(
+            2,
+            receivedEstimatedCostEvents,
+            "タスクの個別のコスト変更によりTotalEstimatedCostのPropertyChangedイベントが発火すること"
+        );
+        Assert.AreEqual(
+            2,
+            receivedActualCostEvents,
+            "タスクの個別のコスト変更によりTotalActualCostのPropertyChangedイベントが発火すること"
+        );
     }
 
     /// <summary>
@@ -234,7 +293,12 @@ public class ProjectViewModelTests
         // Arrange
         var project = new Project();
         project.UpdateName("Test Project");
-        var projectViewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
+        var projectViewModel = new ProjectViewModel(
+            project,
+            Guid.NewGuid(),
+            new Mock<IJoinProjectUseCase>().Object,
+            _viewModelFactoryMock.Object
+        );
 
         // Act
         // Model への直接追加後、ViewModel を同期する
@@ -258,7 +322,12 @@ public class ProjectViewModelTests
         // Arrange
         var project = new Project();
         project.UpdateName("Test Project");
-        var projectViewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
+        var projectViewModel = new ProjectViewModel(
+            project,
+            Guid.NewGuid(),
+            new Mock<IJoinProjectUseCase>().Object,
+            _viewModelFactoryMock.Object
+        );
         var task = new ProjectTask();
         task.UpdateName("Existing Task");
         project.AddTask(task);
@@ -296,7 +365,12 @@ public class ProjectViewModelTests
         var baseTime = new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second, DateTimeKind.Local);
         var project = new Project();
         project.SetUpdatedAt(baseTime.AddSeconds(-secondsOffset));
-        var viewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
+        var viewModel = new ProjectViewModel(
+            project,
+            Guid.NewGuid(),
+            new Mock<IJoinProjectUseCase>().Object,
+            _viewModelFactoryMock.Object
+        );
 
         // Act
         var actual = viewModel.DisplayLastUpdated;
@@ -315,7 +389,12 @@ public class ProjectViewModelTests
         var targetDate = new DateTime(2026, 1, 1, 12, 34, 0, DateTimeKind.Local);
         var project = new Project();
         project.SetUpdatedAt(targetDate);
-        var viewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
+        var viewModel = new ProjectViewModel(
+            project,
+            Guid.NewGuid(),
+            new Mock<IJoinProjectUseCase>().Object,
+            _viewModelFactoryMock.Object
+        );
 
         // Act
         var actual = viewModel.DisplayLastUpdated;
@@ -338,7 +417,12 @@ public class ProjectViewModelTests
 
         var project = new Project();
         project.SetUpdatedAt(oneHourAgo);
-        var viewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
+        var viewModel = new ProjectViewModel(
+            project,
+            Guid.NewGuid(),
+            new Mock<IJoinProjectUseCase>().Object,
+            _viewModelFactoryMock.Object
+        );
 
         // Act
         var actual = viewModel.DisplayLastUpdated;
@@ -362,7 +446,12 @@ public class ProjectViewModelTests
         task1.UpdateName("Task 1");
         project.AddTask(task1);
 
-        var viewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
+        var viewModel = new ProjectViewModel(
+            project,
+            Guid.NewGuid(),
+            new Mock<IJoinProjectUseCase>().Object,
+            _viewModelFactoryMock.Object
+        );
         viewModel.SyncFromModel();
 
         var initialTaskVm1 = viewModel.Tasks.First(t => t.Id == task1.Id);
@@ -385,7 +474,11 @@ public class ProjectViewModelTests
         var currentTaskVm2 = viewModel.Tasks.First(t => t.Id == task2.Id);
 
         Assert.AreSame(initialTaskVm1, currentTaskVm1, "既存タスクの ViewModel インスタンスが再利用されていること");
-        Assert.AreEqual("Task 1 Updated", currentTaskVm1.Name, "再利用された ViewModel のプロパティが更新されていること");
+        Assert.AreEqual(
+            "Task 1 Updated",
+            currentTaskVm1.Name,
+            "再利用された ViewModel のプロパティが更新されていること"
+        );
         Assert.AreEqual("Task 2", currentTaskVm2.Name, "新規タスクの ViewModel が正しく作成されていること");
     }
 }

@@ -20,7 +20,12 @@ public class CommentTests
         // TaskId が Empty
         try
         {
-            _ = new Comment { TaskId = Guid.Empty, AuthorId = authorId, Content = content };
+            _ = new Comment
+            {
+                TaskId = Guid.Empty,
+                AuthorId = authorId,
+                Content = content,
+            };
             Assert.Fail("TaskId が Empty の場合に例外をスローすべき");
         }
         catch (ArgumentException) { }
@@ -28,7 +33,12 @@ public class CommentTests
         // AuthorId が Empty
         try
         {
-            _ = new Comment { TaskId = taskId, AuthorId = Guid.Empty, Content = content };
+            _ = new Comment
+            {
+                TaskId = taskId,
+                AuthorId = Guid.Empty,
+                Content = content,
+            };
             Assert.Fail("AuthorId が Empty の場合に例外をスローすべき");
         }
         catch (ArgumentException) { }
@@ -36,7 +46,12 @@ public class CommentTests
         // Content が 空
         try
         {
-            _ = new Comment { TaskId = taskId, AuthorId = authorId, Content = "" };
+            _ = new Comment
+            {
+                TaskId = taskId,
+                AuthorId = authorId,
+                Content = "",
+            };
             Assert.Fail("Content が 空 の場合に例外をスローすべき");
         }
         catch (ArgumentException) { }

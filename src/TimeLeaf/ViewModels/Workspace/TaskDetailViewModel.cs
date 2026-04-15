@@ -31,7 +31,8 @@ public partial class TaskDetailViewModel : ObservableObject, LeafKit.UI.Services
         ProjectViewModel projectViewModel,
         ProjectTaskViewModel taskViewModel,
         IAddCommentUseCase addCommentUseCase,
-        ILogger<TaskDetailViewModel> logger)
+        ILogger<TaskDetailViewModel> logger
+    )
     {
         _projectViewModel = projectViewModel;
         _taskViewModel = taskViewModel;
@@ -56,7 +57,8 @@ public partial class TaskDetailViewModel : ObservableObject, LeafKit.UI.Services
     [RelayCommand(CanExecute = nameof(CanAddComment))]
     private async System.Threading.Tasks.Task AddComment()
     {
-        if (string.IsNullOrWhiteSpace(NewCommentContent)) return;
+        if (string.IsNullOrWhiteSpace(NewCommentContent))
+            return;
 
         try
         {

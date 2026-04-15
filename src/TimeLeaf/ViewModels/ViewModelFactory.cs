@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using LeafKit.UI.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TimeLeaf.Models.Entities;
@@ -7,7 +8,6 @@ using TimeLeaf.Repositories;
 using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels.Workspace;
-using LeafKit.UI.Services;
 
 namespace TimeLeaf.ViewModels;
 
@@ -20,7 +20,11 @@ public class ViewModelFactory : IViewModelFactory
     private readonly IIdentityService _identityService;
     private readonly IUserService _userService;
 
-    public ViewModelFactory(IServiceProvider serviceProvider, IIdentityService identityService, IUserService userService)
+    public ViewModelFactory(
+        IServiceProvider serviceProvider,
+        IIdentityService identityService,
+        IUserService userService
+    )
     {
         _serviceProvider = serviceProvider;
         _identityService = identityService;
@@ -29,7 +33,15 @@ public class ViewModelFactory : IViewModelFactory
 
     public HomeViewModel CreateHomeViewModel(ObservableCollection<ProjectViewModel> projects)
     {
-        return new HomeViewModel(projects, new UserMenuViewModel(_identityService, _userService, _serviceProvider.GetRequiredService<IDialogService>(), this));
+        return new HomeViewModel(
+            projects,
+            new UserMenuViewModel(
+                _identityService,
+                _userService,
+                _serviceProvider.GetRequiredService<IDialogService>(),
+                this
+            )
+        );
     }
 
     public AllTasksViewModel CreateAllTasksViewModel(ObservableCollection<ProjectViewModel> projects)
@@ -37,7 +49,10 @@ public class ViewModelFactory : IViewModelFactory
         return new AllTasksViewModel(projects);
     }
 
-    public ProjectWorkspaceViewModel CreateProjectWorkspaceViewModel(ProjectViewModel projectViewModel, ObservableCollection<ProjectViewModel> projects)
+    public ProjectWorkspaceViewModel CreateProjectWorkspaceViewModel(
+        ProjectViewModel projectViewModel,
+        ObservableCollection<ProjectViewModel> projects
+    )
     {
         return new ProjectWorkspaceViewModel(
             projectViewModel,
@@ -45,7 +60,8 @@ public class ViewModelFactory : IViewModelFactory
             _serviceProvider.GetRequiredService<INotificationService>(),
             this,
             _serviceProvider.GetRequiredService<ICheckAssignmentUseCase>(),
-            _serviceProvider.GetRequiredService<ILogger<ProjectWorkspaceViewModel>>());
+            _serviceProvider.GetRequiredService<ILogger<ProjectWorkspaceViewModel>>()
+        );
     }
 
     public ProjectViewModel CreateProjectViewModel(Project project)
@@ -54,14 +70,13 @@ public class ViewModelFactory : IViewModelFactory
             project,
             _identityService.CurrentUserId,
             _serviceProvider.GetRequiredService<IJoinProjectUseCase>(),
-            this);
+            this
+        );
     }
 
     public ProjectTaskViewModel CreateProjectTaskViewModel(ProjectTask task)
     {
-        return new ProjectTaskViewModel(
-            task,
-            _userService);
+        return new ProjectTaskViewModel(task, _userService);
     }
 
     public AddProjectViewModel CreateAddProjectViewModel()
@@ -84,7 +99,8 @@ public class ViewModelFactory : IViewModelFactory
         return new ProjectDashboardViewModel(
             projectViewModel,
             _serviceProvider.GetRequiredService<IAddMilestoneUseCase>(),
-            _serviceProvider.GetRequiredService<ILogger<ProjectDashboardViewModel>>());
+            _serviceProvider.GetRequiredService<ILogger<ProjectDashboardViewModel>>()
+        );
     }
 
     public ProjectTasksViewModel CreateProjectTasksViewModel(ProjectViewModel projectViewModel)
@@ -96,7 +112,8 @@ public class ViewModelFactory : IViewModelFactory
             this,
             _serviceProvider.GetRequiredService<IDialogService>(),
             _serviceProvider.GetRequiredService<ILogger<ProjectTasksViewModel>>(),
-            _serviceProvider.GetRequiredService<ILogger<TaskDetailViewModel>>());
+            _serviceProvider.GetRequiredService<ILogger<TaskDetailViewModel>>()
+        );
     }
 
     public ProjectTimelineViewModel CreateProjectTimelineViewModel(ProjectViewModel projectViewModel)
@@ -111,30 +128,42 @@ public class ViewModelFactory : IViewModelFactory
             _serviceProvider.GetRequiredService<IProjectRepository>(),
             _identityService,
             _serviceProvider.GetRequiredService<INotificationService>(),
-            _serviceProvider.GetRequiredService<IDialogService>());
+            _serviceProvider.GetRequiredService<IDialogService>()
+        );
     }
 
-    public NotificationsViewModel CreateNotificationsViewModel(ObservableCollection<ProjectViewModel> projects, Guid? projectIdFilter = null)
+    public NotificationsViewModel CreateNotificationsViewModel(
+        ObservableCollection<ProjectViewModel> projects,
+        Guid? projectIdFilter = null
+    )
     {
         return new NotificationsViewModel(
             _serviceProvider.GetRequiredService<INotificationService>(),
             projects,
             _serviceProvider.GetRequiredService<ILogger<NotificationsViewModel>>(),
-            projectIdFilter);
+            projectIdFilter
+        );
     }
 
-    public TaskSummaryViewModel CreateTaskSummaryViewModel(ProjectViewModel projectViewModel, ProjectTaskViewModel taskViewModel)
+    public TaskSummaryViewModel CreateTaskSummaryViewModel(
+        ProjectViewModel projectViewModel,
+        ProjectTaskViewModel taskViewModel
+    )
     {
         return new TaskSummaryViewModel(projectViewModel, taskViewModel);
     }
 
-    public TaskDetailViewModel CreateTaskDetailViewModel(ProjectViewModel projectViewModel, ProjectTaskViewModel taskViewModel)
+    public TaskDetailViewModel CreateTaskDetailViewModel(
+        ProjectViewModel projectViewModel,
+        ProjectTaskViewModel taskViewModel
+    )
     {
         return new TaskDetailViewModel(
             projectViewModel,
             taskViewModel,
             _serviceProvider.GetRequiredService<IAddCommentUseCase>(),
-            _serviceProvider.GetRequiredService<ILogger<TaskDetailViewModel>>());
+            _serviceProvider.GetRequiredService<ILogger<TaskDetailViewModel>>()
+        );
     }
 
     public ApplicationSettingsViewModel CreateApplicationSettingsViewModel()

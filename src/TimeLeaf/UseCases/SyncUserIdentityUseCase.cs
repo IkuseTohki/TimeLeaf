@@ -18,9 +18,7 @@ public class SyncUserIdentityUseCase : ISyncUserIdentityUseCase
     /// <summary>
     /// ユースケースを初期化します。
     /// </summary>
-    public SyncUserIdentityUseCase(
-        IIdentityService identityService,
-        IUserRepository userRepository)
+    public SyncUserIdentityUseCase(IIdentityService identityService, IUserRepository userRepository)
     {
         _identityService = identityService;
         _userRepository = userRepository;

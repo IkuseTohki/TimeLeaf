@@ -30,7 +30,12 @@ public class DefaultCommitFileNameGenerator : ICommitFileNameGenerator
         // タイムスタンプのパース (yyyyMMdd_HHmmss_fff)
         var timeStr = $"{parts[0]}_{parts[1]}_{parts[2]}";
         // ファイル名はLocal(JST)として保存されているため、Localとしてパースする
-        var timestamp = DateTime.ParseExact(timeStr, TimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal);
+        var timestamp = DateTime.ParseExact(
+            timeStr,
+            TimeFormat,
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.AssumeLocal
+        );
 
         var userId = parts[3];
         // カテゴリは残りのパーツすべて（カテゴリ名に _ が含まれる可能性があるため）

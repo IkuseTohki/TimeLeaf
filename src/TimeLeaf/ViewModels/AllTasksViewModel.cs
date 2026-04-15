@@ -59,7 +59,8 @@ public partial class AllTasksViewModel : ObservableObject
     [RelayCommand]
     private void SelectTask(ProjectTaskViewModel task)
     {
-        if (task == null) return;
+        if (task == null)
+            return;
         var project = _projects.FirstOrDefault(p => p.Name == task.ProjectName);
         if (project != null)
         {
@@ -134,7 +135,13 @@ public partial class AllTasksViewModel : ObservableObject
     private void OnTaskPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         // フィルタリングやソートに関係するプロパティが変更された場合のみ再構築
-        var affectedProperties = new[] { nameof(ProjectTaskViewModel.Name), nameof(ProjectTaskViewModel.Status), nameof(ProjectTaskViewModel.Deadline), nameof(ProjectTaskViewModel.Priority) };
+        var affectedProperties = new[]
+        {
+            nameof(ProjectTaskViewModel.Name),
+            nameof(ProjectTaskViewModel.Status),
+            nameof(ProjectTaskViewModel.Deadline),
+            nameof(ProjectTaskViewModel.Priority),
+        };
         if (affectedProperties.Contains(e.PropertyName))
         {
             RebuildTasks();
@@ -142,6 +149,7 @@ public partial class AllTasksViewModel : ObservableObject
     }
 
     partial void OnSearchKeywordChanged(string value) => RebuildTasks();
+
     partial void OnShowOnlyIncompleteChanged(bool value) => RebuildTasks();
 
     /// <summary>
@@ -155,8 +163,9 @@ public partial class AllTasksViewModel : ObservableObject
         if (!string.IsNullOrWhiteSpace(SearchKeyword))
         {
             query = query.Where(t =>
-                t.Name.Contains(SearchKeyword, StringComparison.OrdinalIgnoreCase) ||
-                t.ProjectName.Contains(SearchKeyword, StringComparison.OrdinalIgnoreCase));
+                t.Name.Contains(SearchKeyword, StringComparison.OrdinalIgnoreCase)
+                || t.ProjectName.Contains(SearchKeyword, StringComparison.OrdinalIgnoreCase)
+            );
         }
 
         // フィルタリング: 未完了のみ

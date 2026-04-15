@@ -7,7 +7,6 @@ using Moq;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Services;
 using TimeLeaf.UseCases;
-
 using TaskStatus = TimeLeaf.Models.Enums.TaskStatus;
 
 namespace TimeLeaf.Tests.UseCases;
@@ -47,10 +46,17 @@ public class CheckTaskDeadlinesUseCaseTests
         useCase.Execute(new[] { project });
 
         // Assert
-        _notificationServiceMock.Verify(x => x.Notify(It.Is<Notification>(n =>
-            n.Title.Contains("期限切れ") &&
-            n.Message.Contains("Overdue Task") &&
-            n.RelatedEntityId == task.Id.ToString())), Times.Once);
+        _notificationServiceMock.Verify(
+            x =>
+                x.Notify(
+                    It.Is<Notification>(n =>
+                        n.Title.Contains("期限切れ")
+                        && n.Message.Contains("Overdue Task")
+                        && n.RelatedEntityId == task.Id.ToString()
+                    )
+                ),
+            Times.Once
+        );
     }
 
     /// <summary>
@@ -77,7 +83,11 @@ public class CheckTaskDeadlinesUseCaseTests
         useCase.Execute(new[] { project });
 
         // Assert
-        _notificationServiceMock.Verify(x => x.Notify(It.IsAny<Notification>()), Times.Never, "本日が期限のタスクは通知されるべきではありません。");
+        _notificationServiceMock.Verify(
+            x => x.Notify(It.IsAny<Notification>()),
+            Times.Never,
+            "本日が期限のタスクは通知されるべきではありません。"
+        );
     }
 
     /// <summary>

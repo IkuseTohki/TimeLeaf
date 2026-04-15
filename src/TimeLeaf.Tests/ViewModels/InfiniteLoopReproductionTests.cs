@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using LeafKit.UI.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -13,7 +14,6 @@ using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
 using TimeLeaf.ViewModels.Workspace;
-using LeafKit.UI.Services;
 
 namespace TimeLeaf.Tests.ViewModels;
 
@@ -38,12 +38,11 @@ public class InfiniteLoopReproductionTests
         _serviceProviderMock = new Mock<IServiceProvider>();
         _userServiceMock = new Mock<IUserService>();
 
-        _serviceProviderMock.Setup(sp => sp.GetService(typeof(ILogger<ProjectWorkspaceViewModel>)))
+        _serviceProviderMock
+            .Setup(sp => sp.GetService(typeof(ILogger<ProjectWorkspaceViewModel>)))
             .Returns(new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
-        _serviceProviderMock.Setup(sp => sp.GetService(typeof(IIdentityService)))
-            .Returns(_identityServiceMock.Object);
-        _serviceProviderMock.Setup(sp => sp.GetService(typeof(IServiceProvider)))
-            .Returns(_serviceProviderMock.Object);
+        _serviceProviderMock.Setup(sp => sp.GetService(typeof(IIdentityService))).Returns(_identityServiceMock.Object);
+        _serviceProviderMock.Setup(sp => sp.GetService(typeof(IServiceProvider))).Returns(_serviceProviderMock.Object);
     }
 
     /// <summary>
@@ -60,20 +59,36 @@ public class InfiniteLoopReproductionTests
         var addProjectUseCaseMock = new Mock<IAddProjectUseCase>();
         var viewModelFactoryMock = new Mock<IViewModelFactory>();
 
-        viewModelFactoryMock.Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
-            .Returns((Project p) => new ProjectViewModel(p, _testUserId, new Mock<IJoinProjectUseCase>().Object, viewModelFactoryMock.Object));
-        viewModelFactoryMock.Setup(x => x.CreateProjectTaskViewModel(It.IsAny<ProjectTask>()))
+        viewModelFactoryMock
+            .Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
+            .Returns(
+                (Project p) =>
+                    new ProjectViewModel(
+                        p,
+                        _testUserId,
+                        new Mock<IJoinProjectUseCase>().Object,
+                        viewModelFactoryMock.Object
+                    )
+            );
+        viewModelFactoryMock
+            .Setup(x => x.CreateProjectTaskViewModel(It.IsAny<ProjectTask>()))
             .Returns((ProjectTask t) => new ProjectTaskViewModel(t, _userServiceMock.Object));
 
         var dispatcherMock = new Mock<IDispatcherService>();
-        dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Action>())).Callback<Action>(a => a()).Returns(Task.CompletedTask);
+        dispatcherMock
+            .Setup(x => x.InvokeAsync(It.IsAny<Action>()))
+            .Callback<Action>(a => a())
+            .Returns(Task.CompletedTask);
         dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Func<Task>>())).Returns<Func<Task>>(f => f());
 
         var projectEntity = new Project();
         projectEntity.UpdateName("LoopTest");
         loadUseCaseMock.Setup(r => r.ExecuteAsync()).ReturnsAsync(new List<Project> { projectEntity });
 
-        var saveCoordinator = new ProjectSaveCoordinator(saveUseCaseMock.Object, new Mock<ILogger<ProjectSaveCoordinator>>().Object);
+        var saveCoordinator = new ProjectSaveCoordinator(
+            saveUseCaseMock.Object,
+            new Mock<ILogger<ProjectSaveCoordinator>>().Object
+        );
         var notificationServiceMock = new Mock<INotificationService>();
         notificationServiceMock.Setup(x => x.UnreadNotifications).Returns(new List<Notification>());
         var snackbarServiceMock = new Mock<ISnackbarService>();
@@ -95,7 +110,8 @@ public class InfiniteLoopReproductionTests
             checkDeadlinesUseCaseMock.Object,
             new Mock<IDialogService>().Object,
             _identityServiceMock.Object,
-            _loggerMock.Object);
+            _loggerMock.Object
+        );
 
         await Task.Delay(100); // Wait for initialize
 
@@ -103,7 +119,14 @@ public class InfiniteLoopReproductionTests
         var addTaskUseCase = new AddTaskUseCase(saveUseCaseMock.Object);
 
         var checkAssignmentMock = new Mock<ICheckAssignmentUseCase>();
-        var workspaceVM = new ProjectWorkspaceViewModel(projectVM, mainVM.Projects, notificationServiceMock.Object, viewModelFactoryMock.Object, checkAssignmentMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
+        var workspaceVM = new ProjectWorkspaceViewModel(
+            projectVM,
+            mainVM.Projects,
+            notificationServiceMock.Object,
+            viewModelFactoryMock.Object,
+            checkAssignmentMock.Object,
+            new Mock<ILogger<ProjectWorkspaceViewModel>>().Object
+        );
         var dialogServiceMock = new Mock<IDialogService>();
         var tasksVM = new ProjectTasksViewModel(
             projectVM,
@@ -112,14 +135,17 @@ public class InfiniteLoopReproductionTests
             viewModelFactoryMock.Object,
             dialogServiceMock.Object,
             new Mock<ILogger<ProjectTasksViewModel>>().Object,
-            new Mock<ILogger<TaskDetailViewModel>>().Object);
+            new Mock<ILogger<TaskDetailViewModel>>().Object
+        );
 
         viewModelFactoryMock.Setup(x => x.CreateProjectTasksViewModel(projectVM)).Returns(tasksVM);
         workspaceVM.SwitchSubViewCommand.Execute("Tasks");
 
         // 2. Act - Add a task with estimated cost
         var addTaskViewModel1 = new AddTaskViewModel { Name = "Task 1" };
-        viewModelFactoryMock.Setup(x => x.CreateAddTaskViewModel(It.IsAny<IEnumerable<User>>())).Returns(addTaskViewModel1);
+        viewModelFactoryMock
+            .Setup(x => x.CreateAddTaskViewModel(It.IsAny<IEnumerable<User>>()))
+            .Returns(addTaskViewModel1);
         dialogServiceMock.Setup(x => x.ShowDialogAsync(addTaskViewModel1)).ReturnsAsync(true);
 
         await tasksVM.AddTaskCommand.ExecuteAsync(null);
@@ -144,20 +170,36 @@ public class InfiniteLoopReproductionTests
         var addProjectUseCaseMock = new Mock<IAddProjectUseCase>();
         var viewModelFactoryMock = new Mock<IViewModelFactory>();
 
-        viewModelFactoryMock.Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
-            .Returns((Project p) => new ProjectViewModel(p, _testUserId, new Mock<IJoinProjectUseCase>().Object, viewModelFactoryMock.Object));
-        viewModelFactoryMock.Setup(x => x.CreateProjectTaskViewModel(It.IsAny<ProjectTask>()))
+        viewModelFactoryMock
+            .Setup(x => x.CreateProjectViewModel(It.IsAny<Project>()))
+            .Returns(
+                (Project p) =>
+                    new ProjectViewModel(
+                        p,
+                        _testUserId,
+                        new Mock<IJoinProjectUseCase>().Object,
+                        viewModelFactoryMock.Object
+                    )
+            );
+        viewModelFactoryMock
+            .Setup(x => x.CreateProjectTaskViewModel(It.IsAny<ProjectTask>()))
             .Returns((ProjectTask t) => new ProjectTaskViewModel(t, _userServiceMock.Object));
 
         var dispatcherMock = new Mock<IDispatcherService>();
-        dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Action>())).Callback<Action>(a => a()).Returns(Task.CompletedTask);
+        dispatcherMock
+            .Setup(x => x.InvokeAsync(It.IsAny<Action>()))
+            .Callback<Action>(a => a())
+            .Returns(Task.CompletedTask);
         dispatcherMock.Setup(x => x.InvokeAsync(It.IsAny<Func<Task>>())).Returns<Func<Task>>(f => f());
 
         var projectEntity = new Project();
         projectEntity.UpdateName("ConcurrencyTest");
         loadUseCaseMock.Setup(r => r.ExecuteAsync()).ReturnsAsync(new List<Project> { projectEntity });
 
-        var saveCoordinator = new ProjectSaveCoordinator(saveUseCaseMock.Object, new Mock<ILogger<ProjectSaveCoordinator>>().Object);
+        var saveCoordinator = new ProjectSaveCoordinator(
+            saveUseCaseMock.Object,
+            new Mock<ILogger<ProjectSaveCoordinator>>().Object
+        );
         var notificationServiceMock = new Mock<INotificationService>();
         notificationServiceMock.Setup(x => x.UnreadNotifications).Returns(new List<Notification>());
         var snackbarServiceMock = new Mock<ISnackbarService>();
@@ -179,7 +221,8 @@ public class InfiniteLoopReproductionTests
             checkDeadlinesUseCaseMock.Object,
             new Mock<IDialogService>().Object,
             _identityServiceMock.Object,
-            _loggerMock.Object);
+            _loggerMock.Object
+        );
 
         await Task.Delay(100);
 
@@ -187,7 +230,14 @@ public class InfiniteLoopReproductionTests
         var addTaskUseCase = new AddTaskUseCase(saveUseCaseMock.Object);
 
         var checkAssignmentMock = new Mock<ICheckAssignmentUseCase>();
-        var workspaceVM = new ProjectWorkspaceViewModel(projectVM, mainVM.Projects, notificationServiceMock.Object, viewModelFactoryMock.Object, checkAssignmentMock.Object, new Mock<ILogger<ProjectWorkspaceViewModel>>().Object);
+        var workspaceVM = new ProjectWorkspaceViewModel(
+            projectVM,
+            mainVM.Projects,
+            notificationServiceMock.Object,
+            viewModelFactoryMock.Object,
+            checkAssignmentMock.Object,
+            new Mock<ILogger<ProjectWorkspaceViewModel>>().Object
+        );
         var dialogServiceMock = new Mock<IDialogService>();
         var tasksVM = new ProjectTasksViewModel(
             projectVM,
@@ -196,20 +246,25 @@ public class InfiniteLoopReproductionTests
             viewModelFactoryMock.Object,
             dialogServiceMock.Object,
             new Mock<ILogger<ProjectTasksViewModel>>().Object,
-            new Mock<ILogger<TaskDetailViewModel>>().Object);
+            new Mock<ILogger<TaskDetailViewModel>>().Object
+        );
 
         viewModelFactoryMock.Setup(x => x.CreateProjectTasksViewModel(projectVM)).Returns(tasksVM);
         workspaceVM.SwitchSubViewCommand.Execute("Tasks");
 
         // 2. Act - Add 1st task
         var addTaskViewModel1 = new AddTaskViewModel { Name = "Task 1" };
-        viewModelFactoryMock.Setup(x => x.CreateAddTaskViewModel(It.IsAny<IEnumerable<User>>())).Returns(addTaskViewModel1);
+        viewModelFactoryMock
+            .Setup(x => x.CreateAddTaskViewModel(It.IsAny<IEnumerable<User>>()))
+            .Returns(addTaskViewModel1);
         dialogServiceMock.Setup(x => x.ShowDialogAsync(addTaskViewModel1)).ReturnsAsync(true);
         await tasksVM.AddTaskCommand.ExecuteAsync(null);
 
         // 3. Act - Add 2nd task immediately
         var addTaskViewModel2 = new AddTaskViewModel { Name = "Task 2" };
-        viewModelFactoryMock.Setup(x => x.CreateAddTaskViewModel(It.IsAny<IEnumerable<User>>())).Returns(addTaskViewModel2);
+        viewModelFactoryMock
+            .Setup(x => x.CreateAddTaskViewModel(It.IsAny<IEnumerable<User>>()))
+            .Returns(addTaskViewModel2);
         dialogServiceMock.Setup(x => x.ShowDialogAsync(addTaskViewModel2)).ReturnsAsync(true);
         await tasksVM.AddTaskCommand.ExecuteAsync(null);
 

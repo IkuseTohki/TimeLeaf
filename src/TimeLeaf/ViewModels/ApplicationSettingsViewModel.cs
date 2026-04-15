@@ -1,11 +1,11 @@
 using System;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using System.Diagnostics;
 using System.Windows;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using LeafKit.UI.Services;
 using TimeLeaf.Models;
 using TimeLeaf.Repositories;
-using LeafKit.UI.Services;
 
 namespace TimeLeaf.ViewModels;
 
@@ -31,7 +31,10 @@ public partial class ApplicationSettingsViewModel : ObservableObject, IDialogVie
     /// </summary>
     public event Action<bool>? RequestClose;
 
-    public ApplicationSettingsViewModel(IApplicationSettingsRepository settingsRepository, ApplicationSettings currentSettings)
+    public ApplicationSettingsViewModel(
+        IApplicationSettingsRepository settingsRepository,
+        ApplicationSettings currentSettings
+    )
     {
         _settingsRepository = settingsRepository;
         _currentSettings = currentSettings;
@@ -70,12 +73,13 @@ public partial class ApplicationSettingsViewModel : ObservableObject, IDialogVie
     private void ResetStoragePath()
     {
         var result = MessageBox.Show(
-            "保存場所を変更するにはアプリケーションの再起動が必要です。\n" +
-            "設定をリセットして終了しますか？\n" +
-            "次回起動時にセットアップ画面が表示されます。",
+            "保存場所を変更するにはアプリケーションの再起動が必要です。\n"
+                + "設定をリセットして終了しますか？\n"
+                + "次回起動時にセットアップ画面が表示されます。",
             "保存場所の変更",
             MessageBoxButton.YesNo,
-            MessageBoxImage.Warning);
+            MessageBoxImage.Warning
+        );
 
         if (result == MessageBoxResult.Yes)
         {

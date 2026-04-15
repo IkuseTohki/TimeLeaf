@@ -1,8 +1,8 @@
+using System;
+using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LeafKit.UI.Services;
-using System;
-using System.IO;
 using TimeLeaf.Repositories;
 
 namespace TimeLeaf.ViewModels
@@ -88,4 +88,3 @@ namespace TimeLeaf.ViewModels
         private void Cancel() => RequestClose?.Invoke(false);
     }
 }
-

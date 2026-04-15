@@ -17,6 +17,8 @@ public class TaskStatusToBoolConverter : IValueConverter
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        return (value is bool completed && completed) ? TimeLeaf.Models.Enums.TaskStatus.Completed : TimeLeaf.Models.Enums.TaskStatus.InProgress;
+        return (value is bool completed && completed)
+            ? TimeLeaf.Models.Enums.TaskStatus.Completed
+            : TimeLeaf.Models.Enums.TaskStatus.InProgress;
     }
 }

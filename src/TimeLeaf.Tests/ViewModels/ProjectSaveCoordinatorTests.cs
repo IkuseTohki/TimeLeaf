@@ -34,7 +34,12 @@ public class ProjectSaveCoordinatorTests
     {
         // Arrange
         var project = new Project();
-        var vm = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
+        var vm = new ProjectViewModel(
+            project,
+            Guid.NewGuid(),
+            new Mock<IJoinProjectUseCase>().Object,
+            _viewModelFactoryMock.Object
+        );
         _projects.Add(vm);
         _coordinator.StartMonitoring(_projects);
 
@@ -52,7 +57,12 @@ public class ProjectSaveCoordinatorTests
         // Arrange
         _coordinator.StartMonitoring(_projects);
         var project = new Project();
-        var vm = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
+        var vm = new ProjectViewModel(
+            project,
+            Guid.NewGuid(),
+            new Mock<IJoinProjectUseCase>().Object,
+            _viewModelFactoryMock.Object
+        );
 
         // Act
         _projects.Add(vm);
@@ -68,7 +78,12 @@ public class ProjectSaveCoordinatorTests
     {
         // Arrange
         var project = new Project();
-        var vm = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
+        var vm = new ProjectViewModel(
+            project,
+            Guid.NewGuid(),
+            new Mock<IJoinProjectUseCase>().Object,
+            _viewModelFactoryMock.Object
+        );
         _projects.Add(vm);
         _coordinator.StartMonitoring(_projects);
         _coordinator.IsEnabled = false;

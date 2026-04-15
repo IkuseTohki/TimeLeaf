@@ -5,8 +5,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Repositories;
-using TimeLeaf.Services;
 using TimeLeaf.Repositories.FileSystem;
+using TimeLeaf.Services;
 
 namespace TimeLeaf.Tests.Infrastructure;
 
@@ -50,7 +50,10 @@ public class StorageMonitoringTests
         // Arrange
         var serializer = new JsonProjectFileSystemSerializer();
         var generator = new DefaultCommitFileNameGenerator();
-        var monitor = new FileSystemProjectStorageMonitor(_tempDir, new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object);
+        var monitor = new FileSystemProjectStorageMonitor(
+            _tempDir,
+            new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object
+        );
         var repository = new FolderProjectRepository(_tempDir, monitor, serializer, generator, _loggerMock.Object);
         var projectId = Guid.NewGuid();
         var projectDir = Path.Combine(_tempDir, $"{projectId}_TestProject");
@@ -73,7 +76,8 @@ public class StorageMonitoringTests
 
         // Assert
         // OSのイベント通知を待機 (最大2秒)
-        var completed = await System.Threading.Tasks.Task.WhenAny(tcs.Task, System.Threading.Tasks.Task.Delay(2000)) == tcs.Task;
+        var completed =
+            await System.Threading.Tasks.Task.WhenAny(tcs.Task, System.Threading.Tasks.Task.Delay(2000)) == tcs.Task;
 
         Assert.IsTrue(completed, "FileSystemWatcher イベントがタイムアウトまでに発火しなかった");
         Assert.AreEqual(projectId, notifiedId, "通知されたプロジェクトIDが一致すること");

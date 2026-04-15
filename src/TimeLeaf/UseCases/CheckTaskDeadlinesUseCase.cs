@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TimeLeaf.Models.Entities;
-using TimeLeaf.Services;
-
 using TimeLeaf.Models.Enums;
+using TimeLeaf.Services;
 
 namespace TimeLeaf.UseCases;
 
@@ -27,13 +26,18 @@ public class CheckTaskDeadlinesUseCase : ICheckTaskDeadlinesUseCase
             {
                 // 未完了かつ期限切れのタスクをチェック
                 // Date プロパティ同士を比較することで、期限日の 23:59:59 までは「期限内」と判定されるようにする
-                if (task.Status != TaskStatus.Completed && task.Deadline.HasValue && task.Deadline.Value.Date < now.Date)
+                if (
+                    task.Status != TaskStatus.Completed
+                    && task.Deadline.HasValue
+                    && task.Deadline.Value.Date < now.Date
+                )
                 {
                     var notification = new Notification(
                         "タスク期限切れ",
                         $"タスク「{task.Name}」の期限を過ぎています。",
                         task.Id.ToString(),
-                        task.Id); // タスクIDをそのまま通知IDとしても使用する
+                        task.Id
+                    ); // タスクIDをそのまま通知IDとしても使用する
 
                     _notificationService.Notify(notification);
                 }

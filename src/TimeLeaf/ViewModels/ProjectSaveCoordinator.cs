@@ -74,17 +74,22 @@ public class ProjectSaveCoordinator : IProjectSaveCoordinator
 
     private async void OnProjectPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (!IsEnabled) return;
-        if (sender is not ProjectViewModel vm) return;
-        if (vm.IsSyncing) return;
+        if (!IsEnabled)
+            return;
+        if (sender is not ProjectViewModel vm)
+            return;
+        if (vm.IsSyncing)
+            return;
 
         // 保存対象となる主要なデータプロパティの変更を監視
-        if (e.PropertyName == nameof(ProjectViewModel.Name) ||
-            e.PropertyName == nameof(ProjectViewModel.Description) ||
-            e.PropertyName == nameof(ProjectViewModel.Status) ||
-            e.PropertyName == nameof(ProjectViewModel.HealthStatus) ||
-            e.PropertyName == nameof(ProjectViewModel.Tasks) ||
-            e.PropertyName == nameof(ProjectViewModel.Milestones))
+        if (
+            e.PropertyName == nameof(ProjectViewModel.Name)
+            || e.PropertyName == nameof(ProjectViewModel.Description)
+            || e.PropertyName == nameof(ProjectViewModel.Status)
+            || e.PropertyName == nameof(ProjectViewModel.HealthStatus)
+            || e.PropertyName == nameof(ProjectViewModel.Tasks)
+            || e.PropertyName == nameof(ProjectViewModel.Milestones)
+        )
         {
             await AutoSaveProjectAsync(vm);
         }

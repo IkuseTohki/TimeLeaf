@@ -3,9 +3,9 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -36,7 +36,8 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         IProjectStorageMonitor monitor,
         IProjectFileSystemSerializer serializer,
         ICommitFileNameGenerator fileNameGenerator,
-        ILogger<FolderProjectRepository> logger)
+        ILogger<FolderProjectRepository> logger
+    )
     {
         _baseDirectory = baseDirectory;
         _monitor = monitor;
@@ -44,7 +45,10 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         _fileNameGenerator = fileNameGenerator;
         _logger = logger;
 
-        _logger.LogInformation("FolderProjectRepository initializing with base directory: {BaseDirectory}", _baseDirectory);
+        _logger.LogInformation(
+            "FolderProjectRepository initializing with base directory: {BaseDirectory}",
+            _baseDirectory
+        );
 
         _monitor.ProjectChanged += OnMonitorProjectChanged;
     }
@@ -109,13 +113,12 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         });
 
         var results = await System.Threading.Tasks.Task.WhenAll(projectTasks);
-        _logger.LogInformation("Finished loading all projects. Found {LoadedProjectCount} valid projects.", results.Count(r => r != null));
+        _logger.LogInformation(
+            "Finished loading all projects. Found {LoadedProjectCount} valid projects.",
+            results.Count(r => r != null)
+        );
 
-        return results
-            .Where(r => r != null)
-            .OrderBy(r => r!.CreatedAt)
-            .Select(r => r!.Project)
-            .ToList();
+        return results.Where(r => r != null).OrderBy(r => r!.CreatedAt).Select(r => r!.Project).ToList();
     }
 
     /// <summary>
@@ -159,13 +162,16 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         return project;
     }
 
-
     private async Task<Project?> ReplayProjectAsync(string projectDirPath, Guid projectId, DateTime createdAt)
     {
         var changesDir = Path.Combine(projectDirPath, "changes");
         if (!Directory.Exists(changesDir))
         {
-            _logger.LogWarning("Changes directory {ChangesDir} not found for {ProjectId}. Returning new Project.", changesDir, projectId);
+            _logger.LogWarning(
+                "Changes directory {ChangesDir} not found for {ProjectId}. Returning new Project.",
+                changesDir,
+                projectId
+            );
             return new Project { Id = projectId, CreatedAt = createdAt };
         }
 
@@ -175,7 +181,8 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
 
     public async System.Threading.Tasks.Task SaveAllAsync(IEnumerable<Project> projects, string userId)
     {
-        foreach (var project in projects) await SaveAsync(project, userId);
+        foreach (var project in projects)
+            await SaveAsync(project, userId);
     }
 
     /// <summary>
@@ -229,7 +236,8 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                 userId,
                 1,
                 project.IsArchived,
-                project.LockedUntil);
+                project.LockedUntil
+            );
 
             bool shouldWriteMetadata = true;
             if (File.Exists(metaFilePath))
@@ -264,8 +272,17 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
             var descSnapshot = new ProjectDescriptionDto(project.Description);
             await TrySaveCategoryAsync(project.Id, changesDir, "Project_Description", descSnapshot, commitTime, userId);
 
-            var milestoneSnapshot = new ProjectMilestonesDto(project.Milestones.Select(m => new MilestoneDto(m.Date, m.Label)).ToList());
-            await TrySaveCategoryAsync(project.Id, changesDir, "Project_Milestones", milestoneSnapshot, commitTime, userId);
+            var milestoneSnapshot = new ProjectMilestonesDto(
+                project.Milestones.Select(m => new MilestoneDto(m.Date, m.Label)).ToList()
+            );
+            await TrySaveCategoryAsync(
+                project.Id,
+                changesDir,
+                "Project_Milestones",
+                milestoneSnapshot,
+                commitTime,
+                userId
+            );
 
             var membersSnapshot = new ProjectMembersDto { AssignedUserIds = project.AssignedUserIds.ToList() };
             await TrySaveCategoryAsync(project.Id, changesDir, "Project_Members", membersSnapshot, commitTime, userId);
@@ -281,19 +298,45 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                     task.Deadline,
                     task.EstimatedCost,
                     task.Assignee,
-                    task.Dependencies.ToList());
-                await TrySaveCategoryAsync(task.Id, changesDir, "Task_Planning", planning, commitTime, userId, isTask: true);
+                    task.Dependencies.ToList()
+                );
+                await TrySaveCategoryAsync(
+                    task.Id,
+                    changesDir,
+                    "Task_Planning",
+                    planning,
+                    commitTime,
+                    userId,
+                    isTask: true
+                );
 
                 var progress = new TaskProgressDto(
                     task.Id,
                     task.Status,
                     task.ActualStartDate,
                     task.ActualEndDate,
-                    task.ActualCost);
-                await TrySaveCategoryAsync(task.Id, changesDir, "Task_Progress", progress, commitTime, userId, isTask: true);
+                    task.ActualCost
+                );
+                await TrySaveCategoryAsync(
+                    task.Id,
+                    changesDir,
+                    "Task_Progress",
+                    progress,
+                    commitTime,
+                    userId,
+                    isTask: true
+                );
 
                 var taskDesc = new TaskDescriptionDto(task.Id, task.Description);
-                await TrySaveCategoryAsync(task.Id, changesDir, "Task_Description", taskDesc, commitTime, userId, isTask: true);
+                await TrySaveCategoryAsync(
+                    task.Id,
+                    changesDir,
+                    "Task_Description",
+                    taskDesc,
+                    commitTime,
+                    userId,
+                    isTask: true
+                );
 
                 // 3. コメントの保存 (各コメント 1ファイル)
                 foreach (var comment in task.Comments)
@@ -311,18 +354,32 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         }
     }
 
-    private async System.Threading.Tasks.Task TrySaveCommentAsync(Guid projectId, Guid taskId, string changesDir, Comment comment, string userId)
+    private async System.Threading.Tasks.Task TrySaveCommentAsync(
+        Guid projectId,
+        Guid taskId,
+        string changesDir,
+        Comment comment,
+        string userId
+    )
     {
         var category = "Comment";
         var cacheKey = GetCacheKey(taskId, $"{category}_{comment.Id}");
 
-        if (_lastSavedContent.ContainsKey(cacheKey)) return;
+        if (_lastSavedContent.ContainsKey(cacheKey))
+            return;
 
         // タスクIDごとのサブフォルダを作成
         var taskDir = Path.Combine(changesDir, taskId.ToString());
-        if (!Directory.Exists(taskDir)) Directory.CreateDirectory(taskDir);
+        if (!Directory.Exists(taskDir))
+            Directory.CreateDirectory(taskDir);
 
-        var commentDto = new CommentDto(comment.Id, comment.TaskId, comment.AuthorId, comment.Content, comment.AttachmentLinks);
+        var commentDto = new CommentDto(
+            comment.Id,
+            comment.TaskId,
+            comment.AuthorId,
+            comment.Content,
+            comment.AttachmentLinks
+        );
         var json = _serializer.Serialize(commentDto);
         var fileName = _fileNameGenerator.Generate(comment.CreatedAt, userId, category);
         var fullPath = Path.Combine(taskDir, fileName);
@@ -342,16 +399,26 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         }
     }
 
-    private async System.Threading.Tasks.Task TrySaveCategoryAsync(Guid entityId, string changesDir, string category, object data, DateTime timestamp, string userId, bool isTask = false)
+    private async System.Threading.Tasks.Task TrySaveCategoryAsync(
+        Guid entityId,
+        string changesDir,
+        string category,
+        object data,
+        DateTime timestamp,
+        string userId,
+        bool isTask = false
+    )
     {
         var json = _serializer.Serialize(data);
         var cacheKey = GetCacheKey(entityId, category);
 
-        if (_lastSavedContent.TryGetValue(cacheKey, out var lastJson) && lastJson == json) return;
+        if (_lastSavedContent.TryGetValue(cacheKey, out var lastJson) && lastJson == json)
+            return;
 
         // 出力先の決定（タスクならサブフォルダ、プロジェクトなら直下）
         var targetDir = isTask ? Path.Combine(changesDir, entityId.ToString()) : changesDir;
-        if (!Directory.Exists(targetDir)) Directory.CreateDirectory(targetDir);
+        if (!Directory.Exists(targetDir))
+            Directory.CreateDirectory(targetDir);
 
         var fileName = _fileNameGenerator.Generate(timestamp, userId, category);
         var fullPath = Path.Combine(targetDir, fileName);
@@ -365,7 +432,13 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error saving category {Category} for entity {EntityId} to {FileName}.", category, entityId, fileName);
+            _logger.LogError(
+                ex,
+                "Error saving category {Category} for entity {EntityId} to {FileName}.",
+                category,
+                entityId,
+                fileName
+            );
             throw;
         }
     }

@@ -5,10 +5,10 @@ using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
-using TimeLeaf.Models.Enums;
-using TimeLeaf.UseCases;
-using TimeLeaf.Repositories;
 using TimeLeaf.Models.Entities;
+using TimeLeaf.Models.Enums;
+using TimeLeaf.Repositories;
+using TimeLeaf.UseCases;
 
 namespace TimeLeaf.ViewModels.Workspace;
 
@@ -48,7 +48,8 @@ public partial class ProjectTasksViewModel : ObservableObject
         IViewModelFactory viewModelFactory,
         LeafKit.UI.Services.IDialogService dialogService,
         ILogger<ProjectTasksViewModel> logger,
-        ILogger<TaskDetailViewModel> detailLogger)
+        ILogger<TaskDetailViewModel> detailLogger
+    )
     {
         _projectViewModel = projectViewModel;
         _addTaskUseCase = addTaskUseCase;
@@ -124,7 +125,7 @@ public partial class ProjectTasksViewModel : ObservableObject
                     null, // actualStartDate
                     null, // actualEndDate
                     addTaskVm.EstimatedWorkHours ?? 0,
-                    0,    // actualCost
+                    0, // actualCost
                     assigneeName
                 );
 

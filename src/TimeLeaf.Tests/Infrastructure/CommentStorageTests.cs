@@ -8,8 +8,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Repositories;
-using TimeLeaf.Services;
 using TimeLeaf.Repositories.FileSystem;
+using TimeLeaf.Services;
 
 namespace TimeLeaf.Tests.Infrastructure;
 
@@ -52,7 +52,10 @@ public class CommentStorageTests
         // Arrange
         var serializer = new JsonProjectFileSystemSerializer();
         var generator = new DefaultCommitFileNameGenerator();
-        var monitor = new FileSystemProjectStorageMonitor(_tempDir, new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object);
+        var monitor = new FileSystemProjectStorageMonitor(
+            _tempDir,
+            new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object
+        );
         var repository = new FolderProjectRepository(_tempDir, monitor, serializer, generator, _loggerMock.Object);
         var project = new Project();
         project.UpdateName("CommentTestProject");
@@ -66,7 +69,7 @@ public class CommentStorageTests
             TaskId = task.Id,
             AuthorId = authorId,
             Content = "First Comment",
-            CreatedAt = new DateTime(2026, 2, 23, 10, 0, 0)
+            CreatedAt = new DateTime(2026, 2, 23, 10, 0, 0),
         };
         task.AddComment(comment);
 
@@ -100,7 +103,10 @@ public class CommentStorageTests
         // Arrange
         var serializer = new JsonProjectFileSystemSerializer();
         var generator = new DefaultCommitFileNameGenerator();
-        var monitor = new FileSystemProjectStorageMonitor(_tempDir, new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object);
+        var monitor = new FileSystemProjectStorageMonitor(
+            _tempDir,
+            new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object
+        );
         var repository = new FolderProjectRepository(_tempDir, monitor, serializer, generator, _loggerMock.Object);
         var project = new Project();
         project.UpdateName("MultiCommentProject");
@@ -109,8 +115,20 @@ public class CommentStorageTests
         project.AddTask(task);
 
         var authorId = Guid.NewGuid();
-        var c1 = new Comment { TaskId = task.Id, AuthorId = authorId, Content = "C1", CreatedAt = DateTime.Now.AddMinutes(-5) };
-        var c2 = new Comment { TaskId = task.Id, AuthorId = authorId, Content = "C2", CreatedAt = DateTime.Now };
+        var c1 = new Comment
+        {
+            TaskId = task.Id,
+            AuthorId = authorId,
+            Content = "C1",
+            CreatedAt = DateTime.Now.AddMinutes(-5),
+        };
+        var c2 = new Comment
+        {
+            TaskId = task.Id,
+            AuthorId = authorId,
+            Content = "C2",
+            CreatedAt = DateTime.Now,
+        };
         task.AddComment(c1);
         task.AddComment(c2);
 

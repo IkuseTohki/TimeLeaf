@@ -46,7 +46,8 @@ public partial class NotificationsViewModel : ObservableObject
         INotificationService notificationService,
         ObservableCollection<ProjectViewModel> projects,
         ILogger<NotificationsViewModel> logger,
-        Guid? projectIdFilter = null)
+        Guid? projectIdFilter = null
+    )
     {
         _notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
         _projects = projects ?? throw new ArgumentNullException(nameof(projects));
@@ -73,12 +74,16 @@ public partial class NotificationsViewModel : ObservableObject
             var taskIds = project?.Tasks.Select(t => t.Id.ToString()).ToList() ?? new List<string>();
             var filterStr = _projectIdFilter.Value.ToString();
 
-            query = query.Where(n => n.RelatedEntityId == filterStr || (n.RelatedEntityId != null && taskIds.Contains(n.RelatedEntityId)));
+            query = query.Where(n =>
+                n.RelatedEntityId == filterStr || (n.RelatedEntityId != null && taskIds.Contains(n.RelatedEntityId))
+            );
         }
 
         foreach (var notification in query)
         {
-            UnreadNotifications.Add(new NotificationViewModel(notification, _notificationService, OnNotificationNavigate));
+            UnreadNotifications.Add(
+                new NotificationViewModel(notification, _notificationService, OnNotificationNavigate)
+            );
         }
     }
 
@@ -90,7 +95,11 @@ public partial class NotificationsViewModel : ObservableObject
             return;
         }
 
-        _logger.LogInformation("Navigation requested for notification {NotificationId} with RelatedEntityId {RelatedEntityId}", vm.Id, vm.RelatedEntityId);
+        _logger.LogInformation(
+            "Navigation requested for notification {NotificationId} with RelatedEntityId {RelatedEntityId}",
+            vm.Id,
+            vm.RelatedEntityId
+        );
 
         if (Guid.TryParse(vm.RelatedEntityId, out var entityId))
         {
@@ -109,7 +118,11 @@ public partial class NotificationsViewModel : ObservableObject
                 var task = project.Tasks.FirstOrDefault(t => t.Id == entityId);
                 if (task != null)
                 {
-                    _logger.LogInformation("Found related task {TaskId} in project {ProjectId}. Raising RequestNavigation.", entityId, project.Id);
+                    _logger.LogInformation(
+                        "Found related task {TaskId} in project {ProjectId}. Raising RequestNavigation.",
+                        entityId,
+                        project.Id
+                    );
                     RequestNavigation?.Invoke(this, (project, task));
                     return;
                 }

@@ -55,7 +55,8 @@ public partial class NotificationViewModel : ObservableObject
     public NotificationViewModel(
         Notification entity,
         INotificationService notificationService,
-        Action<NotificationViewModel> onNavigate)
+        Action<NotificationViewModel> onNavigate
+    )
     {
         _entity = entity ?? throw new ArgumentNullException(nameof(entity));
         _notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));

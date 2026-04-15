@@ -29,7 +29,8 @@ public class AddTaskUseCase : IAddTaskUseCase
         DateTime? actualEndDate,
         double estimatedCost,
         double actualCost,
-        string assignee)
+        string assignee
+    )
     {
         var task = new ProjectTask();
         task.UpdateName(name);

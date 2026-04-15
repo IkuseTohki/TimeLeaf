@@ -17,15 +17,43 @@ public partial class ProjectDashboardViewModel : ObservableObject
     private readonly IAddMilestoneUseCase _addMilestoneUseCase;
     private readonly ILogger<ProjectDashboardViewModel> _logger;
 
-    public string ProjectName { get => _projectViewModel.Name; set { } }
-    public string Description { get => _projectViewModel.Description; set { } }
+    public string ProjectName
+    {
+        get => _projectViewModel.Name;
+        set { }
+    }
+    public string Description
+    {
+        get => _projectViewModel.Description;
+        set { }
+    }
     public ObservableCollection<Milestone> Milestones => _projectViewModel.Milestones;
 
-    public int TotalTaskCount { get => _projectViewModel.TotalTaskCount; set { } }
-    public int CompletedTaskCount { get => _projectViewModel.CompletedTaskCount; set { } }
-    public double CompletionPercentage { get => _projectViewModel.CompletionPercentage; set { } }
-    public double TotalEstimatedCost { get => _projectViewModel.TotalEstimatedCost; set { } }
-    public double TotalActualCost { get => _projectViewModel.TotalActualCost; set { } }
+    public int TotalTaskCount
+    {
+        get => _projectViewModel.TotalTaskCount;
+        set { }
+    }
+    public int CompletedTaskCount
+    {
+        get => _projectViewModel.CompletedTaskCount;
+        set { }
+    }
+    public double CompletionPercentage
+    {
+        get => _projectViewModel.CompletionPercentage;
+        set { }
+    }
+    public double TotalEstimatedCost
+    {
+        get => _projectViewModel.TotalEstimatedCost;
+        set { }
+    }
+    public double TotalActualCost
+    {
+        get => _projectViewModel.TotalActualCost;
+        set { }
+    }
 
     [ObservableProperty]
     private DateTime _newMilestoneDate = DateTime.Today;
@@ -36,7 +64,8 @@ public partial class ProjectDashboardViewModel : ObservableObject
     public ProjectDashboardViewModel(
         ProjectViewModel projectViewModel,
         IAddMilestoneUseCase addMilestoneUseCase,
-        ILogger<ProjectDashboardViewModel> logger)
+        ILogger<ProjectDashboardViewModel> logger
+    )
     {
         _projectViewModel = projectViewModel;
         _addMilestoneUseCase = addMilestoneUseCase;
@@ -46,7 +75,8 @@ public partial class ProjectDashboardViewModel : ObservableObject
     [RelayCommand]
     private async System.Threading.Tasks.Task AddMilestone()
     {
-        if (string.IsNullOrWhiteSpace(NewMilestoneLabel)) return;
+        if (string.IsNullOrWhiteSpace(NewMilestoneLabel))
+            return;
 
         try
         {

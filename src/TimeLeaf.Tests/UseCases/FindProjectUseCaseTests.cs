@@ -27,8 +27,7 @@ public class FindProjectUseCaseTests
         var projectId = Guid.NewGuid();
         var expectedProject = new Project() { Id = projectId };
         expectedProject.UpdateName("Test Project");
-        _projectServiceMock.Setup(s => s.GetProjectAsync(projectId))
-            .ReturnsAsync(expectedProject);
+        _projectServiceMock.Setup(s => s.GetProjectAsync(projectId)).ReturnsAsync(expectedProject);
 
         // Act
         var result = await _useCase.ExecuteAsync(projectId);
@@ -45,8 +44,7 @@ public class FindProjectUseCaseTests
         // Arrange
         /* テスト観点: 指定されたIDでプロジェクトが存在しない場合、nullが返されることを確認する。 */
         var projectId = Guid.NewGuid();
-        _projectServiceMock.Setup(s => s.GetProjectAsync(projectId))
-            .ReturnsAsync((Project?)null);
+        _projectServiceMock.Setup(s => s.GetProjectAsync(projectId)).ReturnsAsync((Project?)null);
 
         // Act
         var result = await _useCase.ExecuteAsync(projectId);

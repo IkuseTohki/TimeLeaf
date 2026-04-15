@@ -6,10 +6,10 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Models.Enums;
+using TimeLeaf.Repositories;
+using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
-using TimeLeaf.Services;
-using TimeLeaf.Repositories;
 
 namespace TimeLeaf.Tests.ViewModels;
 
@@ -25,13 +25,19 @@ public class AllTasksViewModelTests
         _viewModelFactoryMock = new Mock<IViewModelFactory>();
         _userServiceMock = new Mock<IUserService>();
 
-        _viewModelFactoryMock.Setup(x => x.CreateProjectTaskViewModel(It.IsAny<ProjectTask>()))
+        _viewModelFactoryMock
+            .Setup(x => x.CreateProjectTaskViewModel(It.IsAny<ProjectTask>()))
             .Returns((ProjectTask t) => new ProjectTaskViewModel(t, _userServiceMock.Object));
     }
 
     private ProjectViewModel CreateProjectViewModel(Project p)
     {
-        return new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
+        return new ProjectViewModel(
+            p,
+            Guid.NewGuid(),
+            new Mock<IJoinProjectUseCase>().Object,
+            _viewModelFactoryMock.Object
+        );
     }
 
     /// <summary>
@@ -56,7 +62,7 @@ public class AllTasksViewModelTests
         var projects = new ObservableCollection<ProjectViewModel>
         {
             CreateProjectViewModel(p1),
-            CreateProjectViewModel(p2)
+            CreateProjectViewModel(p2),
         };
 
         // Act

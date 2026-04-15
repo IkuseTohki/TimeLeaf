@@ -1,5 +1,5 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TimeLeaf.Models.Entities;
 
 namespace TimeLeaf.Tests.Models.Entities;

@@ -9,8 +9,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Repositories;
-using TimeLeaf.Services;
 using TimeLeaf.Repositories.FileSystem;
+using TimeLeaf.Services;
 
 namespace TimeLeaf.Tests.Infrastructure;
 
@@ -61,20 +61,50 @@ public class FolderProjectRepositoryReplayTests
 
         // 0. .project メタデータの作成
         var metaFile = Path.Combine(projectDir, ".project");
-        await File.WriteAllTextAsync(metaFile,
-            JsonSerializer.Serialize(new { ProjectId = projectId, CreatedAt = baseTime, SchemaVersion = 1 }));
+        await File.WriteAllTextAsync(
+            metaFile,
+            JsonSerializer.Serialize(
+                new
+                {
+                    ProjectId = projectId,
+                    CreatedAt = baseTime,
+                    SchemaVersion = 1,
+                }
+            )
+        );
         // 1. 古い変更 (Name = "Old Name")
         var oldFile = new DefaultCommitFileNameGenerator().Generate(baseTime, "user1", "Project_Basic");
-        await File.WriteAllTextAsync(Path.Combine(changesDir, oldFile),
-            JsonSerializer.Serialize(new { Name = "Old Name", Status = "Initial", HealthStatus = "Healthy" }));
+        await File.WriteAllTextAsync(
+            Path.Combine(changesDir, oldFile),
+            JsonSerializer.Serialize(
+                new
+                {
+                    Name = "Old Name",
+                    Status = "Initial",
+                    HealthStatus = "Healthy",
+                }
+            )
+        );
 
         // 2. 新しい変更 (Name = "New Name")
         var newFile = new DefaultCommitFileNameGenerator().Generate(baseTime.AddSeconds(1), "user1", "Project_Basic");
-        await File.WriteAllTextAsync(Path.Combine(changesDir, newFile),
-            JsonSerializer.Serialize(new { Name = "New Name", Status = "Initial", HealthStatus = "Healthy" }));
+        await File.WriteAllTextAsync(
+            Path.Combine(changesDir, newFile),
+            JsonSerializer.Serialize(
+                new
+                {
+                    Name = "New Name",
+                    Status = "Initial",
+                    HealthStatus = "Healthy",
+                }
+            )
+        );
         var serializer = new JsonProjectFileSystemSerializer();
         var generator = new DefaultCommitFileNameGenerator();
-        var monitor = new FileSystemProjectStorageMonitor(_tempDir, new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object);
+        var monitor = new FileSystemProjectStorageMonitor(
+            _tempDir,
+            new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object
+        );
         var repository = new FolderProjectRepository(_tempDir, monitor, serializer, generator, _loggerMock.Object);
 
         // Act
@@ -101,20 +131,47 @@ public class FolderProjectRepositoryReplayTests
 
         var baseTime = DateTime.Now;
         var metaFile = Path.Combine(projectDir, ".project");
-        await File.WriteAllTextAsync(metaFile,
-            JsonSerializer.Serialize(new { ProjectId = projectId, CreatedAt = baseTime, SchemaVersion = 1 }));
+        await File.WriteAllTextAsync(
+            metaFile,
+            JsonSerializer.Serialize(
+                new
+                {
+                    ProjectId = projectId,
+                    CreatedAt = baseTime,
+                    SchemaVersion = 1,
+                }
+            )
+        );
 
         var basicFile = new DefaultCommitFileNameGenerator().Generate(baseTime.AddSeconds(1), "user1", "Project_Basic");
-        await File.WriteAllTextAsync(Path.Combine(changesDir, basicFile),
-            JsonSerializer.Serialize(new { Name = "Desc Test Project", Status = "InProgress", HealthStatus = "Healthy" }));
+        await File.WriteAllTextAsync(
+            Path.Combine(changesDir, basicFile),
+            JsonSerializer.Serialize(
+                new
+                {
+                    Name = "Desc Test Project",
+                    Status = "InProgress",
+                    HealthStatus = "Healthy",
+                }
+            )
+        );
 
-        var descFile = new DefaultCommitFileNameGenerator().Generate(baseTime.AddSeconds(2), "user1", "Project_Description");
-        await File.WriteAllTextAsync(Path.Combine(changesDir, descFile),
-            JsonSerializer.Serialize(new { Description = "Test Description" }));
+        var descFile = new DefaultCommitFileNameGenerator().Generate(
+            baseTime.AddSeconds(2),
+            "user1",
+            "Project_Description"
+        );
+        await File.WriteAllTextAsync(
+            Path.Combine(changesDir, descFile),
+            JsonSerializer.Serialize(new { Description = "Test Description" })
+        );
 
         var serializer = new JsonProjectFileSystemSerializer();
         var generator = new DefaultCommitFileNameGenerator();
-        var monitor = new FileSystemProjectStorageMonitor(_tempDir, new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object);
+        var monitor = new FileSystemProjectStorageMonitor(
+            _tempDir,
+            new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object
+        );
         var repository = new FolderProjectRepository(_tempDir, monitor, serializer, generator, _loggerMock.Object);
 
         // Act
@@ -142,36 +199,88 @@ public class FolderProjectRepositoryReplayTests
         var generator = new DefaultCommitFileNameGenerator();
 
         // 0. .project
-        await File.WriteAllTextAsync(Path.Combine(projectDir, ".project"),
-            JsonSerializer.Serialize(new { ProjectId = projectId, CreatedAt = baseTime, SchemaVersion = 1 }));
+        await File.WriteAllTextAsync(
+            Path.Combine(projectDir, ".project"),
+            JsonSerializer.Serialize(
+                new
+                {
+                    ProjectId = projectId,
+                    CreatedAt = baseTime,
+                    SchemaVersion = 1,
+                }
+            )
+        );
 
         // 1. Project Basic
         var projectBasicFile = generator.Generate(baseTime.AddMinutes(1), "user1", "Project_Basic");
-        await File.WriteAllTextAsync(Path.Combine(changesDir, projectBasicFile),
-            JsonSerializer.Serialize(new { Name = "Complex Project", Status = "InProgress", HealthStatus = "Healthy" }));
+        await File.WriteAllTextAsync(
+            Path.Combine(changesDir, projectBasicFile),
+            JsonSerializer.Serialize(
+                new
+                {
+                    Name = "Complex Project",
+                    Status = "InProgress",
+                    HealthStatus = "Healthy",
+                }
+            )
+        );
 
         // 2. Task Planning
         var taskId = Guid.NewGuid();
         var taskDir = Path.Combine(changesDir, taskId.ToString());
         Directory.CreateDirectory(taskDir);
         var taskPlanningFile = generator.Generate(baseTime.AddMinutes(2), "user1", "Task_Planning");
-        await File.WriteAllTextAsync(Path.Combine(taskDir, taskPlanningFile),
-            JsonSerializer.Serialize(new { Id = taskId, Name = "Task 1", Priority = "High", EstimatedCost = 5.0, Assignee = "alice" }));
+        await File.WriteAllTextAsync(
+            Path.Combine(taskDir, taskPlanningFile),
+            JsonSerializer.Serialize(
+                new
+                {
+                    Id = taskId,
+                    Name = "Task 1",
+                    Priority = "High",
+                    EstimatedCost = 5.0,
+                    Assignee = "alice",
+                }
+            )
+        );
 
         // 3. Task Progress
         var taskProgressFile = generator.Generate(baseTime.AddMinutes(3), "user1", "Task_Progress");
-        await File.WriteAllTextAsync(Path.Combine(taskDir, taskProgressFile),
-            JsonSerializer.Serialize(new { Id = taskId, Status = "InProgress", ActualStartDate = baseTime.AddMinutes(10), ActualCost = 1.0 }));
+        await File.WriteAllTextAsync(
+            Path.Combine(taskDir, taskProgressFile),
+            JsonSerializer.Serialize(
+                new
+                {
+                    Id = taskId,
+                    Status = "InProgress",
+                    ActualStartDate = baseTime.AddMinutes(10),
+                    ActualCost = 1.0,
+                }
+            )
+        );
 
         // 4. Comment
         var commentId = Guid.NewGuid();
         var commentAuthorId = Guid.NewGuid();
         var commentFile = generator.Generate(baseTime.AddMinutes(4), "user1", "Comment");
-        await File.WriteAllTextAsync(Path.Combine(taskDir, commentFile),
-            JsonSerializer.Serialize(new { Id = commentId, TaskId = taskId, AuthorId = commentAuthorId, Content = "Started task" }));
+        await File.WriteAllTextAsync(
+            Path.Combine(taskDir, commentFile),
+            JsonSerializer.Serialize(
+                new
+                {
+                    Id = commentId,
+                    TaskId = taskId,
+                    AuthorId = commentAuthorId,
+                    Content = "Started task",
+                }
+            )
+        );
 
         var serializer = new JsonProjectFileSystemSerializer();
-        var monitor = new FileSystemProjectStorageMonitor(_tempDir, new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object);
+        var monitor = new FileSystemProjectStorageMonitor(
+            _tempDir,
+            new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object
+        );
         var repository = new FolderProjectRepository(_tempDir, monitor, serializer, generator, _loggerMock.Object);
 
         // Act
@@ -187,6 +296,10 @@ public class FolderProjectRepositoryReplayTests
         Assert.AreEqual(TimeLeaf.Models.Enums.TaskStatus.InProgress, task.Status);
         Assert.AreEqual(1, task.Comments.Count);
         Assert.AreEqual("Started task", task.Comments.First().Content);
-        Assert.AreEqual(baseTime.AddMinutes(4), project.UpdatedAt, "最終更新日時が最後のファイルの時刻になっていること");
+        Assert.AreEqual(
+            baseTime.AddMinutes(4),
+            project.UpdatedAt,
+            "最終更新日時が最後のファイルの時刻になっていること"
+        );
     }
 }

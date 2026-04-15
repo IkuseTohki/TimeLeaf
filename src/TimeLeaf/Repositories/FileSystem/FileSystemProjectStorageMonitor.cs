@@ -32,7 +32,7 @@ public class FileSystemProjectStorageMonitor : IProjectStorageMonitor
         {
             IncludeSubdirectories = true,
             Filter = "*.json",
-            NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite
+            NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite,
         };
         _watcher.Created += OnFileCreated;
         _watcher.Changed += OnFileCreated;
@@ -63,7 +63,11 @@ public class FileSystemProjectStorageMonitor : IProjectStorageMonitor
             }
         }
 
-        _logger.LogInformation("File created/changed event detected: {FullPath} (ChangeType: {ChangeType})", e.FullPath, e.ChangeType);
+        _logger.LogInformation(
+            "File created/changed event detected: {FullPath} (ChangeType: {ChangeType})",
+            e.FullPath,
+            e.ChangeType
+        );
 
         var relativePath = Path.GetRelativePath(_baseDirectory, e.FullPath);
         var pathParts = relativePath.Split(Path.DirectorySeparatorChar);
@@ -75,7 +79,10 @@ public class FileSystemProjectStorageMonitor : IProjectStorageMonitor
 
             if (Guid.TryParse(idPart, out var projectId))
             {
-                _logger.LogDebug("Project ID {ProjectId} extracted from path. Invoking ProjectChanged event.", projectId);
+                _logger.LogDebug(
+                    "Project ID {ProjectId} extracted from path. Invoking ProjectChanged event.",
+                    projectId
+                );
                 ProjectChanged?.Invoke(projectId);
             }
         }
@@ -90,7 +97,10 @@ public class FileSystemProjectStorageMonitor : IProjectStorageMonitor
     private void CleanupIgnoreList()
     {
         var now = DateTime.Now;
-        var toRemove = _justWrittenFiles.Where(kv => now - kv.Value > TimeSpan.FromSeconds(10)).Select(kv => kv.Key).ToList();
+        var toRemove = _justWrittenFiles
+            .Where(kv => now - kv.Value > TimeSpan.FromSeconds(10))
+            .Select(kv => kv.Key)
+            .ToList();
         foreach (var key in toRemove)
         {
             _justWrittenFiles.TryRemove(key, out _);

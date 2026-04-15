@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LeafKit.UI.Services;
-using TimeLeaf.Models.Enums;
 using TimeLeaf.Models.Entities;
-
-using System.Collections.ObjectModel;
+using TimeLeaf.Models.Enums;
 using TimeLeaf.Services;
 
 namespace TimeLeaf.ViewModels;
@@ -103,7 +102,8 @@ public partial class AddTaskViewModel : ObservableObject, IDialogViewModel, IDis
     [RelayCommand]
     private void Confirm()
     {
-        if (string.IsNullOrWhiteSpace(Name)) return;
+        if (string.IsNullOrWhiteSpace(Name))
+            return;
         RequestClose?.Invoke(true);
     }
 

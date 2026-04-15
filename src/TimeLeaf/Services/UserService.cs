@@ -37,7 +37,8 @@ public class UserService : IUserService, IDisposable
 
     public async Task<User?> GetUserAsync(Guid userId)
     {
-        if (userId == Guid.Empty) return null;
+        if (userId == Guid.Empty)
+            return null;
 
         // キャッシュにあれば即座に返す
         if (_cache.TryGetValue(userId, out var cachedUser))
@@ -57,7 +58,8 @@ public class UserService : IUserService, IDisposable
 
     public void UpdateCache(User user)
     {
-        if (user == null) return;
+        if (user == null)
+            return;
 
         // キャッシュを更新または追加
         _cache[user.Id] = user;

@@ -14,6 +14,7 @@ public class Comment
     public Guid Id { get; init; } = Guid.NewGuid();
 
     private readonly Guid _taskId;
+
     /// <summary>
     /// 紐づくタスクの参照ID。
     /// </summary>
@@ -29,6 +30,7 @@ public class Comment
     }
 
     private readonly Guid _authorId;
+
     /// <summary>
     /// 投稿者のユーザーID。
     /// </summary>
@@ -49,6 +51,7 @@ public class Comment
     public DateTime CreatedAt { get; init; } = DateTime.Now;
 
     private readonly string _content = string.Empty;
+
     /// <summary>
     /// コメント本文（Markdown対応）。
     /// </summary>
@@ -77,7 +80,14 @@ public class Comment
     /// パラメータ付きコンストラクタ。
     /// </summary>
     [System.Text.Json.Serialization.JsonConstructor]
-    public Comment(Guid id, Guid taskId, Guid authorId, DateTime createdAt, string content, List<string>? attachmentLinks)
+    public Comment(
+        Guid id,
+        Guid taskId,
+        Guid authorId,
+        DateTime createdAt,
+        string content,
+        List<string>? attachmentLinks
+    )
     {
         Id = id;
         TaskId = taskId;

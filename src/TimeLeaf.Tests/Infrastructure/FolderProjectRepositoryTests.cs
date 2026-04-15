@@ -10,8 +10,8 @@ using Moq;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Models.Enums;
 using TimeLeaf.Repositories;
-using TimeLeaf.Services;
 using TimeLeaf.Repositories.FileSystem;
+using TimeLeaf.Services;
 
 namespace TimeLeaf.Tests.Infrastructure;
 
@@ -36,7 +36,10 @@ public class FolderProjectRepositoryTests
     {
         var serializer = new JsonProjectFileSystemSerializer();
         var generator = new DefaultCommitFileNameGenerator();
-        var monitor = new FileSystemProjectStorageMonitor(_tempDir, new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object);
+        var monitor = new FileSystemProjectStorageMonitor(
+            _tempDir,
+            new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object
+        );
         return new FolderProjectRepository(_tempDir, monitor, serializer, generator, _loggerMock.Object);
     }
 
@@ -74,7 +77,9 @@ public class FolderProjectRepositoryTests
 
         // Assert
         // 1. プロジェクトフォルダの存在確認
-        var expectedProjectDir = Directory.GetDirectories(_tempDir).FirstOrDefault(d => d.Contains(project.Id.ToString()));
+        var expectedProjectDir = Directory
+            .GetDirectories(_tempDir)
+            .FirstOrDefault(d => d.Contains(project.Id.ToString()));
         Assert.IsNotNull(expectedProjectDir, "プロジェクトIDを含むディレクトリが作成されること");
 
         // 2. changes フォルダの存在確認
@@ -89,7 +94,10 @@ public class FolderProjectRepositoryTests
         // ファイル名形式の確認: yyyyMMdd_HHmmss_fff_{UserID}_{Category}.json
         var fileName = Path.GetFileName(basicFile);
         var parts = fileName.Split('_');
-        Assert.IsTrue(parts.Length >= 5, "ファイル名は少なくとも5つのパーツ（日付, 時刻, ミリ秒, ユーザーID, カテゴリ...）で構成されること");
+        Assert.IsTrue(
+            parts.Length >= 5,
+            "ファイル名は少なくとも5つのパーツ（日付, 時刻, ミリ秒, ユーザーID, カテゴリ...）で構成されること"
+        );
         Assert.AreEqual(_testUserId.ToString(), parts[3]);
         Assert.IsTrue(parts[4].StartsWith("Project"), "5番目以降のパーツはカテゴリ名であること");
 
@@ -98,8 +106,14 @@ public class FolderProjectRepositoryTests
         Assert.IsTrue(Directory.Exists(taskDir), "タスクIDのサブフォルダが作成されること");
 
         var taskFiles = Directory.GetFiles(taskDir);
-        Assert.IsTrue(taskFiles.Any(f => f.Contains("Task_Planning")), "Task_Planning ファイルがタスクサブフォルダ内に出力されていること");
-        Assert.IsTrue(taskFiles.Any(f => f.Contains("Task_Progress")), "Task_Progress ファイルがタスクサブフォルダ内に出力されていること");
+        Assert.IsTrue(
+            taskFiles.Any(f => f.Contains("Task_Planning")),
+            "Task_Planning ファイルがタスクサブフォルダ内に出力されていること"
+        );
+        Assert.IsTrue(
+            taskFiles.Any(f => f.Contains("Task_Progress")),
+            "Task_Progress ファイルがタスクサブフォルダ内に出力されていること"
+        );
     }
 
     /// <summary>
@@ -125,7 +139,10 @@ public class FolderProjectRepositoryTests
         foreach (var file in files)
         {
             var attributes = File.GetAttributes(file);
-            Assert.IsTrue(attributes.HasFlag(FileAttributes.ReadOnly), $"ファイル {Path.GetFileName(file)} が読み取り専用属性を持っていること");
+            Assert.IsTrue(
+                attributes.HasFlag(FileAttributes.ReadOnly),
+                $"ファイル {Path.GetFileName(file)} が読み取り専用属性を持っていること"
+            );
         }
     }
 

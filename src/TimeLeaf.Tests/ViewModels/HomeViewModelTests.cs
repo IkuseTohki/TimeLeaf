@@ -2,15 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using LeafKit.UI.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Models.Enums;
+using TimeLeaf.Repositories;
+using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
-using TimeLeaf.Services;
-using TimeLeaf.Repositories;
-using LeafKit.UI.Services;
 
 namespace TimeLeaf.Tests.ViewModels;
 
@@ -26,7 +26,8 @@ public class HomeViewModelTests
         _viewModelFactoryMock = new Mock<IViewModelFactory>();
         _userServiceMock = new Mock<IUserService>();
 
-        _viewModelFactoryMock.Setup(x => x.CreateProjectTaskViewModel(It.IsAny<ProjectTask>()))
+        _viewModelFactoryMock
+            .Setup(x => x.CreateProjectTaskViewModel(It.IsAny<ProjectTask>()))
             .Returns((ProjectTask t) => new ProjectTaskViewModel(t, _userServiceMock.Object));
     }
 
@@ -34,12 +35,22 @@ public class HomeViewModelTests
     {
         var mockIdentity = new Mock<IIdentityService>();
         var mockDialog = new Mock<IDialogService>();
-        return new UserMenuViewModel(mockIdentity.Object, _userServiceMock.Object, mockDialog.Object, _viewModelFactoryMock.Object);
+        return new UserMenuViewModel(
+            mockIdentity.Object,
+            _userServiceMock.Object,
+            mockDialog.Object,
+            _viewModelFactoryMock.Object
+        );
     }
 
     private ProjectViewModel CreateProjectViewModel(Project p)
     {
-        return new ProjectViewModel(p, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
+        return new ProjectViewModel(
+            p,
+            Guid.NewGuid(),
+            new Mock<IJoinProjectUseCase>().Object,
+            _viewModelFactoryMock.Object
+        );
     }
 
     [TestMethod]
@@ -61,7 +72,7 @@ public class HomeViewModelTests
         var projects = new ObservableCollection<ProjectViewModel>
         {
             CreateProjectViewModel(p1),
-            CreateProjectViewModel(p2)
+            CreateProjectViewModel(p2),
         };
 
         // Act
@@ -91,7 +102,7 @@ public class HomeViewModelTests
         var projects = new ObservableCollection<ProjectViewModel>
         {
             CreateProjectViewModel(p1),
-            CreateProjectViewModel(p2)
+            CreateProjectViewModel(p2),
         };
 
         // Act

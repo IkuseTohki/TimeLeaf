@@ -1,5 +1,5 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Repositories.FileSystem.Dtos;
 
@@ -42,7 +42,7 @@ public class UserDtoTests
             DisplayName = "佐藤 次郎",
             ThemeColor = "#00FF00",
             IconPath = "user2.png",
-            UpdatedAt = DateTime.Now
+            UpdatedAt = DateTime.Now,
         };
 
         // Act

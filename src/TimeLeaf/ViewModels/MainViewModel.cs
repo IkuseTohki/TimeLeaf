@@ -6,13 +6,13 @@ using System.Linq;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using LeafKit.UI.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
-using LeafKit.UI.Services;
 
 namespace TimeLeaf.ViewModels;
 
@@ -143,7 +143,8 @@ public partial class MainViewModel : ObservableObject
         ICheckTaskDeadlinesUseCase checkDeadlinesUseCase,
         IDialogService dialogService,
         IIdentityService identityService,
-        ILogger<MainViewModel> logger)
+        ILogger<MainViewModel> logger
+    )
     {
         _loadUseCase = loadUseCase;
         _saveSingleUseCase = saveSingleUseCase;
@@ -225,7 +226,10 @@ public partial class MainViewModel : ObservableObject
                 var existingViewModel = Projects.FirstOrDefault(pvm => pvm.Id == project.Id);
                 if (existingViewModel != null)
                 {
-                    _logger.LogDebug("Updating existing project {ProjectId} ViewModel via differential sync.", project.Id);
+                    _logger.LogDebug(
+                        "Updating existing project {ProjectId} ViewModel via differential sync.",
+                        project.Id
+                    );
                     existingViewModel.UpdateFromModel(project);
                 }
                 else
@@ -325,7 +329,8 @@ public partial class MainViewModel : ObservableObject
     /// <param name="task">遷移時に直接開くタスク（オプション）。</param>
     public void NavigateToProject(ProjectViewModel projectViewModel, ProjectTaskViewModel? task)
     {
-        if (projectViewModel == null) return;
+        if (projectViewModel == null)
+            return;
         _logger.LogInformation("Navigating to project {ProjectId} (Task: {TaskId})", projectViewModel.Id, task?.Id);
 
         // Context を先にセットし、その後に ViewModel をセットする
@@ -376,7 +381,8 @@ public partial class MainViewModel : ObservableObject
                     addProjectVm.Name,
                     addProjectVm.Description,
                     addProjectVm.Status,
-                    addProjectVm.Health);
+                    addProjectVm.Health
+                );
 
                 _logger.LogInformation("AddProject execution requested.");
 

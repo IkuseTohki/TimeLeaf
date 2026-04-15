@@ -14,7 +14,11 @@ public class FileIdentitySeedRepository : IIdentitySeedRepository
     private const string SeedFileName = "seed.json";
     private readonly string _portableDirectory;
     private readonly string _homeDirectory;
-    private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true, WriteIndented = true };
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        WriteIndented = true,
+    };
 
     private string? _currentFilePath;
 
@@ -61,7 +65,8 @@ public class FileIdentitySeedRepository : IIdentitySeedRepository
 
     public async Task SaveAsync(IdentitySeedDto seed)
     {
-        if (_currentFilePath == null) throw new InvalidOperationException("Identity file path is not set.");
+        if (_currentFilePath == null)
+            throw new InvalidOperationException("Identity file path is not set.");
 
         var json = JsonSerializer.Serialize(seed, JsonOptions);
         await File.WriteAllTextAsync(_currentFilePath, json);

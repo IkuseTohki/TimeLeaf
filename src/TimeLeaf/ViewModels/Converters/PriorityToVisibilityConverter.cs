@@ -13,7 +13,9 @@ public class PriorityToVisibilityConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        return value is TaskPriority priority && priority == TaskPriority.High ? Visibility.Visible : Visibility.Collapsed;
+        return value is TaskPriority priority && priority == TaskPriority.High
+            ? Visibility.Visible
+            : Visibility.Collapsed;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

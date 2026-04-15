@@ -21,15 +21,17 @@ public class AddCommentUseCase : IAddCommentUseCase
 
     public async Task ExecuteAsync(Project project, ProjectTask task, string content)
     {
-        if (task == null) throw new ArgumentNullException(nameof(task));
-        if (string.IsNullOrWhiteSpace(content)) throw new ArgumentException("Comment content cannot be empty", nameof(content));
+        if (task == null)
+            throw new ArgumentNullException(nameof(task));
+        if (string.IsNullOrWhiteSpace(content))
+            throw new ArgumentException("Comment content cannot be empty", nameof(content));
 
         var comment = new Comment
         {
             TaskId = task.Id,
             AuthorId = _identityService.CurrentUserId,
             Content = content,
-            CreatedAt = DateTime.Now
+            CreatedAt = DateTime.Now,
         };
 
         task.AddComment(comment);

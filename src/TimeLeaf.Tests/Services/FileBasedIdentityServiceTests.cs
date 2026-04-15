@@ -1,8 +1,8 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Repositories;
 using TimeLeaf.Repositories.FileSystem;
@@ -70,8 +70,14 @@ public class FileBasedIdentityServiceTests
     {
         // Arrange
         var portableId = Guid.NewGuid();
-        File.WriteAllText(Path.Combine(_portableDir, "seed.json"), $"{{\"Id\":\"{portableId}\", \"DisplayName\":\"PortableUser\"}}");
-        File.WriteAllText(Path.Combine(_homeDir, "seed.json"), $"{{\"Id\":\"{Guid.NewGuid()}\", \"DisplayName\":\"HomeUser\"}}");
+        File.WriteAllText(
+            Path.Combine(_portableDir, "seed.json"),
+            $"{{\"Id\":\"{portableId}\", \"DisplayName\":\"PortableUser\"}}"
+        );
+        File.WriteAllText(
+            Path.Combine(_homeDir, "seed.json"),
+            $"{{\"Id\":\"{Guid.NewGuid()}\", \"DisplayName\":\"HomeUser\"}}"
+        );
 
         var service = new FileBasedIdentityService(_repository, _userRepositoryMock.Object, _userServiceMock.Object);
 
@@ -131,7 +137,11 @@ public class FileBasedIdentityServiceTests
 
         // Assert
         Assert.AreEqual(userId, identity.Id);
-        Assert.AreEqual("保存された名前", identity.DisplayName, "リポジトリに保存されている名前がロードされるべきです。");
+        Assert.AreEqual(
+            "保存された名前",
+            identity.DisplayName,
+            "リポジトリに保存されている名前がロードされるべきです。"
+        );
         Assert.AreEqual("#FF0000", identity.ThemeColor);
         Assert.AreEqual("saved_icon.png", identity.IconPath);
     }

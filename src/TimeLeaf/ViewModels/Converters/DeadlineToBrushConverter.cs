@@ -18,9 +18,12 @@ public class DeadlineToBrushConverter : IValueConverter
             var today = DateTime.Today;
             var diff = (deadline.Date - today).TotalDays;
 
-            if (diff < 0) return Brushes.Crimson; // 期限切れ
-            if (diff == 0) return Brushes.OrangeRed; // 今日
-            if (diff <= 3) return Brushes.Orange; // 直近
+            if (diff < 0)
+                return Brushes.Crimson; // 期限切れ
+            if (diff == 0)
+                return Brushes.OrangeRed; // 今日
+            if (diff <= 3)
+                return Brushes.Orange; // 直近
         }
 
         // デフォルトの色（リソースから取得するのが理想的だが、ここでは標準のテキスト色を想定）

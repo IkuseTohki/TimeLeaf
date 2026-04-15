@@ -15,4 +15,5 @@ internal record TaskPlanningDto(
     DateTime? Deadline,
     double EstimatedCost,
     string Assignee,
-    List<Guid> Dependencies);
+    List<Guid> Dependencies
+);

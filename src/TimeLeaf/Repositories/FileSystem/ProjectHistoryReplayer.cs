@@ -23,7 +23,8 @@ internal class ProjectHistoryReplayer
         IProjectFileSystemSerializer serializer,
         ICommitFileNameGenerator fileNameGenerator,
         ILogger logger,
-        System.Collections.Concurrent.ConcurrentDictionary<string, string> lastSavedContent)
+        System.Collections.Concurrent.ConcurrentDictionary<string, string> lastSavedContent
+    )
     {
         _serializer = serializer;
         _fileNameGenerator = fileNameGenerator;
@@ -60,7 +61,8 @@ internal class ProjectHistoryReplayer
 
     private List<(string Path, CommitFileName Meta, Guid EntityId)> ScanChangeFiles(string changesDir, Guid projectId)
     {
-        return Directory.GetFiles(changesDir, "*.json", SearchOption.AllDirectories)
+        return Directory
+            .GetFiles(changesDir, "*.json", SearchOption.AllDirectories)
             .Select(f =>
             {
                 var fileName = Path.GetFileName(f);
@@ -74,7 +76,14 @@ internal class ProjectHistoryReplayer
             .ToList();
     }
 
-    private async Task ApplyChangeAsync(Project project, Dictionary<Guid, ProjectTask> taskMap, List<(CommentDto Dto, DateTime Timestamp)> allCommentData, string filePath, Guid entityId, CommitFileName meta)
+    private async Task ApplyChangeAsync(
+        Project project,
+        Dictionary<Guid, ProjectTask> taskMap,
+        List<(CommentDto Dto, DateTime Timestamp)> allCommentData,
+        string filePath,
+        Guid entityId,
+        CommitFileName meta
+    )
     {
         var json = await File.ReadAllTextAsync(filePath);
         var cacheKey = $"{entityId}_{meta.Category}";
@@ -86,48 +95,69 @@ internal class ProjectHistoryReplayer
 
         switch (meta.Category)
         {
-            case "Project_Basic": ApplyProjectBasic(project, json); break;
-            case "Project_Description": ApplyProjectDescription(project, json); break;
-            case "Project_Milestones": ApplyProjectMilestones(project, json); break;
-            case "Project_Members": ApplyProjectMembers(project, json); break;
-            case "Task_Planning": ApplyTaskPlanning(project, taskMap, json); break;
-            case "Task_Progress": ApplyTaskProgress(project, taskMap, json); break;
-            case "Task_Description": ApplyTaskDescription(project, taskMap, json); break;
-            case "Comment": AccumulateComment(allCommentData, json, meta.Timestamp); break;
+            case "Project_Basic":
+                ApplyProjectBasic(project, json);
+                break;
+            case "Project_Description":
+                ApplyProjectDescription(project, json);
+                break;
+            case "Project_Milestones":
+                ApplyProjectMilestones(project, json);
+                break;
+            case "Project_Members":
+                ApplyProjectMembers(project, json);
+                break;
+            case "Task_Planning":
+                ApplyTaskPlanning(project, taskMap, json);
+                break;
+            case "Task_Progress":
+                ApplyTaskProgress(project, taskMap, json);
+                break;
+            case "Task_Description":
+                ApplyTaskDescription(project, taskMap, json);
+                break;
+            case "Comment":
+                AccumulateComment(allCommentData, json, meta.Timestamp);
+                break;
         }
     }
 
     private void ApplyProjectBasic(Project project, string json)
     {
         var dto = _serializer.Deserialize<ProjectBasicDto>(json);
-        if (dto == null) return;
+        if (dto == null)
+            return;
         project.UpdateBasicInfo(dto.Name, dto.Status, dto.HealthStatus);
     }
 
     private void ApplyProjectDescription(Project project, string json)
     {
         var dto = _serializer.Deserialize<ProjectDescriptionDto>(json);
-        if (dto != null) project.UpdateDescription(dto.Description);
+        if (dto != null)
+            project.UpdateDescription(dto.Description);
     }
 
     private void ApplyProjectMilestones(Project project, string json)
     {
         var dto = _serializer.Deserialize<ProjectMilestonesDto>(json);
-        if (dto == null) return;
+        if (dto == null)
+            return;
         project.ReplayMilestones(dto.Milestones.Select(m => new Milestone { Date = m.Date, Label = m.Label }));
     }
 
     private void ApplyProjectMembers(Project project, string json)
     {
         var dto = _serializer.Deserialize<ProjectMembersDto>(json);
-        if (dto == null) return;
+        if (dto == null)
+            return;
         project.ReplayAssignments(dto.AssignedUserIds);
     }
 
     private void ApplyTaskPlanning(Project project, Dictionary<Guid, ProjectTask> taskMap, string json)
     {
         var dto = _serializer.Deserialize<TaskPlanningDto>(json);
-        if (dto == null) return;
+        if (dto == null)
+            return;
         var task = GetOrCreateTask(project, taskMap, dto.Id);
         task.UpdateName(dto.Name);
         task.UpdatePriority(dto.Priority);
@@ -135,13 +165,15 @@ internal class ProjectHistoryReplayer
         task.UpdateEstimatedCost(dto.EstimatedCost);
         task.AssignTo(dto.Assignee);
         task.Dependencies.Clear();
-        if (dto.Dependencies != null) task.Dependencies.AddRange(dto.Dependencies);
+        if (dto.Dependencies != null)
+            task.Dependencies.AddRange(dto.Dependencies);
     }
 
     private void ApplyTaskProgress(Project project, Dictionary<Guid, ProjectTask> taskMap, string json)
     {
         var dto = _serializer.Deserialize<TaskProgressDto>(json);
-        if (dto == null) return;
+        if (dto == null)
+            return;
         var task = GetOrCreateTask(project, taskMap, dto.Id);
         task.UpdateStatus(dto.Status);
         task.UpdateActualDates(dto.ActualStartDate, dto.ActualEndDate);
@@ -151,12 +183,17 @@ internal class ProjectHistoryReplayer
     private void ApplyTaskDescription(Project project, Dictionary<Guid, ProjectTask> taskMap, string json)
     {
         var dto = _serializer.Deserialize<TaskDescriptionDto>(json);
-        if (dto == null) return;
+        if (dto == null)
+            return;
         var task = GetOrCreateTask(project, taskMap, dto.Id);
         task.UpdateDescription(dto.Description);
     }
 
-    private void AccumulateComment(List<(CommentDto Dto, DateTime Timestamp)> allCommentData, string json, DateTime timestamp)
+    private void AccumulateComment(
+        List<(CommentDto Dto, DateTime Timestamp)> allCommentData,
+        string json,
+        DateTime timestamp
+    )
     {
         var dto = _serializer.Deserialize<CommentDto>(json);
         if (dto != null)
@@ -166,7 +203,10 @@ internal class ProjectHistoryReplayer
         }
     }
 
-    private void AttachComments(Dictionary<Guid, ProjectTask> taskMap, List<(CommentDto Dto, DateTime Timestamp)> allCommentData)
+    private void AttachComments(
+        Dictionary<Guid, ProjectTask> taskMap,
+        List<(CommentDto Dto, DateTime Timestamp)> allCommentData
+    )
     {
         foreach (var entry in allCommentData)
         {
@@ -175,15 +215,17 @@ internal class ProjectHistoryReplayer
             {
                 if (!targetTask.Comments.Any(c => c.Id == dto.Id))
                 {
-                    targetTask.AddComment(new Comment
-                    {
-                        Id = dto.Id,
-                        TaskId = dto.TaskId,
-                        AuthorId = dto.AuthorId,
-                        CreatedAt = entry.Timestamp,
-                        Content = dto.Content,
-                        AttachmentLinks = dto.AttachmentLinks ?? new()
-                    });
+                    targetTask.AddComment(
+                        new Comment
+                        {
+                            Id = dto.Id,
+                            TaskId = dto.TaskId,
+                            AuthorId = dto.AuthorId,
+                            CreatedAt = entry.Timestamp,
+                            Content = dto.Content,
+                            AttachmentLinks = dto.AttachmentLinks ?? new(),
+                        }
+                    );
                 }
             }
         }
@@ -191,7 +233,8 @@ internal class ProjectHistoryReplayer
 
     private ProjectTask GetOrCreateTask(Project project, Dictionary<Guid, ProjectTask> map, Guid taskId)
     {
-        if (map.TryGetValue(taskId, out var task)) return task;
+        if (map.TryGetValue(taskId, out var task))
+            return task;
         var newTask = new ProjectTask { Id = taskId };
         project.AddTask(newTask);
         map[taskId] = newTask;

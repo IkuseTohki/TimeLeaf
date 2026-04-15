@@ -37,7 +37,7 @@ public class NotificationsViewModelTests
         var notifications = new List<Notification>
         {
             new Notification("Title 1", "Message 1"),
-            new Notification("Title 2", "Message 2")
+            new Notification("Title 2", "Message 2"),
         };
         _notificationServiceMock.Setup(x => x.UnreadNotifications).Returns(notifications);
 
@@ -60,12 +60,17 @@ public class NotificationsViewModelTests
         var notifications = new List<Notification>
         {
             new Notification("Title 1", "Msg 1", projectId.ToString()),
-            new Notification("Title 2", "Msg 2", Guid.NewGuid().ToString())
+            new Notification("Title 2", "Msg 2", Guid.NewGuid().ToString()),
         };
         _notificationServiceMock.Setup(x => x.UnreadNotifications).Returns(notifications);
 
         // Act
-        var viewModel = new NotificationsViewModel(_notificationServiceMock.Object, _projects, _loggerMock.Object, projectId);
+        var viewModel = new NotificationsViewModel(
+            _notificationServiceMock.Object,
+            _projects,
+            _loggerMock.Object,
+            projectId
+        );
 
         // Assert
         Assert.AreEqual(1, viewModel.UnreadNotifications.Count);
@@ -84,11 +89,7 @@ public class NotificationsViewModelTests
         var viewModel = new NotificationsViewModel(_notificationServiceMock.Object, _projects, _loggerMock.Object);
 
         // 通知リストを更新
-        var newNotifications = new List<Notification>
-        {
-            new Notification("T1", "M1"),
-            new Notification("T2", "M2")
-        };
+        var newNotifications = new List<Notification> { new Notification("T1", "M1"), new Notification("T2", "M2") };
         _notificationServiceMock.Setup(x => x.UnreadNotifications).Returns(newNotifications);
 
         // Act

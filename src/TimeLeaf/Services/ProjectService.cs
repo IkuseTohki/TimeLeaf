@@ -30,7 +30,8 @@ public class ProjectService : IProjectService, IDisposable
     public ProjectService(
         IProjectRepository repository,
         IIdentityService identityService,
-        ILogger<ProjectService> logger)
+        ILogger<ProjectService> logger
+    )
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         _identityService = identityService ?? throw new ArgumentNullException(nameof(identityService));
@@ -73,7 +74,8 @@ public class ProjectService : IProjectService, IDisposable
 
     public async Task SaveProjectAsync(Project project)
     {
-        if (project == null) throw new ArgumentNullException(nameof(project));
+        if (project == null)
+            throw new ArgumentNullException(nameof(project));
 
         _logger.LogDebug("Saving project {ProjectId} ({ProjectName})", project.Id, project.Name);
 
@@ -96,7 +98,8 @@ public class ProjectService : IProjectService, IDisposable
 
     public async Task SaveAllAsync(IEnumerable<Project> projects)
     {
-        if (projects == null) throw new ArgumentNullException(nameof(projects));
+        if (projects == null)
+            throw new ArgumentNullException(nameof(projects));
 
         var userId = _identityService.CurrentUserId.ToString();
         await _repository.SaveAllAsync(projects, userId);

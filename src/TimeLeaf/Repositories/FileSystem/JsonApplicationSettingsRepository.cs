@@ -31,7 +31,7 @@ namespace TimeLeaf.Repositories.FileSystem
             {
                 WriteIndented = true,
                 PropertyNameCaseInsensitive = true,
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             };
         }
 

@@ -44,7 +44,7 @@ public class UserDto
             DisplayName = user.DisplayName,
             ThemeColor = user.ThemeColor,
             IconPath = user.IconPath,
-            UpdatedAt = updatedAt
+            UpdatedAt = updatedAt,
         };
     }
 

@@ -8,14 +8,26 @@ namespace TimeLeaf.Views.Controls;
 /// </summary>
 public partial class TaskCostEditor : UserControl
 {
-    public static readonly DependencyProperty EstimatedCostProperty =
-        DependencyProperty.Register(nameof(EstimatedCost), typeof(double), typeof(TaskCostEditor), new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+    public static readonly DependencyProperty EstimatedCostProperty = DependencyProperty.Register(
+        nameof(EstimatedCost),
+        typeof(double),
+        typeof(TaskCostEditor),
+        new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)
+    );
 
-    public static readonly DependencyProperty ActualCostProperty =
-        DependencyProperty.Register(nameof(ActualCost), typeof(double), typeof(TaskCostEditor), new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+    public static readonly DependencyProperty ActualCostProperty = DependencyProperty.Register(
+        nameof(ActualCost),
+        typeof(double),
+        typeof(TaskCostEditor),
+        new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)
+    );
 
-    public static readonly DependencyProperty IsReadOnlyProperty =
-        DependencyProperty.Register(nameof(IsReadOnly), typeof(bool), typeof(TaskCostEditor), new PropertyMetadata(false));
+    public static readonly DependencyProperty IsReadOnlyProperty = DependencyProperty.Register(
+        nameof(IsReadOnly),
+        typeof(bool),
+        typeof(TaskCostEditor),
+        new PropertyMetadata(false)
+    );
 
     public double EstimatedCost
     {

@@ -4,8 +4,8 @@ using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
-using TimeLeaf.UseCases;
 using TimeLeaf.Services;
+using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels.Workspace;
 
 namespace TimeLeaf.ViewModels;
@@ -42,14 +42,15 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
     /// <summary>
     /// ナビゲーション用の項目リスト。
     /// </summary>
-    public List<NavigationItem> NavigationItems { get; } = new()
-    {
-        new NavigationItem("Dashboard", "Dashboard"),
-        new NavigationItem("Tasks", "Tasks"),
-        new NavigationItem("Timeline", "Timeline"),
-        new NavigationItem("Notifications", "Notifications"),
-        new NavigationItem("Settings", "Settings")
-    };
+    public List<NavigationItem> NavigationItems { get; } =
+        new()
+        {
+            new NavigationItem("Dashboard", "Dashboard"),
+            new NavigationItem("Tasks", "Tasks"),
+            new NavigationItem("Timeline", "Timeline"),
+            new NavigationItem("Notifications", "Notifications"),
+            new NavigationItem("Settings", "Settings"),
+        };
 
     /// <summary>
     /// 管理対象プロジェクトの ViewModel。
@@ -85,7 +86,8 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
         INotificationService notificationService,
         IViewModelFactory viewModelFactory,
         ICheckAssignmentUseCase checkAssignment,
-        ILogger<ProjectWorkspaceViewModel> logger)
+        ILogger<ProjectWorkspaceViewModel> logger
+    )
     {
         _projectViewModel = projectViewModel ?? throw new ArgumentNullException(nameof(projectViewModel));
         _projects = projects ?? throw new ArgumentNullException(nameof(projects));
@@ -120,7 +122,8 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
         var filterStr = project.Id.ToString();
 
         UnreadNotificationCount = _notificationService.UnreadNotifications.Count(n =>
-            n.RelatedEntityId == filterStr || (n.RelatedEntityId != null && taskIds.Contains(n.RelatedEntityId)));
+            n.RelatedEntityId == filterStr || (n.RelatedEntityId != null && taskIds.Contains(n.RelatedEntityId))
+        );
     }
 
     /// <summary>
@@ -146,7 +149,7 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
             "Timeline" => _viewModelFactory.CreateProjectTimelineViewModel(_projectViewModel),
             "Settings" => _viewModelFactory.CreateProjectSettingsViewModel(_projectViewModel),
             "Notifications" => CreateNotificationsViewModel(),
-            _ => CurrentSubViewModel
+            _ => CurrentSubViewModel,
         };
     }
 
@@ -201,5 +204,3 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
 /// ナビゲーション項目を表すクラス。
 /// </summary>
 public record NavigationItem(string Label, string Parameter);
-
-

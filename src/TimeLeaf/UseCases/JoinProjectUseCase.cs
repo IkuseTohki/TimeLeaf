@@ -22,10 +22,12 @@ public class JoinProjectUseCase : IJoinProjectUseCase
     /// <inheritdoc />
     public async Task ExecuteAsync(Project project)
     {
-        if (project == null) throw new ArgumentNullException(nameof(project));
+        if (project == null)
+            throw new ArgumentNullException(nameof(project));
 
         var myId = _identityService.CurrentUserId;
-        if (myId == Guid.Empty) throw new InvalidOperationException("Identity is not initialized.");
+        if (myId == Guid.Empty)
+            throw new InvalidOperationException("Identity is not initialized.");
 
         // プロジェクトに自分をアサイン
         project.AssignUser(myId);

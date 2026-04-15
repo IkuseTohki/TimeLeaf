@@ -84,7 +84,17 @@ public class Project
     /// JSON デシリアライズ用コンストラクタ。
     /// </summary>
     [System.Text.Json.Serialization.JsonConstructor]
-    public Project(Guid Id, string Name, string Description, ProjectStatus Status, ProjectHealth HealthStatus, DateTime CreatedAt, DateTime UpdatedAt, List<ProjectTask>? Tasks, List<Milestone>? Milestones)
+    public Project(
+        Guid Id,
+        string Name,
+        string Description,
+        ProjectStatus Status,
+        ProjectHealth HealthStatus,
+        DateTime CreatedAt,
+        DateTime UpdatedAt,
+        List<ProjectTask>? Tasks,
+        List<Milestone>? Milestones
+    )
     {
         this.Id = Id;
         this.Name = Name;
@@ -93,8 +103,10 @@ public class Project
         this.HealthStatus = HealthStatus;
         this.CreatedAt = CreatedAt;
         this.UpdatedAt = UpdatedAt;
-        if (Tasks != null) _tasks.AddRange(Tasks);
-        if (Milestones != null) _milestones.AddRange(Milestones);
+        if (Tasks != null)
+            _tasks.AddRange(Tasks);
+        if (Milestones != null)
+            _milestones.AddRange(Milestones);
     }
 
     /// <summary>
@@ -112,7 +124,8 @@ public class Project
     /// </summary>
     public void UpdateName(string name)
     {
-        if (Name == name) return;
+        if (Name == name)
+            return;
         Name = name;
     }
 
@@ -121,7 +134,8 @@ public class Project
     /// </summary>
     public void UpdateStatus(ProjectStatus status)
     {
-        if (Status == status) return;
+        if (Status == status)
+            return;
         Status = status;
     }
 
@@ -130,7 +144,8 @@ public class Project
     /// </summary>
     public void UpdateHealth(ProjectHealth health)
     {
-        if (HealthStatus == health) return;
+        if (HealthStatus == health)
+            return;
         HealthStatus = health;
     }
 
@@ -161,7 +176,8 @@ public class Project
     /// </summary>
     public void UpdateDescription(string description)
     {
-        if (Description == description) return;
+        if (Description == description)
+            return;
         Description = description;
     }
 
@@ -170,7 +186,8 @@ public class Project
     /// </summary>
     public void AddTask(ProjectTask task)
     {
-        if (task == null) throw new ArgumentNullException(nameof(task));
+        if (task == null)
+            throw new ArgumentNullException(nameof(task));
         _tasks.Add(task);
     }
 
@@ -199,7 +216,8 @@ public class Project
     /// </summary>
     public void AddMilestone(Milestone milestone)
     {
-        if (milestone == null) throw new ArgumentNullException(nameof(milestone));
+        if (milestone == null)
+            throw new ArgumentNullException(nameof(milestone));
         _milestones.Add(milestone);
     }
 

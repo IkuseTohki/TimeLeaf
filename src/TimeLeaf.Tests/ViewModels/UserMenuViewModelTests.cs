@@ -1,11 +1,11 @@
 using System;
 using System.Threading.Tasks;
+using LeafKit.UI.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Services;
 using TimeLeaf.ViewModels;
-using LeafKit.UI.Services;
 
 namespace TimeLeaf.Tests.ViewModels;
 
@@ -32,7 +32,8 @@ public class UserMenuViewModelTests
             _identityServiceMock.Object,
             _userServiceMock.Object,
             _dialogServiceMock.Object,
-            _viewModelFactoryMock.Object);
+            _viewModelFactoryMock.Object
+        );
     }
 
     /// <summary>
@@ -65,7 +66,9 @@ public class UserMenuViewModelTests
         // Arrange
         var userId = Guid.NewGuid();
         _identityServiceMock.Setup(x => x.CurrentUserId).Returns(userId);
-        _identityServiceMock.Setup(x => x.GetCurrentIdentityAsync()).ReturnsAsync(new User(userId, "Old Name", "#000000", ""));
+        _identityServiceMock
+            .Setup(x => x.GetCurrentIdentityAsync())
+            .ReturnsAsync(new User(userId, "Old Name", "#000000", ""));
 
         var viewModel = CreateViewModel();
 

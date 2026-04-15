@@ -1,8 +1,8 @@
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using TimeLeaf.Services;
 using LeafKit.UI.Services;
+using TimeLeaf.Services;
 
 namespace TimeLeaf.ViewModels;
 
@@ -27,7 +27,8 @@ public partial class UserMenuViewModel : ObservableObject
         IIdentityService identityService,
         IUserService userService,
         IDialogService dialogService,
-        IViewModelFactory viewModelFactory)
+        IViewModelFactory viewModelFactory
+    )
     {
         _identityService = identityService;
         _userService = userService;

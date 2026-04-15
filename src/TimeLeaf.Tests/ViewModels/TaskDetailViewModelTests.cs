@@ -3,11 +3,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
+using TimeLeaf.Repositories;
+using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
 using TimeLeaf.ViewModels.Workspace;
-using TimeLeaf.Services;
-using TimeLeaf.Repositories;
 
 namespace TimeLeaf.Tests.ViewModels;
 
@@ -33,7 +33,12 @@ public class TaskDetailViewModelTests
         var viewModelFactoryMock = new Mock<IViewModelFactory>();
         var userServiceMock = new Mock<IUserService>();
 
-        _projectViewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, viewModelFactoryMock.Object);
+        _projectViewModel = new ProjectViewModel(
+            project,
+            Guid.NewGuid(),
+            new Mock<IJoinProjectUseCase>().Object,
+            viewModelFactoryMock.Object
+        );
         _taskViewModel = new ProjectTaskViewModel(task, userServiceMock.Object);
     }
 
@@ -45,7 +50,12 @@ public class TaskDetailViewModelTests
     public void TaskProperties_WhenUpdated_ShouldReflectInModel()
     {
         // Arrange
-        var vm = new TaskDetailViewModel(_projectViewModel, _taskViewModel, _addCommentUseCaseMock.Object, _loggerMock.Object);
+        var vm = new TaskDetailViewModel(
+            _projectViewModel,
+            _taskViewModel,
+            _addCommentUseCaseMock.Object,
+            _loggerMock.Object
+        );
 
         var expectedStart = new DateTime(2026, 3, 1, 0, 0, 0, DateTimeKind.Utc);
         var expectedEnd = new DateTime(2026, 3, 2, 0, 0, 0, DateTimeKind.Utc);
@@ -68,7 +78,12 @@ public class TaskDetailViewModelTests
     public void CloseCommand_WithBoolTrue_TriggersRequestCloseWithTrue()
     {
         // Arrange
-        var vm = new TaskDetailViewModel(_projectViewModel, _taskViewModel, _addCommentUseCaseMock.Object, _loggerMock.Object);
+        var vm = new TaskDetailViewModel(
+            _projectViewModel,
+            _taskViewModel,
+            _addCommentUseCaseMock.Object,
+            _loggerMock.Object
+        );
         bool? resultReceived = null;
         vm.RequestClose += (res) => resultReceived = res;
 
@@ -95,7 +110,12 @@ public class TaskSummaryViewModelTests
         var viewModelFactoryMock = new Mock<IViewModelFactory>();
         var userServiceMock = new Mock<IUserService>();
 
-        _projectViewModel = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, viewModelFactoryMock.Object);
+        _projectViewModel = new ProjectViewModel(
+            project,
+            Guid.NewGuid(),
+            new Mock<IJoinProjectUseCase>().Object,
+            viewModelFactoryMock.Object
+        );
         var task = new ProjectTask();
         task.UpdateName("TestTask");
         _taskViewModel = new ProjectTaskViewModel(task, userServiceMock.Object);

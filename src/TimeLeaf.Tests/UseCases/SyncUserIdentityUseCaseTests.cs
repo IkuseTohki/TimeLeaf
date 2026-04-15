@@ -1,8 +1,8 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Repositories;
 using TimeLeaf.Services;
@@ -29,9 +29,7 @@ public class SyncUserIdentityUseCaseTests
 
         var mockUserRepository = new Mock<IUserRepository>();
 
-        var useCase = new SyncUserIdentityUseCase(
-            mockIdentityService.Object,
-            mockUserRepository.Object);
+        var useCase = new SyncUserIdentityUseCase(mockIdentityService.Object, mockUserRepository.Object);
 
         // Act
         await useCase.ExecuteAsync();

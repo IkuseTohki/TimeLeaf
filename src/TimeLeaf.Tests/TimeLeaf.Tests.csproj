@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFrameworks>net10.0-windows;netcoreapp3.1</TargetFrameworks>
     <LangVersion>latest</LangVersion>
@@ -29,5 +28,4 @@
   <ItemGroup>
     <ProjectReference Include="..\TimeLeaf\TimeLeaf.csproj" />
   </ItemGroup>
-
 </Project>

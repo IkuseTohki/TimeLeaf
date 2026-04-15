@@ -18,8 +18,10 @@ public class AddMilestoneUseCase : IAddMilestoneUseCase
 
     public async Task ExecuteAsync(Project project, DateTime date, string label)
     {
-        if (project == null) throw new ArgumentNullException(nameof(project));
-        if (string.IsNullOrWhiteSpace(label)) throw new ArgumentException("Milestone label cannot be empty", nameof(label));
+        if (project == null)
+            throw new ArgumentNullException(nameof(project));
+        if (string.IsNullOrWhiteSpace(label))
+            throw new ArgumentException("Milestone label cannot be empty", nameof(label));
 
         project.AddMilestone(new Milestone { Date = date, Label = label });
 

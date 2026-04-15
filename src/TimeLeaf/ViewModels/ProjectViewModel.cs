@@ -104,7 +104,8 @@ public partial class ProjectViewModel : ObservableObject
 
     private void RefreshUpdatedAt()
     {
-        if (IsSyncing) return;
+        if (IsSyncing)
+            return;
         UpdatedAt = DateTime.Now;
     }
 
@@ -135,10 +136,14 @@ public partial class ProjectViewModel : ObservableObject
             var now = DateTime.Now;
             var diff = now - UpdatedAt;
 
-            if (diff.TotalSeconds < 0) return UpdatedAt.ToString("yyyy/MM/dd HH:mm");
-            if (diff.TotalSeconds < 60) return "たった今";
-            if (diff.TotalMinutes < 60) return $"{(int)diff.TotalMinutes}分前";
-            if (diff.TotalHours < 24) return $"{(int)diff.TotalHours}時間前";
+            if (diff.TotalSeconds < 0)
+                return UpdatedAt.ToString("yyyy/MM/dd HH:mm");
+            if (diff.TotalSeconds < 60)
+                return "たった今";
+            if (diff.TotalMinutes < 60)
+                return $"{(int)diff.TotalMinutes}分前";
+            if (diff.TotalHours < 24)
+                return $"{(int)diff.TotalHours}時間前";
             return UpdatedAt.ToString("yyyy/MM/dd HH:mm");
         }
     }
@@ -156,37 +161,65 @@ public partial class ProjectViewModel : ObservableObject
     /// <summary>
     /// プロジェクト全体の合計見積工数。
     /// </summary>
-    public double TotalEstimatedCost { get => _project.TotalEstimatedCost; set { } }
+    public double TotalEstimatedCost
+    {
+        get => _project.TotalEstimatedCost;
+        set { }
+    }
 
     /// <summary>
     /// プロジェクト全体の合計実績工数。
     /// </summary>
-    public double TotalActualCost { get => _project.TotalActualCost; set { } }
+    public double TotalActualCost
+    {
+        get => _project.TotalActualCost;
+        set { }
+    }
 
     /// <summary>
     /// UI 表示用の合計見積工数文字列。
     /// </summary>
-    public string DisplayTotalEstimatedCost { get => $"合計見積: {TotalEstimatedCost}"; set { } }
+    public string DisplayTotalEstimatedCost
+    {
+        get => $"合計見積: {TotalEstimatedCost}";
+        set { }
+    }
 
     /// <summary>
     /// UI 表示用の合計実績工数文字列。
     /// </summary>
-    public string DisplayTotalActualCost { get => $"合計実績: {TotalActualCost}"; set { } }
+    public string DisplayTotalActualCost
+    {
+        get => $"合計実績: {TotalActualCost}";
+        set { }
+    }
 
     /// <summary>
     /// タスクの総数。
     /// </summary>
-    public int TotalTaskCount { get => _project.Tasks.Count; set { } }
+    public int TotalTaskCount
+    {
+        get => _project.Tasks.Count;
+        set { }
+    }
 
     /// <summary>
     /// 完了済みタスクの数。
     /// </summary>
-    public int CompletedTaskCount { get => _project.Tasks.Count(t => t.Status == TimeLeaf.Models.Enums.TaskStatus.Completed); set { } }
+    public int CompletedTaskCount
+    {
+        get => _project.Tasks.Count(t => t.Status == TimeLeaf.Models.Enums.TaskStatus.Completed);
+        set { }
+    }
 
     /// <summary>
     /// 全体の進捗率 (0-100)。
     /// </summary>
-    public double CompletionPercentage { get => TotalTaskCount == 0 ? 0 : (double)CompletedTaskCount / TotalTaskCount * 100; set { } }
+    public double CompletionPercentage
+    {
+        get => TotalTaskCount == 0 ? 0 : (double)CompletedTaskCount / TotalTaskCount * 100;
+        set { }
+    }
 
     /// <summary>
     /// 現在のユーザー（自分）がこのプロジェクトにアサインされているかどうか。
@@ -205,7 +238,12 @@ public partial class ProjectViewModel : ObservableObject
     /// <param name="currentUserId">現在のユーザー ID。</param>
     /// <param name="joinProjectUseCase">プロジェクトに参加するためのユースケース。</param>
     /// <param name="viewModelFactory">ViewModel を生成するためのファクトリ。</param>
-    public ProjectViewModel(Project project, Guid currentUserId, IJoinProjectUseCase joinProjectUseCase, IViewModelFactory viewModelFactory)
+    public ProjectViewModel(
+        Project project,
+        Guid currentUserId,
+        IJoinProjectUseCase joinProjectUseCase,
+        IViewModelFactory viewModelFactory
+    )
     {
         _project = project ?? throw new ArgumentNullException(nameof(project));
         _currentUserId = currentUserId;
@@ -239,8 +277,10 @@ public partial class ProjectViewModel : ObservableObject
     /// <param name="newModel">最新の状態を持つエンティティ。</param>
     public void UpdateFromModel(Project newModel)
     {
-        if (newModel == null) throw new ArgumentNullException(nameof(newModel));
-        if (newModel.Id != _project.Id) throw new ArgumentException("Cannot update ViewModel with a different Project ID.");
+        if (newModel == null)
+            throw new ArgumentNullException(nameof(newModel));
+        if (newModel.Id != _project.Id)
+            throw new ArgumentException("Cannot update ViewModel with a different Project ID.");
 
         _project = newModel;
         SyncFromModel();
@@ -329,15 +369,18 @@ public partial class ProjectViewModel : ObservableObject
 
     private void OnProjectTaskViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (IsSyncing) return;
+        if (IsSyncing)
+            return;
 
         // 個々のタスクのプロパティ（コスト、担当者、ステータス等）が変更された場合
         // 親である ProjectViewModel の Tasks プロパティが変更されたとみなして通知する。
         // これにより MainViewModel の自動保存がトリガーされる。
         OnPropertyChanged(nameof(Tasks));
 
-        if (e.PropertyName == nameof(ProjectTaskViewModel.EstimatedCost) ||
-            e.PropertyName == nameof(ProjectTaskViewModel.ActualCost))
+        if (
+            e.PropertyName == nameof(ProjectTaskViewModel.EstimatedCost)
+            || e.PropertyName == nameof(ProjectTaskViewModel.ActualCost)
+        )
         {
             NotifyTotalCosts();
         }

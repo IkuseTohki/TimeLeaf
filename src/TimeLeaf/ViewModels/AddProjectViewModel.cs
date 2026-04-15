@@ -38,7 +38,8 @@ public partial class AddProjectViewModel : ObservableObject, IDialogViewModel
     [RelayCommand]
     private void Confirm()
     {
-        if (string.IsNullOrWhiteSpace(Name)) return;
+        if (string.IsNullOrWhiteSpace(Name))
+            return;
         RequestClose?.Invoke(true);
     }
 

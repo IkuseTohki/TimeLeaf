@@ -1,10 +1,10 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using TimeLeaf.Models.Entities;
-using TimeLeaf.ViewModels;
-using TimeLeaf.UseCases;
-using Moq;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using TimeLeaf.Models.Entities;
+using TimeLeaf.UseCases;
+using TimeLeaf.ViewModels;
 
 namespace TimeLeaf.Tests.ViewModels;
 
@@ -31,7 +31,12 @@ public class ProjectViewModelAssignmentTests
         project.AssignUser(myId);
 
         // Act
-        var viewModel = new ProjectViewModel(project, myId, new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
+        var viewModel = new ProjectViewModel(
+            project,
+            myId,
+            new Mock<IJoinProjectUseCase>().Object,
+            _viewModelFactoryMock.Object
+        );
 
         // Assert
         Assert.IsTrue(viewModel.IsAssignedToMe);
@@ -50,7 +55,12 @@ public class ProjectViewModelAssignmentTests
         project.AssignUser(otherId);
 
         // Act
-        var viewModel = new ProjectViewModel(project, myId, new Mock<IJoinProjectUseCase>().Object, _viewModelFactoryMock.Object);
+        var viewModel = new ProjectViewModel(
+            project,
+            myId,
+            new Mock<IJoinProjectUseCase>().Object,
+            _viewModelFactoryMock.Object
+        );
 
         // Assert
         Assert.IsFalse(viewModel.IsAssignedToMe);

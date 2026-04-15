@@ -5,11 +5,11 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
+using TimeLeaf.Repositories;
 using TimeLeaf.Repositories.FileSystem;
+using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
-using TimeLeaf.Services;
-using TimeLeaf.Repositories;
 
 namespace TimeLeaf.Tests.Infrastructure;
 
@@ -22,7 +22,7 @@ public class DateTimeHandlingTests
     public void CommitFileName_ShouldPreserveTimePoint_RegardlessOfLocalTime()
     {
         /*
-         * テスト観点: 
+         * テスト観点:
          * 日本標準時(JST)などのローカル時刻でファイルを生成し、それをパースした際に、
          * 9時間のズレ（JSTの場合）が発生しないことを確認する。
          */
@@ -87,7 +87,12 @@ public class DateTimeHandlingTests
         // Arrange
         var project = new Project();
         var viewModelFactoryMock = new Mock<IViewModelFactory>();
-        var vm = new ProjectViewModel(project, Guid.NewGuid(), new Mock<IJoinProjectUseCase>().Object, viewModelFactoryMock.Object);
+        var vm = new ProjectViewModel(
+            project,
+            Guid.NewGuid(),
+            new Mock<IJoinProjectUseCase>().Object,
+            viewModelFactoryMock.Object
+        );
         var nowLocal = DateTime.Now;
 
         // Act & Assert
@@ -132,7 +137,11 @@ public class DateTimeHandlingTests
         Assert.IsNotNull(task.ScheduledStartDate);
         Assert.AreEqual(localDate, task.ScheduledStartDate.Value);
         // 内部的にLocalとして保持されている
-        Assert.AreEqual(DateTimeKind.Local, task.ScheduledStartDate.Value.Kind, "ドメイン層ではLocalとして保持されるべき");
+        Assert.AreEqual(
+            DateTimeKind.Local,
+            task.ScheduledStartDate.Value.Kind,
+            "ドメイン層ではLocalとして保持されるべき"
+        );
     }
 
     [TestMethod]
@@ -140,7 +149,13 @@ public class DateTimeHandlingTests
     {
         // Arrange
         var timestamp = new DateTime(2026, 2, 26, 15, 30, 45, 789, DateTimeKind.Utc);
-        var dto = new { ProjectId = Guid.NewGuid(), CreatedAt = timestamp, CreatedBy = "test", SchemaVersion = 1 };
+        var dto = new
+        {
+            ProjectId = Guid.NewGuid(),
+            CreatedAt = timestamp,
+            CreatedBy = "test",
+            SchemaVersion = 1,
+        };
         var options = new System.Text.Json.JsonSerializerOptions();
 
         // Act

@@ -51,7 +51,7 @@ public class AddTaskUseCaseTests
             null, // actualStart
             null, // actualEnd
             10.5, // estimatedCost
-            0.0,  // actualCost
+            0.0, // actualCost
             assignee
         );
 

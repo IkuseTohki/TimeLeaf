@@ -90,9 +90,22 @@ public class ProjectTask
     /// JSON デシリアライズ用コンストラクタ。
     /// </summary>
     [System.Text.Json.Serialization.JsonConstructor]
-    public ProjectTask(Guid Id, string Name, string Description, TaskStatus Status, TaskPriority Priority,
-        DateTime? ScheduledStartDate, DateTime? Deadline, DateTime? ActualStartDate, DateTime? ActualEndDate,
-        double EstimatedCost, double ActualCost, string Assignee, List<Guid>? Dependencies, List<Comment>? Comments)
+    public ProjectTask(
+        Guid Id,
+        string Name,
+        string Description,
+        TaskStatus Status,
+        TaskPriority Priority,
+        DateTime? ScheduledStartDate,
+        DateTime? Deadline,
+        DateTime? ActualStartDate,
+        DateTime? ActualEndDate,
+        double EstimatedCost,
+        double ActualCost,
+        string Assignee,
+        List<Guid>? Dependencies,
+        List<Comment>? Comments
+    )
     {
         this.Id = Id;
         this.Name = Name;
@@ -107,7 +120,8 @@ public class ProjectTask
         this.ActualCost = ActualCost;
         this.Assignee = Assignee;
         this.Dependencies = Dependencies ?? new();
-        if (Comments != null) _comments.AddRange(Comments);
+        if (Comments != null)
+            _comments.AddRange(Comments);
     }
 
     /// <summary>
@@ -134,7 +148,8 @@ public class ProjectTask
     /// </summary>
     public void UpdateStatus(TaskStatus status)
     {
-        if (Status == status) return;
+        if (Status == status)
+            return;
 
         Status = status;
 
@@ -145,7 +160,8 @@ public class ProjectTask
         else if (status == TaskStatus.Completed && ActualEndDate == null)
         {
             ActualEndDate = DateTime.Now;
-            if (ActualStartDate == null) ActualStartDate = DateTime.Now; // 未開始のまま完了した場合は開始日も埋める
+            if (ActualStartDate == null)
+                ActualStartDate = DateTime.Now; // 未開始のまま完了した場合は開始日も埋める
         }
     }
 
@@ -180,7 +196,8 @@ public class ProjectTask
     /// </summary>
     public void UpdateEstimatedCost(double cost)
     {
-        if (cost < 0) throw new ArgumentException("Cost cannot be negative.", nameof(cost));
+        if (cost < 0)
+            throw new ArgumentException("Cost cannot be negative.", nameof(cost));
         EstimatedCost = cost;
     }
 
@@ -189,7 +206,8 @@ public class ProjectTask
     /// </summary>
     public void UpdateActualCost(double cost)
     {
-        if (cost < 0) throw new ArgumentException("Cost cannot be negative.", nameof(cost));
+        if (cost < 0)
+            throw new ArgumentException("Cost cannot be negative.", nameof(cost));
         ActualCost = cost;
     }
 
@@ -206,7 +224,8 @@ public class ProjectTask
     /// </summary>
     public void AddComment(Comment comment)
     {
-        if (comment == null) throw new ArgumentNullException(nameof(comment));
+        if (comment == null)
+            throw new ArgumentNullException(nameof(comment));
         _comments.Add(comment);
     }
 

@@ -63,11 +63,15 @@ public class NotificationViewModelTests
         // Arrange
         var entity = new Notification("Title", "Message", "RelatedId");
         bool actionCalled = false;
-        var viewModel = new NotificationViewModel(entity, _notificationServiceMock.Object, vm =>
-        {
-            actionCalled = true;
-            Assert.AreEqual(entity.Id, vm.Id);
-        });
+        var viewModel = new NotificationViewModel(
+            entity,
+            _notificationServiceMock.Object,
+            vm =>
+            {
+                actionCalled = true;
+                Assert.AreEqual(entity.Id, vm.Id);
+            }
+        );
 
         // Act
         viewModel.NavigateCommand.Execute(null);

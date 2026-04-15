@@ -23,7 +23,7 @@ public class FileSystemUserRepository : IUserRepository
         PropertyNameCaseInsensitive = true,
         WriteIndented = true,
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping, // 日本語をエスケープせずに保存
-        Converters = { new JsonStringEnumConverter() }
+        Converters = { new JsonStringEnumConverter() },
     };
 
     /// <summary>
@@ -46,7 +46,7 @@ public class FileSystemUserRepository : IUserRepository
         // フォルダ監視の初期化
         _watcher = new FileSystemWatcher(_usersDirectory, "*.json")
         {
-            NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.CreationTime
+            NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.CreationTime,
         };
         _watcher.Changed += OnFileChanged;
         _watcher.Created += OnFileChanged;

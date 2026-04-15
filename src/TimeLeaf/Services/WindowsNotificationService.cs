@@ -33,7 +33,7 @@ public class WindowsNotificationService : IOSNotificationService, IDisposable
             // デフォルトのアイコン（システムアイコン）を設定
             Icon = SystemIcons.Information,
             Visible = true,
-            Text = "TimeLeaf"
+            Text = "TimeLeaf",
         };
 
         // ダブルクリックで開く
@@ -55,7 +55,8 @@ public class WindowsNotificationService : IOSNotificationService, IDisposable
     /// <param name="message">通知の内容。</param>
     public void Show(string title, string message)
     {
-        if (_isDisposed) return;
+        if (_isDisposed)
+            return;
 
         // 5000ミリ秒（5秒）表示
         _notifyIcon.ShowBalloonTip(5000, title, message, ToolTipIcon.Info);
@@ -67,7 +68,8 @@ public class WindowsNotificationService : IOSNotificationService, IDisposable
     /// <param name="isVisible">表示する場合は true。</param>
     public void SetTrayVisible(bool isVisible)
     {
-        if (_isDisposed) return;
+        if (_isDisposed)
+            return;
         _notifyIcon.Visible = isVisible;
     }
 

@@ -83,8 +83,8 @@ public partial class HomeViewModel : ObservableObject
         var now = DateTime.Now;
         var startOfWeek = now.AddDays(-(int)now.DayOfWeek + (int)DayOfWeek.Monday).Date;
         CompletedThisWeekCount = allTasks.Count(t =>
-            t.Status == TimeLeaf.Models.Enums.TaskStatus.Completed &&
-            t.ActualEndDate >= startOfWeek);
+            t.Status == TimeLeaf.Models.Enums.TaskStatus.Completed && t.ActualEndDate >= startOfWeek
+        );
 
         // 期限が近いタスク（未完了かつ期限あり）
         UpcomingDeadlines.Clear();
@@ -92,7 +92,8 @@ public partial class HomeViewModel : ObservableObject
             .Where(t => t.Status != TimeLeaf.Models.Enums.TaskStatus.Completed && t.Deadline.HasValue)
             .OrderBy(t => t.Deadline)
             .Take(5);
-        foreach (var t in deadlines) UpcomingDeadlines.Add(t);
+        foreach (var t in deadlines)
+            UpcomingDeadlines.Add(t);
 
         // マイルストーンの集約
         UpcomingMilestones.Clear();
@@ -101,7 +102,8 @@ public partial class HomeViewModel : ObservableObject
             .Where(m => m.Date >= now.Date)
             .OrderBy(m => m.Date)
             .Take(5);
-        foreach (var m in milestones) UpcomingMilestones.Add(m);
+        foreach (var m in milestones)
+            UpcomingMilestones.Add(m);
     }
 }
 
