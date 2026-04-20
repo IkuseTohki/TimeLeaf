@@ -67,6 +67,8 @@ public partial class ProjectTaskViewModel : ObservableObject, IDisposable
                 OnPropertyChanged(nameof(Status));
                 OnPropertyChanged(nameof(ActualStartDate));
                 OnPropertyChanged(nameof(ActualEndDate));
+                OnPropertyChanged(nameof(StatusBrush));
+                OnPropertyChanged(nameof(IsCompleted));
             }
         }
     }
@@ -80,6 +82,7 @@ public partial class ProjectTaskViewModel : ObservableObject, IDisposable
             {
                 _projectTask.UpdatePriority(value);
                 OnPropertyChanged(nameof(Priority));
+                OnPropertyChanged(nameof(PriorityBrush));
             }
         }
     }
@@ -106,6 +109,7 @@ public partial class ProjectTaskViewModel : ObservableObject, IDisposable
             {
                 _projectTask.UpdateSchedule(_projectTask.ScheduledStartDate, value);
                 OnPropertyChanged(nameof(Deadline));
+                OnPropertyChanged(nameof(DeadlineGroup));
             }
         }
     }
@@ -171,7 +175,64 @@ public partial class ProjectTaskViewModel : ObservableObject, IDisposable
             {
                 _projectTask.AssignTo(value);
                 OnPropertyChanged(nameof(Assignee));
+                OnPropertyChanged(nameof(AssigneeName));
             }
+        }
+    }
+
+    /// <summary>
+    /// 担当者の表示名。
+    /// </summary>
+    public string AssigneeName => _userService.GetUserName(Assignee);
+
+    /// <summary>
+    /// タスクが完了状態かどうか。
+    /// </summary>
+    public bool IsCompleted => Status == TimeLeaf.Models.Enums.TaskStatus.Completed;
+
+    /// <summary>
+    /// 優先度に応じた色。
+    /// </summary>
+    public System.Windows.Media.Brush PriorityBrush =>
+        Priority switch
+        {
+            TaskPriority.High => System.Windows.Media.Brushes.Crimson,
+            TaskPriority.Medium => System.Windows.Media.Brushes.SeaGreen,
+            TaskPriority.Low => System.Windows.Media.Brushes.Gray,
+            _ => System.Windows.Media.Brushes.Gray,
+        };
+
+    /// <summary>
+    /// ステータスに応じた色。
+    /// </summary>
+    public System.Windows.Media.Brush StatusBrush =>
+        Status switch
+        {
+            TimeLeaf.Models.Enums.TaskStatus.Completed => System.Windows.Media.Brushes.LightGray,
+            TimeLeaf.Models.Enums.TaskStatus.InProgress => (System.Windows.Media.Brush)
+                System.Windows.Application.Current.FindResource("BrandPrimaryBrush"),
+            TimeLeaf.Models.Enums.TaskStatus.InReview => System.Windows.Media.Brushes.MediumPurple,
+            _ => System.Windows.Media.Brushes.Gray,
+        };
+
+    /// <summary>
+    /// タイムライン表示用のグループ名。
+    /// </summary>
+    public string DeadlineGroup
+    {
+        get
+        {
+            if (!Deadline.HasValue)
+                return "Future / Someday";
+            var date = Deadline.Value.Date;
+            var today = DateTime.Today;
+            if (date == today)
+                return "Today";
+            if (date == today.AddDays(1))
+                return "Tomorrow";
+            if (date <= today.AddDays(7))
+                return "This Week";
+            return "Later";
         }
     }
 
@@ -252,6 +313,11 @@ public partial class ProjectTaskViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(Assignee));
         OnPropertyChanged(nameof(Dependencies));
         OnPropertyChanged(nameof(Comments));
+        OnPropertyChanged(nameof(StatusBrush));
+        OnPropertyChanged(nameof(PriorityBrush));
+        OnPropertyChanged(nameof(DeadlineGroup));
+        OnPropertyChanged(nameof(IsCompleted));
+        OnPropertyChanged(nameof(AssigneeName));
     }
 
     public void Dispose()

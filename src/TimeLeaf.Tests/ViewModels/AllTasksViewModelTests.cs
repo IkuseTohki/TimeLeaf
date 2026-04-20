@@ -208,4 +208,75 @@ public class AllTasksViewModelTests
         // Assert
         Assert.AreEqual(1, viewModel.AllTasks.Count, "名前の変更により検索にヒットするようになること");
     }
+
+    /// <summary>
+    /// テスト観点: 表示モードを Timeline に切り替えた際に、ICollectionView にグループ化（DeadlineGroup）が適用されることを確認する。
+    /// </summary>
+    [TestMethod]
+    public void CurrentViewMode_SwitchingToTimeline_ShouldApplyGrouping()
+    {
+        // Arrange
+        var projects = new ObservableCollection<ProjectViewModel>();
+        var viewModel = new AllTasksViewModel(projects);
+        Assert.AreEqual(AllTasksViewMode.List, viewModel.CurrentViewMode);
+        Assert.AreEqual(
+            0,
+            viewModel.AllTasksView.GroupDescriptions.Count,
+            "初期状態（List）ではグループ化されていないこと"
+        );
+
+        // Act
+        viewModel.CurrentViewMode = AllTasksViewMode.Timeline;
+
+        // Assert
+        Assert.AreEqual(
+            1,
+            viewModel.AllTasksView.GroupDescriptions.Count,
+            "Timelineモードではグループ化が適用されること"
+        );
+        var groupDesc = viewModel.AllTasksView.GroupDescriptions[0] as System.Windows.Data.PropertyGroupDescription;
+        Assert.IsNotNull(groupDesc);
+        Assert.AreEqual(nameof(ProjectTaskViewModel.DeadlineGroup), groupDesc.PropertyName);
+    }
+
+    /// <summary>
+    /// テスト観点: 表示モードを Timeline から List に戻した際に、グループ化が解除されることを確認する。
+    /// </summary>
+    [TestMethod]
+    public void CurrentViewMode_SwitchingBackToList_ShouldRemoveGrouping()
+    {
+        // Arrange
+        var projects = new ObservableCollection<ProjectViewModel>();
+        var viewModel = new AllTasksViewModel(projects);
+        viewModel.CurrentViewMode = AllTasksViewMode.Timeline;
+        Assert.IsTrue(viewModel.AllTasksView.GroupDescriptions.Count > 0);
+
+        // Act
+        viewModel.CurrentViewMode = AllTasksViewMode.List;
+
+        // Assert
+        Assert.AreEqual(
+            0,
+            viewModel.AllTasksView.GroupDescriptions.Count,
+            "Listモードに戻すとグループ化が解除されること"
+        );
+    }
+
+    /// <summary>
+    /// テスト観点: ViewModeItems コレクションが正しく初期化され、期待されるすべての表示モードが含まれていることを確認する。
+    /// </summary>
+    [TestMethod]
+    public void ViewModeItems_ShouldContainAllModes()
+    {
+        // Arrange & Act
+        var projects = new ObservableCollection<ProjectViewModel>();
+        var viewModel = new AllTasksViewModel(projects);
+
+        // Assert
+        Assert.IsNotNull(viewModel.ViewModeItems);
+        Assert.AreEqual(3, viewModel.ViewModeItems.Count);
+        Assert.IsTrue(viewModel.ViewModeItems.Any(i => i.Value == AllTasksViewMode.List));
+        Assert.IsTrue(viewModel.ViewModeItems.Any(i => i.Value == AllTasksViewMode.Timeline));
+        Assert.IsTrue(viewModel.ViewModeItems.Any(i => i.Value == AllTasksViewMode.Grid));
+    }
 }

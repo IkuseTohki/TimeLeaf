@@ -85,4 +85,62 @@ public class UserServiceTests
         var cached = await _userService.GetUserAsync(userId);
         Assert.AreEqual("Updated User", cached?.DisplayName);
     }
+
+    /// <summary>
+    /// テスト観点: GetUserName がキャッシュヒット時に正しい表示名を返すことを確認する。
+    /// </summary>
+    [TestMethod]
+    public void GetUserName_WhenCached_ReturnsDisplayName()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var user = new User(userId, "Cache Hit User", "#000000", "");
+        _userService.UpdateCache(user);
+
+        // Act
+        var result = _userService.GetUserName(userId.ToString());
+
+        // Assert
+        Assert.AreEqual("Cache Hit User", result);
+    }
+
+    /// <summary>
+    /// テスト観点: GetUserName がキャッシュにない場合、"Unknown" を返すことを確認する。
+    /// </summary>
+    [TestMethod]
+    public void GetUserName_WhenNotCached_ReturnsUnknown()
+    {
+        // Act
+        var result = _userService.GetUserName(Guid.NewGuid().ToString());
+
+        // Assert
+        Assert.AreEqual("Unknown", result);
+    }
+
+    /// <summary>
+    /// テスト観点: GetUserName に空文字や null が渡された場合、"Unassigned" を返すことを確認する。
+    /// </summary>
+    [TestMethod]
+    public void GetUserName_WhenEmptyOrNull_ReturnsUnassigned()
+    {
+        // Act & Assert
+        Assert.AreEqual("Unassigned", _userService.GetUserName(""));
+        Assert.AreEqual("Unassigned", _userService.GetUserName(null!));
+    }
+
+    /// <summary>
+    /// テスト観点: GetUserName に GUID ではない文字列が渡された場合、そのまま返すことを確認する。
+    /// </summary>
+    [TestMethod]
+    public void GetUserName_WhenInvalidFormat_ReturnsInputString()
+    {
+        // Arrange
+        var invalidId = "not-a-guid-but-maybe-a-system-account";
+
+        // Act
+        var result = _userService.GetUserName(invalidId);
+
+        // Assert
+        Assert.AreEqual(invalidId, result);
+    }
 }

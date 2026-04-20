@@ -27,6 +27,15 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
     [ObservableProperty]
     private string _currentViewName = "Dashboard";
 
+    partial void OnCurrentViewNameChanged(string value)
+    {
+        // プロパティが変更されたら、自動的にビュー切り替えロジックを実行
+        if (CurrentSubViewModel?.GetType().Name.Contains(value) != true)
+        {
+            SwitchSubView(value);
+        }
+    }
+
     /// <summary>
     /// 現在表示中のサブビューのViewModel。
     /// </summary>
@@ -163,8 +172,11 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
     private ProjectTasksViewModel CreateTasksViewModel()
     {
         var vm = _viewModelFactory.CreateProjectTasksViewModel(_projectViewModel);
-        vm.TaskDetailRequested += OnTaskDetailRequested;
-        return vm;
+        if (vm != null)
+        {
+            vm.TaskDetailRequested += OnTaskDetailRequested;
+        }
+        return vm!;
     }
 
     private void OnTaskDetailRequested(object? sender, ProjectTaskViewModel task)

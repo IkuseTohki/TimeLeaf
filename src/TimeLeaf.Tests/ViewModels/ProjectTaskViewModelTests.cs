@@ -195,4 +195,85 @@ public class ProjectTaskViewModelTests
         CollectionAssert.Contains(notifiedProperties, nameof(viewModel.Priority));
         CollectionAssert.Contains(notifiedProperties, nameof(viewModel.Status));
     }
+
+    /// <summary>
+    /// テスト観点: AssigneeName が IUserService を通じて正しく取得されること、
+    /// および Assignee 変更時に AssigneeName の通知も行われることを確認する。
+    /// </summary>
+    [TestMethod]
+    public void Assignee_ShouldRaiseAssigneeNameNotification()
+    {
+        // Arrange
+        var projectTask = new ProjectTask();
+        var viewModel = new ProjectTaskViewModel(projectTask, _userServiceMock.Object);
+        var userId = Guid.NewGuid().ToString();
+        var expectedName = "Test User";
+
+        _userServiceMock.Setup(s => s.GetUserName(userId)).Returns(expectedName);
+
+        var receivedNames = new List<string>();
+        viewModel.PropertyChanged += (s, e) => receivedNames.Add(e.PropertyName!);
+
+        // Act
+        viewModel.Assignee = userId;
+
+        // Assert
+        Assert.AreEqual(expectedName, viewModel.AssigneeName);
+        CollectionAssert.Contains(receivedNames, nameof(ProjectTaskViewModel.Assignee));
+        CollectionAssert.Contains(receivedNames, nameof(ProjectTaskViewModel.AssigneeName));
+    }
+
+    /// <summary>
+    /// テスト観点: DeadlineGroup プロパティが、締切日に基づいて期待通りのグループ名（Today, Tomorrow, etc.）を返すことを確認する。
+    /// </summary>
+    [TestMethod]
+    public void DeadlineGroup_ShouldReturnCorrectLabel()
+    {
+        // Arrange
+        var projectTask = new ProjectTask();
+        var viewModel = new ProjectTaskViewModel(projectTask, _userServiceMock.Object);
+        var today = DateTime.Today;
+
+        // Act & Assert
+        // Case: No Deadline
+        viewModel.Deadline = null;
+        Assert.AreEqual("Future / Someday", viewModel.DeadlineGroup);
+
+        // Case: Today
+        viewModel.Deadline = today.AddHours(10);
+        Assert.AreEqual("Today", viewModel.DeadlineGroup);
+
+        // Case: Tomorrow
+        viewModel.Deadline = today.AddDays(1);
+        Assert.AreEqual("Tomorrow", viewModel.DeadlineGroup);
+
+        // Case: Within This Week
+        viewModel.Deadline = today.AddDays(3);
+        Assert.AreEqual("This Week", viewModel.DeadlineGroup);
+
+        // Case: Later
+        viewModel.Deadline = today.AddDays(10);
+        Assert.AreEqual("Later", viewModel.DeadlineGroup);
+    }
+
+    /// <summary>
+    /// テスト観点: PriorityBrush および StatusBrush が、特定の列挙値に対して null でない有効な Brush を返すことを確認する。
+    /// </summary>
+    [TestMethod]
+    public void Brushes_ShouldReturnNonNullForStandardValues()
+    {
+        // Arrange
+        var projectTask = new ProjectTask();
+        var viewModel = new ProjectTaskViewModel(projectTask, _userServiceMock.Object);
+
+        // Act & Assert
+        Assert.IsNotNull(viewModel.PriorityBrush, "PriorityBrush should not be null");
+        Assert.IsNotNull(viewModel.StatusBrush, "StatusBrush should not be null");
+
+        viewModel.Priority = TaskPriority.High;
+        Assert.IsNotNull(viewModel.PriorityBrush);
+
+        viewModel.Status = TimeLeaf.Models.Enums.TaskStatus.Completed;
+        Assert.IsNotNull(viewModel.StatusBrush);
+    }
 }

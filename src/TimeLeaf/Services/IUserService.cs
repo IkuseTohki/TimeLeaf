@@ -19,6 +19,13 @@ public interface IUserService
     Task<User?> GetUserAsync(Guid userId);
 
     /// <summary>
+    /// ユーザーIDから表示名を同期的に取得します（キャッシュヒット時のみ名前、未キャッシュ時はIDを返却）。
+    /// </summary>
+    /// <param name="userIdString">GUID形式のユーザーID文字列。</param>
+    /// <returns>ユーザー名。</returns>
+    string GetUserName(string userIdString);
+
+    /// <summary>
     /// キャッシュを強制的に更新し、変更通知イベントを発行します。
     /// </summary>
     /// <param name="user">最新のユーザー情報。</param>

@@ -4,8 +4,10 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using TimeLeaf.Models.Enums;
 
 namespace TimeLeaf.ViewModels;
 
@@ -16,10 +18,39 @@ public partial class AllTasksViewModel : ObservableObject
 {
     private readonly ObservableCollection<ProjectViewModel> _projects;
 
+    [ObservableProperty]
+    private AllTasksViewMode _currentViewMode = AllTasksViewMode.List;
+
+    /// <summary>
+    /// 再帰的な DataTemplate 適用を避けるために ContentControl の Content にバインドされるオブジェクト。
+    /// </summary>
+    public object CurrentSubViewContext => this;
+
+    /// <summary>
+    /// 表示モード切替用のナビゲーション項目。
+    /// </summary>
+    public List<ViewModeItem> ViewModeItems { get; } =
+        new()
+        {
+            new ViewModeItem("List", AllTasksViewMode.List),
+            new ViewModeItem("Timeline", AllTasksViewMode.Timeline),
+            new ViewModeItem("Grid", AllTasksViewMode.Grid),
+        };
+
     /// <summary>
     /// 表示対象となるすべてのタスク。
     /// </summary>
     public ObservableCollection<ProjectTaskViewModel> AllTasks { get; } = new();
+
+    /// <summary>
+    /// グループ化やソートを適用したタスクビュー。
+    /// </summary>
+    public ICollectionView AllTasksView { get; }
+
+    /// <summary>
+    /// 全プロジェクトのリスト。
+    /// </summary>
+    public ObservableCollection<ProjectViewModel> Projects => _projects;
 
     [ObservableProperty]
     private string _searchKeyword = string.Empty;
@@ -39,6 +70,7 @@ public partial class AllTasksViewModel : ObservableObject
     public AllTasksViewModel(ObservableCollection<ProjectViewModel> projects)
     {
         _projects = projects ?? throw new ArgumentNullException(nameof(projects));
+        AllTasksView = CollectionViewSource.GetDefaultView(AllTasks);
 
         // 初期集約と全タスクへの監視設定
         foreach (var project in _projects)
@@ -55,6 +87,19 @@ public partial class AllTasksViewModel : ObservableObject
         // プロジェクトリストの変更を監視
         _projects.CollectionChanged += OnProjectsCollectionChanged;
     }
+
+    private void ApplyGrouping()
+    {
+        AllTasksView.GroupDescriptions.Clear();
+        if (CurrentViewMode == AllTasksViewMode.Timeline)
+        {
+            AllTasksView.GroupDescriptions.Add(
+                new PropertyGroupDescription(nameof(ProjectTaskViewModel.DeadlineGroup))
+            );
+        }
+    }
+
+    partial void OnCurrentViewModeChanged(AllTasksViewMode value) => ApplyGrouping();
 
     [RelayCommand]
     private void SelectTask(ProjectTaskViewModel task)
@@ -188,5 +233,20 @@ public partial class AllTasksViewModel : ObservableObject
         {
             AllTasks.Add(t);
         }
+    }
+}
+
+/// <summary>
+/// 表示モード切替項目を表すクラス。
+/// </summary>
+public class ViewModeItem
+{
+    public string Label { get; }
+    public AllTasksViewMode Value { get; }
+
+    public ViewModeItem(string label, AllTasksViewMode value)
+    {
+        Label = label;
+        Value = value;
     }
 }

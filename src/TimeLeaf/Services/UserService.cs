@@ -56,6 +56,21 @@ public class UserService : IUserService, IDisposable
         return user;
     }
 
+    public string GetUserName(string userIdString)
+    {
+        if (string.IsNullOrEmpty(userIdString))
+            return "Unassigned";
+        if (!Guid.TryParse(userIdString, out var guid))
+            return userIdString;
+
+        if (_cache.TryGetValue(guid, out var user))
+        {
+            return user.DisplayName;
+        }
+
+        return "Unknown";
+    }
+
     public void UpdateCache(User user)
     {
         if (user == null)
