@@ -28,6 +28,138 @@ public class ProjectViewModelTests
             .Returns((ProjectTask t) => new ProjectTaskViewModel(t, _userServiceMock.Object));
     }
 
+    // --- 既存のテストケース (Name_ShouldUpdateModelAndRaisePropertyChanged 等) ---
+    // (省略)
+
+    // --- AssignmentTests から移植 ---
+    [TestMethod]
+    public void IsAssignedToMe_ShouldBeTrue_WhenMyIdIsInAssignedUserIds()
+    {
+        var myId = Guid.NewGuid();
+        var project = new Project();
+        project.AssignUser(myId);
+
+        var viewModel = new ProjectViewModel(
+            project,
+            myId,
+            new Mock<IJoinProjectUseCase>().Object,
+            _viewModelFactoryMock.Object
+        );
+
+        Assert.IsTrue(viewModel.IsAssignedToMe);
+    }
+
+    [TestMethod]
+    public void IsAssignedToMe_ShouldBeFalse_WhenMyIdIsNotInAssignedUserIds()
+    {
+        var myId = Guid.NewGuid();
+        var otherId = Guid.NewGuid();
+        var project = new Project();
+        project.AssignUser(otherId);
+
+        var viewModel = new ProjectViewModel(
+            project,
+            myId,
+            new Mock<IJoinProjectUseCase>().Object,
+            _viewModelFactoryMock.Object
+        );
+
+        Assert.IsFalse(viewModel.IsAssignedToMe);
+    }
+
+    [TestMethod]
+    public async System.Threading.Tasks.Task JoinProjectCommand_ShouldAssignMe()
+    {
+        var myId = Guid.NewGuid();
+        var project = new Project();
+        var mockJoinUseCase = new Mock<IJoinProjectUseCase>();
+        var viewModel = new ProjectViewModel(project, myId, mockJoinUseCase.Object, _viewModelFactoryMock.Object);
+
+        await viewModel.JoinProjectCommand.ExecuteAsync(null);
+
+        mockJoinUseCase.Verify(u => u.ExecuteAsync(project), Times.Once);
+    }
+
+    // --- SyncTests から移植 ---
+    [TestMethod]
+    public void ProjectViewModel_UpdateProperty_ShouldUpdateModel()
+    {
+        var project = new Project();
+        project.UpdateName("Old Name");
+        project.UpdateDescription("Old Desc");
+        var viewModel = new ProjectViewModel(
+            project,
+            Guid.NewGuid(),
+            new Mock<IJoinProjectUseCase>().Object,
+            _viewModelFactoryMock.Object
+        );
+
+        viewModel.Name = "New Name";
+        viewModel.Description = "New Desc";
+
+        Assert.AreEqual("New Name", project.Name);
+        Assert.AreEqual("New Desc", project.Description);
+    }
+
+    [TestMethod]
+    public void ProjectTaskViewModel_UpdateProperty_ShouldUpdateModel()
+    {
+        var task = new ProjectTask();
+        task.UpdateName("Old Task");
+        task.AssignTo("Old User");
+        var viewModel = new ProjectTaskViewModel(task, _userServiceMock.Object);
+
+        viewModel.Name = "New Task";
+        viewModel.Assignee = "New User";
+
+        Assert.AreEqual("New Task", task.Name);
+        Assert.AreEqual("New User", task.Assignee);
+    }
+
+    [TestMethod]
+    public void ProjectModel_AddTask_ShouldReflectInViewModel()
+    {
+        var project = new Project();
+        project.UpdateName("Test Project");
+        var viewModel = new ProjectViewModel(
+            project,
+            Guid.NewGuid(),
+            new Mock<IJoinProjectUseCase>().Object,
+            _viewModelFactoryMock.Object
+        );
+        var newTask = new ProjectTask();
+        newTask.UpdateName("New Task");
+
+        project.AddTask(newTask);
+        viewModel.SyncFromModel();
+
+        Assert.IsNotNull(viewModel.Tasks);
+        Assert.AreEqual(1, viewModel.Tasks.Count);
+        Assert.AreEqual(newTask.Id, viewModel.Tasks.First().Id);
+    }
+
+    [TestMethod]
+    public void ProjectModel_RemoveTask_ShouldReflectInViewModel()
+    {
+        var project = new Project();
+        project.UpdateName("Test Project");
+        var task = new ProjectTask();
+        task.UpdateName("Task 1");
+        project.AddTask(task);
+        var viewModel = new ProjectViewModel(
+            project,
+            Guid.NewGuid(),
+            new Mock<IJoinProjectUseCase>().Object,
+            _viewModelFactoryMock.Object
+        );
+
+        project.RemoveTask(task.Id);
+        viewModel.SyncFromModel();
+
+        Assert.IsNotNull(viewModel.Tasks);
+        Assert.AreEqual(0, viewModel.Tasks.Count);
+    }
+
     /// <summary>
     /// テスト観点: Name プロパティを変更した際に、基になる Project エンティティの Name が更新され、
     /// かつ PropertyChanged イベントが発火することを確認する。

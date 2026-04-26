@@ -26,6 +26,13 @@ public interface IUserService
     string GetUserName(string userIdString);
 
     /// <summary>
+    /// ユーザー名からユーザーIDを検索します。
+    /// </summary>
+    /// <param name="name">検索対象のユーザー名。</param>
+    /// <returns>見つかった場合はそのユーザーIDの文字列表記、見つからない場合は null。</returns>
+    string? GetUserIdByName(string name);
+
+    /// <summary>
     /// キャッシュを強制的に更新し、変更通知イベントを発行します。
     /// </summary>
     /// <param name="user">最新のユーザー情報。</param>

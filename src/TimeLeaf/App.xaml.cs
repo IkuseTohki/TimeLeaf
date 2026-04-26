@@ -280,6 +280,8 @@ public partial class App : Application
         services.AddTransient<IJoinProjectUseCase, JoinProjectUseCase>();
         services.AddTransient<ICheckAssignmentUseCase, CheckAssignmentUseCase>();
         services.AddTransient<IGetProjectMembersUseCase, GetProjectMembersUseCase>();
+        services.AddTransient<CalculateCriticalPathUseCase>();
+        services.AddTransient<DetectProjectRisksUseCase>();
 
         // コーディネーターの登録
         services.AddSingleton<IProjectSaveCoordinator, ProjectSaveCoordinator>();

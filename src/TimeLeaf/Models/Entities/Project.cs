@@ -28,7 +28,7 @@ public class Project
     /// <summary>
     /// プロジェクトを一意に識別するID。
     /// </summary>
-    public Guid Id { get; init; } = Guid.NewGuid();
+    public Guid Id { get; init; }
 
     /// <summary>
     /// プロジェクト名。
@@ -78,7 +78,10 @@ public class Project
     /// <summary>
     /// デフォルトコンストラクタ。
     /// </summary>
-    public Project() { }
+    public Project()
+    {
+        Id = Guid.NewGuid();
+    }
 
     /// <summary>
     /// JSON デシリアライズ用コンストラクタ。
@@ -96,13 +99,13 @@ public class Project
         List<Milestone>? Milestones
     )
     {
-        this.Id = Id;
+        this.Id = Id == Guid.Empty ? Guid.NewGuid() : Id;
         this.Name = Name;
         this.Description = Description;
         this.Status = Status;
         this.HealthStatus = HealthStatus;
-        this.CreatedAt = CreatedAt;
-        this.UpdatedAt = UpdatedAt;
+        this.CreatedAt = CreatedAt == default ? DateTime.Now : CreatedAt;
+        this.UpdatedAt = UpdatedAt == default ? DateTime.Now : UpdatedAt;
         if (Tasks != null)
             _tasks.AddRange(Tasks);
         if (Milestones != null)
@@ -310,5 +313,57 @@ public class Project
     {
         IsArchived = isArchived;
         LockedUntil = lockedUntil;
+    }
+
+    /// <summary>
+    /// プロジェクトの制約（依存関係）を検証し、循環参照などの問題を検出します。
+    /// </summary>
+    public ProjectValidationResult ValidateConstraints()
+    {
+        var result = new ProjectValidationResult();
+        var taskDict = _tasks.ToDictionary(t => t.Id);
+
+        var visited = new HashSet<Guid>();
+        var recStack = new HashSet<Guid>();
+
+        foreach (var task in _tasks)
+        {
+            if (HasCycle(task.Id, taskDict, visited, recStack))
+            {
+                result.AddError("Cycle detected in task constraints.");
+                break;
+            }
+        }
+
+        return result;
+    }
+
+    private bool HasCycle(
+        Guid taskId,
+        Dictionary<Guid, ProjectTask> taskDict,
+        HashSet<Guid> visited,
+        HashSet<Guid> recStack
+    )
+    {
+        if (recStack.Contains(taskId))
+            return true;
+
+        if (visited.Contains(taskId))
+            return false;
+
+        visited.Add(taskId);
+        recStack.Add(taskId);
+
+        if (taskDict.TryGetValue(taskId, out var task))
+        {
+            foreach (var constraint in task.Constraints)
+            {
+                if (HasCycle(constraint.PredecessorId, taskDict, visited, recStack))
+                    return true;
+            }
+        }
+
+        recStack.Remove(taskId);
+        return false;
     }
 }

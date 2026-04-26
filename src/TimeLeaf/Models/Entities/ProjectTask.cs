@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TimeLeaf.Models.Enums;
 
 namespace TimeLeaf.Models.Entities;
@@ -10,11 +11,32 @@ namespace TimeLeaf.Models.Entities;
 public class ProjectTask
 {
     private readonly List<Comment> _comments = new();
+    private readonly List<TaskConstraint> _constraints = new();
+    private readonly List<ProjectTask> _children = new();
+    private readonly List<Guid> _dependencies = new();
 
     /// <summary>
     /// タスクを一意に識別するID。
     /// </summary>
     public Guid Id { get; init; } = Guid.NewGuid();
+
+    /// <summary>
+    /// 親タスクのID。
+    /// </summary>
+    public Guid? ParentId { get; private set; }
+
+    /// <summary>
+    /// 親タスクIDを設定します（リポジトリ復元用）。
+    /// </summary>
+    internal void SetParentId(Guid? parentId)
+    {
+        ParentId = parentId;
+    }
+
+    /// <summary>
+    /// 子タスクのリスト（読み取り専用）。
+    /// </summary>
+    public IReadOnlyList<ProjectTask> Children => _children;
 
     /// <summary>
     /// タスク名。
@@ -72,9 +94,15 @@ public class ProjectTask
     public string Assignee { get; private set; } = string.Empty;
 
     /// <summary>
+    /// タスク間の制約（依存関係）のリスト（読み取り専用）。
+    /// </summary>
+    public IReadOnlyList<TaskConstraint> Constraints => _constraints;
+
+    /// <summary>
     /// 依存タスクのIDリスト。
     /// </summary>
-    public List<Guid> Dependencies { get; init; } = new();
+    [Obsolete("Use Constraints instead.")]
+    public List<Guid> Dependencies => _dependencies;
 
     /// <summary>
     /// タスクに関するコメントのリスト（読み取り専用）。
@@ -103,11 +131,12 @@ public class ProjectTask
         double EstimatedCost,
         double ActualCost,
         string Assignee,
-        List<Guid>? Dependencies,
+        List<TaskConstraint>? Constraints,
         List<Comment>? Comments
     )
     {
-        this.Id = Id;
+        if (Id != Guid.Empty)
+            this.Id = Id;
         this.Name = Name;
         this.Description = Description;
         this.Status = Status;
@@ -119,7 +148,11 @@ public class ProjectTask
         this.EstimatedCost = EstimatedCost;
         this.ActualCost = ActualCost;
         this.Assignee = Assignee;
-        this.Dependencies = Dependencies ?? new();
+        if (Constraints != null)
+        {
+            _constraints.AddRange(Constraints);
+            _dependencies.AddRange(Constraints.Select(c => c.PredecessorId));
+        }
         if (Comments != null)
             _comments.AddRange(Comments);
     }
@@ -237,4 +270,99 @@ public class ProjectTask
         _comments.Clear();
         _comments.AddRange(comments);
     }
+
+    /// <summary>
+    /// 制約を追加します。
+    /// </summary>
+    public void AddConstraint(TaskConstraint constraint)
+    {
+        if (constraint == null)
+            throw new ArgumentNullException(nameof(constraint));
+        _constraints.Add(constraint);
+
+        if (!_dependencies.Contains(constraint.PredecessorId))
+            _dependencies.Add(constraint.PredecessorId);
+    }
+
+    /// <summary>
+    /// 既存の制約を一括で追加します（再ロード時等に使用）。
+    /// </summary>
+    public void LoadConstraints(IEnumerable<TaskConstraint> constraints)
+    {
+        _constraints.Clear();
+        _dependencies.Clear();
+        if (constraints != null)
+        {
+            foreach (var c in constraints)
+            {
+                AddConstraint(c);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 子タスクを追加します。
+    /// </summary>
+    public void AddChild(ProjectTask child)
+    {
+        if (child == null)
+            throw new ArgumentNullException(nameof(child));
+        if (child.Id != Guid.Empty && child.Id == this.Id)
+            throw new ArgumentException("Cannot add self as child.", nameof(child));
+
+        child.ParentId = this.Id;
+        _children.Add(child);
+        AggregateChildren();
+    }
+
+    /// <summary>
+    /// 既存の子タスクを一括で追加します（再ロード時等に使用）。
+    /// </summary>
+    public void LoadChildren(IEnumerable<ProjectTask> children)
+    {
+        _children.Clear();
+        foreach (var child in children)
+        {
+            child.ParentId = this.Id;
+            _children.Add(child);
+        }
+        AggregateChildren();
+    }
+
+    /// <summary>
+    /// 子タスクの情報を元に、自身のスケジュールと進捗を自動集計します。
+    /// </summary>
+    private void AggregateChildren()
+    {
+        if (!_children.Any())
+            return;
+
+        // スケジュールの集計
+        var starts = _children
+            .Where(c => c.ScheduledStartDate.HasValue)
+            .Select(c => c.ScheduledStartDate!.Value)
+            .ToList();
+        ScheduledStartDate = starts.Any() ? starts.Min() : null;
+
+        var ends = _children.Where(c => c.Deadline.HasValue).Select(c => c.Deadline!.Value).ToList();
+        Deadline = ends.Any() ? ends.Max() : null;
+
+        // 進捗の集計
+        double averageProgress = _children.Average(c => GetProgressValue(c.Status));
+        if (averageProgress >= 1.0)
+            Status = TaskStatus.Completed;
+        else if (averageProgress <= 0.0)
+            Status = TaskStatus.NotStarted;
+        else
+            Status = TaskStatus.InProgress;
+    }
+
+    private double GetProgressValue(TaskStatus status) =>
+        status switch
+        {
+            TaskStatus.Completed => 1.0,
+            TaskStatus.InProgress => 0.5,
+            TaskStatus.InReview => 0.8,
+            _ => 0.0,
+        };
 }

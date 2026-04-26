@@ -85,8 +85,9 @@ public class ProjectWorkspaceViewModelTests
                         new Mock<IGetProjectMembersUseCase>().Object,
                         _viewModelFactoryMock.Object,
                         new Mock<IDialogService>().Object,
+                        new DetectProjectRisksUseCase(new CalculateCriticalPathUseCase()),
                         new Mock<ILogger<ProjectTasksViewModel>>().Object,
-                        detailLoggerMock.Object
+                        new Mock<ILogger<TaskDetailViewModel>>().Object
                     )
             );
     }

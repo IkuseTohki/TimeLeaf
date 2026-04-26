@@ -111,6 +111,7 @@ public class ViewModelFactory : IViewModelFactory
             _serviceProvider.GetRequiredService<IGetProjectMembersUseCase>(),
             this,
             _serviceProvider.GetRequiredService<IDialogService>(),
+            _serviceProvider.GetRequiredService<DetectProjectRisksUseCase>(),
             _serviceProvider.GetRequiredService<ILogger<ProjectTasksViewModel>>(),
             _serviceProvider.GetRequiredService<ILogger<TaskDetailViewModel>>()
         );

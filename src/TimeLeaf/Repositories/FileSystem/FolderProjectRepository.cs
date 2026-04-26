@@ -292,13 +292,20 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
             {
                 var planning = new TaskPlanningDto(
                     task.Id,
+                    task.ParentId,
                     task.Name,
                     task.Priority,
                     task.ScheduledStartDate,
                     task.Deadline,
                     task.EstimatedCost,
                     task.Assignee,
-                    task.Dependencies.ToList()
+                    task.Constraints.Select(c => new TaskConstraintDto(
+                            c.PredecessorId,
+                            c.Type,
+                            c.LagDays,
+                            c.Description
+                        ))
+                        .ToList()
                 );
                 await TrySaveCategoryAsync(
                     task.Id,

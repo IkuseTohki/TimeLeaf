@@ -365,6 +365,7 @@ public partial class ProjectViewModel : ObservableObject
         OnPropertyChanged(nameof(DisplayTotalEstimatedCost));
         OnPropertyChanged(nameof(DisplayTotalActualCost));
         OnPropertyChanged(nameof(IsAssignedToMe));
+        OnPropertyChanged(nameof(Tasks));
     }
 
     private void OnProjectTaskViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -372,7 +373,26 @@ public partial class ProjectViewModel : ObservableObject
         if (IsSyncing)
             return;
 
-        // 個々のタスクのプロパティ（コスト、担当者、ステータス等）が変更された場合
+        // 保存が必要なプロパティの変更のみ、親に通知して自動保存をトリガーする。
+        // ホワイトリスト方式により、X, Y, IsSelected などの UI 状態変更を完全に除外する。
+        var importantProperties = new[]
+        {
+            nameof(ProjectTaskViewModel.Name),
+            nameof(ProjectTaskViewModel.Description),
+            nameof(ProjectTaskViewModel.Status),
+            nameof(ProjectTaskViewModel.Priority),
+            nameof(ProjectTaskViewModel.ScheduledStartDate),
+            nameof(ProjectTaskViewModel.Deadline),
+            nameof(ProjectTaskViewModel.EstimatedCost),
+            nameof(ProjectTaskViewModel.ActualCost),
+            nameof(ProjectTaskViewModel.Assignee),
+            "Constraints",
+        };
+
+        if (!importantProperties.Contains(e.PropertyName))
+            return;
+
+        // 個々のタスクのプロパティが変更された場合
         // 親である ProjectViewModel の Tasks プロパティが変更されたとみなして通知する。
         // これにより MainViewModel の自動保存がトリガーされる。
         OnPropertyChanged(nameof(Tasks));

@@ -13,15 +13,14 @@ public class Comment
     /// </summary>
     public Guid Id { get; init; } = Guid.NewGuid();
 
-    private readonly Guid _taskId;
+    private Guid _taskId;
 
     /// <summary>
     /// 紐づくタスクの参照ID。
-    /// </summary>
     public Guid TaskId
     {
         get => _taskId;
-        init
+        set
         {
             if (value == Guid.Empty)
                 throw new ArgumentException("TaskId cannot be empty.", nameof(value));

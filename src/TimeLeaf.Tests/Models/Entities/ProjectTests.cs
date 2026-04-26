@@ -201,4 +201,79 @@ public class ProjectTests
         Assert.AreEqual(DateTimeKind.Local, project.CreatedAt.Kind, "CreatedAt は Local であるべき");
         Assert.AreEqual(DateTimeKind.Local, project.UpdatedAt.Kind, "UpdatedAt は Local であるべき");
     }
+
+    /// <summary>
+    /// テスト観点: タスク間の依存関係に循環参照がある場合、検証メソッドがエラーを返すことを確認する。
+    /// </summary>
+    [TestMethod]
+    public void ValidateConstraints_ShouldDetectCycle()
+    {
+        // Arrange
+        var project = new Project();
+        var taskA = new ProjectTask { Id = Guid.NewGuid() };
+        var taskB = new ProjectTask { Id = Guid.NewGuid() };
+        project.AddTask(taskA);
+        project.AddTask(taskB);
+
+        // A -> B (BがAに依存)
+        taskB.AddConstraint(new TaskConstraint(taskA.Id));
+        // B -> A (AがBに依存) -> Cycle!
+        taskA.AddConstraint(new TaskConstraint(taskB.Id));
+
+        // Act
+        var result = project.ValidateConstraints();
+
+        // Assert
+        Assert.IsFalse(result.IsValid, "循環参照がある場合は無効と判定されるべき");
+        Assert.IsTrue(result.Errors.Any(e => e.Contains("Cycle")), "エラーメッセージに 'Cycle' が含まれるべき");
+    }
+
+    /// <summary>
+    /// テスト観点: 自己参照（タスクが自分自身に依存）を検出できることを確認する。
+    /// </summary>
+    [TestMethod]
+    public void ValidateConstraints_ShouldDetectSelfReference()
+    {
+        // Arrange
+        var project = new Project();
+        var task = new ProjectTask { Id = Guid.NewGuid() };
+        project.AddTask(task);
+
+        // A -> A
+        task.AddConstraint(new TaskConstraint(task.Id));
+
+        // Act
+        var result = project.ValidateConstraints();
+
+        // Assert
+        Assert.IsFalse(result.IsValid);
+        Assert.IsTrue(result.Errors.Any(e => e.Contains("Cycle")));
+    }
+
+    /// <summary>
+    /// テスト観点: 3つ以上のタスクに跨る深い循環参照を検出できることを確認する。
+    /// </summary>
+    [TestMethod]
+    public void ValidateConstraints_ShouldDetectDeepCycle()
+    {
+        // Arrange
+        var project = new Project();
+        var a = new ProjectTask { Id = Guid.NewGuid() };
+        var b = new ProjectTask { Id = Guid.NewGuid() };
+        var c = new ProjectTask { Id = Guid.NewGuid() };
+        project.AddTask(a);
+        project.AddTask(b);
+        project.AddTask(c);
+
+        // A -> B -> C -> A
+        b.AddConstraint(new TaskConstraint(a.Id));
+        c.AddConstraint(new TaskConstraint(b.Id));
+        a.AddConstraint(new TaskConstraint(c.Id));
+
+        // Act
+        var result = project.ValidateConstraints();
+
+        // Assert
+        Assert.IsFalse(result.IsValid);
+    }
 }

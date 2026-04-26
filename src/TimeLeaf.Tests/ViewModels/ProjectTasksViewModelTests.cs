@@ -23,6 +23,7 @@ public class ProjectTasksViewModelTests
     private Mock<IDialogService> _dialogServiceMock = null!;
     private Mock<ILogger<ProjectTasksViewModel>> _loggerMock = null!;
     private Mock<ILogger<TaskDetailViewModel>> _detailLoggerMock = null!;
+    private DetectProjectRisksUseCase _detectRisksUseCase = null!;
     private ProjectViewModel _projectViewModel = null!;
 
     [TestInitialize]
@@ -48,6 +49,7 @@ public class ProjectTasksViewModelTests
         _dialogServiceMock = new Mock<IDialogService>();
         _loggerMock = new Mock<ILogger<ProjectTasksViewModel>>();
         _detailLoggerMock = new Mock<ILogger<TaskDetailViewModel>>();
+        _detectRisksUseCase = new DetectProjectRisksUseCase(new CalculateCriticalPathUseCase());
 
         var project = new Project();
         _projectViewModel = new ProjectViewModel(
@@ -78,6 +80,7 @@ public class ProjectTasksViewModelTests
             _getProjectMembersUseCaseMock.Object,
             _viewModelFactoryMock.Object,
             _dialogServiceMock.Object,
+            _detectRisksUseCase,
             _loggerMock.Object,
             _detailLoggerMock.Object
         );

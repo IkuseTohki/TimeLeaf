@@ -9,11 +9,12 @@ namespace TimeLeaf.Repositories.FileSystem.Dtos;
 /// </summary>
 internal record TaskPlanningDto(
     Guid Id,
+    Guid? ParentId,
     string Name,
     TaskPriority Priority,
     DateTime? ScheduledStartDate,
     DateTime? Deadline,
     double EstimatedCost,
     string Assignee,
-    List<Guid> Dependencies
+    List<TaskConstraintDto> Constraints
 );

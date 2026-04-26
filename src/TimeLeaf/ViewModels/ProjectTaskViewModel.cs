@@ -183,7 +183,18 @@ public partial class ProjectTaskViewModel : ObservableObject, IDisposable
     /// <summary>
     /// 担当者の表示名。
     /// </summary>
-    public string AssigneeName => _userService.GetUserName(Assignee);
+    public string AssigneeName
+    {
+        get => _userService.GetUserName(Assignee);
+        set
+        {
+            var userId = _userService.GetUserIdByName(value);
+            if (userId != null)
+            {
+                Assignee = userId;
+            }
+        }
+    }
 
     /// <summary>
     /// タスクが完了状態かどうか。
@@ -239,7 +250,18 @@ public partial class ProjectTaskViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     private bool _isSelected;
 
-    public List<Guid> Dependencies => _projectTask.Dependencies;
+    [ObservableProperty]
+    private double _x;
+
+    [ObservableProperty]
+    private double _y;
+
+    [ObservableProperty]
+    private bool _hasRisk;
+
+    public IReadOnlyList<TaskConstraint> Constraints => _projectTask.Constraints;
+
+    public IReadOnlyList<Guid> Dependencies => _projectTask.Constraints.Select(c => c.PredecessorId).ToList();
 
     /// <summary>
     /// 優先度の全選択肢。
@@ -312,6 +334,8 @@ public partial class ProjectTaskViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(ActualCost));
         OnPropertyChanged(nameof(Assignee));
         OnPropertyChanged(nameof(Dependencies));
+        OnPropertyChanged(nameof(Constraints));
+        OnPropertyChanged(nameof(HasRisk));
         OnPropertyChanged(nameof(Comments));
         OnPropertyChanged(nameof(StatusBrush));
         OnPropertyChanged(nameof(PriorityBrush));

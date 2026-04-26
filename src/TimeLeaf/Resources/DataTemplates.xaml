@@ -404,4 +404,88 @@
         </DataTemplate.Triggers>
     </DataTemplate>
 
+    <!-- ============================================================ -->
+    <!-- Subtractive Design Templates -->
+    <!-- ============================================================ -->
+
+    <!-- 「引き算のデザイン」用タスクアイテム・テンプレート -->
+    <ControlTemplate x:Key="SubtractiveTaskItemTemplate" TargetType="ListBoxItem">
+        <Grid x:Name="RootGrid"
+              Margin="0"
+              Background="Transparent">
+            <!-- 選択時のカード外枠（通常は非表示・マージンなし） -->
+            <Border x:Name="CardBorder"
+                    Margin="0"
+                    Padding="20,12"
+                    Background="Transparent"
+                    BorderBrush="{DynamicResource BorderLightBrush}"
+                    BorderThickness="0,0,0,1"
+                    CornerRadius="0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- リスクインジケーター（ドット） -->
+                    <Ellipse x:Name="RiskDot"
+                             Width="6"
+                             Height="6"
+                             Margin="0,0,12,0"
+                             Fill="{DynamicResource ErrorBrush}"
+                             Visibility="Collapsed" />
+
+                    <!-- タスク名 -->
+                    <StackPanel Grid.Column="1">
+                        <TextBlock x:Name="TaskNameText"
+                                   Style="{StaticResource LabelBaseStyle}"
+                                   Text="{Binding Name}" />
+
+                        <!-- 詳細情報（選択時のみ表示） -->
+                        <StackPanel x:Name="DetailInfo"
+                                    Margin="0,8,0,0"
+                                    Visibility="Collapsed">
+                            <TextBlock FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}">
+                                <Run Text="👤 " />
+                                <Run Text="{Binding AssigneeName, TargetNullValue='未設定'}" />
+                                <Run Text="  📅 " />
+                                <Run Text="{Binding Deadline, StringFormat={}{0:MM/dd}, TargetNullValue='--/--'}" />
+                            </TextBlock>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+        <ControlTemplate.Triggers>
+            <!-- 選択状態：カード化 -->
+            <Trigger Property="IsSelected" Value="True">
+                <Setter TargetName="CardBorder" Property="Margin" Value="12,8" />
+                <Setter TargetName="CardBorder" Property="Padding" Value="20,16" />
+                <Setter TargetName="CardBorder" Property="Background" Value="White" />
+                <Setter TargetName="CardBorder" Property="BorderBrush" Value="{DynamicResource BrandPrimaryBrush}" />
+                <Setter TargetName="CardBorder" Property="BorderThickness" Value="1" />
+                <Setter TargetName="CardBorder" Property="CornerRadius" Value="12" />
+                <Setter TargetName="DetailInfo" Property="Visibility" Value="Visible" />
+                <Setter TargetName="TaskNameText" Property="FontWeight" Value="Bold" />
+                <Setter TargetName="TaskNameText" Property="Foreground" Value="{DynamicResource BrandPrimaryBrush}" />
+                <Setter TargetName="CardBorder" Property="Effect">
+                    <Setter.Value>
+                        <DropShadowEffect BlurRadius="15"
+                                          Direction="-90"
+                                          Opacity="0.1"
+                                          ShadowDepth="5" />
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+            <!-- マウスホバー -->
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="RootGrid" Property="Background" Value="{DynamicResource StateHoverBrush}" />
+            </Trigger>
+            <!-- リスクがある場合 -->
+            <DataTrigger Binding="{Binding HasRisk}" Value="True">
+                <Setter TargetName="RiskDot" Property="Visibility" Value="Visible" />
+            </DataTrigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
 </ResourceDictionary>

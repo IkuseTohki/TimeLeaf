@@ -195,7 +195,7 @@ public class FolderProjectRepositoryTests
         var mainTask = new ProjectTask();
         mainTask.UpdateName("MainTask");
         mainTask.AssignTo("user123");
-        mainTask.Dependencies.Add(depTaskId);
+        mainTask.AddConstraint(new TaskConstraint(depTaskId));
         project.AddTask(mainTask);
 
         // Act
@@ -207,9 +207,12 @@ public class FolderProjectRepositoryTests
         var loadedTask = loadedProject.Tasks.FirstOrDefault(t => t.Id == mainTask.Id);
         Assert.IsNotNull(loadedTask, "保存されたタスクがロードされること");
         Assert.AreEqual("user123", loadedTask.Assignee, "Assignee が正しく復元されること");
-        Assert.IsNotNull(loadedTask.Dependencies);
-        Assert.AreEqual(1, loadedTask.Dependencies.Count, "Dependencies の要素数が正しいこと");
-        Assert.AreEqual(depTaskId, loadedTask.Dependencies[0], "Dependencies の内容が正しいこと");
+        Assert.IsNotNull(loadedTask.Constraints);
+        Assert.AreEqual(1, loadedTask.Constraints.Count, "Constraints の要素数が正しいこと");
+        Assert.AreEqual(depTaskId, loadedTask.Constraints[0].PredecessorId, "Constraints の内容が正しいこと");
+#pragma warning disable CS0618
+        Assert.AreEqual(depTaskId, loadedTask.Dependencies[0], "Obsolete な Dependencies も正しく算出されること");
+#pragma warning restore CS0618
     }
 
     /// <summary>
@@ -337,5 +340,42 @@ public class FolderProjectRepositoryTests
         Assert.AreEqual(2, loadedProject.AssignedUserIds.Count, "アサインされたユーザー数が一致すること");
         Assert.IsTrue(loadedProject.AssignedUserIds.Contains(user1), "ユーザー1が含まれていること");
         Assert.IsTrue(loadedProject.AssignedUserIds.Contains(user2), "ユーザー2が含まれていること");
+    }
+
+    /// <summary>
+    /// テスト観点: タスクの親子関係（コンテナ構造）が正しく保存・復元されることを確認する。
+    /// </summary>
+    [TestMethod]
+    public async System.Threading.Tasks.Task SaveAndLoad_ShouldPreserveHierarchy()
+    {
+        // Arrange
+        var repository = CreateRepository();
+        var projectId = Guid.NewGuid();
+        var project = new Project { Id = projectId };
+        project.UpdateName("HierarchyTest");
+
+        var parentTask = new ProjectTask();
+        parentTask.UpdateName("Parent");
+        var childTask = new ProjectTask();
+        childTask.UpdateName("Child");
+
+        parentTask.AddChild(childTask);
+        project.AddTask(parentTask);
+        project.AddTask(childTask);
+
+        // Act
+        await repository.SaveAsync(project, _testUserId.ToString());
+        var loadedProject = await repository.LoadAsync(projectId);
+
+        // Assert
+        Assert.IsNotNull(loadedProject);
+        var loadedParent = loadedProject.Tasks.FirstOrDefault(t => t.Id == parentTask.Id);
+        var loadedChild = loadedProject.Tasks.FirstOrDefault(t => t.Id == childTask.Id);
+
+        Assert.IsNotNull(loadedParent);
+        Assert.IsNotNull(loadedChild);
+        Assert.AreEqual(parentTask.Id, loadedChild.ParentId, "子タスクの ParentId が復元されること");
+        Assert.AreEqual(1, loadedParent.Children.Count, "親タスクの子リストが復元されること");
+        Assert.AreEqual(childTask.Id, loadedParent.Children[0].Id, "正しい子が紐付いていること");
     }
 }

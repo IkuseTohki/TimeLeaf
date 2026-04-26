@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Linq;
 using System.Threading.Tasks;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Repositories;
@@ -69,6 +70,12 @@ public class UserService : IUserService, IDisposable
         }
 
         return "Unknown";
+    }
+
+    public string? GetUserIdByName(string name)
+    {
+        var user = _cache.Values.FirstOrDefault(u => u.DisplayName == name);
+        return user?.Id.ToString();
     }
 
     public void UpdateCache(User user)

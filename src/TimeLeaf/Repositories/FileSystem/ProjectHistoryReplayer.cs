@@ -50,6 +50,7 @@ internal class ProjectHistoryReplayer
         }
 
         AttachComments(taskMap, allCommentData);
+        ResolveHierarchy(taskMap);
 
         if (files.Any())
         {
@@ -57,6 +58,21 @@ internal class ProjectHistoryReplayer
         }
 
         return project;
+    }
+
+    private void ResolveHierarchy(Dictionary<Guid, ProjectTask> taskMap)
+    {
+        foreach (var task in taskMap.Values.ToList())
+        {
+            if (task.ParentId.HasValue && taskMap.TryGetValue(task.ParentId.Value, out var parent))
+            {
+                // すでに親の子リストに含まれていない場合のみ追加
+                if (!parent.Children.Any(c => c.Id == task.Id))
+                {
+                    parent.AddChild(task);
+                }
+            }
+        }
     }
 
     private List<(string Path, CommitFileName Meta, Guid EntityId)> ScanChangeFiles(string changesDir, Guid projectId)
@@ -159,14 +175,23 @@ internal class ProjectHistoryReplayer
         if (dto == null)
             return;
         var task = GetOrCreateTask(project, taskMap, dto.Id);
+        task.SetParentId(dto.ParentId);
         task.UpdateName(dto.Name);
         task.UpdatePriority(dto.Priority);
         task.UpdateSchedule(dto.ScheduledStartDate, dto.Deadline);
         task.UpdateEstimatedCost(dto.EstimatedCost);
         task.AssignTo(dto.Assignee);
-        task.Dependencies.Clear();
-        if (dto.Dependencies != null)
-            task.Dependencies.AddRange(dto.Dependencies);
+
+        if (dto.Constraints != null)
+        {
+            var constraints = dto.Constraints.Select(c => new TaskConstraint(
+                c.PredecessorId,
+                c.Type,
+                c.LagDays,
+                c.Description
+            ));
+            task.LoadConstraints(constraints);
+        }
     }
 
     private void ApplyTaskProgress(Project project, Dictionary<Guid, ProjectTask> taskMap, string json)
