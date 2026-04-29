@@ -22,7 +22,11 @@
 
                 <!-- App Specific Resources -->
                 <ResourceDictionary Source="Resources/Converters.xaml" />
+                <ResourceDictionary Source="Resources/Layout.xaml" />
+                <ResourceDictionary Source="Resources/Typography.xaml" />
                 <ResourceDictionary Source="Resources/Styles.xaml" />
+                <ResourceDictionary Source="Resources/ControlStyles.xaml" />
+                <ResourceDictionary Source="Resources/WorkspaceStyles.xaml" />
                 <ResourceDictionary Source="Resources/DataTemplates.xaml" />
             </ResourceDictionary.MergedDictionaries>
 

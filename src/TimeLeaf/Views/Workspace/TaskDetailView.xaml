@@ -40,8 +40,7 @@
                 <!-- 1. タスクタイトル -->
                 <c:EditableLabel Grid.Row="0"
                                  Margin="4,0,0,16"
-                                 FontSize="20"
-                                 FontWeight="ExtraBold"
+                                 Style="{StaticResource TitleBaseStyle}"
                                  Text="{Binding Task.Name, UpdateSourceTrigger=PropertyChanged}" />
 
                 <!-- 2. ROOTS (詳細説明) -->
@@ -77,22 +76,21 @@
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
                                         <Border Background="{Binding AuthorColor}" Style="{StaticResource TaskCommentAvatarStyle}">
-                                            <TextBlock FontSize="9"
-                                                       Style="{StaticResource UserAvatarInitialStyle}"
+                                            <TextBlock Foreground="White"
+                                                       Style="{StaticResource MetaBaseStyle}"
                                                        Text="KT" />
                                         </Border>
                                         <StackPanel Grid.Column="1" Margin="8,0,0,0">
                                             <Grid Margin="0,0,0,2">
                                                 <TextBlock Style="{StaticResource TaskCommentAuthorStyle}" Text="{Binding AuthorName}" />
                                                 <TextBlock HorizontalAlignment="Right"
-                                                           FontSize="9"
                                                            Style="{StaticResource TaskPanelMetaLabelStyle}"
                                                            Text="{Binding CreatedAt, StringFormat={}{0:MM/dd HH:mm}}" />
                                             </Grid>
                                             <Border Style="{StaticResource TaskCommentContentStyle}">
-                                                <TextBlock FontSize="11"
-                                                           Foreground="{DynamicResource TextPrimaryBrush}"
+                                                <TextBlock Foreground="{DynamicResource TextPrimaryBrush}"
                                                            LineHeight="15"
+                                                           Style="{StaticResource MetaBaseStyle}"
                                                            Text="{Binding Content}"
                                                            TextWrapping="Wrap" />
                                             </Border>

@@ -17,5 +17,6 @@
     <tlcv:InverseBooleanConverter x:Key="InverseBooleanConverter" />
     <lk:EqualityToBooleanConverter x:Key="EqualityToBooleanConverter" />
     <lk:ComparisonConverter x:Key="ComparisonConverter" />
+    <lk:StringFormatMultiConverter x:Key="StringFormatMultiConverter" />
 
 </ResourceDictionary>

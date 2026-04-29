@@ -62,7 +62,7 @@
                             <!-- メインメニュー -->
                             <Button Command="{Binding NavigateToHomeCommand}" Style="{DynamicResource SidebarButtonStyle}">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontSize="18" Text="🏠" />
+                                    <TextBlock Style="{StaticResource SidebarIconTextStyle}" Text="🏠" />
                                     <TextBlock Margin="12,0,0,0"
                                                VerticalAlignment="Center"
                                                Text="Home"
@@ -71,7 +71,7 @@
                             </Button>
                             <Button Command="{Binding NavigateToAllTasksCommand}" Style="{DynamicResource SidebarButtonStyle}">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontSize="18" Text="📋" />
+                                    <TextBlock Style="{StaticResource SidebarIconTextStyle}" Text="📋" />
                                     <TextBlock Margin="12,0,0,0"
                                                VerticalAlignment="Center"
                                                Text="All Tasks"
@@ -81,7 +81,7 @@
                             <Button Command="{Binding NavigateToNotificationsCommand}" Style="{DynamicResource SidebarButtonStyle}">
                                 <Grid>
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock FontSize="18" Text="🔔" />
+                                        <TextBlock Style="{StaticResource SidebarIconTextStyle}" Text="🔔" />
                                         <TextBlock Margin="12,0,0,0"
                                                    VerticalAlignment="Center"
                                                    Text="Notifications"
@@ -94,9 +94,9 @@
                                             Visibility="{Binding UnreadNotificationCount, Converter={StaticResource IntToVisibilityConverter}}">
                                         <TextBlock HorizontalAlignment="Center"
                                                    VerticalAlignment="Center"
-                                                   FontSize="10"
                                                    FontWeight="Bold"
                                                    Foreground="White"
+                                                   Style="{StaticResource MetaBaseStyle}"
                                                    Text="{Binding UnreadNotificationCount}" />
                                     </Border>
                                 </Grid>
@@ -128,7 +128,7 @@
                                                 CommandParameter="{Binding}"
                                                 Style="{DynamicResource SidebarButtonStyle}">
                                             <StackPanel Orientation="Horizontal">
-                                                <TextBlock FontSize="18" Text="🌲" />
+                                                <TextBlock Style="{StaticResource SidebarIconTextStyle}" Text="🌲" />
                                                 <TextBlock Margin="12,0,0,0"
                                                            VerticalAlignment="Center"
                                                            Text="{Binding Name}"

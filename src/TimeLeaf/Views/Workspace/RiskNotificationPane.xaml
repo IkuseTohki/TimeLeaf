@@ -21,14 +21,14 @@
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock x:Name="IconText"
                                                Margin="0,0,8,0"
-                                               FontSize="12" />
+                                               Style="{StaticResource LabelBaseStyle}" />
                                     <TextBlock x:Name="HeaderText"
-                                               FontSize="11"
-                                               FontWeight="Bold" />
+                                               FontWeight="Bold"
+                                               Style="{StaticResource LabelBaseStyle}" />
                                 </StackPanel>
                                 <TextBlock Margin="0,4,0,0"
-                                           FontSize="12"
                                            Foreground="{DynamicResource TextPrimaryBrush}"
+                                           Style="{StaticResource LabelBaseStyle}"
                                            Text="{Binding Message}"
                                            TextWrapping="Wrap" />
                             </StackPanel>

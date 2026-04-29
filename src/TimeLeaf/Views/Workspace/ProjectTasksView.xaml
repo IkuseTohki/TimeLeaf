@@ -1,4 +1,4 @@
-<UserControl x:Class="TimeLeaf.Views.Workspace.ProjectTasksView"
+﻿<UserControl x:Class="TimeLeaf.Views.Workspace.ProjectTasksView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -19,158 +19,48 @@
         </Grid.ColumnDefinitions>
 
         <!-- 左側：コンテナ・タスクリスト -->
-        <ScrollViewer Grid.Column="0"
-                      Style="{DynamicResource WorkspaceScrollContainerStyle}"
-                      VerticalScrollBarVisibility="Auto">
+        <ScrollViewer Grid.Column="0" Style="{DynamicResource WorkspaceScrollContainerStyle}">
             <StackPanel Margin="20">
                 <ItemsControl ItemsSource="{Binding TaskContainers}">
                     <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Border x:Name="ContainerBorder"
-                                    Margin="0,0,0,20"
-                                    Background="{DynamicResource SurfaceBaseBrush}"
-                                    CornerRadius="12"
-                                    Effect="{DynamicResource AllTasksShadowEffect}">
+                        <DataTemplate DataType="{x:Type wvm:TaskContainerViewModel}">
+                            <Border x:Name="ContainerBorder" Style="{StaticResource TaskContainerCardStyle}">
                                 <Grid>
                                     <StackPanel>
                                         <!-- Container Header -->
-                                        <Border Padding="16,12"
-                                                BorderBrush="{DynamicResource OutlineBaseBrush}"
-                                                BorderThickness="0,0,0,1">
+                                        <Border Style="{StaticResource TaskContainerHeaderStyle}">
                                             <Grid>
                                                 <StackPanel Orientation="Horizontal">
                                                     <TextBlock VerticalAlignment="Center"
-                                                               FontSize="14"
+                                                               Style="{StaticResource MetaBaseStyle}"
                                                                Text="📂 " />
-                                                    <TextBlock VerticalAlignment="Center"
-                                                               Style="{DynamicResource TaskGroupTitleStyle}"
-                                                               Text="{Binding DisplayName}" />
+                                                    <TextBlock Style="{DynamicResource TaskGroupTitleStyle}" Text="{Binding DisplayName}" />
                                                 </StackPanel>
                                                 <StackPanel HorizontalAlignment="Right"
                                                             VerticalAlignment="Center"
                                                             Orientation="Horizontal">
-                                                    <TextBlock Style="{DynamicResource MetaBaseStyle}">
-                                                        <Run Text="{Binding DoneTasksCount, Mode=OneWay}" />
-                                                        <Run Text="/" />
-                                                        <Run Text="{Binding TotalTasksCount, Mode=OneWay}" />
-                                                        <Run Text=" Done" />
+                                                    <TextBlock Style="{StaticResource MetaBaseStyle}">
+                                                        <TextBlock.Text>
+                                                            <MultiBinding Converter="{StaticResource StringFormatMultiConverter}" StringFormat="{}{0}/{1} Done">
+                                                                <Binding Path="DoneTasksCount" />
+                                                                <Binding Path="TotalTasksCount" />
+                                                            </MultiBinding>
+                                                        </TextBlock.Text>
                                                     </TextBlock>
                                                 </StackPanel>
                                             </Grid>
                                         </Border>
 
                                         <!-- Sub Task List -->
-                                        <ListBox Background="Transparent"
-                                                 BorderThickness="0"
+                                        <ListBox ItemContainerStyle="{StaticResource TaskSubTaskItemContainerStyle}"
                                                  ItemsSource="{Binding SubTasks}"
-                                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                                            <ListBox.ItemContainerStyle>
-                                                <Style TargetType="ListBoxItem">
-                                                    <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
-                                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                                                    <Setter Property="Padding" Value="0" />
-                                                    <Setter Property="Background" Value="Transparent" />
-                                                    <Setter Property="BorderThickness" Value="0" />
-                                                    <Setter Property="Template">
-                                                        <Setter.Value>
-                                                            <ControlTemplate TargetType="ListBoxItem">
-                                                                <Grid x:Name="RootGrid" Background="{TemplateBinding Background}">
-                                                                    <i:Interaction.Triggers>
-                                                                        <i:EventTrigger EventName="MouseDoubleClick">
-                                                                            <i:InvokeCommandAction Command="{Binding DataContext.OpenTaskDetailWindowCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" />
-                                                                        </i:EventTrigger>
-                                                                    </i:Interaction.Triggers>
-
-                                                                    <Border x:Name="TaskBorder"
-                                                                            Padding="20,12"
-                                                                            BorderBrush="#F1F5F9"
-                                                                            BorderThickness="0,0,0,1">
-                                                                        <StackPanel>
-                                                                            <TextBlock x:Name="TaskNameText"
-                                                                                       FontSize="12"
-                                                                                       Foreground="{DynamicResource TextPrimaryBrush}"
-                                                                                       Text="{Binding Name}" />
-                                                                            <StackPanel x:Name="InfoPanel"
-                                                                                        Margin="0,4,0,0"
-                                                                                        Orientation="Horizontal"
-                                                                                        Visibility="Collapsed">
-                                                                                <TextBlock Style="{DynamicResource MetaBaseStyle}">
-                                                                                    <Run Text="担当: " />
-                                                                                    <Run Text="{Binding AssigneeName}" />
-                                                                                    <Run Text=" | 期限: " />
-                                                                                    <Run Text="{Binding Deadline, StringFormat=MM/dd}" />
-                                                                                </TextBlock>
-                                                                            </StackPanel>
-                                                                        </StackPanel>
-                                                                    </Border>
-                                                                </Grid>
-                                                                <ControlTemplate.Triggers>
-                                                                    <Trigger Property="IsMouseOver" Value="True">
-                                                                        <Setter TargetName="RootGrid" Property="Background" Value="#F8FAFC" />
-                                                                    </Trigger>
-                                                                    <Trigger Property="IsSelected" Value="True">
-                                                                        <Setter TargetName="TaskBorder" Property="Background" Value="White" />
-                                                                        <Setter TargetName="TaskBorder" Property="Margin" Value="12,8" />
-                                                                        <Setter TargetName="TaskBorder" Property="Padding" Value="16" />
-                                                                        <Setter TargetName="TaskBorder" Property="CornerRadius" Value="8" />
-                                                                        <Setter TargetName="TaskBorder" Property="BorderBrush" Value="{DynamicResource BrandPrimaryBrush}" />
-                                                                        <Setter TargetName="TaskBorder" Property="BorderThickness" Value="1" />
-                                                                        <Setter TargetName="TaskNameText" Property="FontWeight" Value="Bold" />
-                                                                        <Setter TargetName="TaskNameText" Property="Foreground" Value="{DynamicResource BrandPrimaryBrush}" />
-                                                                        <Setter TargetName="InfoPanel" Property="Visibility" Value="Visible" />
-                                                                        <Setter TargetName="RootGrid" Property="Background" Value="Transparent" />
-                                                                        <Setter Property="Effect">
-                                                                            <Setter.Value>
-                                                                                <DropShadowEffect BlurRadius="6"
-                                                                                                  Opacity="0.1"
-                                                                                                  ShadowDepth="2"
-                                                                                                  Color="{Binding Source={StaticResource BrandPrimaryColor}}" />
-                                                                            </Setter.Value>
-                                                                        </Setter>
-                                                                    </Trigger>
-                                                                </ControlTemplate.Triggers>
-                                                            </ControlTemplate>
-                                                        </Setter.Value>
-                                                    </Setter>
-                                                </Style>
-                                            </ListBox.ItemContainerStyle>
-                                        </ListBox>
+                                                 Style="{StaticResource TaskSubTaskListStyle}" />
 
                                         <!-- Add Task Area (Hover-only via DataTemplate Triggers) -->
                                         <Button x:Name="AddTaskBtn"
-                                                Height="2"
-                                                HorizontalContentAlignment="Center"
-                                                VerticalContentAlignment="Center"
-                                                Background="Transparent"
-                                                BorderThickness="0"
                                                 Command="{Binding AddTaskCommand}"
                                                 CommandParameter="{Binding}"
-                                                Cursor="Hand"
-                                                Opacity="0">
-                                            <Button.Template>
-                                                <ControlTemplate TargetType="Button">
-                                                    <Border x:Name="BtnBorder" Background="{TemplateBinding Background}">
-                                                        <TextBlock x:Name="AddIcon"
-                                                                   HorizontalAlignment="Center"
-                                                                   VerticalAlignment="Center"
-                                                                   FontSize="16"
-                                                                   Foreground="{DynamicResource BrandPrimaryBrush}"
-                                                                   RenderTransformOrigin="0.5,0.5"
-                                                                   Text="＋" />
-                                                    </Border>
-                                                    <ControlTemplate.Triggers>
-                                                        <Trigger Property="IsMouseOver" Value="True">
-                                                            <Setter Property="Opacity" Value="1.0" />
-                                                            <Setter TargetName="AddIcon" Property="RenderTransform">
-                                                                <Setter.Value>
-                                                                    <ScaleTransform ScaleX="1.2" ScaleY="1.2" />
-                                                                </Setter.Value>
-                                                            </Setter>
-                                                        </Trigger>
-                                                    </ControlTemplate.Triggers>
-                                                </ControlTemplate>
-                                            </Button.Template>
-                                        </Button>
+                                                Style="{StaticResource AddTaskButtonStyle}" />
                                     </StackPanel>
                                 </Grid>
                             </Border>
@@ -186,38 +76,7 @@
                 </ItemsControl>
 
                 <!-- Ghost Container (Add Group) -->
-                <Button Margin="0,10,0,20"
-                        Background="Transparent"
-                        BorderThickness="0"
-                        Command="{Binding AddProjectCommand}">
-                    <Button.Template>
-                        <ControlTemplate TargetType="Button">
-                            <Grid>
-                                <Rectangle x:Name="Root"
-                                           Fill="Transparent"
-                                           RadiusX="12"
-                                           RadiusY="12"
-                                           SnapsToDevicePixels="True"
-                                           Stroke="#CBD5E1"
-                                           StrokeDashArray="4 2"
-                                           StrokeThickness="2" />
-                                <TextBlock x:Name="AddText"
-                                           Margin="20"
-                                           HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"
-                                           Foreground="{DynamicResource TextSecondaryBrush}"
-                                           Text="+ 新規グループを作成" />
-                            </Grid>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="Root" Property="Stroke" Value="{DynamicResource BrandPrimaryBrush}" />
-                                    <Setter TargetName="Root" Property="Fill" Value="#052D5A27" />
-                                    <Setter TargetName="AddText" Property="Foreground" Value="{DynamicResource BrandPrimaryBrush}" />
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Button.Template>
-                </Button>
+                <Button Command="{Binding AddProjectCommand}" Style="{StaticResource AddGroupButtonStyle}" />
             </StackPanel>
         </ScrollViewer>
 

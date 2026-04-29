@@ -14,8 +14,7 @@
 
         <StackPanel Margin="0,0,8,0">
             <TextBlock Margin="0,0,0,4"
-                       FontSize="11"
-                       Foreground="#999"
+                       Style="{StaticResource MetaBaseStyle}"
                        Text="見積 (h)" />
             <TextBox IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType=UserControl}}"
                      Style="{StaticResource OrganicTextBoxStyle}"
@@ -24,8 +23,7 @@
 
         <StackPanel Grid.Column="1" Margin="8,0,0,0">
             <TextBlock Margin="0,0,0,4"
-                       FontSize="11"
-                       Foreground="#999"
+                       Style="{StaticResource MetaBaseStyle}"
                        Text="実績 (h)" />
             <TextBox Style="{StaticResource OrganicTextBoxStyle}" Text="{Binding ActualCost, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" />
         </StackPanel>

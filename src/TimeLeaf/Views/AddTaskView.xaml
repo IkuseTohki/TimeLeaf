@@ -64,8 +64,8 @@
                 <TextBlock Grid.Column="1"
                            Margin="6,0"
                            VerticalAlignment="Center"
-                           FontSize="12"
                            Foreground="{DynamicResource TextPrimaryBrush}"
+                           Style="{StaticResource LabelBaseStyle}"
                            Text="{Binding DisplayName}" />
             </Grid>
         </DataTemplate>

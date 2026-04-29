@@ -19,11 +19,10 @@
         </Border.Effect>
         <StackPanel Orientation="Horizontal">
             <TextBlock Margin="0,0,8,0"
-                       FontSize="14"
+                       Style="{StaticResource LabelBaseStyle}"
                        Text="{Binding WeatherIcon}" />
             <TextBlock VerticalAlignment="Center"
-                       FontSize="11"
-                       Foreground="{DynamicResource TextSecondaryBrush}"
+                       Style="{StaticResource MetaBaseStyle}"
                        Text="{Binding WeatherMessage}" />
         </StackPanel>
     </Border>

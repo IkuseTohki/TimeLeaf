@@ -82,7 +82,20 @@ TimeLeafは、ネットワークが制限された環境下でのデータ同期
 タスクの状態やスケジュールなど、一意の「現在の値」を持つデータに適用される。
 
 - **単位**: 関連するプロパティ群（基本情報、進捗、スケジュール等）を1つのファイル（カテゴリ）にまとめる。
+- **Task_Planning.json の構造**:
+  - `TaskName` (String)
+  - `Priority` (Enum)
+  - `ScheduledStartDate` (DateTime)
+  - `DueDate` (DateTime)
+  - `EstimatedCost` (Double)
+  - `AssigneeId` (Guid)
+  - **`Constraints`** (Array): このタスクが依存する先行タスクのリスト。
+    - `PredecessorId` (Guid): 先行タスクのID。
+    - `Type` (String): 制約型（FS, SS, FF, SF）。
+    - `LagDays` (Int): 猶予期間（日）。
+    - `Description` (String): 制約の理由・メモ。
 - **動作**: 変更が発生した際、そのカテゴリに属する**すべての最新の値**を新しいファイルとして書き出す。
+- **保存の方向性**: データの整合性を保つため、常に「後続タスク（Successor）」のファイル内に「先行タスク（Predecessor）」への参照を保持する。
 - **復元**: `changes/` 内のファイルを日時順に走査し、最新の値をメモリ上のエンティティに上書き（Replay）する。
 
 ### 5.2. インクリメンタル・レコード（蓄積型）

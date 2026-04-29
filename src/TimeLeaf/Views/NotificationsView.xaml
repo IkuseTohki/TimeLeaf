@@ -89,8 +89,8 @@
             <StackPanel HorizontalAlignment="Center">
                 <TextBlock Style="{StaticResource NotificationEmptyIconStyle}" Text="🍂" />
                 <TextBlock HorizontalAlignment="Center"
-                           FontSize="16"
                            Foreground="{DynamicResource TextSecondaryBrush}"
+                           Style="{StaticResource LabelBaseStyle}"
                            Text="未読の通知はありません" />
             </StackPanel>
         </Border>

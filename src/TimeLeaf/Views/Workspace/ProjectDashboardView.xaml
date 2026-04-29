@@ -37,8 +37,11 @@
                     <StackPanel>
                         <TextBlock Style="{StaticResource StatsLabelStyle}" Text="進捗率" />
                         <TextBlock Style="{StaticResource StatsValueStyle}">
-                            <Run Text="{Binding CompletionPercentage, Mode=OneWay, StringFormat={}{0:F0}}" />
-                            <Run FontSize="12" Text="%" />
+                            <TextBlock.Text>
+                                <MultiBinding Converter="{StaticResource StringFormatMultiConverter}" StringFormat="{}{0:F0}%">
+                                    <Binding Mode="OneWay" Path="CompletionPercentage" />
+                                </MultiBinding>
+                            </TextBlock.Text>
                         </TextBlock>
                     </StackPanel>
                 </Border>
@@ -46,8 +49,11 @@
                     <StackPanel>
                         <TextBlock Style="{StaticResource StatsLabelStyle}" Text="実績工数" />
                         <TextBlock Style="{StaticResource StatsValueStyle}">
-                            <Run Text="{Binding TotalActualCost, Mode=OneWay, StringFormat={}{0:F1}}" />
-                            <Run FontSize="10" Text="h" />
+                            <TextBlock.Text>
+                                <MultiBinding Converter="{StaticResource StringFormatMultiConverter}" StringFormat="{}{0:F1}h">
+                                    <Binding Mode="OneWay" Path="TotalActualCost" />
+                                </MultiBinding>
+                            </TextBlock.Text>
                         </TextBlock>
                     </StackPanel>
                 </Border>

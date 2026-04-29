@@ -35,13 +35,13 @@
                                   ShadowDepth="2" />
             </Border.Effect>
             <StackPanel>
-                <TextBlock FontSize="12"
-                           FontWeight="Bold"
+                <TextBlock FontWeight="Bold"
+                           Style="{StaticResource LabelBaseStyle}"
                            Text="{Binding Name}"
                            TextTrimming="CharacterEllipsis" />
                 <TextBlock Margin="0,4,0,0"
-                           FontSize="10"
                            Foreground="{DynamicResource TextSecondaryBrush}"
+                           Style="{StaticResource MetaBaseStyle}"
                            Text="{Binding Status}" />
             </StackPanel>
         </Border>
