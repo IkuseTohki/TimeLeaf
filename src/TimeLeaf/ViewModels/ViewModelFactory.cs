@@ -112,6 +112,7 @@ public class ViewModelFactory : IViewModelFactory
             this,
             _serviceProvider.GetRequiredService<IDialogService>(),
             _serviceProvider.GetRequiredService<DetectProjectRisksUseCase>(),
+            _serviceProvider.GetRequiredService<CalculateFlowLayoutUseCase>(),
             _serviceProvider.GetRequiredService<ILogger<ProjectTasksViewModel>>(),
             _serviceProvider.GetRequiredService<ILogger<TaskDetailViewModel>>()
         );
@@ -120,6 +121,15 @@ public class ViewModelFactory : IViewModelFactory
     public ProjectTimelineViewModel CreateProjectTimelineViewModel(ProjectViewModel projectViewModel)
     {
         return new ProjectTimelineViewModel(projectViewModel);
+    }
+
+    public ProjectFlowViewModel CreateProjectFlowViewModel(ProjectViewModel projectViewModel)
+    {
+        return new ProjectFlowViewModel(
+            projectViewModel,
+            _serviceProvider.GetRequiredService<CalculateFlowLayoutUseCase>(),
+            _userService
+        );
     }
 
     public ProjectSettingsViewModel CreateProjectSettingsViewModel(ProjectViewModel projectViewModel)
@@ -144,14 +154,6 @@ public class ViewModelFactory : IViewModelFactory
             _serviceProvider.GetRequiredService<ILogger<NotificationsViewModel>>(),
             projectIdFilter
         );
-    }
-
-    public TaskSummaryViewModel CreateTaskSummaryViewModel(
-        ProjectViewModel projectViewModel,
-        ProjectTaskViewModel taskViewModel
-    )
-    {
-        return new TaskSummaryViewModel(projectViewModel, taskViewModel);
     }
 
     public TaskDetailViewModel CreateTaskDetailViewModel(

@@ -23,6 +23,7 @@ public class AddTaskUseCase : IAddTaskUseCase
         string description,
         TimeLeaf.Models.Enums.TaskStatus status,
         TaskPriority priority,
+        Guid? parentId,
         DateTime? scheduledStartDate,
         DateTime? deadline,
         DateTime? actualStartDate,
@@ -37,6 +38,7 @@ public class AddTaskUseCase : IAddTaskUseCase
         task.UpdateDescription(description);
         task.UpdateStatus(status);
         task.UpdatePriority(priority);
+        task.SetParentId(parentId);
         task.UpdateSchedule(scheduledStartDate, deadline);
         task.UpdateActualDates(actualStartDate, actualEndDate);
         task.UpdateEstimatedCost(estimatedCost);

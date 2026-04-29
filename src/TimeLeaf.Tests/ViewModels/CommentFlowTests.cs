@@ -192,6 +192,7 @@ public class CommentFlowTests
             new Mock<IViewModelFactory>().Object,
             new Mock<IDialogService>().Object,
             new DetectProjectRisksUseCase(new CalculateCriticalPathUseCase()),
+            new CalculateFlowLayoutUseCase(),
             new Mock<ILogger<ProjectTasksViewModel>>().Object,
             new Mock<ILogger<TaskDetailViewModel>>().Object
         );

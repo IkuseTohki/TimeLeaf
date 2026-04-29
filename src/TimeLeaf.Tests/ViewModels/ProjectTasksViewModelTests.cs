@@ -81,6 +81,7 @@ public class ProjectTasksViewModelTests
             _viewModelFactoryMock.Object,
             _dialogServiceMock.Object,
             _detectRisksUseCase,
+            new CalculateFlowLayoutUseCase(),
             _loggerMock.Object,
             _detailLoggerMock.Object
         );

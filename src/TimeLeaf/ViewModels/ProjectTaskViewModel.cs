@@ -30,6 +30,8 @@ public partial class ProjectTaskViewModel : ObservableObject, IDisposable
 
     public Guid Id => _projectTask.Id;
 
+    public Guid? ParentId => _projectTask.ParentId;
+
     public string Name
     {
         get => _projectTask.Name;

@@ -8,6 +8,7 @@
     <Color x:Key="WarningColor">#FFAB40</Color>
 
     <SolidColorBrush x:Key="BrandForegroundBrush" Color="White" />
+    <SolidColorBrush x:Key="WorkspaceBackgroundBrush" Color="#1E293B" />
     <SolidColorBrush x:Key="ErrorBrush" Color="{StaticResource ErrorColor}" />
     <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource WarningColor}" />
 

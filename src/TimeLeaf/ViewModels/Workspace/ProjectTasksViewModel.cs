@@ -25,6 +25,7 @@ public partial class ProjectTasksViewModel : ObservableObject
     private readonly ILogger<ProjectTasksViewModel> _logger;
     private readonly ILogger<TaskDetailViewModel> _detailLogger;
     private readonly DetectProjectRisksUseCase _detectRisksUseCase;
+    private readonly CalculateFlowLayoutUseCase _layoutUseCase;
 
     /// <summary>
     /// タスク詳細の表示がリクエストされたときに発生するイベント。
@@ -35,9 +36,6 @@ public partial class ProjectTasksViewModel : ObservableObject
 
     [ObservableProperty]
     private ProjectTaskViewModel? _selectedTask;
-
-    [ObservableProperty]
-    private TaskSummaryViewModel? _taskSummaryViewModel;
 
     [ObservableProperty]
     private bool _isDetailVisible;
@@ -54,6 +52,8 @@ public partial class ProjectTasksViewModel : ObservableObject
     [ObservableProperty]
     private ObservableCollection<TaskEdgeViewModel> _edges = new();
 
+    public ObservableCollection<TaskContainerViewModel> TaskContainers { get; } = new();
+
     public ProjectTasksViewModel(
         ProjectViewModel projectViewModel,
         IAddTaskUseCase addTaskUseCase,
@@ -61,6 +61,7 @@ public partial class ProjectTasksViewModel : ObservableObject
         IViewModelFactory viewModelFactory,
         LeafKit.UI.Services.IDialogService dialogService,
         DetectProjectRisksUseCase detectRisksUseCase,
+        CalculateFlowLayoutUseCase layoutUseCase,
         ILogger<ProjectTasksViewModel> logger,
         ILogger<TaskDetailViewModel> detailLogger
     )
@@ -71,27 +72,71 @@ public partial class ProjectTasksViewModel : ObservableObject
         _viewModelFactory = viewModelFactory;
         _dialogService = dialogService;
         _detectRisksUseCase = detectRisksUseCase;
+        _layoutUseCase = layoutUseCase;
         _logger = logger;
         _detailLogger = detailLogger;
+
+        InitializeNodePositions();
+        SyncEdges();
+        RebuildContainers();
+    }
+
+    private void RebuildContainers()
+    {
+        TaskContainers.Clear();
+        var allTasks = Tasks.ToList();
+
+        // 1. 親タスク（コンテナ）となるタスクを抽出
+        var parentIds = allTasks
+            .Select(t => t.ParentId)
+            .Where(id => id.HasValue)
+            .Select(id => id!.Value)
+            .Distinct()
+            .ToHashSet();
+        var parents = allTasks.Where(t => parentIds.Contains(t.Id) || t.Model.Children.Any()).ToList();
+
+        // 2. コンテナ作成
+        foreach (var parent in parents)
+        {
+            var children = allTasks.Where(t => t.ParentId == parent.Id).ToList();
+            if (children.Any() || allTasks.Contains(parent))
+            {
+                TaskContainers.Add(
+                    new TaskContainerViewModel(
+                        parent,
+                        new ObservableCollection<ProjectTaskViewModel>(children),
+                        AddTaskToContainerCommand
+                    )
+                );
+            }
+        }
+
+        // 3. 未分類タスク
+        var unclassified = allTasks
+            .Where(t => !t.ParentId.HasValue && !parentIds.Contains(t.Id) && !t.Model.Children.Any())
+            .ToList();
+        if (unclassified.Any())
+        {
+            TaskContainers.Add(
+                new TaskContainerViewModel(
+                    null,
+                    new ObservableCollection<ProjectTaskViewModel>(unclassified),
+                    AddTaskToContainerCommand
+                )
+            );
+        }
     }
 
     private void InitializeNodePositions()
     {
-        // 簡易的な初期配置ロジック（グリッド状）
-        double startX = 50;
-        double startY = 50;
-        double offsetX = 200;
-        double offsetY = 100;
-        int cols = 4;
+        var layout = _layoutUseCase.Execute(_projectViewModel.Model);
 
-        for (int i = 0; i < Tasks.Count; i++)
+        foreach (var t in Tasks)
         {
-            var t = Tasks[i];
-            // すでに座標がある場合は維持（将来的に保存された座標を使う）
-            if (t.X == 0 && t.Y == 0)
+            if (layout.TryGetValue(t.Id, out var pos))
             {
-                t.X = startX + (i % cols) * offsetX;
-                t.Y = startY + (i / cols) * offsetY;
+                t.X = pos.X;
+                t.Y = pos.Y;
             }
         }
     }
@@ -99,12 +144,13 @@ public partial class ProjectTasksViewModel : ObservableObject
     private void SyncEdges()
     {
         Edges.Clear();
+        var vmMap = Tasks.ToDictionary(t => t.Id);
+
         foreach (var task in Tasks)
         {
             foreach (var constraint in task.Constraints)
             {
-                var predecessor = Tasks.FirstOrDefault(t => t.Id == constraint.PredecessorId);
-                if (predecessor != null)
+                if (vmMap.TryGetValue(constraint.PredecessorId, out var predecessor))
                 {
                     Edges.Add(new TaskEdgeViewModel(predecessor, task));
                 }
@@ -172,34 +218,22 @@ public partial class ProjectTasksViewModel : ObservableObject
 
         if (value != null)
         {
-            TaskSummaryViewModel = _viewModelFactory.CreateTaskSummaryViewModel(_projectViewModel, value);
             IsDetailVisible = true;
         }
         else
         {
             IsDetailVisible = false;
-            TaskSummaryViewModel = null;
         }
     }
 
     [RelayCommand]
-    private void CloseDetail() => SelectedTask = null;
-
-    [RelayCommand]
-    private void SelectTask(ProjectTaskViewModel task)
+    private void AddProject()
     {
-        SelectedTask = task;
+        _ = AddTaskToContainer(null);
     }
 
     [RelayCommand]
-    private void OpenTaskDetailWindow(ProjectTaskViewModel task)
-    {
-        _logger.LogInformation("Requesting task detail for: {TaskName}", task.Name);
-        TaskDetailRequested?.Invoke(this, task);
-    }
-
-    [RelayCommand]
-    private async System.Threading.Tasks.Task AddTask()
+    private async System.Threading.Tasks.Task AddTaskToContainer(TaskContainerViewModel? container)
     {
         try
         {
@@ -210,6 +244,7 @@ public partial class ProjectTasksViewModel : ObservableObject
             if (result)
             {
                 var assigneeName = addTaskVm.Assignee?.DisplayName ?? string.Empty;
+                var parentId = container?.ParentTask?.Id;
 
                 await _addTaskUseCase.ExecuteAsync(
                     _projectViewModel.Model,
@@ -217,16 +252,18 @@ public partial class ProjectTasksViewModel : ObservableObject
                     addTaskVm.Description,
                     addTaskVm.Status,
                     addTaskVm.Priority,
-                    null,
+                    parentId,
+                    null, // scheduledStartDate
                     addTaskVm.DueDate,
-                    null,
-                    null,
+                    null, // actualStartDate
+                    null, // actualEndDate
                     addTaskVm.EstimatedWorkHours ?? 0,
-                    0,
+                    0, // actualCost
                     assigneeName
                 );
 
                 _projectViewModel.SyncFromModel();
+                RebuildContainers();
                 await ScanRisksAsync();
             }
         }
@@ -234,5 +271,15 @@ public partial class ProjectTasksViewModel : ObservableObject
         {
             _logger.LogError(ex, "Failed to add task.");
         }
+    }
+
+    [RelayCommand]
+    private async System.Threading.Tasks.Task AddTask() => await AddTaskToContainer(null);
+
+    [RelayCommand]
+    private void OpenTaskDetailWindow(ProjectTaskViewModel task)
+    {
+        _logger.LogInformation("Requesting task detail for: {TaskName}", task.Name);
+        TaskDetailRequested?.Invoke(this, task);
     }
 }

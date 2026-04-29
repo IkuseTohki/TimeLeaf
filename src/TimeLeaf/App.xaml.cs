@@ -281,6 +281,7 @@ public partial class App : Application
         services.AddTransient<ICheckAssignmentUseCase, CheckAssignmentUseCase>();
         services.AddTransient<IGetProjectMembersUseCase, GetProjectMembersUseCase>();
         services.AddTransient<CalculateCriticalPathUseCase>();
+        services.AddTransient<CalculateFlowLayoutUseCase>();
         services.AddTransient<DetectProjectRisksUseCase>();
 
         // コーディネーターの登録

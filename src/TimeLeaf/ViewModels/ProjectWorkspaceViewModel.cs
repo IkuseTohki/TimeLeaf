@@ -40,7 +40,7 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
     /// 現在表示中のサブビューのViewModel。
     /// </summary>
     [ObservableProperty]
-    private ObservableObject _currentSubViewModel;
+    private ObservableObject _currentSubViewModel = null!;
 
     /// <summary>
     /// 未読の通知件数。
@@ -56,6 +56,7 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
         {
             new NavigationItem("Dashboard", "Dashboard"),
             new NavigationItem("Tasks", "Tasks"),
+            new NavigationItem("Flow", "Flow"),
             new NavigationItem("Timeline", "Timeline"),
             new NavigationItem("Notifications", "Notifications"),
             new NavigationItem("Settings", "Settings"),
@@ -114,7 +115,7 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
         };
 
         // 初期表示としてダッシュボードを設定
-        _currentSubViewModel = _viewModelFactory.CreateProjectDashboardViewModel(_projectViewModel);
+        CurrentSubViewModel = _viewModelFactory.CreateProjectDashboardViewModel(_projectViewModel);
 
         // 通知カウントの同期
         _notificationService.UnreadCountChanged += (s, e) => UpdateUnreadCount();
@@ -150,11 +151,16 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
             oldTasksVm.TaskDetailRequested -= OnTaskDetailRequested;
         }
 
-        CurrentViewName = viewName;
+        if (CurrentViewName != viewName)
+        {
+            CurrentViewName = viewName;
+        }
+
         CurrentSubViewModel = viewName switch
         {
             "Dashboard" => _viewModelFactory.CreateProjectDashboardViewModel(_projectViewModel),
             "Tasks" => CreateTasksViewModel(),
+            "Flow" => _viewModelFactory.CreateProjectFlowViewModel(_projectViewModel),
             "Timeline" => _viewModelFactory.CreateProjectTimelineViewModel(_projectViewModel),
             "Settings" => _viewModelFactory.CreateProjectSettingsViewModel(_projectViewModel),
             "Notifications" => CreateNotificationsViewModel(),

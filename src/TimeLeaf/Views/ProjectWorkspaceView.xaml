@@ -20,6 +20,9 @@
         <DataTemplate DataType="{x:Type wvm:ProjectTasksViewModel}">
             <wv:ProjectTasksView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type wvm:ProjectFlowViewModel}">
+            <wv:ProjectFlowView />
+        </DataTemplate>
         <DataTemplate DataType="{x:Type wvm:ProjectTimelineViewModel}">
             <wv:ProjectTimelineView />
         </DataTemplate>

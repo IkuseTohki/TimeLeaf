@@ -2,9 +2,9 @@ using System.Windows.Controls;
 
 namespace TimeLeaf.Views.Workspace;
 
-public partial class TaskQuickPanelView : UserControl
+public partial class ProjectFlowView : UserControl
 {
-    public TaskQuickPanelView()
+    public ProjectFlowView()
     {
         InitializeComponent();
     }

@@ -46,6 +46,7 @@ public class AddTaskUseCaseTests
             description,
             status,
             priority,
+            null, // parentId
             null, // scheduledStart
             null, // deadline
             null, // actualStart
@@ -63,10 +64,48 @@ public class AddTaskUseCaseTests
         Assert.AreEqual(description, addedTask.Description);
         Assert.AreEqual(status, addedTask.Status);
         Assert.AreEqual(priority, addedTask.Priority);
+        Assert.IsNull(addedTask.ParentId);
         Assert.AreEqual(assignee, addedTask.Assignee);
         Assert.AreEqual(10.5, addedTask.EstimatedCost);
 
         // 2. プロジェクトの保存が呼び出されていること
         _saveUseCaseMock.Verify(s => s.ExecuteAsync(project), Times.Once);
+    }
+
+    /// <summary>
+    /// テスト観点: 親タスクを指定してタスクを追加した場合、ParentIdが正しく設定されることを確認する。
+    /// </summary>
+    [TestMethod]
+    public async System.Threading.Tasks.Task ExecuteAsync_WithParentId_ShouldSetParentId()
+    {
+        // Arrange
+        var project = new Project();
+        var parentTask = new ProjectTask();
+        project.AddTask(parentTask);
+
+        var useCase = new AddTaskUseCase(_saveUseCaseMock.Object);
+        var parentId = parentTask.Id;
+
+        // Act
+        await useCase.ExecuteAsync(
+            project,
+            "Child Task",
+            "",
+            TimeLeaf.Models.Enums.TaskStatus.NotStarted,
+            TaskPriority.Medium,
+            parentId,
+            null,
+            null,
+            null,
+            null,
+            0,
+            0,
+            ""
+        );
+
+        // Assert
+        var childTask = project.Tasks.FirstOrDefault(t => t.Name == "Child Task");
+        Assert.IsNotNull(childTask);
+        Assert.AreEqual(parentId, childTask.ParentId);
     }
 }

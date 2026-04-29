@@ -16,6 +16,7 @@ public interface IAddTaskUseCase
         string description,
         TimeLeaf.Models.Enums.TaskStatus status,
         TaskPriority priority,
+        Guid? parentId,
         DateTime? scheduledStartDate,
         DateTime? deadline,
         DateTime? actualStartDate,

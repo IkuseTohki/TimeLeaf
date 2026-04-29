@@ -25,6 +25,7 @@ public interface IViewModelFactory
 
     ProjectDashboardViewModel CreateProjectDashboardViewModel(ProjectViewModel projectViewModel);
     ProjectTasksViewModel CreateProjectTasksViewModel(ProjectViewModel projectViewModel);
+    ProjectFlowViewModel CreateProjectFlowViewModel(ProjectViewModel projectViewModel);
     ProjectTimelineViewModel CreateProjectTimelineViewModel(ProjectViewModel projectViewModel);
     ProjectSettingsViewModel CreateProjectSettingsViewModel(ProjectViewModel projectViewModel);
     NotificationsViewModel CreateNotificationsViewModel(
@@ -32,10 +33,6 @@ public interface IViewModelFactory
         Guid? projectIdFilter = null
     );
 
-    TaskSummaryViewModel CreateTaskSummaryViewModel(
-        ProjectViewModel projectViewModel,
-        ProjectTaskViewModel taskViewModel
-    );
     TaskDetailViewModel CreateTaskDetailViewModel(
         ProjectViewModel projectViewModel,
         ProjectTaskViewModel taskViewModel

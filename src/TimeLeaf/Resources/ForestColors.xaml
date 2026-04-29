@@ -11,6 +11,7 @@
     <SolidColorBrush x:Key="ProgressBarBlankBrush" Color="#E8F0E6" />
 
     <SolidColorBrush x:Key="BrandForegroundBrush" Color="White" />
+    <SolidColorBrush x:Key="WorkspaceBackgroundBrush" Color="#F0F4EF" />
     <SolidColorBrush x:Key="ErrorBrush" Color="{StaticResource ErrorColor}" />
     <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource WarningColor}" />
 
