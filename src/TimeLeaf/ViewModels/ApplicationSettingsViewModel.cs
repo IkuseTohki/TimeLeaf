@@ -6,12 +6,14 @@ using CommunityToolkit.Mvvm.Input;
 using LeafKit.UI.Services;
 using TimeLeaf.Models;
 using TimeLeaf.Repositories;
+using TimeLeaf.Services;
 
 namespace TimeLeaf.ViewModels;
 
 public partial class ApplicationSettingsViewModel : ObservableObject, IDialogViewModel
 {
     private readonly IApplicationSettingsRepository _settingsRepository;
+    private readonly IThemeService _themeService;
     private readonly ApplicationSettings _currentSettings;
 
     [ObservableProperty]
@@ -36,10 +38,12 @@ public partial class ApplicationSettingsViewModel : ObservableObject, IDialogVie
 
     public ApplicationSettingsViewModel(
         IApplicationSettingsRepository settingsRepository,
+        IThemeService themeService,
         ApplicationSettings currentSettings
     )
     {
         _settingsRepository = settingsRepository;
+        _themeService = themeService;
         _currentSettings = currentSettings;
 
         // 初期値ロード
@@ -62,8 +66,8 @@ public partial class ApplicationSettingsViewModel : ObservableObject, IDialogVie
 
         _settingsRepository.Save(_currentSettings);
 
-        // テーマ適用ロジックが必要だが、今回はリロードを促すか、別途ThemeServiceが必要
-        // ここでは簡易的に保存のみ
+        // テーマを即座に適用
+        _themeService.ApplyTheme(SelectedTheme);
 
         RequestClose?.Invoke(true);
     }

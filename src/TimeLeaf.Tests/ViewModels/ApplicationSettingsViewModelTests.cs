@@ -2,6 +2,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models;
 using TimeLeaf.Repositories;
+using TimeLeaf.Services;
 using TimeLeaf.ViewModels;
 
 namespace TimeLeaf.Tests.ViewModels;
@@ -10,11 +11,13 @@ namespace TimeLeaf.Tests.ViewModels;
 public class ApplicationSettingsViewModelTests
 {
     private Mock<IApplicationSettingsRepository> _settingsRepoMock = null!;
+    private Mock<IThemeService> _themeServiceMock = null!;
 
     [TestInitialize]
     public void Setup()
     {
         _settingsRepoMock = new Mock<IApplicationSettingsRepository>();
+        _themeServiceMock = new Mock<IThemeService>();
     }
 
     [TestMethod]
@@ -32,7 +35,7 @@ public class ApplicationSettingsViewModelTests
             MinimizeOnClose = false,
         };
 
-        var viewModel = new ApplicationSettingsViewModel(_settingsRepoMock.Object, settings);
+        var viewModel = new ApplicationSettingsViewModel(_settingsRepoMock.Object, _themeServiceMock.Object, settings);
 
         Assert.AreEqual(settings.StoragePath, viewModel.StoragePath);
         Assert.AreEqual(settings.Theme, viewModel.SelectedTheme);
@@ -45,10 +48,10 @@ public class ApplicationSettingsViewModelTests
     public void SaveCommand_ShouldUpdateModelAndCallRepository()
     {
         /*
-        テスト観点: Saveコマンド実行時、ViewModelのプロパティがModelに反映され、リポジトリのSaveが呼ばれることを確認する。
+        テスト観点: Saveコマンド実行時、ViewModelのプロパティがModelに反映され、リポジトリのSaveとThemeServiceのApplyThemeが呼ばれることを確認する。
         */
         var settings = new ApplicationSettings();
-        var viewModel = new ApplicationSettingsViewModel(_settingsRepoMock.Object, settings);
+        var viewModel = new ApplicationSettingsViewModel(_settingsRepoMock.Object, _themeServiceMock.Object, settings);
 
         viewModel.SelectedTheme = "Dark";
         viewModel.EnableOsNotification = true;
@@ -62,5 +65,6 @@ public class ApplicationSettingsViewModelTests
         Assert.IsTrue(settings.EnableAppNotification);
         Assert.IsFalse(settings.MinimizeOnClose);
         _settingsRepoMock.Verify(r => r.Save(settings), Times.Once);
+        _themeServiceMock.Verify(s => s.ApplyTheme("Dark"), Times.Once);
     }
 }

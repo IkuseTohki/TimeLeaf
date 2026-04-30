@@ -187,6 +187,10 @@ public partial class App : Application
             var syncUseCase = _serviceProvider.GetRequiredService<ISyncUserIdentityUseCase>();
             await syncUseCase.ExecuteAsync();
 
+            // 保存されているテーマを適用
+            var themeService = _serviceProvider.GetRequiredService<IThemeService>();
+            themeService.ApplyTheme(settings.Theme);
+
             // DIコンテナからメインウィンドウを取得
             var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
             var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
@@ -259,6 +263,12 @@ public partial class App : Application
 
         // LeafKit.UI サービスの登録
         services.AddSingleton<IDialogService, DialogService>();
+
+        // テーマサービスの登録
+        services.AddSingleton<IThemeService>(sp => new ThemeService(
+            this.Resources.MergedDictionaries,
+            sp.GetRequiredService<ILogger<ThemeService>>()
+        ));
 
         // アプリケーションサービスの登録
         services.AddSingleton<IProjectService, ProjectService>();
