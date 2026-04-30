@@ -46,12 +46,13 @@
                     </ItemsControl.ItemContainerStyle>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <local:TaskFlowNodeControl>
+                            <local:TaskFlowNodeControl DataContext="{Binding}">
                                 <i:Interaction.Behaviors>
                                     <li:DragPositionBehavior X="{Binding X, Mode=TwoWay}" Y="{Binding Y, Mode=TwoWay}" />
                                 </i:Interaction.Behaviors>
                             </local:TaskFlowNodeControl>
                         </DataTemplate>
+
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </Canvas>

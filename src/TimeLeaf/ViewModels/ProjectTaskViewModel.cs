@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Models.Enums;
 using TimeLeaf.Services;
@@ -19,6 +20,17 @@ public partial class ProjectTaskViewModel : ObservableObject, IDisposable
 {
     private ProjectTask _projectTask;
     private readonly IUserService _userService;
+
+    /// <summary>
+    /// 詳細画面への遷移を要求するイベント。
+    /// </summary>
+    public static event EventHandler<ProjectTaskViewModel>? GlobalRequestDetail;
+
+    [RelayCommand]
+    public void RequestDetail()
+    {
+        GlobalRequestDetail?.Invoke(this, this);
+    }
 
     [ObservableProperty]
     private string _projectName = string.Empty;

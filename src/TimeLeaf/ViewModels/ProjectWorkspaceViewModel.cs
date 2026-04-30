@@ -105,6 +105,8 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
         _viewModelFactory = viewModelFactory ?? throw new ArgumentNullException(nameof(viewModelFactory));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
+        ProjectTaskViewModel.GlobalRequestDetail += OnGlobalRequestDetail;
+
         // ProjectViewModel の変更（アサイン状態）を監視
         _projectViewModel.PropertyChanged += (s, e) =>
         {
@@ -122,6 +124,11 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
         UpdateUnreadCount();
 
         _logger.LogInformation("ProjectWorkspaceViewModel initialized for project {ProjectId}.", _projectViewModel.Id);
+    }
+
+    private void OnGlobalRequestDetail(object? sender, ProjectTaskViewModel task)
+    {
+        OpenTaskDetail(task);
     }
 
     private void UpdateUnreadCount()

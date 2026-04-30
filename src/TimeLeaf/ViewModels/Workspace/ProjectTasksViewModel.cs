@@ -279,6 +279,11 @@ public partial class ProjectTasksViewModel : ObservableObject
     [RelayCommand]
     private void OpenTaskDetailWindow(ProjectTaskViewModel task)
     {
+        TriggerTaskDetailRequested(task);
+    }
+
+    public void TriggerTaskDetailRequested(ProjectTaskViewModel task)
+    {
         _logger.LogInformation("Requesting task detail for: {TaskName}", task.Name);
         TaskDetailRequested?.Invoke(this, task);
     }
