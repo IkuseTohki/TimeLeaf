@@ -8,6 +8,11 @@ namespace TimeLeaf.Repositories
     public interface IApplicationSettingsRepository
     {
         /// <summary>
+        /// 設定が変更（保存）されたときに発生します。
+        /// </summary>
+        event System.EventHandler<ApplicationSettings>? SettingsChanged;
+
+        /// <summary>
         /// 現在の設定を読み込みます。設定ファイルが存在しない場合はデフォルト値を返します。
         /// </summary>
         /// <returns>読み込まれたアプリケーション設定。</returns>

@@ -26,6 +26,9 @@ public partial class ApplicationSettingsViewModel : ObservableObject, IDialogVie
     [ObservableProperty]
     private bool _enableAppNotification;
 
+    [ObservableProperty]
+    private bool _minimizeOnClose;
+
     /// <summary>
     /// ダイアログを閉じるよう要求するイベント。
     /// </summary>
@@ -44,6 +47,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject, IDialogVie
         SelectedTheme = _currentSettings.Theme;
         EnableOsNotification = _currentSettings.EnableOsNotification;
         EnableAppNotification = _currentSettings.EnableAppNotification;
+        MinimizeOnClose = _currentSettings.MinimizeOnClose;
     }
 
     [RelayCommand]
@@ -53,6 +57,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject, IDialogVie
         _currentSettings.Theme = SelectedTheme;
         _currentSettings.EnableOsNotification = EnableOsNotification;
         _currentSettings.EnableAppNotification = EnableAppNotification;
+        _currentSettings.MinimizeOnClose = MinimizeOnClose;
         // StoragePathはここからは変更しない（別コマンドでリセット）
 
         _settingsRepository.Save(_currentSettings);

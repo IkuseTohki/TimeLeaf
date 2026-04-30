@@ -88,6 +88,8 @@ public class MainViewModelSyncTests
         var osNotificationServiceMock = new Mock<IOSNotificationService>();
         var checkDeadlinesUseCaseMock = new Mock<ICheckTaskDeadlinesUseCase>();
         var identityServiceMock = new Mock<IIdentityService>();
+        var settingsRepoMock = new Mock<IApplicationSettingsRepository>();
+        var settings = new TimeLeaf.Models.ApplicationSettings();
 
         var saveCoordinator = new ProjectSaveCoordinator(
             saveUseCaseMock.Object,
@@ -108,6 +110,8 @@ public class MainViewModelSyncTests
             checkDeadlinesUseCaseMock.Object,
             dialogServiceMock.Object,
             identityServiceMock.Object,
+            settingsRepoMock.Object,
+            settings,
             loggerMock.Object
         );
         await System.Threading.Tasks.Task.Delay(100); // InitializeAsync の完了を待つ

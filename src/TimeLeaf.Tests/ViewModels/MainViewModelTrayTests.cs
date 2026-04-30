@@ -7,6 +7,7 @@ using LeafKit.UI.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using TimeLeaf.Models;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Repositories;
 using TimeLeaf.Services;
@@ -32,6 +33,8 @@ public class MainViewModelTrayTests
     private Mock<ICheckTaskDeadlinesUseCase> _checkDeadlinesUseCaseMock = null!;
     private Mock<IDialogService> _dialogServiceMock = null!;
     private Mock<IIdentityService> _identityServiceMock = null!;
+    private Mock<IApplicationSettingsRepository> _settingsRepoMock = null!;
+    private ApplicationSettings _settings = null!;
     private Mock<ILogger<MainViewModel>> _loggerMock = null!;
     private Mock<IUserService> _userServiceMock = null!;
 
@@ -53,6 +56,8 @@ public class MainViewModelTrayTests
         _checkDeadlinesUseCaseMock = new Mock<ICheckTaskDeadlinesUseCase>();
         _dialogServiceMock = new Mock<IDialogService>();
         _identityServiceMock = new Mock<IIdentityService>();
+        _settingsRepoMock = new Mock<IApplicationSettingsRepository>();
+        _settings = new ApplicationSettings();
         _loggerMock = new Mock<ILogger<MainViewModel>>();
         _userServiceMock = new Mock<IUserService>();
 
@@ -92,6 +97,8 @@ public class MainViewModelTrayTests
             _checkDeadlinesUseCaseMock.Object,
             _dialogServiceMock.Object,
             _identityServiceMock.Object,
+            _settingsRepoMock.Object,
+            _settings,
             _loggerMock.Object
         );
     }
@@ -120,13 +127,49 @@ public class MainViewModelTrayTests
     public void RequestExit_ShouldAllowApplicationExit()
     {
         // Arrange
+        _settings.MinimizeOnClose = true;
         var viewModel = CreateViewModel();
-        Assert.IsFalse(viewModel.CanExit, "初期状態では終了不可（隠すだけ）であること");
+        Assert.IsFalse(viewModel.CanExit, "初期状態（MinimizeOnClose=true）では終了不可であること");
 
         // Act
         _osNotificationServiceMock.Raise(x => x.RequestExit += null, EventArgs.Empty);
 
         // Assert
-        Assert.IsTrue(viewModel.CanExit);
+        Assert.IsTrue(viewModel.CanExit, "トレイからの終了要求時は設定に関わらず終了可能になること");
+    }
+
+    /// <summary>
+    /// テスト観点: MinimizeOnClose設定がfalseの場合、CanExitが最初からtrueになることを確認する。
+    /// </summary>
+    [TestMethod]
+    public void CanExit_ShouldBeTrue_WhenMinimizeOnCloseIsFalse()
+    {
+        // Arrange
+        _settings.MinimizeOnClose = false;
+
+        // Act
+        var viewModel = CreateViewModel();
+
+        // Assert
+        Assert.IsTrue(viewModel.CanExit, "MinimizeOnCloseがfalseなら(X)で終了できるべき");
+    }
+
+    /// <summary>
+    /// テスト観点: 実行中に設定が変更された際、CanExitプロパティが追従して更新されることを確認する。
+    /// </summary>
+    [TestMethod]
+    public void CanExit_ShouldUpdate_WhenSettingsChanged()
+    {
+        // Arrange
+        _settings.MinimizeOnClose = true;
+        var viewModel = CreateViewModel();
+        Assert.IsFalse(viewModel.CanExit);
+
+        // Act
+        _settings.MinimizeOnClose = false;
+        _settingsRepoMock.Raise(x => x.SettingsChanged += null, null, _settings);
+
+        // Assert
+        Assert.IsTrue(viewModel.CanExit, "設定変更後にCanExitが更新されること");
     }
 }

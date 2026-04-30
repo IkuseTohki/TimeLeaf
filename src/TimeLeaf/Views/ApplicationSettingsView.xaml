@@ -73,6 +73,16 @@
                               Style="{StaticResource FormCheckBoxStyle}" />
                 </StackPanel>
             </GroupBox>
+
+            <!-- Behavior Settings -->
+            <GroupBox Header="動作" Style="{StaticResource SettingsGroupBoxStyle}">
+                <StackPanel>
+                    <CheckBox Content="閉じるボタン押下時にタスクトレイに最小化する"
+                              IsChecked="{Binding MinimizeOnClose}"
+                              Style="{StaticResource FormCheckBoxStyle}" />
+                    <TextBlock Style="{StaticResource SettingsAnnotationStyle}" Text="※オフにすると、ウィンドウを閉じた際にアプリケーションが完全に終了します。" />
+                </StackPanel>
+            </GroupBox>
         </StackPanel>
 
         <!-- Footer Buttons -->

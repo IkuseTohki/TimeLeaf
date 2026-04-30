@@ -7,6 +7,7 @@ using LeafKit.UI.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using TimeLeaf.Models;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Repositories;
 using TimeLeaf.Services;
@@ -32,6 +33,8 @@ public class MainNavigationTests
     private Mock<ICheckTaskDeadlinesUseCase> _checkDeadlinesUseCaseMock = null!;
     private Mock<IDialogService> _dialogServiceMock = null!;
     private Mock<IIdentityService> _identityServiceMock = null!;
+    private Mock<IApplicationSettingsRepository> _settingsRepoMock = null!;
+    private ApplicationSettings _settings = null!;
     private Mock<ILogger<MainViewModel>> _loggerMock = null!;
     private Mock<IUserService> _userServiceMock = null!;
 
@@ -53,6 +56,8 @@ public class MainNavigationTests
         _checkDeadlinesUseCaseMock = new Mock<ICheckTaskDeadlinesUseCase>();
         _dialogServiceMock = new Mock<IDialogService>();
         _identityServiceMock = new Mock<IIdentityService>();
+        _settingsRepoMock = new Mock<IApplicationSettingsRepository>();
+        _settings = new ApplicationSettings();
         _loggerMock = new Mock<ILogger<MainViewModel>>();
         _userServiceMock = new Mock<IUserService>();
 
@@ -97,6 +102,8 @@ public class MainNavigationTests
             _checkDeadlinesUseCaseMock.Object,
             _dialogServiceMock.Object,
             _identityServiceMock.Object,
+            _settingsRepoMock.Object,
+            _settings,
             _loggerMock.Object
         );
     }

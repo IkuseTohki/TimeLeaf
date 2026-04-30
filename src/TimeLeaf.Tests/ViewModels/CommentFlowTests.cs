@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using TimeLeaf.Models;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Repositories;
 using TimeLeaf.Services;
@@ -105,6 +106,8 @@ public class CommentFlowTests
 
         var snackbarServiceMock = new Mock<ISnackbarService>();
         var checkDeadlinesUseCaseMock = new Mock<ICheckTaskDeadlinesUseCase>();
+        var settingsRepoMock = new Mock<IApplicationSettingsRepository>();
+        var settings = new ApplicationSettings();
 
         _mainViewModel = new MainViewModel(
             loadUseCaseMock.Object,
@@ -121,6 +124,8 @@ public class CommentFlowTests
             checkDeadlinesUseCaseMock.Object,
             _dialogServiceMock.Object,
             _identityServiceMock.Object,
+            settingsRepoMock.Object,
+            settings,
             loggerMock.Object
         );
 

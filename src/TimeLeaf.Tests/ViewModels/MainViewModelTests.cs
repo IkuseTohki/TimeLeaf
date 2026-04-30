@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using TimeLeaf.Models;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Repositories;
 using TimeLeaf.Services;
@@ -37,6 +38,8 @@ public class MainViewModelTests
     private Mock<IDialogService> _dialogServiceMock = null!;
     private Mock<IIdentityService> _identityServiceMock = null!;
     private Mock<ICheckAssignmentUseCase> _checkAssignmentMock = null!;
+    private Mock<IApplicationSettingsRepository> _settingsRepoMock = null!;
+    private ApplicationSettings _settings = null!;
     private Mock<ILogger<MainViewModel>> _loggerMock = null!;
 
     [TestInitialize]
@@ -60,6 +63,8 @@ public class MainViewModelTests
         _dialogServiceMock = new Mock<IDialogService>();
         _identityServiceMock = new Mock<IIdentityService>();
         _checkAssignmentMock = new Mock<ICheckAssignmentUseCase>();
+        _settingsRepoMock = new Mock<IApplicationSettingsRepository>();
+        _settings = new ApplicationSettings();
         _loggerMock = new Mock<ILogger<MainViewModel>>();
 
         _dispatcherServiceMock
@@ -123,6 +128,8 @@ public class MainViewModelTests
             _checkDeadlinesUseCaseMock.Object,
             _dialogServiceMock.Object,
             _identityServiceMock.Object,
+            _settingsRepoMock.Object,
+            _settings,
             _loggerMock.Object
         );
     }

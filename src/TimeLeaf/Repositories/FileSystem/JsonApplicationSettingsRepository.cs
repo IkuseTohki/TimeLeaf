@@ -16,6 +16,9 @@ namespace TimeLeaf.Repositories.FileSystem
         private readonly string _settingsFilePath;
         private readonly JsonSerializerOptions _jsonOptions;
 
+        /// <inheritdoc/>
+        public event EventHandler<ApplicationSettings>? SettingsChanged;
+
         public JsonApplicationSettingsRepository()
         {
             var userProfilePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
@@ -63,6 +66,7 @@ namespace TimeLeaf.Repositories.FileSystem
             {
                 var json = JsonSerializer.Serialize(settings, _jsonOptions);
                 File.WriteAllText(_settingsFilePath, json);
+                SettingsChanged?.Invoke(this, settings);
             }
             catch (Exception ex)
             {

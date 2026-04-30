@@ -27,5 +27,10 @@ namespace TimeLeaf.Models
         /// アプリ内通知（スナックバー等）を利用するかどうかを取得または設定します。
         /// </summary>
         public bool EnableAppNotification { get; set; } = true;
+
+        /// <summary>
+        /// 閉じるボタン押下時にタスクトレイに最小化するかどうかを取得または設定します。
+        /// </summary>
+        public bool MinimizeOnClose { get; set; } = true;
     }
 }

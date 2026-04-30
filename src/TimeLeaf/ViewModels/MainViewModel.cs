@@ -9,7 +9,9 @@ using CommunityToolkit.Mvvm.Input;
 using LeafKit.UI.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using TimeLeaf.Models;
 using TimeLeaf.Models.Entities;
+using TimeLeaf.Repositories;
 using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.ViewModels;
@@ -35,6 +37,8 @@ public partial class MainViewModel : ObservableObject
     private readonly ICheckTaskDeadlinesUseCase _checkDeadlinesUseCase;
     private readonly IDialogService _dialogService;
     private readonly IIdentityService _identityService;
+    private readonly IApplicationSettingsRepository _settingsRepo;
+    private readonly ApplicationSettings _settings;
     private readonly ILogger<MainViewModel> _logger;
 
     [ObservableProperty]
@@ -113,7 +117,10 @@ public partial class MainViewModel : ObservableObject
     /// アプリケーションを完全に終了してもよいかどうか。
     /// false の場合はウィンドウを閉じる代わりに隠す挙動になります。
     /// </summary>
-    public bool CanExit { get; private set; } = false;
+    [ObservableProperty]
+    private bool _canExit;
+
+    private bool _forceExit = false;
 
     /// <summary>
     /// アプリケーションの終了が要求されたときに発生します。
@@ -143,6 +150,8 @@ public partial class MainViewModel : ObservableObject
         ICheckTaskDeadlinesUseCase checkDeadlinesUseCase,
         IDialogService dialogService,
         IIdentityService identityService,
+        IApplicationSettingsRepository settingsRepo,
+        ApplicationSettings settings,
         ILogger<MainViewModel> logger
     )
     {
@@ -160,6 +169,8 @@ public partial class MainViewModel : ObservableObject
         _checkDeadlinesUseCase = checkDeadlinesUseCase;
         _dialogService = dialogService;
         _identityService = identityService;
+        _settingsRepo = settingsRepo;
+        _settings = settings;
         _logger = logger;
 
         _navigationContext = MainNavigationContext.Home;
@@ -185,9 +196,16 @@ public partial class MainViewModel : ObservableObject
         _osNotificationService.RequestOpen += (s, e) => IsWindowVisible = true;
         _osNotificationService.RequestExit += (s, e) =>
         {
-            CanExit = true;
+            _forceExit = true;
+            UpdateCanExit();
             ExitRequested?.Invoke(this, EventArgs.Empty);
         };
+
+        // 設定変更の購読
+        _settingsRepo.SettingsChanged += (s, e) => UpdateCanExit();
+
+        // 初期状態の設定
+        UpdateCanExit();
 
         // 自動保存の開始
         _saveCoordinator.StartMonitoring(Projects);
@@ -195,6 +213,11 @@ public partial class MainViewModel : ObservableObject
         _ = InitializeAsync();
 
         _logger.LogInformation("MainViewModel Initializing Complete");
+    }
+
+    private void UpdateCanExit()
+    {
+        CanExit = _forceExit || !_settings.MinimizeOnClose;
     }
 
     private void UpdateUnreadCount()
