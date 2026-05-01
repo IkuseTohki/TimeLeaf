@@ -28,7 +28,7 @@
                     VerticalAlignment="Center"
                     Command="{Binding MarkAllAsReadCommand}"
                     Content="すべて既読にする"
-                    Style="{StaticResource OrganicButtonStyle}" />
+                    Style="{StaticResource RoundButtonStyle}" />
         </Grid>
 
         <!-- プロジェクト内アクションエリア（プロジェクト表示時のみ表示） -->
@@ -38,7 +38,7 @@
             <Button HorizontalAlignment="Right"
                     Command="{Binding MarkAllAsReadCommand}"
                     Content="すべて既読にする"
-                    Style="{StaticResource OrganicButtonStyle}" />
+                    Style="{StaticResource RoundButtonStyle}" />
         </Grid>
 
         <!-- 通知リスト -->
@@ -63,13 +63,13 @@
                                 <StackPanel Grid.Column="1"
                                             VerticalAlignment="Top"
                                             Orientation="Horizontal">
-                                    <Button Width="50"
+                                    <Button Width="60"
                                             Margin="0,0,8,0"
                                             Command="{Binding NavigateCommand}"
                                             Content="開く"
                                             Style="{StaticResource PrimaryButtonStyle}"
                                             Visibility="{Binding CanNavigate, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                                    <Button Width="50"
+                                    <Button Width="60"
                                             Command="{Binding MarkAsReadCommand}"
                                             Content="既読"
                                             Style="{StaticResource RoundButtonStyle}" />

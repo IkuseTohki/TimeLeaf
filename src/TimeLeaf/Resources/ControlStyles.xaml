@@ -6,84 +6,12 @@
     <!-- Button Bases & Styles -->
     <!-- ====================================================================== -->
 
-    <!-- 基本となるオーガニックボタンのテンプレート -->
-    <Style x:Key="BaseButtonStyle" TargetType="Button">
-        <Setter Property="MinHeight" Value="{StaticResource ButtonHeightMedium}" />
-        <Setter Property="Padding" Value="12,2" />
-        <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="Cursor" Value="Hand" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border Padding="{TemplateBinding Padding}"
-                            Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="14">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Opacity" Value="0.8" />
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Opacity" Value="0.5" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
-    <!-- 小サイズボタン -->
-    <Style x:Key="SmallButtonStyle"
-           BasedOn="{StaticResource BaseButtonStyle}"
-           TargetType="Button">
-        <Setter Property="MinHeight" Value="{StaticResource ButtonHeightSmall}" />
-        <Setter Property="Padding" Value="8,1" />
-        <Setter Property="FontSize" Value="10" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border Padding="{TemplateBinding Padding}"
-                            Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="10">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Opacity" Value="0.8" />
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Opacity" Value="0.5" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
-    <!-- 大サイズボタン -->
-    <Style x:Key="LargeButtonStyle"
-           BasedOn="{StaticResource BaseButtonStyle}"
-           TargetType="Button">
-        <Setter Property="MinHeight" Value="{StaticResource ButtonHeightLarge}" />
-        <Setter Property="Padding" Value="20,6" />
-        <Setter Property="FontSize" Value="14" />
-        <Style.Resources>
-            <Style TargetType="Border">
-                <Setter Property="CornerRadius" Value="18" />
-            </Style>
-        </Style.Resources>
-    </Style>
-
     <!-- 角丸の強いボタンスタイル（透過背景） -->
     <Style x:Key="RoundButtonStyle"
            BasedOn="{StaticResource BaseButtonStyle}"
            TargetType="Button">
         <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
         <Setter Property="BorderThickness" Value="1" />
         <Style.Triggers>
@@ -91,43 +19,6 @@
                 <Setter Property="Background" Value="{DynamicResource StateHoverBrush}" />
             </Trigger>
         </Style.Triggers>
-    </Style>
-
-    <!-- オーガニックなボタンスタイル（標準） -->
-    <Style x:Key="OrganicButtonStyle"
-           BasedOn="{StaticResource BaseButtonStyle}"
-           TargetType="Button">
-        <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{DynamicResource ButtonHoverBackgroundBrush}" />
-            </Trigger>
-        </Style.Triggers>
-    </Style>
-
-    <!-- 強調ボタンスタイル（ブランドカラー） -->
-    <Style x:Key="PrimaryButtonStyle"
-           BasedOn="{StaticResource BaseButtonStyle}"
-           TargetType="Button">
-        <Setter Property="Background" Value="{DynamicResource BrandPrimaryBrush}" />
-        <Setter Property="Foreground" Value="{DynamicResource BrandForegroundBrush}" />
-        <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="FontWeight" Value="Bold" />
-    </Style>
-
-    <!-- 二次ボタンスタイル（アウトライン） -->
-    <Style x:Key="SecondaryButtonStyle"
-           BasedOn="{StaticResource OrganicButtonStyle}"
-           TargetType="Button" />
-
-    <!-- アウトライン強調ボタンスタイル -->
-    <Style x:Key="OutlinedButtonStyle"
-           BasedOn="{StaticResource RoundButtonStyle}"
-           TargetType="Button">
-        <Setter Property="BorderThickness" Value="2" />
-        <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
 
     <!-- 危険な操作ボタンのスタイル -->
@@ -149,6 +40,7 @@
     <Style x:Key="OrganicTextBoxStyle" TargetType="TextBox">
         <Setter Property="MinHeight" Value="{StaticResource InputHeightMedium}" />
         <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="10,0" />

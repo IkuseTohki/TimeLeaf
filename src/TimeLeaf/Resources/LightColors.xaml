@@ -7,9 +7,10 @@
     <Color x:Key="ErrorColor">#E81123</Color>
     <Color x:Key="WarningColor">#D83B01</Color>
 
-    <SolidColorBrush x:Key="BrandForegroundBrush" Color="White" />
     <SolidColorBrush x:Key="WorkspaceBackgroundBrush" Color="#F4F7F6" />
     <SolidColorBrush x:Key="ErrorBrush" Color="{StaticResource ErrorColor}" />
     <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource WarningColor}" />
+
+    <SolidColorBrush x:Key="GlobalSidebarBackgroundBrush" Color="{StaticResource SurfaceLayer1Color}" />
 
 </ResourceDictionary>

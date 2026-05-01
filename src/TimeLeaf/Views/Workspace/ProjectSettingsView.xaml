@@ -51,7 +51,7 @@
                     <StackPanel Style="{StaticResource InverseVisibility}">
                         <Button Command="{Binding ArchiveCommand}"
                                 Content="プロジェクトをアーカイブする"
-                                Style="{StaticResource OutlinedButtonStyle}" />
+                                Style="{StaticResource SecondaryButtonStyle}" />
                         <TextBlock Margin="0,4,0,0"
                                    Style="{StaticResource SettingsAnnotationStyle}"
                                    Text="※ アーカイブするとプロジェクトは読み取り専用になり、通常のリストから非表示になります。" />

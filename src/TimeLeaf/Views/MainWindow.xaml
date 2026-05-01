@@ -45,7 +45,7 @@
         <!-- グローバル・サイドバー -->
         <Border x:Name="SidebarBorder"
                 Grid.Column="0"
-                Style="{StaticResource SidebarBorderStyle}">
+                Style="{StaticResource GlobalSidebarBorderStyle}">
             <Grid>
                 <DockPanel LastChildFill="True">
                     <!-- ブランドロゴエリア -->
@@ -87,6 +87,7 @@
                                                    Text="Notifications"
                                                    Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BooleanToVisibilityConverter}}" />
                                     </StackPanel>
+                                    <!-- バッジ -->
                                     <Border Margin="12,-8,0,0"
                                             HorizontalAlignment="Left"
                                             VerticalAlignment="Top"

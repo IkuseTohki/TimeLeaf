@@ -283,7 +283,7 @@
 
                         <Border x:Name="TaskBorder"
                                 Padding="20,12"
-                                BorderBrush="#F1F5F9"
+                                BorderBrush="{DynamicResource OutlineBaseBrush}"
                                 BorderThickness="0,0,0,1">
                             <StackPanel>
                                 <TextBlock x:Name="TaskNameText"
@@ -306,10 +306,10 @@
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="RootGrid" Property="Background" Value="#F8FAFC" />
+                            <Setter TargetName="RootGrid" Property="Background" Value="{DynamicResource StateHoverBrush}" />
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="TaskBorder" Property="Background" Value="White" />
+                            <Setter TargetName="TaskBorder" Property="Background" Value="{DynamicResource SurfaceLayer1Brush}" />
                             <Setter TargetName="TaskBorder" Property="Margin" Value="12,8" />
                             <Setter TargetName="TaskBorder" Property="Padding" Value="16" />
                             <Setter TargetName="TaskBorder" Property="CornerRadius" Value="8" />
@@ -382,7 +382,7 @@
                                    RadiusX="12"
                                    RadiusY="12"
                                    SnapsToDevicePixels="True"
-                                   Stroke="#CBD5E1"
+                                   Stroke="{DynamicResource OutlineBaseBrush}"
                                    StrokeDashArray="4 2"
                                    StrokeThickness="2" />
                         <TextBlock x:Name="AddText"
@@ -395,7 +395,7 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="Root" Property="Stroke" Value="{DynamicResource BrandPrimaryBrush}" />
-                            <Setter TargetName="Root" Property="Fill" Value="#052D5A27" />
+                            <Setter TargetName="Root" Property="Fill" Value="{DynamicResource StateHoverBrush}" />
                             <Setter TargetName="AddText" Property="Foreground" Value="{DynamicResource BrandPrimaryBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>

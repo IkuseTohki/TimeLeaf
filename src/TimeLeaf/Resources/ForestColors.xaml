@@ -7,13 +7,13 @@
     <Color x:Key="ErrorColor">#B03A2E</Color>
     <Color x:Key="WarningColor">#D35400</Color>
 
-
-    <SolidColorBrush x:Key="ProgressBarBlankBrush" Color="#E8F0E6" />
-
-    <SolidColorBrush x:Key="BrandForegroundBrush" Color="White" />
     <SolidColorBrush x:Key="WorkspaceBackgroundBrush" Color="#F0F4EF" />
     <SolidColorBrush x:Key="ErrorBrush" Color="{StaticResource ErrorColor}" />
     <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource WarningColor}" />
+
+    <SolidColorBrush x:Key="GlobalSidebarBackgroundBrush" Color="{StaticResource BrandPrimaryColor}" />
+
+    <SolidColorBrush x:Key="ProgressBarBlankBrush" Color="#E8F0E6" />
 
     <LinearGradientBrush x:Key="NotificationPaneBackgroundBrush" StartPoint="1,0.5" EndPoint="0,0.5">
         <GradientStop Offset="0.6" Color="#F2FFFFFF" />
@@ -21,4 +21,10 @@
     </LinearGradientBrush>
 
     <SolidColorBrush x:Key="FlowBackgroundBrush" Color="#FAFAFA" />
+
+    <!-- 4. 形状・定数 (角丸) -->
+    <CornerRadius x:Key="ControlCornerRadius">20</CornerRadius>
+    <CornerRadius x:Key="ContainerCornerRadius">32</CornerRadius>
+    <CornerRadius x:Key="ButtonCornerRadius">14</CornerRadius>
+    <CornerRadius x:Key="ComboBoxItemCornerRadius">8</CornerRadius>
 </ResourceDictionary>
