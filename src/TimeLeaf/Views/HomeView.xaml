@@ -83,14 +83,6 @@
                             <TextBlock Style="{StaticResource HomeStatsValueStyle}" Text="{Binding CompletedThisWeekCount}" />
                         </StackPanel>
                     </Border>
-                    <Border Padding="{StaticResource CardPadding}" Style="{StaticResource SurfaceCardStyle}">
-                        <StackPanel>
-                            <TextBlock Style="{StaticResource HomeStatsLabelStyle}" Text="森の健全性" />
-                            <TextBlock Foreground="{DynamicResource BrandPrimaryBrush}"
-                                       Style="{StaticResource HomeStatsValueStyle}"
-                                       Text="Healthy" />
-                        </StackPanel>
-                    </Border>
                 </UniformGrid>
 
                 <Grid>
