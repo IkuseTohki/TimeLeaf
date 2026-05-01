@@ -400,12 +400,7 @@ public partial class MainViewModel : ObservableObject
                 _logger.LogDebug("Adding project: {Name}", addProjectVm.Name);
 
                 // ユースケースを実行（内部で ProjectService.SaveProjectAsync が呼ばれ、イベントが飛んでくる）
-                await _addProjectUseCase.ExecuteAsync(
-                    addProjectVm.Name,
-                    addProjectVm.Description,
-                    addProjectVm.Status,
-                    addProjectVm.Health
-                );
+                await _addProjectUseCase.ExecuteAsync(addProjectVm.Name, addProjectVm.Description, addProjectVm.Status);
 
                 _logger.LogInformation("AddProject execution requested.");
 

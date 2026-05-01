@@ -87,21 +87,6 @@ public partial class ProjectViewModel : ObservableObject
         }
     }
 
-    public TimeLeaf.Models.Enums.ProjectHealth HealthStatus
-    {
-        get => _project.HealthStatus;
-        set
-        {
-            if (_project.HealthStatus != value)
-            {
-                _project.UpdateHealth(value);
-                OnPropertyChanged(nameof(HealthStatus));
-                OnPropertyChanged(nameof(UpdatedAt));
-                OnPropertyChanged(nameof(DisplayLastUpdated));
-            }
-        }
-    }
-
     private void RefreshUpdatedAt()
     {
         if (IsSyncing)
@@ -357,7 +342,6 @@ public partial class ProjectViewModel : ObservableObject
         OnPropertyChanged(nameof(Name));
         OnPropertyChanged(nameof(Description));
         OnPropertyChanged(nameof(Status));
-        OnPropertyChanged(nameof(HealthStatus));
         OnPropertyChanged(nameof(UpdatedAt));
         OnPropertyChanged(nameof(DisplayLastUpdated));
         OnPropertyChanged(nameof(TotalEstimatedCost));

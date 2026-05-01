@@ -21,11 +21,7 @@ public partial class AddProjectViewModel : ObservableObject, IDialogViewModel
     [ObservableProperty]
     private ProjectStatus _status = ProjectStatus.Initial;
 
-    [ObservableProperty]
-    private ProjectHealth _health = ProjectHealth.Healthy;
-
     public IEnumerable<ProjectStatus> ProjectStatusValues => (ProjectStatus[])Enum.GetValues(typeof(ProjectStatus));
-    public IEnumerable<ProjectHealth> ProjectHealthValues => (ProjectHealth[])Enum.GetValues(typeof(ProjectHealth));
 
     /// <summary>
     /// ダイアログを閉じるよう要求するイベント。

@@ -23,9 +23,6 @@ public class AddProjectUseCaseTests
         _identityServiceMock.Setup(s => s.CurrentUserId).Returns(Guid.NewGuid());
     }
 
-    /// <summary>
-    /// テスト観点: AddProjectUseCase が、指定された内容でプロジェクトを作成し、保存することを確認する。
-    /// </summary>
     [TestMethod]
     public async Task ExecuteAsync_ShouldCreateAndSaveProject()
     {
@@ -34,17 +31,15 @@ public class AddProjectUseCaseTests
         var name = "New Project";
         var description = "Description";
         var status = TimeLeaf.Models.Enums.ProjectStatus.InProgress;
-        var health = TimeLeaf.Models.Enums.ProjectHealth.Healthy;
 
         // Act
-        var project = await useCase.ExecuteAsync(name, description, status, health);
+        var project = await useCase.ExecuteAsync(name, description, status);
 
         // Assert
         Assert.IsNotNull(project);
         Assert.AreEqual(name, project.Name);
         Assert.AreEqual(description, project.Description);
         Assert.AreEqual(status, project.Status);
-        Assert.AreEqual(health, project.HealthStatus);
 
         // サービスの保存が呼び出されていること
         _projectServiceMock.Verify(s => s.SaveProjectAsync(It.Is<Project>(p => p.Id == project.Id)), Times.Once);
@@ -62,12 +57,7 @@ public class AddProjectUseCaseTests
         var useCase = new AddProjectUseCase(_projectServiceMock.Object, _identityServiceMock.Object);
 
         // Act
-        var project = await useCase.ExecuteAsync(
-            "Test",
-            "Desc",
-            TimeLeaf.Models.Enums.ProjectStatus.Initial,
-            TimeLeaf.Models.Enums.ProjectHealth.Healthy
-        );
+        var project = await useCase.ExecuteAsync("Test", "Desc", TimeLeaf.Models.Enums.ProjectStatus.Initial);
 
         // Assert
         Assert.AreEqual(creatorId, project.CreatedBy);

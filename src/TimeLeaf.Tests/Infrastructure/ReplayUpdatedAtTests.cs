@@ -71,7 +71,7 @@ public class ReplayUpdatedAtTests
 
         // 過去の日時を持つ履歴ファイル
         var fileName = new DefaultCommitFileNameGenerator().Generate(pastTime, "user-A", "Project_Basic");
-        var json = "{\"Name\":\"Old Project\", \"Status\":\"Initial\", \"HealthStatus\":\"Healthy\"}";
+        var json = "{\"Name\":\"Old Project\", \"Status\":\"Initial\"}";
         await File.WriteAllTextAsync(Path.Combine(changesDir, fileName), json);
 
         // Act: ロード

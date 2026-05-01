@@ -125,7 +125,7 @@ public class FolderProjectRepositoryTests
         // Arrange
         var repository = CreateRepository();
         var project = new Project(Guid.Empty);
-        project.UpdateBasicInfo("ReadOnlyTest", ProjectStatus.InProgress, ProjectHealth.Healthy);
+        project.UpdateBasicInfo("ReadOnlyTest", ProjectStatus.InProgress);
 
         // Act
         await repository.SaveAsync(project, _testUserId.ToString());
@@ -293,7 +293,6 @@ public class FolderProjectRepositoryTests
             "MetadataTest",
             "",
             ProjectStatus.Initial,
-            ProjectHealth.Healthy,
             createdAt,
             createdAt,
             Guid.Empty,

@@ -51,11 +51,6 @@ public class Project
     public ProjectStatus Status { get; private set; } = ProjectStatus.Initial;
 
     /// <summary>
-    /// プロジェクトの健全性ステータス。
-    /// </summary>
-    public ProjectHealth HealthStatus { get; private set; } = ProjectHealth.Healthy;
-
-    /// <summary>
     /// プロジェクトがアーカイブされているかどうか。
     /// </summary>
     public bool IsArchived { get; private set; } = false;
@@ -103,7 +98,6 @@ public class Project
         string Name,
         string Description,
         ProjectStatus Status,
-        ProjectHealth HealthStatus,
         DateTime CreatedAt,
         DateTime UpdatedAt,
         Guid CreatedBy,
@@ -116,7 +110,6 @@ public class Project
         this.Name = Name;
         this.Description = Description;
         this.Status = Status;
-        this.HealthStatus = HealthStatus;
         this.CreatedAt = CreatedAt == default ? DateTime.Now : CreatedAt;
         this.UpdatedAt = UpdatedAt == default ? DateTime.Now : UpdatedAt;
         this.CreatedBy = CreatedBy;
@@ -171,23 +164,12 @@ public class Project
     }
 
     /// <summary>
-    /// プロジェクトの健全性を更新します。
-    /// </summary>
-    public void UpdateHealth(ProjectHealth health)
-    {
-        if (HealthStatus == health)
-            return;
-        HealthStatus = health;
-    }
-
-    /// <summary>
     /// プロジェクトの基本情報を更新します。
     /// </summary>
-    public void UpdateBasicInfo(string name, ProjectStatus status, ProjectHealth health)
+    public void UpdateBasicInfo(string name, ProjectStatus status)
     {
         UpdateName(name);
         UpdateStatus(status);
-        UpdateHealth(health);
     }
 
     /// <summary>

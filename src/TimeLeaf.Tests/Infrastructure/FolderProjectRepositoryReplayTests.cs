@@ -146,14 +146,7 @@ public class FolderProjectRepositoryReplayTests
         var basicFile = new DefaultCommitFileNameGenerator().Generate(baseTime.AddSeconds(1), "user1", "Project_Basic");
         await File.WriteAllTextAsync(
             Path.Combine(changesDir, basicFile),
-            JsonSerializer.Serialize(
-                new
-                {
-                    Name = "Desc Test Project",
-                    Status = "InProgress",
-                    HealthStatus = "Healthy",
-                }
-            )
+            JsonSerializer.Serialize(new { Name = "Desc Test Project", Status = "InProgress" })
         );
 
         var descFile = new DefaultCommitFileNameGenerator().Generate(
@@ -215,14 +208,7 @@ public class FolderProjectRepositoryReplayTests
         var projectBasicFile = generator.Generate(baseTime.AddMinutes(1), "user1", "Project_Basic");
         await File.WriteAllTextAsync(
             Path.Combine(changesDir, projectBasicFile),
-            JsonSerializer.Serialize(
-                new
-                {
-                    Name = "Complex Project",
-                    Status = "InProgress",
-                    HealthStatus = "Healthy",
-                }
-            )
+            JsonSerializer.Serialize(new { Name = "Complex Project", Status = "InProgress" })
         );
 
         // 2. Task Planning

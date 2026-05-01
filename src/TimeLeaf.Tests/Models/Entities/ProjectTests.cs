@@ -60,15 +60,13 @@ public class ProjectTests
         var project = new Project(Guid.Empty);
         var name = "Updated Name";
         var status = TimeLeaf.Models.Enums.ProjectStatus.InProgress;
-        var health = TimeLeaf.Models.Enums.ProjectHealth.Warning;
 
         // Act
-        project.UpdateBasicInfo(name, status, health);
+        project.UpdateBasicInfo(name, status);
 
         // Assert
         Assert.AreEqual(name, project.Name);
         Assert.AreEqual(status, project.Status);
-        Assert.AreEqual(health, project.HealthStatus);
     }
 
     /// <summary>

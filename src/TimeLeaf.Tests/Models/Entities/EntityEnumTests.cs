@@ -8,19 +8,14 @@ namespace TimeLeaf.Tests.Models.Entities;
 [TestClass]
 public class EntityEnumTests
 {
-    /// <summary>
-    /// テスト観点: Project エンティティに状態(Status)と健全性(Health)が追加され、
-    /// デフォルト値が適切であることを確認する。
-    /// </summary>
     [TestMethod]
-    public void Project_ShouldHaveStatusAndHealth()
+    public void Project_ShouldHaveStatus()
     {
         // Arrange & Act
         var project = new Project(Guid.Empty);
 
         // Assert
         Assert.AreEqual(ProjectStatus.Initial, project.Status);
-        Assert.AreEqual(ProjectHealth.Healthy, project.HealthStatus);
     }
 
     /// <summary>

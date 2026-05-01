@@ -27,7 +27,7 @@ public class ProjectFileSystemSerializerTests
     public void Serialize_ShouldReturnExpectedJson()
     {
         // Arrange
-        var dto = new ProjectBasicDto("テストプロジェクト", ProjectStatus.InProgress, ProjectHealth.Healthy);
+        var dto = new ProjectBasicDto("テストプロジェクト", ProjectStatus.InProgress);
         _serializer = new JsonProjectFileSystemSerializer();
 
         // Act

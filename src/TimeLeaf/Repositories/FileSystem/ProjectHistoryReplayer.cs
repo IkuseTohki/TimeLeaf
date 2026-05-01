@@ -143,7 +143,7 @@ internal class ProjectHistoryReplayer
         var dto = _serializer.Deserialize<ProjectBasicDto>(json);
         if (dto == null)
             return;
-        project.UpdateBasicInfo(dto.Name, dto.Status, dto.HealthStatus);
+        project.UpdateBasicInfo(dto.Name, dto.Status);
     }
 
     private void ApplyProjectDescription(Project project, string json)

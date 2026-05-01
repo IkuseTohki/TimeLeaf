@@ -86,7 +86,6 @@ public class ProjectSaveCoordinator : IProjectSaveCoordinator
             e.PropertyName == nameof(ProjectViewModel.Name)
             || e.PropertyName == nameof(ProjectViewModel.Description)
             || e.PropertyName == nameof(ProjectViewModel.Status)
-            || e.PropertyName == nameof(ProjectViewModel.HealthStatus)
             || e.PropertyName == nameof(ProjectViewModel.Tasks)
             || e.PropertyName == nameof(ProjectViewModel.Milestones)
         )

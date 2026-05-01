@@ -284,7 +284,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
             var commitTime = DateTime.Now;
 
             // 1. プロジェクト情報の保存 (3カテゴリ)
-            var basicSnapshot = new ProjectBasicDto(project.Name, project.Status, project.HealthStatus);
+            var basicSnapshot = new ProjectBasicDto(project.Name, project.Status);
             await TrySaveCategoryAsync(project.Id, changesDir, "Project_Basic", basicSnapshot, commitTime, userId);
 
             var descSnapshot = new ProjectDescriptionDto(project.Description);

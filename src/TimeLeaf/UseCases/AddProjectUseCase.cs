@@ -20,10 +20,10 @@ public class AddProjectUseCase : IAddProjectUseCase
         _identityService = identityService ?? throw new ArgumentNullException(nameof(identityService));
     }
 
-    public async Task<Project> ExecuteAsync(string name, string description, ProjectStatus status, ProjectHealth health)
+    public async Task<Project> ExecuteAsync(string name, string description, ProjectStatus status)
     {
         var project = new Project(_identityService.CurrentUserId);
-        project.UpdateBasicInfo(name, status, health);
+        project.UpdateBasicInfo(name, status);
         project.UpdateDescription(description);
 
         await _projectService.SaveProjectAsync(project);

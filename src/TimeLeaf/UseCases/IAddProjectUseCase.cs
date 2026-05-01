@@ -6,5 +6,5 @@ namespace TimeLeaf.UseCases;
 
 public interface IAddProjectUseCase
 {
-    Task<Project> ExecuteAsync(string name, string description, ProjectStatus status, ProjectHealth health);
+    Task<Project> ExecuteAsync(string name, string description, ProjectStatus status);
 }
