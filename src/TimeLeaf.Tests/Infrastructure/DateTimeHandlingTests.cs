@@ -85,7 +85,7 @@ public class DateTimeHandlingTests
     public void DisplayLastUpdated_ShouldHandleRelativeTimesCorrectly()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         var viewModelFactoryMock = new Mock<IViewModelFactory>();
         var vm = new ProjectViewModel(
             project,

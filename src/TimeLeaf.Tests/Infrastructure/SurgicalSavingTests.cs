@@ -57,9 +57,9 @@ public class SurgicalSavingTests
             new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object
         );
         var repo = new FolderProjectRepository(_tempDir, monitor, serializer, generator, _loggerMock.Object);
-        var projectA = new Project();
+        var projectA = new Project(Guid.Empty);
         projectA.UpdateName("ProjectA");
-        var projectB = new Project();
+        var projectB = new Project(Guid.Empty);
         projectB.UpdateName("ProjectB");
 
         // Act
@@ -89,7 +89,7 @@ public class SurgicalSavingTests
             new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object
         );
         var repo = new FolderProjectRepository(_tempDir, monitor, serializer, generator, _loggerMock.Object);
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.UpdateName("SameName");
 
         // 1回目の保存

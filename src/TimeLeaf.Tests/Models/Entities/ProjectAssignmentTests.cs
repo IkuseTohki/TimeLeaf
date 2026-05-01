@@ -15,7 +15,7 @@ public class ProjectAssignmentTests
     public void AssignUser_ShouldAddUserToAssignedUsers()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         var userId = Guid.NewGuid();
 
         // Act
@@ -32,7 +32,7 @@ public class ProjectAssignmentTests
     public void AssignUser_ShouldNotDuplicateUsers()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         var userId = Guid.NewGuid();
 
         // Act
@@ -50,7 +50,7 @@ public class ProjectAssignmentTests
     public void UnassignUser_ShouldRemoveUserFromAssignedUsers()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         var userId = Guid.NewGuid();
         project.AssignUser(userId);
 

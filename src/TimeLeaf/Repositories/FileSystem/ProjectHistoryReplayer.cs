@@ -35,12 +35,12 @@ internal class ProjectHistoryReplayer
     /// <summary>
     /// 指定されたディレクトリ内の履歴ファイルをスキャンし、プロジェクトの状態を復元します。
     /// </summary>
-    public async Task<Project> ReplayAsync(string changesDir, Guid projectId, DateTime createdAt)
+    public async Task<Project> ReplayAsync(string changesDir, Guid projectId, DateTime createdAt, Guid createdBy)
     {
         var files = ScanChangeFiles(changesDir, projectId);
         _logger.LogDebug("Found {ChangeFileCount} change files for project {ProjectId}.", files.Count, projectId);
 
-        var project = new Project { Id = projectId, CreatedAt = createdAt };
+        var project = new Project(createdBy) { Id = projectId, CreatedAt = createdAt };
         var allCommentData = new List<(CommentDto Dto, DateTime Timestamp)>();
         var taskMap = new Dictionary<Guid, ProjectTask>();
 

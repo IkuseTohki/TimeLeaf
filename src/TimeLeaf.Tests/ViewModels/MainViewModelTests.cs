@@ -141,7 +141,7 @@ public class MainViewModelTests
     public async Task Initialize_ShouldCheckDeadlines()
     {
         // Arrange
-        var projects = new List<Project> { new Project() };
+        var projects = new List<Project> { new Project(Guid.Empty) };
         _loadUseCaseMock.Setup(x => x.ExecuteAsync()).ReturnsAsync(projects);
 
         // Act
@@ -179,7 +179,7 @@ public class MainViewModelTests
     public async Task Initialize_ShouldLoadAllProjects()
     {
         // Arrange
-        var projects = new List<Project> { new Project(), new Project() };
+        var projects = new List<Project> { new Project(Guid.Empty), new Project(Guid.Empty) };
         _loadUseCaseMock.Setup(x => x.ExecuteAsync()).ReturnsAsync(projects);
 
         // Act
@@ -199,7 +199,7 @@ public class MainViewModelTests
     {
         // Arrange
         var viewModel = CreateViewModel();
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.UpdateName("Test Project");
         var projectViewModel = new ProjectViewModel(
             project,
@@ -278,7 +278,7 @@ public class MainViewModelTests
     {
         // Arrange
         var viewModel = CreateViewModel();
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.UpdateName("Test Project");
         var projectViewModel = new ProjectViewModel(
             project,

@@ -25,7 +25,7 @@ public class CheckAssignmentUseCaseTests
         // Arrange
         /* テスト観点: ユーザーがプロジェクトにアサインされている場合、IsUserAssignedがtrueを返すことを確認する。 */
         var userId = Guid.NewGuid();
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.UpdateName("Test Project");
         project.AssignUser(userId);
 
@@ -45,7 +45,7 @@ public class CheckAssignmentUseCaseTests
         /* テスト観点: ユーザーがプロジェクトにアサインされていない場合、IsUserAssignedがfalseを返すことを確認する。 */
         var userId = Guid.NewGuid();
         var otherUserId = Guid.NewGuid();
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.UpdateName("Test Project");
         project.AssignUser(otherUserId);
 
@@ -64,7 +64,7 @@ public class CheckAssignmentUseCaseTests
         // Arrange
         /* テスト観点: プロジェクトに誰もアサインされていない場合、IsUserAssignedがfalseを返すことを確認する。 */
         var userId = Guid.NewGuid();
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.UpdateName("Test Project");
 
         _identityServiceMock.Setup(i => i.CurrentUserId).Returns(userId);

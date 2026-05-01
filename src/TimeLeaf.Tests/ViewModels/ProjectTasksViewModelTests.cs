@@ -51,7 +51,7 @@ public class ProjectTasksViewModelTests
         _detailLoggerMock = new Mock<ILogger<TaskDetailViewModel>>();
         _detectRisksUseCase = new DetectProjectRisksUseCase(new CalculateCriticalPathUseCase());
 
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         _projectViewModel = new ProjectViewModel(
             project,
             Guid.NewGuid(),

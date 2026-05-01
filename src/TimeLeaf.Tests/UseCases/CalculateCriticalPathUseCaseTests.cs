@@ -18,7 +18,7 @@ public class CalculateCriticalPathUseCaseTests
     public async Task ExecuteAsync_ShouldIdentifyCriticalPath()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
 
         // t1: 4/1 - 4/5 (5日間)
         var t1 = new ProjectTask { Id = Guid.NewGuid() };
@@ -60,7 +60,7 @@ public class CalculateCriticalPathUseCaseTests
     public async Task ExecuteAsync_ShouldConsiderLagDays()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
 
         // t1: 4/1 - 4/5 (5日間)
         var t1 = new ProjectTask { Id = Guid.NewGuid() };

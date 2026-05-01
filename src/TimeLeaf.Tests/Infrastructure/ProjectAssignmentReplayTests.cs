@@ -60,7 +60,7 @@ public class ProjectAssignmentReplayTests
         var replayer = new ProjectHistoryReplayer(_serializer, _fileNameGenerator, NullLogger.Instance, new());
 
         // Act
-        var project = await replayer.ReplayAsync(_changesDir, projectId, DateTime.Now);
+        var project = await replayer.ReplayAsync(_changesDir, projectId, DateTime.Now, Guid.Empty);
 
         // Assert
         Assert.AreEqual(2, project.AssignedUserIds.Count);

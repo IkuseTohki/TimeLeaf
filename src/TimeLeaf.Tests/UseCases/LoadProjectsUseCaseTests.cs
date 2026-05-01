@@ -28,7 +28,7 @@ public class LoadProjectsUseCaseTests
     public async Task ExecuteAsync_ShouldCallLoadAndReturnAllProjects()
     {
         // Arrange
-        var projects = new List<Project> { new Project(), new Project() };
+        var projects = new List<Project> { new Project(Guid.Empty), new Project(Guid.Empty) };
         _projectServiceMock.Setup(s => s.AllProjects).Returns(projects);
 
         var useCase = new LoadProjectsUseCase(_projectServiceMock.Object);

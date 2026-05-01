@@ -25,7 +25,7 @@ public class FindProjectUseCaseTests
         // Arrange
         /* テスト観点: 指定されたIDでプロジェクトが存在する場合、Serviceから取得したProjectオブジェクトが返されることを確認する。 */
         var projectId = Guid.NewGuid();
-        var expectedProject = new Project() { Id = projectId };
+        var expectedProject = new Project(Guid.Empty) { Id = projectId };
         expectedProject.UpdateName("Test Project");
         _projectServiceMock.Setup(s => s.GetProjectAsync(projectId)).ReturnsAsync(expectedProject);
 

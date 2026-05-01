@@ -16,7 +16,7 @@ public class ProjectFlowViewModelTests
     public void Constructor_ShouldPopulateTaskNodes()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.AddTask(new ProjectTask { Id = Guid.NewGuid() });
         project.AddTask(new ProjectTask { Id = Guid.NewGuid() });
 

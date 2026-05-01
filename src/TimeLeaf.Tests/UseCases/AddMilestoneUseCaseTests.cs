@@ -27,7 +27,7 @@ public class AddMilestoneUseCaseTests
     public async Task ExecuteAsync_ShouldAddMilestoneAndSaveProject()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.UpdateName("Test Project");
 
         var useCase = new AddMilestoneUseCase(_saveUseCaseMock.Object);

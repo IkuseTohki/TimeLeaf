@@ -94,8 +94,15 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                     return null;
                 }
                 _logger.LogDebug("Loading project {ProjectId} from {Directory}", meta.ProjectId, dir);
+
+                Guid createdBy = Guid.Empty;
+                if (Guid.TryParse(meta.CreatedBy, out var cbGuid))
+                {
+                    createdBy = cbGuid;
+                }
+
                 // .project から判明している ID を渡して Replay を開始
-                var project = await ReplayProjectAsync(dir, meta.ProjectId, meta.CreatedAt);
+                var project = await ReplayProjectAsync(dir, meta.ProjectId, meta.CreatedAt, createdBy);
 
                 // ライフサイクル状態を適用
                 if (project != null)
@@ -142,6 +149,8 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         bool isArchived = false;
         DateTime? lockedUntil = null;
 
+        Guid createdBy = Guid.Empty;
+
         if (File.Exists(metaPath))
         {
             var metaJson = await File.ReadAllTextAsync(metaPath);
@@ -151,10 +160,14 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                 createdAt = meta.CreatedAt;
                 isArchived = meta.IsArchived;
                 lockedUntil = meta.LockedUntil;
+                if (Guid.TryParse(meta.CreatedBy, out var cbGuid))
+                {
+                    createdBy = cbGuid;
+                }
             }
         }
 
-        var project = await ReplayProjectAsync(targetDir, projectId, createdAt);
+        var project = await ReplayProjectAsync(targetDir, projectId, createdAt, createdBy);
         if (project != null)
         {
             project.SetLifecycleStatus(isArchived, lockedUntil);
@@ -162,7 +175,12 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         return project;
     }
 
-    private async Task<Project?> ReplayProjectAsync(string projectDirPath, Guid projectId, DateTime createdAt)
+    private async Task<Project?> ReplayProjectAsync(
+        string projectDirPath,
+        Guid projectId,
+        DateTime createdAt,
+        Guid createdBy
+    )
     {
         var changesDir = Path.Combine(projectDirPath, "changes");
         if (!Directory.Exists(changesDir))
@@ -172,11 +190,11 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                 changesDir,
                 projectId
             );
-            return new Project { Id = projectId, CreatedAt = createdAt };
+            return new Project(createdBy) { Id = projectId, CreatedAt = createdAt };
         }
 
         var replayer = new ProjectHistoryReplayer(_serializer, _fileNameGenerator, _logger, _lastSavedContent);
-        return await replayer.ReplayAsync(changesDir, projectId, createdAt);
+        return await replayer.ReplayAsync(changesDir, projectId, createdAt, createdBy);
     }
 
     public async System.Threading.Tasks.Task SaveAllAsync(IEnumerable<Project> projects, string userId)

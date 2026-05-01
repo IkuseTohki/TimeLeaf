@@ -212,7 +212,7 @@ public class ReplayUpdatedAtTests
     public async Task Save_ShouldUpdateUpdatedAtOnlyAfterSuccess()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.UpdateName("Initial Name");
         var originalUpdatedAt = project.UpdatedAt;
 

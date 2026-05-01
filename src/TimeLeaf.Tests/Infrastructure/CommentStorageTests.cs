@@ -57,7 +57,7 @@ public class CommentStorageTests
             new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object
         );
         var repository = new FolderProjectRepository(_tempDir, monitor, serializer, generator, _loggerMock.Object);
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.UpdateName("CommentTestProject");
         var task = new ProjectTask();
         task.UpdateName("Task with Comment");
@@ -108,7 +108,7 @@ public class CommentStorageTests
             new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object
         );
         var repository = new FolderProjectRepository(_tempDir, monitor, serializer, generator, _loggerMock.Object);
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.UpdateName("MultiCommentProject");
         var task = new ProjectTask();
         task.UpdateName("Task");

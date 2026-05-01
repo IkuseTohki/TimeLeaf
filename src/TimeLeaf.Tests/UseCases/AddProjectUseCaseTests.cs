@@ -13,11 +13,14 @@ namespace TimeLeaf.Tests.UseCases;
 public class AddProjectUseCaseTests
 {
     private Mock<IProjectService> _projectServiceMock = null!;
+    private Mock<IIdentityService> _identityServiceMock = null!;
 
     [TestInitialize]
     public void Setup()
     {
         _projectServiceMock = new Mock<IProjectService>();
+        _identityServiceMock = new Mock<IIdentityService>();
+        _identityServiceMock.Setup(s => s.CurrentUserId).Returns(Guid.NewGuid());
     }
 
     /// <summary>
@@ -27,7 +30,7 @@ public class AddProjectUseCaseTests
     public async Task ExecuteAsync_ShouldCreateAndSaveProject()
     {
         // Arrange
-        var useCase = new AddProjectUseCase(_projectServiceMock.Object);
+        var useCase = new AddProjectUseCase(_projectServiceMock.Object, _identityServiceMock.Object);
         var name = "New Project";
         var description = "Description";
         var status = TimeLeaf.Models.Enums.ProjectStatus.InProgress;
@@ -45,5 +48,29 @@ public class AddProjectUseCaseTests
 
         // サービスの保存が呼び出されていること
         _projectServiceMock.Verify(s => s.SaveProjectAsync(It.Is<Project>(p => p.Id == project.Id)), Times.Once);
+    }
+
+    /// <summary>
+    /// テスト観点: AddProjectUseCase でプロジェクトを作成した際、作成者が AssignedUserIds に含まれていることを確認する。
+    /// </summary>
+    [TestMethod]
+    public async Task ExecuteAsync_ShouldAddCreatorToAssignedUserIds()
+    {
+        // Arrange
+        var creatorId = Guid.NewGuid();
+        _identityServiceMock.Setup(s => s.CurrentUserId).Returns(creatorId);
+        var useCase = new AddProjectUseCase(_projectServiceMock.Object, _identityServiceMock.Object);
+
+        // Act
+        var project = await useCase.ExecuteAsync(
+            "Test",
+            "Desc",
+            TimeLeaf.Models.Enums.ProjectStatus.Initial,
+            TimeLeaf.Models.Enums.ProjectHealth.Healthy
+        );
+
+        // Assert
+        Assert.AreEqual(creatorId, project.CreatedBy);
+        Assert.IsTrue(project.AssignedUserIds.Contains(creatorId), "作成者が AssignedUserIds に含まれていること");
     }
 }

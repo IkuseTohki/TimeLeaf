@@ -33,7 +33,7 @@ public class ProjectSaveCoordinatorTests
     public async Task PropertyChanged_ShouldTriggerSave()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         var vm = new ProjectViewModel(
             project,
             Guid.NewGuid(),
@@ -56,7 +56,7 @@ public class ProjectSaveCoordinatorTests
     {
         // Arrange
         _coordinator.StartMonitoring(_projects);
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         var vm = new ProjectViewModel(
             project,
             Guid.NewGuid(),
@@ -77,7 +77,7 @@ public class ProjectSaveCoordinatorTests
     public async Task WhenDisabled_ShouldNotTriggerSave()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         var vm = new ProjectViewModel(
             project,
             Guid.NewGuid(),

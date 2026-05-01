@@ -22,7 +22,7 @@ public class SyncUserIdentityUseCaseTests
         // Arrange
         var myId = Guid.NewGuid();
         var myIdentity = new User(myId, "自分", "#00FF00", "my.png");
-        var project = new Project();
+        var project = new Project(Guid.Empty);
 
         var mockIdentityService = new Mock<IIdentityService>();
         mockIdentityService.Setup(s => s.GetCurrentIdentityAsync()).ReturnsAsync(myIdentity);

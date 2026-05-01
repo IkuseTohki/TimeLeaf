@@ -57,13 +57,13 @@ public class HomeViewModelTests
     public void TaskStats_ShouldReflectAllProjects()
     {
         // Arrange
-        var p1 = new Project();
+        var p1 = new Project(Guid.Empty);
         p1.UpdateName("P1");
         var t1 = new ProjectTask();
         t1.UpdateStatus(TaskStatus.InProgress);
         p1.AddTask(t1);
 
-        var p2 = new Project();
+        var p2 = new Project(Guid.Empty);
         p2.UpdateName("P2");
         var t2 = new ProjectTask();
         t2.UpdateStatus(TaskStatus.NotStarted);
@@ -87,13 +87,13 @@ public class HomeViewModelTests
     public void UpcomingDeadlines_ShouldIncludeTasksFromAllProjects()
     {
         // Arrange
-        var p1 = new Project();
+        var p1 = new Project(Guid.Empty);
         var t1 = new ProjectTask();
         t1.UpdateName("Task 1");
         t1.UpdateSchedule(null, DateTime.Now.AddDays(1));
         p1.AddTask(t1);
 
-        var p2 = new Project();
+        var p2 = new Project(Guid.Empty);
         var t2 = new ProjectTask();
         t2.UpdateName("Task 2");
         t2.UpdateSchedule(null, DateTime.Now.AddDays(2));

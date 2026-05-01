@@ -29,7 +29,7 @@ public class CheckTaskDeadlinesUseCaseTests
     public void Execute_WithOverdueTask_ShouldSendNotification()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.UpdateName("Test Project");
 
         var task = new ProjectTask();
@@ -66,7 +66,7 @@ public class CheckTaskDeadlinesUseCaseTests
     public void Execute_WithTaskDueToday_ShouldNotSendNotification()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         var task = new ProjectTask();
         task.UpdateName("Today's Task");
 
@@ -97,7 +97,7 @@ public class CheckTaskDeadlinesUseCaseTests
     public void Execute_WithHealthyTasks_ShouldNotSendNotification()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         var task1 = new ProjectTask();
         task1.UpdateName("Future Task");
         task1.UpdateSchedule(null, DateTime.Now.Date.AddDays(1));

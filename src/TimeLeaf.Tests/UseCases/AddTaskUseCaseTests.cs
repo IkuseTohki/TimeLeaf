@@ -28,7 +28,7 @@ public class AddTaskUseCaseTests
     public async System.Threading.Tasks.Task ExecuteAsync_ShouldAddTaskAndSaveProject()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.UpdateName("Test Project");
 
         var useCase = new AddTaskUseCase(_saveUseCaseMock.Object);
@@ -79,7 +79,7 @@ public class AddTaskUseCaseTests
     public async System.Threading.Tasks.Task ExecuteAsync_WithParentId_ShouldSetParentId()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         var parentTask = new ProjectTask();
         project.AddTask(parentTask);
 

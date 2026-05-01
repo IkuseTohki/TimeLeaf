@@ -16,6 +16,11 @@ public class Project
     private readonly List<Guid> _assignedUserIds = new();
 
     /// <summary>
+    /// プロジェクトの作成者ID。
+    /// </summary>
+    public Guid CreatedBy { get; init; }
+
+    /// <summary>
     /// プロジェクトの作成日時。
     /// </summary>
     public DateTime CreatedAt { get; init; } = DateTime.Now;
@@ -78,9 +83,15 @@ public class Project
     /// <summary>
     /// デフォルトコンストラクタ。
     /// </summary>
-    public Project()
+    /// <param name="createdBy">プロジェクトの作成者ID。</param>
+    public Project(Guid createdBy)
     {
         Id = Guid.NewGuid();
+        CreatedBy = createdBy;
+        if (createdBy != Guid.Empty)
+        {
+            AssignUser(createdBy);
+        }
     }
 
     /// <summary>
@@ -95,8 +106,10 @@ public class Project
         ProjectHealth HealthStatus,
         DateTime CreatedAt,
         DateTime UpdatedAt,
+        Guid CreatedBy,
         List<ProjectTask>? Tasks,
-        List<Milestone>? Milestones
+        List<Milestone>? Milestones,
+        List<Guid>? AssignedUserIds
     )
     {
         this.Id = Id == Guid.Empty ? Guid.NewGuid() : Id;
@@ -106,10 +119,25 @@ public class Project
         this.HealthStatus = HealthStatus;
         this.CreatedAt = CreatedAt == default ? DateTime.Now : CreatedAt;
         this.UpdatedAt = UpdatedAt == default ? DateTime.Now : UpdatedAt;
+        this.CreatedBy = CreatedBy;
+
         if (Tasks != null)
             _tasks.AddRange(Tasks);
         if (Milestones != null)
             _milestones.AddRange(Milestones);
+        if (AssignedUserIds != null)
+        {
+            foreach (var userId in AssignedUserIds)
+            {
+                AssignUser(userId);
+            }
+        }
+
+        // 作成者がアサインリストに含まれていない場合は追加（互換性・不整合防止）
+        if (CreatedBy != Guid.Empty && !_assignedUserIds.Contains(CreatedBy))
+        {
+            AssignUser(CreatedBy);
+        }
     }
 
     /// <summary>

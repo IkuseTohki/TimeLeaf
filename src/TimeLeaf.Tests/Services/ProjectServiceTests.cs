@@ -32,9 +32,9 @@ public class ProjectServiceTests
     {
         /* テスト観点: 全プロジェクトのロードを呼び出した際、キャッシュがリセットされ、リポジトリからのデータが格納されることを確認する。 */
         // Arrange
-        var p1 = new Project() { Id = Guid.NewGuid() };
+        var p1 = new Project(Guid.Empty) { Id = Guid.NewGuid() };
         p1.UpdateName("P1");
-        var p2 = new Project() { Id = Guid.NewGuid() };
+        var p2 = new Project(Guid.Empty) { Id = Guid.NewGuid() };
         p2.UpdateName("P2");
         var projects = new List<Project> { p1, p2 };
         _repositoryMock.Setup(r => r.LoadAllAsync()).ReturnsAsync(projects);
@@ -53,7 +53,7 @@ public class ProjectServiceTests
         /* テスト観点: プロジェクトがキャッシュに存在する場合、リポジトリにアクセスせずにキャッシュから取得することを確認する。 */
         // Arrange
         var projectId = Guid.NewGuid();
-        var project = new Project() { Id = projectId };
+        var project = new Project(Guid.Empty) { Id = projectId };
         project.UpdateName("Test");
         _repositoryMock.Setup(r => r.LoadAllAsync()).ReturnsAsync(new List<Project> { project });
         await _projectService.LoadAllAsync(); // Cache it
@@ -70,7 +70,7 @@ public class ProjectServiceTests
     public async Task SaveProjectAsync_ThrowsException_WhenRepositoryFails()
     {
         // Arrange
-        var project = new Project() { Id = Guid.NewGuid() };
+        var project = new Project(Guid.Empty) { Id = Guid.NewGuid() };
         _repositoryMock
             .Setup(r => r.SaveAsync(It.IsAny<Project>(), It.IsAny<string>()))
             .ThrowsAsync(new InvalidOperationException("Save failed"));
@@ -96,7 +96,7 @@ public class ProjectServiceTests
     {
         /* テスト観点: 新規プロジェクトを保存した際、ProjectAddedイベントが発火されることを確認する。 */
         // Arrange
-        var project = new Project() { Id = Guid.NewGuid() };
+        var project = new Project(Guid.Empty) { Id = Guid.NewGuid() };
         project.UpdateName("New Project");
         var userId = Guid.NewGuid();
         _identityServiceMock.Setup(i => i.CurrentUserId).Returns(userId);
@@ -124,7 +124,7 @@ public class ProjectServiceTests
         /* テスト観点: 既存プロジェクトを保存した際、ProjectUpdatedイベントが発火されることを確認する。 */
         // Arrange
         var projectId = Guid.NewGuid();
-        var project = new Project() { Id = projectId };
+        var project = new Project(Guid.Empty) { Id = projectId };
         project.UpdateName("Existing Project");
         _repositoryMock.Setup(r => r.LoadAllAsync()).ReturnsAsync(new List<Project> { project });
         await _projectService.LoadAllAsync(); // Add to cache
@@ -149,7 +149,7 @@ public class ProjectServiceTests
         // Arrange
         /* テスト観点: リポジトリのProjectChangedイベントを受けた際、キャッシュが最新化されProjectUpdatedが発火することを確認する。 */
         var projectId = Guid.NewGuid();
-        var updatedProject = new Project() { Id = projectId };
+        var updatedProject = new Project(Guid.Empty) { Id = projectId };
         updatedProject.UpdateName("Updated Externally");
         _repositoryMock.Setup(r => r.LoadAsync(projectId)).ReturnsAsync(updatedProject);
 

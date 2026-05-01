@@ -36,7 +36,7 @@ public class ProjectViewModelTests
     public void IsAssignedToMe_ShouldBeTrue_WhenMyIdIsInAssignedUserIds()
     {
         var myId = Guid.NewGuid();
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.AssignUser(myId);
 
         var viewModel = new ProjectViewModel(
@@ -54,7 +54,7 @@ public class ProjectViewModelTests
     {
         var myId = Guid.NewGuid();
         var otherId = Guid.NewGuid();
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.AssignUser(otherId);
 
         var viewModel = new ProjectViewModel(
@@ -71,7 +71,7 @@ public class ProjectViewModelTests
     public async System.Threading.Tasks.Task JoinProjectCommand_ShouldAssignMe()
     {
         var myId = Guid.NewGuid();
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         var mockJoinUseCase = new Mock<IJoinProjectUseCase>();
         var viewModel = new ProjectViewModel(project, myId, mockJoinUseCase.Object, _viewModelFactoryMock.Object);
 
@@ -84,7 +84,7 @@ public class ProjectViewModelTests
     [TestMethod]
     public void ProjectViewModel_UpdateProperty_ShouldUpdateModel()
     {
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.UpdateName("Old Name");
         project.UpdateDescription("Old Desc");
         var viewModel = new ProjectViewModel(
@@ -119,7 +119,7 @@ public class ProjectViewModelTests
     [TestMethod]
     public void ProjectModel_AddTask_ShouldReflectInViewModel()
     {
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.UpdateName("Test Project");
         var viewModel = new ProjectViewModel(
             project,
@@ -141,7 +141,7 @@ public class ProjectViewModelTests
     [TestMethod]
     public void ProjectModel_RemoveTask_ShouldReflectInViewModel()
     {
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.UpdateName("Test Project");
         var task = new ProjectTask();
         task.UpdateName("Task 1");
@@ -168,7 +168,7 @@ public class ProjectViewModelTests
     public void Name_ShouldUpdateModelAndRaisePropertyChanged()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.UpdateName("Old Name");
         var viewModel = new ProjectViewModel(
             project,
@@ -203,7 +203,7 @@ public class ProjectViewModelTests
     public void Description_ShouldUpdateModelAndRaisePropertyChanged()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.UpdateDescription("Old Description");
         var viewModel = new ProjectViewModel(
             project,
@@ -242,7 +242,7 @@ public class ProjectViewModelTests
     public void Tasks_CollectionChanged_ShouldRaisePropertyChangedForTotalCosts()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         var viewModel = new ProjectViewModel(
             project,
             Guid.NewGuid(),
@@ -293,7 +293,7 @@ public class ProjectViewModelTests
     public void Tasks_CollectionRemoved_ShouldRaisePropertyChangedForTotalCosts()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         var task = new ProjectTask();
         task.UpdateEstimatedCost(10);
         task.UpdateActualCost(5);
@@ -345,7 +345,7 @@ public class ProjectViewModelTests
     public void TotalCosts_ShouldBeZero_WhenNoTasks()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         var viewModel = new ProjectViewModel(
             project,
             Guid.NewGuid(),
@@ -366,7 +366,7 @@ public class ProjectViewModelTests
     public void Tasks_IndividualTaskPropertyChanged_ShouldRaisePropertyChangedForTotalCosts()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         var task1 = new ProjectTask();
         task1.UpdateEstimatedCost(10);
         task1.UpdateActualCost(5);
@@ -423,7 +423,7 @@ public class ProjectViewModelTests
     public void AddTask_ShouldAddOnlyOneViewModel()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.UpdateName("Test Project");
         var projectViewModel = new ProjectViewModel(
             project,
@@ -452,7 +452,7 @@ public class ProjectViewModelTests
     public void ModelClear_ShouldClearViewModelTasks()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.UpdateName("Test Project");
         var projectViewModel = new ProjectViewModel(
             project,
@@ -495,7 +495,7 @@ public class ProjectViewModelTests
         // DateTime.Now の微細な Ticks による誤差を防ぐため、秒単位で丸める
         var now = DateTime.Now;
         var baseTime = new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second, DateTimeKind.Local);
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.SetUpdatedAt(baseTime.AddSeconds(-secondsOffset));
         var viewModel = new ProjectViewModel(
             project,
@@ -519,7 +519,7 @@ public class ProjectViewModelTests
     {
         // Arrange
         var targetDate = new DateTime(2026, 1, 1, 12, 34, 0, DateTimeKind.Local);
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.SetUpdatedAt(targetDate);
         var viewModel = new ProjectViewModel(
             project,
@@ -547,7 +547,7 @@ public class ProjectViewModelTests
         // 1時間前の時刻を作成 (Local)
         var oneHourAgo = DateTime.Now.AddHours(-1);
 
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.SetUpdatedAt(oneHourAgo);
         var viewModel = new ProjectViewModel(
             project,
@@ -573,7 +573,7 @@ public class ProjectViewModelTests
     public void SyncFromModel_ShouldPreserveExistingViewModelInstances()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         var task1 = new ProjectTask();
         task1.UpdateName("Task 1");
         project.AddTask(task1);

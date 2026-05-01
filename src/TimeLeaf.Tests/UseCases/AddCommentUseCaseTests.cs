@@ -32,7 +32,7 @@ public class AddCommentUseCaseTests
     public async Task ExecuteAsync_ShouldAddCommentAndSaveProject()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         var task = new ProjectTask();
         project.AddTask(task);
 

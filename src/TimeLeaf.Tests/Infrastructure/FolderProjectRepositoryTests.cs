@@ -65,7 +65,7 @@ public class FolderProjectRepositoryTests
     {
         // Arrange
         var repository = CreateRepository();
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.UpdateName("StructureTest");
         var task = new ProjectTask();
         task.UpdateName("SubFolderTask");
@@ -124,7 +124,7 @@ public class FolderProjectRepositoryTests
     {
         // Arrange
         var repository = CreateRepository();
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.UpdateBasicInfo("ReadOnlyTest", ProjectStatus.InProgress, ProjectHealth.Healthy);
 
         // Act
@@ -155,7 +155,7 @@ public class FolderProjectRepositoryTests
         // Arrange
         var repository = CreateRepository();
         var projectId = Guid.NewGuid();
-        var project = new Project { Id = projectId };
+        var project = new Project(Guid.Empty) { Id = projectId };
         project.UpdateName("CostTest");
         var deadline = new DateTime(2026, 12, 31, 23, 59, 0);
         var task = new ProjectTask();
@@ -188,7 +188,7 @@ public class FolderProjectRepositoryTests
         // Arrange
         var repository = CreateRepository();
         var projectId = Guid.NewGuid();
-        var project = new Project { Id = projectId };
+        var project = new Project(Guid.Empty) { Id = projectId };
         project.UpdateName("RelationTest");
 
         var depTaskId = Guid.NewGuid();
@@ -224,7 +224,7 @@ public class FolderProjectRepositoryTests
         // Arrange
         var repository = CreateRepository();
         var projectId = Guid.NewGuid();
-        var project = new Project { Id = projectId };
+        var project = new Project(Guid.Empty) { Id = projectId };
         project.UpdateName("MilestoneTest");
         var mDate = new DateTime(2026, 10, 10);
         var mLabel = "Final Release";
@@ -251,7 +251,7 @@ public class FolderProjectRepositoryTests
         // Arrange
         var repository = CreateRepository();
         var projectId = Guid.NewGuid();
-        var project = new Project { Id = projectId };
+        var project = new Project(Guid.Empty) { Id = projectId };
         project.UpdateName("ScheduleTest");
         var sDate = new DateTime(2026, 4, 1);
         var asDate = new DateTime(2026, 4, 2);
@@ -296,6 +296,8 @@ public class FolderProjectRepositoryTests
             ProjectHealth.Healthy,
             createdAt,
             createdAt,
+            Guid.Empty,
+            null,
             null,
             null
         );
@@ -322,7 +324,7 @@ public class FolderProjectRepositoryTests
         // Arrange
         var repository = CreateRepository();
         var projectId = Guid.NewGuid();
-        var project = new Project { Id = projectId };
+        var project = new Project(Guid.Empty) { Id = projectId };
         project.UpdateName("AssignmentTest");
 
         var user1 = Guid.NewGuid();
@@ -351,7 +353,7 @@ public class FolderProjectRepositoryTests
         // Arrange
         var repository = CreateRepository();
         var projectId = Guid.NewGuid();
-        var project = new Project { Id = projectId };
+        var project = new Project(Guid.Empty) { Id = projectId };
         project.UpdateName("HierarchyTest");
 
         var parentTask = new ProjectTask();

@@ -47,13 +47,13 @@ public class AllTasksViewModelTests
     public void Constructor_ShouldAggregateTasksFromAllProjects()
     {
         // Arrange
-        var p1 = new Project { Id = Guid.NewGuid() };
+        var p1 = new Project(Guid.Empty) { Id = Guid.NewGuid() };
         p1.UpdateName("Project 1");
         var t1 = new ProjectTask();
         t1.UpdateName("Task 1-1");
         p1.AddTask(t1);
 
-        var p2 = new Project { Id = Guid.NewGuid() };
+        var p2 = new Project(Guid.Empty) { Id = Guid.NewGuid() };
         p2.UpdateName("Project 2");
         var t2 = new ProjectTask();
         t2.UpdateName("Task 2-1");
@@ -85,7 +85,7 @@ public class AllTasksViewModelTests
         var viewModel = new AllTasksViewModel(projects);
 
         // Act
-        var p = new Project { Id = Guid.NewGuid() };
+        var p = new Project(Guid.Empty) { Id = Guid.NewGuid() };
         p.UpdateName("New Project");
         var t = new ProjectTask();
         t.UpdateName("New Task");
@@ -105,7 +105,7 @@ public class AllTasksViewModelTests
     public void SearchKeyword_ShouldFilterTasks()
     {
         // Arrange
-        var p = new Project { Id = Guid.NewGuid() };
+        var p = new Project(Guid.Empty) { Id = Guid.NewGuid() };
         p.UpdateName("Project");
         var t1 = new ProjectTask();
         t1.UpdateName("Apple");
@@ -132,7 +132,7 @@ public class AllTasksViewModelTests
     public void ShowOnlyIncomplete_ShouldFilterTasks()
     {
         // Arrange
-        var p = new Project { Id = Guid.NewGuid() };
+        var p = new Project(Guid.Empty) { Id = Guid.NewGuid() };
         p.UpdateName("Project");
         var t1 = new ProjectTask();
         t1.UpdateName("Task 1");
@@ -166,7 +166,7 @@ public class AllTasksViewModelTests
     public void TaskStatusChanged_ShouldUpdateFiltering()
     {
         // Arrange
-        var p = new Project { Id = Guid.NewGuid() };
+        var p = new Project(Guid.Empty) { Id = Guid.NewGuid() };
         p.UpdateName("Project");
         var t = new ProjectTask();
         t.UpdateName("Task 1");
@@ -192,7 +192,7 @@ public class AllTasksViewModelTests
     public void TaskNameChanged_ShouldUpdateFiltering()
     {
         // Arrange
-        var p = new Project { Id = Guid.NewGuid() };
+        var p = new Project(Guid.Empty) { Id = Guid.NewGuid() };
         var t = new ProjectTask();
         t.UpdateName("Initial Name");
         p.AddTask(t);

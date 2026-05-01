@@ -16,7 +16,7 @@ public class ProjectTests
     public void Description_ShouldBeReadAndWrite()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         var description = "This is a test project description.";
 
         // Act
@@ -34,7 +34,7 @@ public class ProjectTests
     public void AddTask_ShouldUpdateTasks()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.UpdateName("Domain Test");
         var task = new ProjectTask();
         task.UpdateName("New Task");
@@ -57,7 +57,7 @@ public class ProjectTests
     public void UpdateBasicInfo_ShouldUpdateProperties()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         var name = "Updated Name";
         var status = TimeLeaf.Models.Enums.ProjectStatus.InProgress;
         var health = TimeLeaf.Models.Enums.ProjectHealth.Warning;
@@ -78,7 +78,7 @@ public class ProjectTests
     public void AssignUser_ShouldAddUserId()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         var userId = Guid.NewGuid();
 
         // Act
@@ -95,7 +95,7 @@ public class ProjectTests
     public void UnassignUser_ShouldRemoveUserId()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         var userId = Guid.NewGuid();
         project.AssignUser(userId);
 
@@ -113,7 +113,7 @@ public class ProjectTests
     public void ReplayAssignments_ShouldOverwriteList()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         var oldId = Guid.NewGuid();
         project.AssignUser(oldId);
 
@@ -136,7 +136,7 @@ public class ProjectTests
     public void ArchiveAndUnarchive_ShouldUpdateStatus()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         Assert.IsFalse(project.IsArchived, "デフォルトは非アーカイブであること");
 
         // Act (Archive)
@@ -157,7 +157,7 @@ public class ProjectTests
     public void LockAndUnlock_ShouldUpdateLockedUntil()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         var lockUntil = DateTime.Now.AddDays(7);
         Assert.IsNull(project.LockedUntil, "デフォルトはロックなしであること");
 
@@ -179,7 +179,7 @@ public class ProjectTests
     public void SetLifecycleStatus_ShouldUpdateProperties()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         var isArchived = true;
         var lockedUntil = DateTime.Now.AddDays(1);
 
@@ -195,7 +195,7 @@ public class ProjectTests
     public void DateTime_ShouldBeLocalByDefault()
     {
         // テスト観点: Projectの作成日時と更新日時がLocal (JST想定) であることを確認する
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.UpdateName("Test Project");
 
         Assert.AreEqual(DateTimeKind.Local, project.CreatedAt.Kind, "CreatedAt は Local であるべき");
@@ -209,7 +209,7 @@ public class ProjectTests
     public void ValidateConstraints_ShouldDetectCycle()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         var taskA = new ProjectTask { Id = Guid.NewGuid() };
         var taskB = new ProjectTask { Id = Guid.NewGuid() };
         project.AddTask(taskA);
@@ -235,7 +235,7 @@ public class ProjectTests
     public void ValidateConstraints_ShouldDetectSelfReference()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         var task = new ProjectTask { Id = Guid.NewGuid() };
         project.AddTask(task);
 
@@ -257,7 +257,7 @@ public class ProjectTests
     public void ValidateConstraints_ShouldDetectDeepCycle()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         var a = new ProjectTask { Id = Guid.NewGuid() };
         var b = new ProjectTask { Id = Guid.NewGuid() };
         var c = new ProjectTask { Id = Guid.NewGuid() };
@@ -275,5 +275,22 @@ public class ProjectTests
 
         // Assert
         Assert.IsFalse(result.IsValid);
+    }
+
+    /// <summary>
+    /// テスト観点: プロジェクト作成時に作成者が自動的にアサイン済みユーザーに含まれることを確認する。
+    /// </summary>
+    [TestMethod]
+    public void Constructor_ShouldAddCreatorToAssignedUserIds()
+    {
+        // Arrange
+        var creatorId = Guid.NewGuid();
+
+        // Act
+        var project = new Project(creatorId);
+
+        // Assert
+        Assert.AreEqual(creatorId, project.CreatedBy, "CreatedBy が正しくセットされていること");
+        Assert.IsTrue(project.AssignedUserIds.Contains(creatorId), "作成者が AssignedUserIds に含まれていること");
     }
 }

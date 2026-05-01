@@ -1,3 +1,4 @@
+using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Models.Enums;
@@ -15,7 +16,7 @@ public class EntityEnumTests
     public void Project_ShouldHaveStatusAndHealth()
     {
         // Arrange & Act
-        var project = new Project();
+        var project = new Project(Guid.Empty);
 
         // Assert
         Assert.AreEqual(ProjectStatus.Initial, project.Status);

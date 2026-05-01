@@ -36,7 +36,7 @@ public class ProjectWorkspaceViewModelTests
         _userServiceMock = new Mock<IUserService>();
         _projects = new ObservableCollection<ProjectViewModel>();
 
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.UpdateName("Test Project");
         _projectViewModel = new ProjectViewModel(
             project,
@@ -98,7 +98,7 @@ public class ProjectWorkspaceViewModelTests
     {
         // Arrange
         var myId = Guid.NewGuid();
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         // 自分はまだアサインされていない
         var projectVm = new ProjectViewModel(
             project,
@@ -132,7 +132,7 @@ public class ProjectWorkspaceViewModelTests
     {
         // Arrange
         var myId = Guid.NewGuid();
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         var projectVm = new ProjectViewModel(
             project,
             myId,

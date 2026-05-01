@@ -27,7 +27,7 @@ public class SaveProjectUseCaseTests
     public async System.Threading.Tasks.Task ExecuteAsync_ShouldCallSaveOnService()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.UpdateName("Single Project");
         var useCase = new SaveProjectUseCase(_projectServiceMock.Object);
 
@@ -45,9 +45,9 @@ public class SaveProjectUseCaseTests
     public async System.Threading.Tasks.Task ExecuteAsync_WithMultipleProjects_ShouldCallSaveAllOnService()
     {
         // Arrange
-        var project1 = new Project();
+        var project1 = new Project(Guid.Empty);
         project1.UpdateName("P1");
-        var project2 = new Project();
+        var project2 = new Project(Guid.Empty);
         project2.UpdateName("P2");
         var projects = new[] { project1, project2 };
 

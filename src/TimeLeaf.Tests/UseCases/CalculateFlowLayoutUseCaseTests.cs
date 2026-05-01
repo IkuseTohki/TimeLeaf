@@ -25,7 +25,7 @@ public class CalculateFlowLayoutUseCaseTests
     public void Execute_ShouldReturnCoordinatesForEachTask()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         var task1 = new ProjectTask();
         task1.UpdateName("Task 1");
         var task2 = new ProjectTask();

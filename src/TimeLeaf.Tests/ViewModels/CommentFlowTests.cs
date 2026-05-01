@@ -57,7 +57,7 @@ public class CommentFlowTests
         var viewModelFactoryMock = new Mock<IViewModelFactory>();
         var loggerMock = new Mock<ILogger<MainViewModel>>();
 
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.UpdateName("Test Project");
         var task = new ProjectTask();
         task.UpdateName("Test Task");

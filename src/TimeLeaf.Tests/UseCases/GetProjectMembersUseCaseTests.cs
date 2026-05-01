@@ -32,7 +32,7 @@ public class GetProjectMembersUseCaseTests
         var user1 = new User(userId1, "User 1", "#FFFFFF", "icon1.png");
         var user2 = new User(userId2, "User 2", "#000000", "icon2.png");
 
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.UpdateName("Project 1");
         project.AssignUser(userId1);
         project.AssignUser(userId2);
@@ -57,7 +57,7 @@ public class GetProjectMembersUseCaseTests
         var userId2 = Guid.NewGuid();
         var user1 = new User(userId1, "User 1", "#FFFFFF", "icon1.png");
 
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.UpdateName("Project 1");
         project.AssignUser(userId1);
         project.AssignUser(userId2); // 見つからない想定

@@ -57,7 +57,7 @@ public class ProjectMetadataTests
             new Mock<ILogger<FileSystemProjectStorageMonitor>>().Object
         );
         var repo = new FolderProjectRepository(_tempDir, monitor, serializer, generator, _loggerMock.Object);
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         project.UpdateName("MetaTest");
 
         // Act
@@ -103,14 +103,14 @@ public class ProjectMetadataTests
         var repo = new FolderProjectRepository(_tempDir, monitor, serializer, generator, _loggerMock.Object);
 
         // 1つ目のプロジェクト作成
-        var p1 = new Project();
+        var p1 = new Project(Guid.Empty);
         p1.UpdateName("First");
         await repo.SaveAsync(p1, _testUserId.ToString());
 
         await System.Threading.Tasks.Task.Delay(100); // 作成日をずらす
 
         // 2つ目のプロジェクト作成
-        var p2 = new Project();
+        var p2 = new Project(Guid.Empty);
         p2.UpdateName("Second");
         await repo.SaveAsync(p2, _testUserId.ToString());
 

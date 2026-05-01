@@ -15,7 +15,7 @@ public class ProjectSnapshotTests
     public void ProjectBasicSnapshot_ShouldSerializeCorrectly()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         // IDはコンストラクタで生成されるが、テスト用にリフレクション等で上書きするか、
         // あるいは現在のIDを使用して検証する
         project.UpdateName("Snapshot Test Project");

@@ -27,7 +27,7 @@ public class DetectProjectRisksUseCaseTests
     public async Task ExecuteAsync_ShouldDetectConstraintViolation()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         var t1 = new ProjectTask { Id = Guid.NewGuid() };
         t1.UpdateName("Predecessor");
         t1.UpdateStatus(TimeLeaf.Models.Enums.TaskStatus.InProgress); // 未完了
@@ -57,7 +57,7 @@ public class DetectProjectRisksUseCaseTests
     public async Task ExecuteAsync_ShouldDetectCycle()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         var t1 = new ProjectTask { Id = Guid.NewGuid() };
         var t2 = new ProjectTask { Id = Guid.NewGuid() };
         project.AddTask(t1);
@@ -83,7 +83,7 @@ public class DetectProjectRisksUseCaseTests
     public async Task ExecuteAsync_ShouldDetectOverdue()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         var task = new ProjectTask { Id = Guid.NewGuid() };
         task.UpdateSchedule(null, DateTime.Today.AddDays(-1)); // 期限切れ
         task.UpdateStatus(TimeLeaf.Models.Enums.TaskStatus.InProgress);
@@ -103,7 +103,7 @@ public class DetectProjectRisksUseCaseTests
     public async Task ExecuteAsync_ShouldDetectSSViolation()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         var t1 = new ProjectTask { Id = Guid.NewGuid() };
         t1.UpdateName("Pre-SS");
         t1.UpdateStatus(TimeLeaf.Models.Enums.TaskStatus.NotStarted); // 未着手
@@ -132,7 +132,7 @@ public class DetectProjectRisksUseCaseTests
     public async Task ExecuteAsync_ShouldDetectFFViolation()
     {
         // Arrange
-        var project = new Project();
+        var project = new Project(Guid.Empty);
         var t1 = new ProjectTask { Id = Guid.NewGuid() };
         t1.UpdateName("Pre-FF");
         t1.UpdateStatus(TimeLeaf.Models.Enums.TaskStatus.InProgress); // 未完了

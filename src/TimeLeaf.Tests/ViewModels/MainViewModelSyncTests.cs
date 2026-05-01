@@ -70,7 +70,7 @@ public class MainViewModelSyncTests
             .Returns((ProjectTask t) => new ProjectTaskViewModel(t, _userServiceMock.Object));
 
         var projectId = Guid.NewGuid();
-        var initialProject = new Project { Id = projectId };
+        var initialProject = new Project(Guid.Empty) { Id = projectId };
         initialProject.UpdateName("Initial");
 
         loadUseCaseMock.Setup(r => r.ExecuteAsync()).ReturnsAsync(new List<Project> { initialProject });
@@ -117,7 +117,7 @@ public class MainViewModelSyncTests
         await System.Threading.Tasks.Task.Delay(100); // InitializeAsync の完了を待つ
 
         // ロードされる「最新」の状態を準備（別のタスクがある状態）
-        var updatedProject = new Project { Id = projectId };
+        var updatedProject = new Project(Guid.Empty) { Id = projectId };
         updatedProject.UpdateName("Updated");
         var taskFromSync = new ProjectTask();
         taskFromSync.UpdateName("Task from Sync");

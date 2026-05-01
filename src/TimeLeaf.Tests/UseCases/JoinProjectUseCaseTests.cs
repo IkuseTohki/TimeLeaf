@@ -21,7 +21,7 @@ public class JoinProjectUseCaseTests
     {
         // Arrange
         var myId = Guid.NewGuid();
-        var project = new Project();
+        var project = new Project(Guid.Empty);
 
         var mockIdentityService = new Mock<IIdentityService>();
         mockIdentityService.Setup(s => s.CurrentUserId).Returns(myId);

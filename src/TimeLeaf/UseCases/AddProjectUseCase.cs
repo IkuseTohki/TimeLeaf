@@ -12,15 +12,17 @@ namespace TimeLeaf.UseCases;
 public class AddProjectUseCase : IAddProjectUseCase
 {
     private readonly IProjectService _projectService;
+    private readonly IIdentityService _identityService;
 
-    public AddProjectUseCase(IProjectService projectService)
+    public AddProjectUseCase(IProjectService projectService, IIdentityService identityService)
     {
         _projectService = projectService ?? throw new ArgumentNullException(nameof(projectService));
+        _identityService = identityService ?? throw new ArgumentNullException(nameof(identityService));
     }
 
     public async Task<Project> ExecuteAsync(string name, string description, ProjectStatus status, ProjectHealth health)
     {
-        var project = new Project();
+        var project = new Project(_identityService.CurrentUserId);
         project.UpdateBasicInfo(name, status, health);
         project.UpdateDescription(description);
 
