@@ -316,6 +316,9 @@ public class MainViewModelTests
             projectViewModel,
             taskViewModel,
             new Mock<IAddCommentUseCase>().Object,
+            new Mock<ISaveProjectUseCase>().Object,
+            new Mock<IDeleteTaskUseCase>().Object,
+            new Mock<IDialogService>().Object,
             new Mock<ILogger<TaskDetailViewModel>>().Object
         ).Object;
         _viewModelFactoryMock

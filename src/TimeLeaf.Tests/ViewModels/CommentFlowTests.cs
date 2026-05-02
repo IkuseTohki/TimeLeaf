@@ -164,6 +164,9 @@ public class CommentFlowTests
             projectVM,
             taskVM,
             addCommentUseCase,
+            new Mock<ISaveProjectUseCase>().Object,
+            new Mock<IDeleteTaskUseCase>().Object,
+            new Mock<IDialogService>().Object,
             new Mock<ILogger<TaskDetailViewModel>>().Object
         );
 

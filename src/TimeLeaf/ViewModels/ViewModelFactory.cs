@@ -165,6 +165,9 @@ public class ViewModelFactory : IViewModelFactory
             projectViewModel,
             taskViewModel,
             _serviceProvider.GetRequiredService<IAddCommentUseCase>(),
+            _serviceProvider.GetRequiredService<ISaveProjectUseCase>(),
+            _serviceProvider.GetRequiredService<IDeleteTaskUseCase>(),
+            _serviceProvider.GetRequiredService<IDialogService>(),
             _serviceProvider.GetRequiredService<ILogger<TaskDetailViewModel>>()
         );
     }

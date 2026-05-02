@@ -285,6 +285,7 @@ public partial class App : Application
         services.AddTransient<IAddTaskUseCase, AddTaskUseCase>();
         services.AddTransient<IAddCommentUseCase, AddCommentUseCase>();
         services.AddTransient<IAddMilestoneUseCase, AddMilestoneUseCase>();
+        services.AddTransient<IDeleteTaskUseCase, DeleteTaskUseCase>();
         services.AddTransient<ICheckTaskDeadlinesUseCase, CheckTaskDeadlinesUseCase>();
         services.AddTransient<ISyncUserIdentityUseCase, SyncUserIdentityUseCase>();
         services.AddTransient<IJoinProjectUseCase, JoinProjectUseCase>();

@@ -10,6 +10,29 @@
              MinHeight="400"
              d:DataContext="{d:DesignInstance wvm:TaskDetailViewModel}"
              mc:Ignorable="d">
+    <UserControl.Resources>
+        <Style x:Key="IconButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="4" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="4">
+                            <ContentPresenter />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="IconPathStyle" TargetType="Path">
+            <Setter Property="Fill" Value="{DynamicResource TextPrimaryBrush}" />
+            <Setter Property="Width" Value="16" />
+            <Setter Property="Height" Value="16" />
+            <Setter Property="Stretch" Value="Uniform" />
+        </Style>
+    </UserControl.Resources>
     <Grid Background="{DynamicResource SurfaceBaseBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -183,14 +206,32 @@
                 Background="{DynamicResource SurfaceBaseBrush}"
                 BorderBrush="{DynamicResource OutlineBaseBrush}"
                 BorderThickness="0,1,0,0">
-            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                <Button MinWidth="100"
-                        Padding="20,6"
-                        Command="{Binding CloseCommand}"
-                        CommandParameter="True"
-                        Content="保存して閉じる"
-                        Style="{StaticResource RoundButtonStyle}" />
-            </StackPanel>
+            <Grid>
+                <Button HorizontalAlignment="Left"
+                        Command="{Binding BackCommand}"
+                        Style="{StaticResource IconButton}">
+                    <Path Data="{StaticResource BackIconGeometry}" Style="{StaticResource IconPathStyle}" />
+                </Button>
+
+                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                    <Button Margin="0,0,8,0"
+                            Command="{Binding DeleteCommand}"
+                            Style="{StaticResource IconButton}">
+                        <Path Data="{StaticResource DeleteIconGeometry}" Style="{StaticResource IconPathStyle}" />
+                    </Button>
+                    <Button MinWidth="80"
+                            Margin="0,0,8,0"
+                            Padding="16,6"
+                            Command="{Binding SaveCommand}"
+                            Content="保存"
+                            Style="{StaticResource PrimaryButtonStyle}" />
+                    <Button MinWidth="80"
+                            Padding="16,6"
+                            Command="{Binding CloseCommand}"
+                            Content="閉じる"
+                            Style="{StaticResource SecondaryButtonStyle}" />
+                </StackPanel>
+            </Grid>
         </Border>
     </Grid>
 </UserControl>
