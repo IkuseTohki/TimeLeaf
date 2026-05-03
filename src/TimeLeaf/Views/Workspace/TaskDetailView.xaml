@@ -247,12 +247,6 @@
                 BorderBrush="{DynamicResource OutlineBaseBrush}"
                 BorderThickness="0,1,0,0">
             <Grid>
-                <Button HorizontalAlignment="Left"
-                        Command="{Binding BackCommand}"
-                        Style="{StaticResource IconButton}">
-                    <Path Data="{StaticResource BackIconGeometry}" Style="{StaticResource IconPathStyle}" />
-                </Button>
-
                 <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
                     <Button Margin="0,0,8,0"
                             Command="{Binding DeleteCommand}"

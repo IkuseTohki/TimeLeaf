@@ -42,6 +42,10 @@ public class TaskDetailViewModelTests
         _userServiceMock = new Mock<IUserService>();
         _joinProjectUseCaseMock = new Mock<IJoinProjectUseCase>();
         _viewModelFactoryMock = new Mock<IViewModelFactory>();
+        _viewModelFactoryMock
+            .Setup(x => x.CreateProjectTaskViewModel(It.IsAny<ProjectTask>()))
+            .Returns((ProjectTask t) => new ProjectTaskViewModel(t, _userServiceMock.Object));
+
         _projectServiceMock = new Mock<IProjectService>();
 
         var project = new Project(Guid.NewGuid());
@@ -68,6 +72,7 @@ public class TaskDetailViewModelTests
             null,
             null
         );
+        project.AddTask(task);
         _taskViewModel = new ProjectTaskViewModel(task, _userServiceMock.Object);
 
         _viewModel = new TaskDetailViewModel(
@@ -146,14 +151,14 @@ public class TaskDetailViewModelTests
     }
 
     [TestMethod]
-    public async Task BackCommand_WhenNotDirty_ShouldCloseImmediately()
+    public async Task CloseCommand_WhenNotDirty_ShouldCloseImmediately()
     {
         // Arrange
         bool closeRequested = false;
         _viewModel.RequestClose += (res) => closeRequested = true;
 
         // Act
-        await _viewModel.BackCommand.ExecuteAsync(null);
+        _viewModel.CloseCommand.Execute(null);
 
         // Assert
         Assert.IsTrue(closeRequested);
@@ -161,20 +166,145 @@ public class TaskDetailViewModelTests
     }
 
     [TestMethod]
-    public async Task BackCommand_WhenDirty_ShouldShowConfirmation()
+    public async Task CloseCommand_WhenDirtyAndCanceled_ShouldNotClose()
     {
         // Arrange
-        _viewModel.Task.Name = "Changed Name"; // 作業用コピーを変更
-        _dialogServiceMock.Setup(x => x.ShowConfirmationDialog(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
+        _viewModel.Task.Name = "Changed Name";
+        _dialogServiceMock.Setup(x => x.ShowConfirmationDialog(It.IsAny<string>(), It.IsAny<string>())).Returns(false);
 
         bool closeRequested = false;
         _viewModel.RequestClose += (res) => closeRequested = true;
 
         // Act
-        await _viewModel.BackCommand.ExecuteAsync(null);
+        _viewModel.CloseCommand.Execute(null);
 
         // Assert
-        _dialogServiceMock.Verify(x => x.ShowConfirmationDialog(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
-        Assert.IsTrue(closeRequested);
+        Assert.IsFalse(closeRequested, "キャンセルした場合は閉じられないこと");
+    }
+
+    [TestMethod]
+    public void ReloadLatest_WhenNotDirty_ShouldSyncFromMaster()
+    {
+        // Arrange
+        // マスターモデルを外部から書き換えられたと仮定
+        var latestName = "Latest Name From Other User";
+        _taskViewModel.Model.UpdateName(latestName);
+        _taskViewModel.UpdateFromModel(_taskViewModel.Model);
+
+        _viewModel.HasExternalChange = true;
+
+        // Act
+        _viewModel.ReloadLatestCommand.Execute(null);
+
+        // Assert
+        Assert.AreEqual(latestName, _viewModel.Task.Name, "最新のデータが作業コピーに反映されること");
+        Assert.IsFalse(_viewModel.HasExternalChange, "リロード後は HasExternalChange が解消されること");
+    }
+
+    [TestMethod]
+    public void ReloadLatest_WhenDirtyAndConfirmed_ShouldSyncFromMaster()
+    {
+        // Arrange
+        _viewModel.Task.Name = "My Edit";
+        var latestName = "Latest Name";
+        _taskViewModel.Model.UpdateName(latestName);
+
+        _dialogServiceMock.Setup(x => x.ShowConfirmationDialog(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
+
+        // Act
+        _viewModel.ReloadLatestCommand.Execute(null);
+
+        // Assert
+        Assert.AreEqual(latestName, _viewModel.Task.Name);
+        Assert.IsFalse(_viewModel.IsDirty);
+    }
+
+    [TestMethod]
+    public async Task SaveCommand_WhenExternalChangeExistsAndConfirmed_ShouldSave()
+    {
+        // Arrange
+        _viewModel.Task.Name = "My Final Version";
+        _viewModel.HasExternalChange = true;
+        _dialogServiceMock.Setup(x => x.ShowConfirmationDialog(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
+
+        // Act
+        await _viewModel.SaveCommand.ExecuteAsync(null);
+
+        // Assert
+        _saveProjectUseCaseMock.Verify(x => x.ExecuteAsync(It.IsAny<Project>()), Times.Once);
+        Assert.IsFalse(_viewModel.HasExternalChange);
+    }
+
+    [TestMethod]
+    public async Task SaveCommand_WhenExternalChangeExistsAndCanceled_ShouldNotSave()
+    {
+        // Arrange
+        _viewModel.Task.Name = "My Edit";
+        _viewModel.HasExternalChange = true;
+        _dialogServiceMock.Setup(x => x.ShowConfirmationDialog(It.IsAny<string>(), It.IsAny<string>())).Returns(false);
+
+        // Act
+        await _viewModel.SaveCommand.ExecuteAsync(null);
+
+        // Assert
+        _saveProjectUseCaseMock.Verify(x => x.ExecuteAsync(It.IsAny<Project>()), Times.Never);
+        Assert.IsTrue(_viewModel.HasExternalChange);
+    }
+
+    [TestMethod]
+    public void ProjectUpdated_ForDifferentProject_ShouldNotSetHasExternalChange()
+    {
+        // Arrange
+        var otherProject = new Project(Guid.NewGuid());
+
+        // Act
+        _projectServiceMock.Raise(x => x.ProjectUpdated += null, otherProject);
+
+        // Assert
+        Assert.IsFalse(_viewModel.HasExternalChange, "別プロジェクトの更新は無視すること");
+    }
+
+    [TestMethod]
+    public async Task AddComment_ShouldUpdateBothMasterAndWorkingCopy()
+    {
+        // Arrange
+        var content = "New Comment";
+        _viewModel.NewCommentContent = content;
+
+        // AddCommentUseCase が呼ばれたらモデルにコメントが追加されるようにモック（または本物）が必要
+        // ここでは、ViewModel 内部でモデルに反映されることを期待する
+        _addCommentUseCaseMock
+            .Setup(x => x.ExecuteAsync(It.IsAny<Project>(), It.IsAny<ProjectTask>(), content))
+            .Callback<Project, ProjectTask, string>(
+                (p, t, c) =>
+                {
+                    t.AddComment(new Comment(Guid.NewGuid(), t.Id, Guid.NewGuid(), DateTime.Now, c, null));
+                }
+            )
+            .Returns(System.Threading.Tasks.Task.CompletedTask);
+
+        // Act
+        await _viewModel.AddCommentCommand.ExecuteAsync(null);
+
+        // Assert
+        Assert.AreEqual(1, _taskViewModel.Model.Comments.Count, "マスターにコメントが追加されていること");
+        Assert.AreEqual(1, _viewModel.Task.Comments.Count, "作業用コピーの表示も更新されていること");
+        Assert.AreEqual(string.Empty, _viewModel.NewCommentContent, "入力欄がクリアされていること");
+    }
+
+    [TestMethod]
+    public void AddCommentCommand_CanExecute_ShouldReturnFalse_WhenContentIsEmpty()
+    {
+        // Arrange
+        _viewModel.NewCommentContent = "";
+
+        // Assert
+        Assert.IsFalse(_viewModel.AddCommentCommand.CanExecute(null));
+
+        // Act
+        _viewModel.NewCommentContent = "Valid";
+
+        // Assert
+        Assert.IsTrue(_viewModel.AddCommentCommand.CanExecute(null));
     }
 }

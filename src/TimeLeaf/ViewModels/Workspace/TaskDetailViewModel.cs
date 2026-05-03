@@ -174,30 +174,21 @@ public partial class TaskDetailViewModel : ObservableObject, IDialogViewModel, I
     }
 
     /// <summary>
-    /// 詳細ウィンドウを閉じます。
+    /// 詳細ウィンドウを閉じます。未保存の変更がある場合は確認します。
     /// </summary>
     /// <param name="result">ダイアログの結果。</param>
     [RelayCommand]
     private void Close(object? result)
     {
-        bool dialogResult = result is bool b ? b : (result is string s && bool.TryParse(s, out var parsed) && parsed);
-        RequestClose?.Invoke(dialogResult);
-    }
-
-    /// <summary>
-    /// 戻るボタンの処理。未保存の変更がある場合は確認します。
-    /// </summary>
-    [RelayCommand]
-    private async System.Threading.Tasks.Task Back()
-    {
         if (IsDirty)
         {
-            var result = _dialogService.ShowConfirmationDialog("変更を破棄して戻りますか？", "未保存の変更があります");
-            if (!result)
+            var confirm = _dialogService.ShowConfirmationDialog("変更を破棄して閉じますか？", "未保存の変更があります");
+            if (!confirm)
                 return;
         }
 
-        RequestClose?.Invoke(false);
+        bool dialogResult = result is bool b ? b : (result is string s && bool.TryParse(s, out var parsed) && parsed);
+        RequestClose?.Invoke(dialogResult);
     }
 
     /// <summary>
