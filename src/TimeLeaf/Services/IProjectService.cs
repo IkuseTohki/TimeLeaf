@@ -35,10 +35,15 @@ public interface IProjectService
     Task SaveProjectAsync(Project project);
 
     /// <summary>
-    /// 複数のプロジェクトを一括で保存します。
+    /// 複数のプロジェクトを一括で非同期保存します。
     /// </summary>
-    /// <param name="projects">保存するプロジェクトのリスト。</param>
+    /// <param name="projects">保存対象のプロジェクトリスト。</param>
     Task SaveAllAsync(IEnumerable<Project> projects);
+
+    /// <summary>
+    /// タスクを削除します。
+    /// </summary>
+    Task DeleteTaskAsync(Project project, Guid taskId);
 
     /// <summary>
     /// プロジェクトが追加された際に発生します。

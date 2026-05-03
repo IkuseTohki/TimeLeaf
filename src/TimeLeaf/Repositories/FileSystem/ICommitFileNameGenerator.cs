@@ -11,7 +11,7 @@ public interface ICommitFileNameGenerator
     /// <summary>
     /// 各要素からファイル名を生成します。
     /// </summary>
-    string Generate(DateTime timestamp, string userId, string category);
+    string Generate(DateTime timestamp, string userId, string category, Guid? entityId = null);
 
     /// <summary>
     /// ファイル名から要素を解析します。

@@ -14,6 +14,7 @@ public class Project
     private readonly List<ProjectTask> _tasks = new();
     private readonly List<Milestone> _milestones = new();
     private readonly List<Guid> _assignedUserIds = new();
+    private readonly List<Guid> _deletedTaskIds = new();
 
     /// <summary>
     /// プロジェクトの作成者ID。
@@ -74,6 +75,11 @@ public class Project
     /// プロジェクトにアサインされているユーザーのID（読み取り専用）。
     /// </summary>
     public IReadOnlyList<Guid> AssignedUserIds => _assignedUserIds;
+
+    /// <summary>
+    /// 論理削除されたタスクのIDリスト（保存後にクリアされるべき作業用状態）。
+    /// </summary>
+    public IReadOnlyList<Guid> DeletedTaskIds => _deletedTaskIds;
 
     /// <summary>
     /// デフォルトコンストラクタ。
@@ -202,6 +208,12 @@ public class Project
         if (task == null)
             throw new ArgumentNullException(nameof(task));
         _tasks.Add(task);
+
+        // もし削除済みリストに入っていた場合は、再追加されたとみなして削除リストから除外する
+        if (_deletedTaskIds.Contains(task.Id))
+        {
+            _deletedTaskIds.Remove(task.Id);
+        }
     }
 
     /// <summary>
@@ -213,7 +225,19 @@ public class Project
         if (task != null)
         {
             _tasks.Remove(task);
+            if (!_deletedTaskIds.Contains(taskId))
+            {
+                _deletedTaskIds.Add(taskId);
+            }
         }
+    }
+
+    /// <summary>
+    /// 削除済みタスクIDの追跡リストをクリアします（保存完了後用）。
+    /// </summary>
+    public void ClearDeletedTaskIds()
+    {
+        _deletedTaskIds.Clear();
     }
 
     /// <summary>

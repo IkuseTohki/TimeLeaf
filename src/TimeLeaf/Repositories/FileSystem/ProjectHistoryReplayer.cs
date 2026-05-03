@@ -38,6 +38,15 @@ internal class ProjectHistoryReplayer
     public async Task<Project> ReplayAsync(string changesDir, Guid projectId, DateTime createdAt, Guid createdBy)
     {
         var files = ScanChangeFiles(changesDir, projectId);
+
+        // 削除マーカー(Tombstone)の検出
+        var deletedTasks = new HashSet<Guid>();
+        var tombstoneFiles = files.Where(f => f.Meta.Category == "Deleted").ToList();
+        foreach (var tombstone in tombstoneFiles)
+        {
+            deletedTasks.Add(tombstone.EntityId);
+        }
+
         _logger.LogDebug("Found {ChangeFileCount} change files for project {ProjectId}.", files.Count, projectId);
 
         var project = new Project(createdBy) { Id = projectId, CreatedAt = createdAt };
@@ -46,6 +55,10 @@ internal class ProjectHistoryReplayer
 
         foreach (var file in files)
         {
+            // 削除済みエンティティの変更は無視
+            if (deletedTasks.Contains(file.EntityId))
+                continue;
+
             await ApplyChangeAsync(project, taskMap, allCommentData, file.Path, file.EntityId, file.Meta);
         }
 

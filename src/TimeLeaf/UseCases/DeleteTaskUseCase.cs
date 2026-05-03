@@ -25,7 +25,6 @@ public class DeleteTaskUseCase : IDeleteTaskUseCase
         if (project == null)
             throw new ArgumentNullException(nameof(project));
 
-        project.RemoveTask(taskId);
-        await _projectService.SaveProjectAsync(project);
+        await _projectService.DeleteTaskAsync(project, taskId);
     }
 }

@@ -11,9 +11,12 @@ public class DefaultCommitFileNameGenerator : ICommitFileNameGenerator
 {
     private const string TimeFormat = "yyyyMMdd_HHmmss_fff";
 
-    public string Generate(DateTime timestamp, string userId, string category)
+    public string Generate(DateTime timestamp, string userId, string category, Guid? entityId = null)
     {
-        // 常に渡された日時のまま（JST前提）文字列化する。
+        if (category == "Deleted" && entityId.HasValue)
+        {
+            return $"{timestamp.ToString(TimeFormat)}_{userId}_{entityId}_{category}.json";
+        }
         return $"{timestamp.ToString(TimeFormat)}_{userId}_{category}.json";
     }
 
@@ -38,8 +41,17 @@ public class DefaultCommitFileNameGenerator : ICommitFileNameGenerator
         );
 
         var userId = parts[3];
-        // カテゴリは残りのパーツすべて（カテゴリ名に _ が含まれる可能性があるため）
-        var category = string.Join("_", parts, 4, parts.Length - 4);
+
+        // カテゴリ名にGUIDが含まれているか確認（Deletedの場合）
+        string category;
+        if (parts.Length >= 6 && parts[parts.Length - 1] == "Deleted")
+        {
+            category = parts[parts.Length - 1];
+        }
+        else
+        {
+            category = string.Join("_", parts, 4, parts.Length - 4);
+        }
 
         return new CommitFileName(timestamp, userId, category);
     }

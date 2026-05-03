@@ -111,6 +111,15 @@ public class ProjectService : IProjectService, IDisposable
         }
     }
 
+    public async Task DeleteTaskAsync(Project project, Guid taskId)
+    {
+        if (project == null)
+            throw new ArgumentNullException(nameof(project));
+
+        project.RemoveTask(taskId);
+        await SaveProjectAsync(project);
+    }
+
     private async void OnProjectExternalChanged(Guid projectId)
     {
         _logger.LogInformation("External change detected for project {ProjectId}. Re-syncing...", projectId);

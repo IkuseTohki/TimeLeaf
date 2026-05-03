@@ -291,4 +291,51 @@ public class ProjectTests
         Assert.AreEqual(creatorId, project.CreatedBy, "CreatedBy が正しくセットされていること");
         Assert.IsTrue(project.AssignedUserIds.Contains(creatorId), "作成者が AssignedUserIds に含まれていること");
     }
+
+    /// <summary>
+    /// テスト観点: タスクを削除した際、プロジェクトからタスクが消え、DeletedTaskIds に ID が記録されることを確認する。
+    /// </summary>
+    [TestMethod]
+    public void RemoveTask_ShouldTrackDeletedTaskId()
+    {
+        // Arrange
+        var project = new Project(Guid.Empty);
+        var taskId = Guid.NewGuid();
+        var task = new ProjectTask { Id = taskId };
+        project.AddTask(task);
+
+        // Act
+        project.RemoveTask(taskId);
+
+        // Assert
+        Assert.AreEqual(0, project.Tasks.Count);
+        Assert.AreEqual(1, project.DeletedTaskIds.Count);
+        Assert.AreEqual(taskId, project.DeletedTaskIds[0]);
+
+        // Act: クリア
+        project.ClearDeletedTaskIds();
+        Assert.AreEqual(0, project.DeletedTaskIds.Count, "クリア後はリストが空になること");
+    }
+
+    /// <summary>
+    /// テスト観点: 削除したタスクを再度追加した際、DeletedTaskIds から ID が除去されることを確認する。
+    /// </summary>
+    [TestMethod]
+    public void AddTask_ShouldRemoveFromDeletedTaskIds_IfPreviouslyDeleted()
+    {
+        // Arrange
+        var project = new Project(Guid.Empty);
+        var taskId = Guid.NewGuid();
+        var task = new ProjectTask { Id = taskId };
+        project.AddTask(task);
+        project.RemoveTask(taskId);
+        Assert.AreEqual(1, project.DeletedTaskIds.Count);
+
+        // Act
+        project.AddTask(task);
+
+        // Assert
+        Assert.AreEqual(1, project.Tasks.Count);
+        Assert.AreEqual(0, project.DeletedTaskIds.Count, "再追加されたタスクは削除リストから除去されるべき");
+    }
 }

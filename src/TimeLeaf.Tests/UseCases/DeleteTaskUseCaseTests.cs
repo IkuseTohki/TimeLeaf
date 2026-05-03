@@ -23,31 +23,7 @@ public class DeleteTaskUseCaseTests
     }
 
     [TestMethod]
-    public async Task ExecuteAsync_ShouldRemoveTaskFromProjectAndSave()
-    {
-        // Arrange
-        var project = new Project(Guid.NewGuid());
-        var task = new ProjectTask();
-        task.UpdateName("Task to delete");
-        project.AddTask(task);
-        var taskId = task.Id;
-
-        Assert.AreEqual(1, project.Tasks.Count);
-
-        // Act
-        await _useCase.ExecuteAsync(project, taskId);
-
-        // Assert
-        Assert.AreEqual(0, project.Tasks.Count, "タスクがプロジェクトから削除されていること");
-        _projectServiceMock.Verify(
-            x => x.SaveProjectAsync(project),
-            Times.Once,
-            "サービスの保存が呼び出されていること"
-        );
-    }
-
-    [TestMethod]
-    public async Task ExecuteAsync_WithNonExistentTask_ShouldStillSave()
+    public async Task ExecuteAsync_ShouldDelegateToDeleteTaskAsync()
     {
         // Arrange
         var project = new Project(Guid.NewGuid());
@@ -57,6 +33,10 @@ public class DeleteTaskUseCaseTests
         await _useCase.ExecuteAsync(project, taskId);
 
         // Assert
-        _projectServiceMock.Verify(x => x.SaveProjectAsync(project), Times.Once, "存在しないタスクでも保存処理は走る");
+        _projectServiceMock.Verify(
+            x => x.DeleteTaskAsync(project, taskId),
+            Times.Once,
+            "ProjectService.DeleteTaskAsync が呼び出されていること"
+        );
     }
 }

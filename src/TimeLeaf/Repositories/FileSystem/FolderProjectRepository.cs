@@ -283,7 +283,25 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
             var changesDir = Path.Combine(projectDir, "changes");
             var commitTime = DateTime.Now;
 
-            // 1. プロジェクト情報の保存 (3カテゴリ)
+            // 1. 削除マーカー（Tombstone）の生成
+            foreach (var taskId in project.DeletedTaskIds)
+            {
+                var taskDir = Path.Combine(changesDir, taskId.ToString());
+                if (!Directory.Exists(taskDir))
+                    Directory.CreateDirectory(taskDir);
+
+                var tombstoneFileName = _fileNameGenerator.Generate(commitTime, userId, "Deleted", taskId);
+                var tombstonePath = Path.Combine(taskDir, tombstoneFileName);
+
+                if (!File.Exists(tombstonePath))
+                {
+                    await File.WriteAllTextAsync(tombstonePath, "{}");
+                    _monitor.MarkFileAsJustWritten(tombstoneFileName);
+                    _logger.LogInformation("Created tombstone for task {TaskId}.", taskId);
+                }
+            }
+
+            // 2. プロジェクト情報の保存 (4カテゴリ)
             var basicSnapshot = new ProjectBasicDto(project.Name, project.Status);
             await TrySaveCategoryAsync(project.Id, changesDir, "Project_Basic", basicSnapshot, commitTime, userId);
 
@@ -305,7 +323,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
             var membersSnapshot = new ProjectMembersDto { AssignedUserIds = project.AssignedUserIds.ToList() };
             await TrySaveCategoryAsync(project.Id, changesDir, "Project_Members", membersSnapshot, commitTime, userId);
 
-            // 2. タスク情報の保存 (各タスク 3カテゴリ)
+            // 3. タスク情報の保存 (各タスク 3カテゴリ)
             foreach (var task in project.Tasks)
             {
                 var planning = new TaskPlanningDto(
@@ -363,13 +381,15 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                     isTask: true
                 );
 
-                // 3. コメントの保存 (各コメント 1ファイル)
+                // 4. コメントの保存 (各コメント 1ファイル)
                 foreach (var comment in task.Comments)
                 {
                     await TrySaveCommentAsync(project.Id, task.Id, changesDir, comment, userId);
                 }
             }
 
+            // 保存完了後、ドメインの状態をリセット
+            project.ClearDeletedTaskIds();
             project.SetUpdatedAt(commitTime);
         }
         catch (Exception ex)
