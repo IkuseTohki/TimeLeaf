@@ -222,4 +222,93 @@ public class ProjectTaskTests
         }
         catch (ArgumentException) { }
     }
+
+    /// <summary>
+    /// テスト観点: Clone メソッドによってディープコピーが作成されることを確認する。
+    /// </summary>
+    [TestMethod]
+    public void Clone_ShouldCreateDeepCopy()
+    {
+        // Arrange
+        var original = new ProjectTask(
+            Guid.NewGuid(),
+            "Original Task",
+            "Description",
+            TaskStatus.InProgress,
+            TaskPriority.High,
+            DateTime.Now,
+            DateTime.Now.AddDays(1),
+            null,
+            null,
+            10.0,
+            2.0,
+            "Assignee",
+            new System.Collections.Generic.List<TaskConstraint> { new TaskConstraint(Guid.NewGuid()) },
+            new System.Collections.Generic.List<Comment>()
+        );
+
+        // Act
+        var clone = original.Clone();
+
+        // Assert
+        Assert.IsNotNull(clone);
+        Assert.AreNotSame(original, clone);
+        Assert.AreEqual(original.Id, clone.Id);
+        Assert.AreEqual(original.Name, clone.Name);
+        Assert.AreEqual(original.Constraints.Count, clone.Constraints.Count);
+        // TaskConstraint は record（不変）のため、参照が同一であっても問題ないが、
+        // リスト自体は別物であることを確認する
+        Assert.AreNotSame(original.Constraints, clone.Constraints);
+    }
+
+    /// <summary>
+    /// テスト観点: MergeFrom メソッドによってデータが正しくマージされることを確認する。
+    /// </summary>
+    [TestMethod]
+    public void MergeFrom_ShouldUpdateProperties()
+    {
+        // Arrange
+        var target = new ProjectTask(
+            Guid.NewGuid(),
+            "Old Name",
+            "",
+            TaskStatus.NotStarted,
+            TaskPriority.Low,
+            null,
+            null,
+            null,
+            null,
+            0,
+            0,
+            "",
+            null,
+            null
+        );
+        var source = new ProjectTask(
+            target.Id,
+            "New Name",
+            "New Desc",
+            TaskStatus.Completed,
+            TaskPriority.High,
+            DateTime.Now,
+            DateTime.Now,
+            DateTime.Now,
+            DateTime.Now,
+            10,
+            5,
+            "user1",
+            null,
+            null
+        );
+
+        // Act
+        target.MergeFrom(source);
+
+        // Assert
+        Assert.AreEqual("New Name", target.Name);
+        Assert.AreEqual("New Desc", target.Description);
+        Assert.AreEqual(TaskStatus.Completed, target.Status);
+        Assert.AreEqual(TaskPriority.High, target.Priority);
+        Assert.AreEqual("user1", target.Assignee);
+    }
 }

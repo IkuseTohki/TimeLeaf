@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using TimeLeaf.Models.Enums;
 
 namespace TimeLeaf.Models.Entities;
@@ -23,6 +25,7 @@ public class ProjectTask
     /// <summary>
     /// 親タスクのID。
     /// </summary>
+    [JsonIgnore]
     public Guid? ParentId { get; private set; }
 
     /// <summary>
@@ -36,6 +39,7 @@ public class ProjectTask
     /// <summary>
     /// 子タスクのリスト（読み取り専用）。
     /// </summary>
+    [JsonIgnore]
     public IReadOnlyList<ProjectTask> Children => _children;
 
     /// <summary>
@@ -119,42 +123,42 @@ public class ProjectTask
     /// </summary>
     [System.Text.Json.Serialization.JsonConstructor]
     public ProjectTask(
-        Guid Id,
-        string Name,
-        string Description,
-        TaskStatus Status,
-        TaskPriority Priority,
-        DateTime? ScheduledStartDate,
-        DateTime? Deadline,
-        DateTime? ActualStartDate,
-        DateTime? ActualEndDate,
-        double EstimatedCost,
-        double ActualCost,
-        string Assignee,
-        List<TaskConstraint>? Constraints,
-        List<Comment>? Comments
+        Guid id,
+        string name,
+        string description,
+        TaskStatus status,
+        TaskPriority priority,
+        DateTime? scheduledStartDate,
+        DateTime? deadline,
+        DateTime? actualStartDate,
+        DateTime? actualEndDate,
+        double estimatedCost,
+        double actualCost,
+        string assignee,
+        List<TaskConstraint>? constraints,
+        List<Comment>? comments
     )
     {
-        if (Id != Guid.Empty)
-            this.Id = Id;
-        this.Name = Name;
-        this.Description = Description;
-        this.Status = Status;
-        this.Priority = Priority;
-        this.ScheduledStartDate = ScheduledStartDate;
-        this.Deadline = Deadline;
-        this.ActualStartDate = ActualStartDate;
-        this.ActualEndDate = ActualEndDate;
-        this.EstimatedCost = EstimatedCost;
-        this.ActualCost = ActualCost;
-        this.Assignee = Assignee;
-        if (Constraints != null)
+        if (id != Guid.Empty)
+            this.Id = id;
+        this.Name = name;
+        this.Description = description;
+        this.Status = status;
+        this.Priority = priority;
+        this.ScheduledStartDate = scheduledStartDate;
+        this.Deadline = deadline;
+        this.ActualStartDate = actualStartDate;
+        this.ActualEndDate = actualEndDate;
+        this.EstimatedCost = estimatedCost;
+        this.ActualCost = actualCost;
+        this.Assignee = assignee;
+        if (constraints != null)
         {
-            _constraints.AddRange(Constraints);
-            _dependencies.AddRange(Constraints.Select(c => c.PredecessorId));
+            _constraints.AddRange(constraints);
+            _dependencies.AddRange(constraints.Select(c => c.PredecessorId));
         }
-        if (Comments != null)
-            _comments.AddRange(Comments);
+        if (comments != null)
+            _comments.AddRange(comments);
     }
 
     /// <summary>
@@ -365,4 +369,62 @@ public class ProjectTask
             TaskStatus.InReview => 0.8,
             _ => 0.0,
         };
+
+    /// <summary>
+    /// このタスクのディープコピーを作成します。
+    /// </summary>
+    /// <returns>複製された ProjectTask インスタンス。</returns>
+    public ProjectTask Clone()
+    {
+        var clone = new ProjectTask(
+            this.Id,
+            this.Name,
+            this.Description,
+            this.Status,
+            this.Priority,
+            this.ScheduledStartDate,
+            this.Deadline,
+            this.ActualStartDate,
+            this.ActualEndDate,
+            this.EstimatedCost,
+            this.ActualCost,
+            this.Assignee,
+            this.Constraints.ToList(),
+            this.Comments.Select(c => new Comment(
+                    c.Id,
+                    c.TaskId,
+                    c.AuthorId,
+                    c.CreatedAt,
+                    c.Content,
+                    c.AttachmentLinks.ToList()
+                ))
+                .ToList()
+        );
+        clone.SetParentId(this.ParentId);
+        return clone;
+    }
+
+    /// <summary>
+    /// 指定されたタスクの内容をこのタスクにマージ（反映）します。
+    /// ID は変更されません。
+    /// </summary>
+    /// <param name="source">コピー元となるタスク。</param>
+    public void MergeFrom(ProjectTask source)
+    {
+        if (source == null)
+            throw new ArgumentNullException(nameof(source));
+
+        UpdateName(source.Name);
+        UpdateDescription(source.Description);
+        UpdateStatus(source.Status);
+        UpdatePriority(source.Priority);
+        UpdateSchedule(source.ScheduledStartDate, source.Deadline);
+        UpdateActualDates(source.ActualStartDate, source.ActualEndDate);
+        UpdateEstimatedCost(source.EstimatedCost);
+        UpdateActualCost(source.ActualCost);
+        AssignTo(source.Assignee);
+
+        LoadConstraints(source.Constraints);
+        LoadComments(source.Comments);
+    }
 }

@@ -40,6 +40,10 @@
         </Grid.RowDefinitions>
 
         <Grid IsEnabled="{Binding ProjectViewModel.IsAssignedToMe}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <!-- 左側: メインエリア（可変幅） -->
@@ -47,8 +51,42 @@
                 <!-- 右側: プロパティ欄 (幅180) -->
             </Grid.ColumnDefinitions>
 
+            <!-- 外部変更通知バナー -->
+            <Border Grid.Row="0"
+                    Grid.ColumnSpan="2"
+                    Margin="12,12,12,0"
+                    Padding="12,8"
+                    Background="{DynamicResource BrandPrimaryBrush}"
+                    CornerRadius="4"
+                    Visibility="{Binding HasExternalChange, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal">
+                        <Path Margin="0,0,8,0"
+                              VerticalAlignment="Center"
+                              Data="M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z"
+                              Fill="White"
+                              Stretch="Uniform" />
+                        <TextBlock VerticalAlignment="Center"
+                                   FontWeight="Bold"
+                                   Foreground="White"
+                                   Text="他ユーザーによる変更が検知されました。" />
+                    </StackPanel>
+                    <Button Grid.Column="1"
+                            Padding="8,2"
+                            Command="{Binding ReloadLatestCommand}"
+                            Content="最新を読み込む"
+                            Style="{StaticResource SecondaryButtonStyle}" />
+                </Grid>
+            </Border>
+
             <!-- 左側: メインコンテンツ (縦に 1.タイトル, 2.説明, 3.対話) -->
-            <Grid Grid.Column="0" Margin="24,12">
+            <Grid Grid.Row="1"
+                  Grid.Column="0"
+                  Margin="24,12">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <!-- 1. タイトル -->
@@ -151,7 +189,9 @@
             </Grid>
 
             <!-- 右側: プロパティ サイドバー -->
-            <Border Grid.Column="1" Style="{StaticResource TaskDetailSidebarStyle}">
+            <Border Grid.Row="1"
+                    Grid.Column="1"
+                    Style="{StaticResource TaskDetailSidebarStyle}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel>
                         <TextBlock Style="{StaticResource TaskPanelSectionHeaderStyle}" Text="プロパティ" />

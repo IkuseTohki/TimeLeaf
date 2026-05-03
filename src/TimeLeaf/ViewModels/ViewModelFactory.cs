@@ -168,6 +168,8 @@ public class ViewModelFactory : IViewModelFactory
             _serviceProvider.GetRequiredService<ISaveProjectUseCase>(),
             _serviceProvider.GetRequiredService<IDeleteTaskUseCase>(),
             _serviceProvider.GetRequiredService<IDialogService>(),
+            _serviceProvider.GetRequiredService<IUserService>(),
+            _serviceProvider.GetRequiredService<IProjectService>(),
             _serviceProvider.GetRequiredService<ILogger<TaskDetailViewModel>>()
         );
     }

@@ -167,6 +167,8 @@ public class CommentFlowTests
             new Mock<ISaveProjectUseCase>().Object,
             new Mock<IDeleteTaskUseCase>().Object,
             new Mock<IDialogService>().Object,
+            _userServiceMock.Object,
+            new Mock<IProjectService>().Object,
             new Mock<ILogger<TaskDetailViewModel>>().Object
         );
 
