@@ -213,6 +213,29 @@
         <Setter Property="BorderThickness" Value="1,0,0,0" />
     </Style>
 
+    <!-- コメント入力エリア：外枠スタイル -->
+    <Style x:Key="TaskDetailCommentInputAreaStyle" TargetType="Border">
+        <Setter Property="Padding" Value="0,8,0,0" />
+        <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
+        <Setter Property="BorderThickness" Value="0,1,0,0" />
+    </Style>
+
+    <!-- コメント入力エリア：テキストボックススタイル -->
+    <Style x:Key="TaskDetailCommentTextBoxStyle"
+           BasedOn="{StaticResource OrganicTextBoxStyle}"
+           TargetType="TextBox">
+        <Setter Property="Height" Value="40" />
+    </Style>
+
+    <!-- コメント入力エリア：送信ボタンスタイル -->
+    <Style x:Key="TaskDetailCommentButtonStyle"
+           BasedOn="{StaticResource PrimaryButtonStyle}"
+           TargetType="Button">
+        <Setter Property="Height" Value="30" />
+        <Setter Property="Width" Value="30" />
+        <Setter Property="Padding" Value="8,2" />
+    </Style>
+
     <!-- ====================================================================== -->
     <!-- Editable Controls Overrides -->
     <!-- ====================================================================== -->

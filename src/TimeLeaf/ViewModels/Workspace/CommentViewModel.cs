@@ -18,6 +18,9 @@ public partial class CommentViewModel : ObservableObject, IDisposable
     private string _authorName = "Unknown User";
 
     [ObservableProperty]
+    private string _authorInitial = "?";
+
+    [ObservableProperty]
     private string _authorColor = "#9D9D9D";
 
     /// <summary>
@@ -78,6 +81,7 @@ public partial class CommentViewModel : ObservableObject, IDisposable
     {
         AuthorName = name;
         AuthorColor = color;
+        AuthorInitial = (name.Length >= 1 ? name.Substring(0, 1) : name).ToUpper();
     }
 
     public void Dispose()

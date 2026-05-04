@@ -113,7 +113,7 @@
                            Margin="0,0,0,10"
                            Background="{DynamicResource OutlineBaseBrush}" />
 
-                <!-- 3. DISCUSSION (対話) -->
+                <!-- 3. DISCUSSION -->
                 <Grid Grid.Row="3">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -121,7 +121,7 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <TextBlock Style="{StaticResource TaskPanelSectionHeaderStyle}" Text="DISCUSSION (対話)" />
+                    <TextBlock Style="{StaticResource TaskPanelSectionHeaderStyle}" Text="DISCUSSION" />
 
                     <!-- コメント履歴 -->
                     <ScrollViewer Grid.Row="1"
@@ -137,8 +137,8 @@
                                         </Grid.ColumnDefinitions>
                                         <Border Background="{Binding AuthorColor}" Style="{StaticResource TaskCommentAvatarStyle}">
                                             <TextBlock Foreground="White"
-                                                       Style="{StaticResource MetaBaseStyle}"
-                                                       Text="KT" />
+                                                       Style="{StaticResource UserAvatarInitialStyle}"
+                                                       Text="{Binding AuthorInitial}" />
                                         </Border>
                                         <StackPanel Grid.Column="1" Margin="8,0,0,0">
                                             <Grid Margin="0,0,0,2">
@@ -163,27 +163,26 @@
                     </ScrollViewer>
 
                     <!-- コメント入力 -->
-                    <Border Grid.Row="2"
-                            Padding="0,8,0,0"
-                            BorderBrush="{DynamicResource OutlineBaseBrush}"
-                            BorderThickness="0,1,0,0">
+                    <Border Grid.Row="2" Style="{StaticResource TaskDetailCommentInputAreaStyle}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <TextBox Height="40"
-                                     AcceptsReturn="True"
-                                     Style="{StaticResource OrganicTextBoxStyle}"
+                            <TextBox AcceptsReturn="True"
+                                     Style="{StaticResource TaskDetailCommentTextBoxStyle}"
                                      Tag="メッセージを送信..."
                                      Text="{Binding NewCommentContent, UpdateSourceTrigger=PropertyChanged}" />
                             <Button Grid.Column="1"
-                                    MinHeight="{StaticResource ButtonHeightSmall}"
                                     Margin="8,0,0,0"
-                                    Padding="8,2"
                                     Command="{Binding AddCommentCommand}"
-                                    Content="送信"
-                                    Style="{StaticResource PrimaryButtonStyle}" />
+                                    Style="{StaticResource TaskDetailCommentButtonStyle}">
+                                <Path Width="16"
+                                      Height="16"
+                                      Data="{StaticResource SendIconGeometry}"
+                                      Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                      Stretch="Uniform" />
+                            </Button>
                         </Grid>
                     </Border>
                 </Grid>
