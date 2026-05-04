@@ -1,5 +1,6 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="http://schemas.leafkit.com/wpf/ui/controls"
                     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
                     xmlns:li="clr-namespace:LeafKit.UI.Behaviors.Interactions;assembly=LeafKit.UI">
 
@@ -104,6 +105,13 @@
            TargetType="TextBlock">
         <Setter Property="FontSize" Value="15" />
         <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <!-- タスク詳細：タイトルのスタイル (TaskDetailView用) -->
+    <Style x:Key="TaskDetailTitleStyle" TargetType="c:EditableLabel">
+        <Setter Property="FontSize" Value="20" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
     </Style>
 
     <!-- タスクパネル：閉じるボタンのスタイル -->
