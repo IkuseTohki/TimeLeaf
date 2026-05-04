@@ -12,6 +12,7 @@ using TimeLeaf.Repositories;
 using TimeLeaf.Repositories.FileSystem;
 using TimeLeaf.Services;
 using TimeLeaf.UseCases;
+using TimeLeaf.Utilities;
 using TimeLeaf.ViewModels;
 using TimeLeaf.Views;
 
@@ -287,6 +288,7 @@ public partial class App : Application
         services.AddTransient<IAddMilestoneUseCase, AddMilestoneUseCase>();
         services.AddTransient<IDeleteTaskUseCase, DeleteTaskUseCase>();
         services.AddTransient<ICheckTaskDeadlinesUseCase, CheckTaskDeadlinesUseCase>();
+        services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
         services.AddTransient<ISyncUserIdentityUseCase, SyncUserIdentityUseCase>();
         services.AddTransient<IJoinProjectUseCase, JoinProjectUseCase>();
         services.AddTransient<ICheckAssignmentUseCase, CheckAssignmentUseCase>();

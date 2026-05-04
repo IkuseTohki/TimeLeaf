@@ -7,52 +7,57 @@ namespace TimeLeaf.Tests.Models.Entities;
 [TestClass]
 public class CommentTests
 {
-    /// <summary>
-    /// テスト観点: 必須項目（TaskId, AuthorId, Content）が欠けている場合、例外をスローすること。
-    /// </summary>
-    [TestMethod]
-    public void Constructor_ShouldThrow_ForMissingRequiredFields()
-    {
-        var taskId = Guid.NewGuid();
-        var authorId = Guid.NewGuid();
-        var content = "テストコメント";
+    private static readonly Guid ValidTaskId = Guid.NewGuid();
+    private static readonly Guid ValidAuthorId = Guid.NewGuid();
+    private const string ValidContent = "テストコメント";
 
-        // TaskId が Empty
+    [TestMethod]
+    public void Constructor_ShouldThrow_WhenTaskIdIsEmpty()
+    {
+        // テスト観点: TaskId が Empty の場合、ArgumentException がスローされることを確認する。
         try
         {
             _ = new Comment
             {
                 TaskId = Guid.Empty,
-                AuthorId = authorId,
-                Content = content,
+                AuthorId = ValidAuthorId,
+                Content = ValidContent,
             };
-            Assert.Fail("TaskId が Empty の場合に例外をスローすべき");
+            Assert.Fail("例外がスローされるべきです");
         }
         catch (ArgumentException) { }
+    }
 
-        // AuthorId が Empty
+    [TestMethod]
+    public void Constructor_ShouldThrow_WhenAuthorIdIsEmpty()
+    {
+        // テスト観点: AuthorId が Empty の場合、ArgumentException がスローされることを確認する。
         try
         {
             _ = new Comment
             {
-                TaskId = taskId,
+                TaskId = ValidTaskId,
                 AuthorId = Guid.Empty,
-                Content = content,
+                Content = ValidContent,
             };
-            Assert.Fail("AuthorId が Empty の場合に例外をスローすべき");
+            Assert.Fail("例外がスローされるべきです");
         }
         catch (ArgumentException) { }
+    }
 
-        // Content が 空
+    [TestMethod]
+    public void Constructor_ShouldThrow_WhenContentIsEmpty()
+    {
+        // テスト観点: Content が 空文字の場合、ArgumentException がスローされることを確認する。
         try
         {
             _ = new Comment
             {
-                TaskId = taskId,
-                AuthorId = authorId,
-                Content = "",
+                TaskId = ValidTaskId,
+                AuthorId = ValidAuthorId,
+                Content = string.Empty,
             };
-            Assert.Fail("Content が 空 の場合に例外をスローすべき");
+            Assert.Fail("例外がスローされるべきです");
         }
         catch (ArgumentException) { }
     }

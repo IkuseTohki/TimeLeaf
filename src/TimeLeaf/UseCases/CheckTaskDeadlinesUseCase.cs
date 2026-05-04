@@ -4,21 +4,24 @@ using System.Linq;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Models.Enums;
 using TimeLeaf.Services;
+using TimeLeaf.Utilities;
 
 namespace TimeLeaf.UseCases;
 
 public class CheckTaskDeadlinesUseCase : ICheckTaskDeadlinesUseCase
 {
     private readonly INotificationService _notificationService;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
-    public CheckTaskDeadlinesUseCase(INotificationService notificationService)
+    public CheckTaskDeadlinesUseCase(INotificationService notificationService, IDateTimeProvider dateTimeProvider)
     {
         _notificationService = notificationService;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public void Execute(IEnumerable<Project> projects)
     {
-        var now = DateTime.Now;
+        var now = _dateTimeProvider.Now;
 
         foreach (var project in projects)
         {
