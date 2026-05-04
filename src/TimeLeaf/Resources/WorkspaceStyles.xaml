@@ -166,6 +166,18 @@
     </Style>
 
     <!-- ====================================================================== -->
+    <!-- Task Detail Components -->
+    <!-- ====================================================================== -->
+
+    <!-- タスク詳細：サイドバープロパティ欄のスタイル -->
+    <Style x:Key="TaskDetailSidebarStyle" TargetType="Border">
+        <Setter Property="Padding" Value="12" />
+        <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
+        <Setter Property="BorderThickness" Value="1,0,0,0" />
+    </Style>
+
+    <!-- ====================================================================== -->
     <!-- Comment Components -->
     <!-- ====================================================================== -->
 
@@ -205,30 +217,22 @@
         <Setter Property="BorderThickness" Value="1" />
     </Style>
 
-    <!-- タスク詳細：サイドバープロパティ欄のスタイル -->
-    <Style x:Key="TaskDetailSidebarStyle" TargetType="Border">
-        <Setter Property="Padding" Value="12" />
-        <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
-        <Setter Property="BorderThickness" Value="1,0,0,0" />
-    </Style>
-
     <!-- コメント入力エリア：外枠スタイル -->
-    <Style x:Key="TaskDetailCommentInputAreaStyle" TargetType="Border">
+    <Style x:Key="TaskCommentInputAreaStyle" TargetType="Border">
         <Setter Property="Padding" Value="0,8,0,0" />
         <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
         <Setter Property="BorderThickness" Value="0,1,0,0" />
     </Style>
 
     <!-- コメント入力エリア：テキストボックススタイル -->
-    <Style x:Key="TaskDetailCommentTextBoxStyle"
+    <Style x:Key="TaskCommentTextBoxStyle"
            BasedOn="{StaticResource OrganicTextBoxStyle}"
            TargetType="TextBox">
         <Setter Property="Height" Value="40" />
     </Style>
 
     <!-- コメント入力エリア：送信ボタンスタイル -->
-    <Style x:Key="TaskDetailCommentButtonStyle"
+    <Style x:Key="TaskCommentButtonStyle"
            BasedOn="{StaticResource PrimaryButtonStyle}"
            TargetType="Button">
         <Setter Property="Height" Value="30" />

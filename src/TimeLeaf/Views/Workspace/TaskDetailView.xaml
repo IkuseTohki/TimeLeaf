@@ -163,20 +163,20 @@
                     </ScrollViewer>
 
                     <!-- コメント入力 -->
-                    <Border Grid.Row="2" Style="{StaticResource TaskDetailCommentInputAreaStyle}">
+                    <Border Grid.Row="2" Style="{StaticResource TaskCommentInputAreaStyle}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <TextBox AcceptsReturn="True"
-                                     Style="{StaticResource TaskDetailCommentTextBoxStyle}"
+                                     Style="{StaticResource TaskCommentTextBoxStyle}"
                                      Tag="メッセージを送信..."
                                      Text="{Binding NewCommentContent, UpdateSourceTrigger=PropertyChanged}" />
                             <Button Grid.Column="1"
                                     Margin="8,0,0,0"
                                     Command="{Binding AddCommentCommand}"
-                                    Style="{StaticResource TaskDetailCommentButtonStyle}">
+                                    Style="{StaticResource TaskCommentButtonStyle}">
                                 <Path Width="16"
                                       Height="16"
                                       Data="{StaticResource SendIconGeometry}"
