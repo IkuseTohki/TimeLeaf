@@ -4,6 +4,7 @@
              xmlns:c="http://schemas.leafkit.com/wpf/ui/controls"
              xmlns:conv="clr-namespace:LeafKit.UI.Converters;assembly=LeafKit.UI"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:lk="clr-namespace:LeafKit.UI.Controls;assembly=LeafKit.UI"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:TimeLeaf.ViewModels"
              Width="{StaticResource DialogWidthLarge}"
@@ -100,16 +101,16 @@
             <!-- ステータス -->
             <StackPanel Grid.Row="0" Grid.Column="0">
                 <Label Content="ステータス" Style="{StaticResource SectionHeaderLabelStyle}" />
-                <ComboBox ItemsSource="{Binding TaskStatusValues}"
-                          SelectedItem="{Binding Status}"
-                          Style="{DynamicResource CompactFormComboBoxStyle}" />
+                <lk:InteractiveChipsPicker ItemsSource="{Binding TaskStatusValues}"
+                                           Orientation="Horizontal"
+                                           SelectedItem="{Binding Status, Mode=TwoWay}" />
             </StackPanel>
 
             <StackPanel Grid.Row="0" Grid.Column="2">
                 <Label Content="優先度" Style="{StaticResource SectionHeaderLabelStyle}" />
-                <ComboBox ItemsSource="{Binding TaskPriorityValues}"
-                          SelectedItem="{Binding Priority}"
-                          Style="{DynamicResource CompactFormComboBoxStyle}" />
+                <lk:InteractiveChipsPicker ItemsSource="{Binding TaskPriorityValues}"
+                                           Orientation="Horizontal"
+                                           SelectedItem="{Binding Priority, Mode=TwoWay}" />
             </StackPanel>
 
             <StackPanel Grid.Row="1" Grid.Column="0">

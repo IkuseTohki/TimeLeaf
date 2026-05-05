@@ -4,6 +4,7 @@
              xmlns:c="http://schemas.leafkit.com/wpf/ui/controls"
              xmlns:controls="clr-namespace:TimeLeaf.Views.Controls"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:lk="clr-namespace:LeafKit.UI.Controls;assembly=LeafKit.UI"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:wvm="clr-namespace:TimeLeaf.ViewModels.Workspace"
              MinWidth="600"
@@ -193,27 +194,56 @@
                     Grid.Column="1"
                     Style="{StaticResource TaskDetailSidebarStyle}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel>
+                    <StackPanel Grid.IsSharedSizeScope="True">
                         <TextBlock Style="{StaticResource TaskPanelSectionHeaderStyle}" Text="プロパティ" />
 
-                        <StackPanel Margin="0,0,0,16">
-                            <TextBlock Style="{StaticResource TaskPanelMetaLabelStyle}" Text="ステータス" />
-                            <controls:TaskStatusPicker SelectedStatus="{Binding Task.Status, Mode=TwoWay}" />
-                        </StackPanel>
+                        <Grid Margin="0,0,0,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="MetaLabel" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock VerticalAlignment="Center"
+                                       Style="{StaticResource TaskPanelMetaLabelStyle}"
+                                       Text="ステータス" />
+                            <lk:InteractiveChipsPicker Grid.Column="2"
+                                                       HorizontalAlignment="Left"
+                                                       ItemsSource="{Binding Task.StatusValues}"
+                                                       Orientation="Horizontal"
+                                                       SelectedItem="{Binding Task.Status, Mode=TwoWay}" />
+                        </Grid>
 
-                        <StackPanel Margin="0,0,0,16">
-                            <TextBlock Style="{StaticResource TaskPanelMetaLabelStyle}" Text="優先度" />
-                            <ComboBox ItemsSource="{Binding Task.PriorityValues}"
-                                      SelectedItem="{Binding Task.Priority, Mode=TwoWay}"
-                                      Style="{DynamicResource CompactFormComboBoxStyle}" />
-                        </StackPanel>
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="MetaLabel" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock VerticalAlignment="Center"
+                                       Style="{StaticResource TaskPanelMetaLabelStyle}"
+                                       Text="優先度" />
+                            <lk:InteractiveChipsPicker Grid.Column="2"
+                                                       HorizontalAlignment="Left"
+                                                       ItemsSource="{Binding Task.PriorityValues}"
+                                                       Orientation="Horizontal"
+                                                       SelectedItem="{Binding Task.Priority, Mode=TwoWay}" />
+                        </Grid>
 
-                        <StackPanel Margin="0,0,0,16">
-                            <TextBlock Style="{StaticResource TaskPanelMetaLabelStyle}" Text="担当者" />
-                            <TextBlock FontWeight="Bold"
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="MetaLabel" />
+                                <ColumnDefinition Width="20" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock VerticalAlignment="Center"
+                                       Style="{StaticResource TaskPanelMetaLabelStyle}"
+                                       Text="担当者" />
+                            <TextBlock Grid.Column="2"
+                                       VerticalAlignment="Center"
+                                       FontWeight="Bold"
                                        Foreground="{DynamicResource TextPrimaryBrush}"
                                        Text="{Binding Task.Assignee}" />
-                        </StackPanel>
+                        </Grid>
 
                         <Separator Margin="0,0,0,16" Background="{DynamicResource OutlineBaseBrush}" />
 
