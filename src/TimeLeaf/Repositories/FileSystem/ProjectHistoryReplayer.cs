@@ -17,19 +17,19 @@ internal class ProjectHistoryReplayer
     private readonly IProjectFileSystemSerializer _serializer;
     private readonly ICommitFileNameGenerator _fileNameGenerator;
     private readonly ILogger _logger;
-    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, string> _lastSavedContent;
+    private readonly IProjectStorageCache _cache;
 
     public ProjectHistoryReplayer(
         IProjectFileSystemSerializer serializer,
         ICommitFileNameGenerator fileNameGenerator,
         ILogger logger,
-        System.Collections.Concurrent.ConcurrentDictionary<string, string> lastSavedContent
+        IProjectStorageCache cache
     )
     {
         _serializer = serializer;
         _fileNameGenerator = fileNameGenerator;
         _logger = logger;
-        _lastSavedContent = lastSavedContent;
+        _cache = cache;
     }
 
     /// <summary>
@@ -115,11 +115,11 @@ internal class ProjectHistoryReplayer
     )
     {
         var json = await File.ReadAllTextAsync(filePath);
-        var cacheKey = $"{entityId}_{meta.Category}";
 
+        // すべてのカテゴリをキャッシュする (コメントは AccumulateComment 内で taskId が判明した後に更新する)
         if (meta.Category != "Comment")
         {
-            _lastSavedContent[cacheKey] = json;
+            _cache.UpdateCategory(entityId, meta.Category, json);
         }
 
         switch (meta.Category)
@@ -237,7 +237,7 @@ internal class ProjectHistoryReplayer
         if (dto != null)
         {
             allCommentData.Add((dto, timestamp));
-            _lastSavedContent[$"{dto.Id}_Comment"] = json;
+            _cache.UpdateComment(dto.TaskId, dto.Id, json);
         }
     }
 

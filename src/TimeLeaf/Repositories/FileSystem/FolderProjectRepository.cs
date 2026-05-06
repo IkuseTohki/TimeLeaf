@@ -27,7 +27,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
     private readonly ICommitFileNameGenerator _fileNameGenerator;
     private readonly ILogger<FolderProjectRepository> _logger;
 
-    private readonly ConcurrentDictionary<string, string> _lastSavedContent = new();
+    private readonly IProjectStorageCache _cache = new ProjectStorageCache();
 
     public event Action<Guid>? ProjectChanged;
 
@@ -193,7 +193,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
             return new Project(createdBy) { Id = projectId, CreatedAt = createdAt };
         }
 
-        var replayer = new ProjectHistoryReplayer(_serializer, _fileNameGenerator, _logger, _lastSavedContent);
+        var replayer = new ProjectHistoryReplayer(_serializer, _fileNameGenerator, _logger, _cache);
         return await replayer.ReplayAsync(changesDir, projectId, createdAt, createdBy);
     }
 
@@ -407,14 +407,33 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         string userId
     )
     {
-        var category = "Comment";
-        var cacheKey = GetCacheKey(taskId, $"{category}_{comment.Id}");
+        // 診断用ログ
+        _logger.LogInformation(
+            "Saving comment. Cache size: {Count}, TaskId: {TaskId}, CommentId: {CommentId}",
+            _cache.Count,
+            taskId,
+            comment.Id
+        );
 
-        if (_lastSavedContent.ContainsKey(cacheKey))
+        // メモリキャッシュによる重複チェック
+        if (_cache.TryGetComment(taskId, comment.Id, out _))
+        {
+            _logger.LogInformation("Cache hit for comment {CommentId}", comment.Id);
             return;
+        }
 
         // タスクIDごとのサブフォルダを作成
         var taskDir = Path.Combine(changesDir, taskId.ToString());
+        var fileName = _fileNameGenerator.Generate(comment.CreatedAt, userId, "Comment");
+        var fullPath = Path.Combine(taskDir, fileName);
+
+        // 物理ファイルによる重複チェック
+        if (File.Exists(fullPath))
+        {
+            _logger.LogInformation("Physical file exists for comment {CommentId}, skipping.", comment.Id);
+            return;
+        }
+
         if (!Directory.Exists(taskDir))
             Directory.CreateDirectory(taskDir);
 
@@ -426,16 +445,25 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
             comment.AttachmentLinks
         );
         var json = _serializer.Serialize(commentDto);
-        var fileName = _fileNameGenerator.Generate(comment.CreatedAt, userId, category);
-        var fullPath = Path.Combine(taskDir, fileName);
 
         _monitor.MarkFileAsJustWritten(fileName);
 
         try
         {
             await File.WriteAllTextAsync(fullPath, json);
-            File.SetAttributes(fullPath, File.GetAttributes(fullPath) | FileAttributes.ReadOnly);
-            _lastSavedContent[cacheKey] = json;
+            try
+            {
+                File.SetAttributes(fullPath, File.GetAttributes(fullPath) | FileAttributes.ReadOnly);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Could not set ReadOnly attribute for {FileName}, but file was saved.",
+                    fileName
+                );
+            }
+            _cache.UpdateComment(taskId, comment.Id, json);
         }
         catch (Exception ex)
         {
@@ -455,9 +483,8 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
     )
     {
         var json = _serializer.Serialize(data);
-        var cacheKey = GetCacheKey(entityId, category);
 
-        if (_lastSavedContent.TryGetValue(cacheKey, out var lastJson) && lastJson == json)
+        if (_cache.TryGetCategory(entityId, category, out var lastJson) && lastJson == json)
             return;
 
         // 出力先の決定（タスクならサブフォルダ、プロジェクトなら直下）
@@ -472,8 +499,19 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         try
         {
             await File.WriteAllTextAsync(fullPath, json);
-            File.SetAttributes(fullPath, File.GetAttributes(fullPath) | FileAttributes.ReadOnly);
-            _lastSavedContent[cacheKey] = json;
+            try
+            {
+                File.SetAttributes(fullPath, File.GetAttributes(fullPath) | FileAttributes.ReadOnly);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Could not set ReadOnly attribute for {FileName}, but file was saved.",
+                    fileName
+                );
+            }
+            _cache.UpdateCategory(entityId, category, json);
         }
         catch (Exception ex)
         {
@@ -488,10 +526,5 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         }
     }
 
-    private string GetCacheKey(Guid projectId, string category) => $"{projectId}_{category}";
-
-    public void Dispose()
-    {
-        _logger.LogInformation("FolderProjectRepository disposing.");
-    }
+    public void Dispose() { }
 }
