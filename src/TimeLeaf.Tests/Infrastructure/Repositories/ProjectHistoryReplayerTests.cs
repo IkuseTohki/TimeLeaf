@@ -9,10 +9,10 @@ using TimeLeaf.Models.Entities;
 using TimeLeaf.Repositories.FileSystem;
 using TimeLeaf.Repositories.FileSystem.Dtos;
 
-namespace TimeLeaf.Tests.Infrastructure;
+namespace TimeLeaf.Tests.Infrastructure.Repositories;
 
 [TestClass]
-public class ProjectAssignmentReplayTests
+public class ProjectHistoryReplayerTests
 {
     private string _testRoot = null!;
     private string _changesDir = null!;
@@ -57,7 +57,12 @@ public class ProjectAssignmentReplayTests
         var fileName = _fileNameGenerator.Generate(DateTime.Now, userId, "Project_Members");
         await File.WriteAllTextAsync(Path.Combine(_changesDir, fileName), _serializer.Serialize(dto));
 
-        var replayer = new ProjectHistoryReplayer(_serializer, _fileNameGenerator, NullLogger.Instance, new());
+        var replayer = new ProjectHistoryReplayer(
+            _serializer,
+            _fileNameGenerator,
+            NullLogger.Instance,
+            new ProjectStorageCache()
+        );
 
         // Act
         var project = await replayer.ReplayAsync(_changesDir, projectId, DateTime.Now, Guid.Empty);
