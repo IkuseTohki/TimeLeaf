@@ -354,6 +354,23 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                 isEntity: false
             );
 
+            // 2.1 表示順序の保存 (コンテナ -> タスクの順で現在の物理的な並びを保存)
+            var orderedIds = project.Containers.Select(c => c.Id).Concat(project.Tasks.Select(t => t.Id)).ToList();
+
+            if (orderedIds.Any())
+            {
+                var sortOrderSnapshot = new ProjectSortOrderDto(orderedIds);
+                await TrySaveCategoryAsync(
+                    project.Id,
+                    changesDir,
+                    "Project_SortOrder",
+                    sortOrderSnapshot,
+                    commitTime,
+                    userId,
+                    isEntity: false
+                );
+            }
+
             // 3. コンテナ情報の保存
             foreach (var container in project.Containers)
             {

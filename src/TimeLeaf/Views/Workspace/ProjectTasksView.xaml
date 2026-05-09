@@ -75,6 +75,12 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
+                <!-- 順序調整ボタン -->
+                <Button Margin="0,16,0,8"
+                        Command="{Binding ReorderItemsCommand}"
+                        Content="表示順序を調整..."
+                        Style="{StaticResource SecondaryButtonStyle}" />
+
                 <!-- Ghost Container (Add Group) -->
                 <Button Command="{Binding AddContainerCommand}" Style="{StaticResource AddGroupButtonStyle}" />
             </StackPanel>

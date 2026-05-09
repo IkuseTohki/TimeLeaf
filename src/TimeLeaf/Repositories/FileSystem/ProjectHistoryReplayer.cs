@@ -54,12 +54,21 @@ internal class ProjectHistoryReplayer
         var taskMap = new Dictionary<Guid, ProjectTask>();
         var containerMap = new Dictionary<Guid, ProjectContainer>();
         var workItemMap = new Dictionary<Guid, ProjectWorkItem>();
+        string? latestSortOrderJson = null;
 
         foreach (var file in files)
         {
             // 削除済みエンティティの変更は無視
             if (deletedEntities.Contains(file.EntityId))
                 continue;
+
+            if (file.Meta.Category == "Project_SortOrder")
+            {
+                // 最新の順序ファイルのみを記憶しておく
+                latestSortOrderJson = await File.ReadAllTextAsync(file.Path);
+                _cache.UpdateCategory(file.EntityId, file.Meta.Category, latestSortOrderJson);
+                continue;
+            }
 
             await ApplyChangeAsync(
                 project,
@@ -71,6 +80,16 @@ internal class ProjectHistoryReplayer
                 file.EntityId,
                 file.Meta
             );
+        }
+
+        // 表示順序の適用（全アイテムの復元が完了した後に行う）
+        if (latestSortOrderJson != null)
+        {
+            var dto = _serializer.Deserialize<ProjectSortOrderDto>(latestSortOrderJson);
+            if (dto != null && dto.OrderedIds != null)
+            {
+                project.ReorderWorkItems(dto.OrderedIds);
+            }
         }
 
         AttachComments(taskMap, allCommentData);
@@ -267,7 +286,7 @@ internal class ProjectHistoryReplayer
         if (dto == null)
             return;
         var container = GetOrCreateContainer(project, containerMap, workItemMap, dto.Id);
-        // 現時点では WatcherIds 等の復元のみ（必要に応じてエンティティ側のメソッドを呼び出す）
+        // 現時点では WatcherIds 等の復元のみ
     }
 
     private void ApplyTaskPlanning(

@@ -348,6 +348,38 @@ public class Project
     }
 
     /// <summary>
+    /// 指定された ID リストの順序に基づいて、内部のタスクおよびコンテナリストを並べ替えます。
+    /// </summary>
+    /// <param name="orderedIds">期待される順序で並んだアイテムIDのリスト。</param>
+    public void ReorderWorkItems(IEnumerable<Guid> orderedIds)
+    {
+        if (orderedIds == null)
+            return;
+
+        var idList = orderedIds.ToList();
+        var orderDict = idList.Select((id, index) => new { id, index }).ToDictionary(x => x.id, x => x.index);
+
+        // 内部リストを物理的に並べ替える
+        _tasks.Sort(
+            (a, b) =>
+            {
+                int orderA = orderDict.TryGetValue(a.Id, out int oa) ? oa : int.MaxValue;
+                int orderB = orderDict.TryGetValue(b.Id, out int ob) ? ob : int.MaxValue;
+                return orderA.CompareTo(orderB);
+            }
+        );
+
+        _containers.Sort(
+            (a, b) =>
+            {
+                int orderA = orderDict.TryGetValue(a.Id, out int oa) ? oa : int.MaxValue;
+                int orderB = orderDict.TryGetValue(b.Id, out int ob) ? ob : int.MaxValue;
+                return orderA.CompareTo(orderB);
+            }
+        );
+    }
+
+    /// <summary>
     /// 最終更新日時を明示的に設定します（同期用）。
     /// </summary>
     public void SetUpdatedAt(DateTime updatedAt)

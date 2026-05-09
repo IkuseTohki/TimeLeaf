@@ -85,6 +85,43 @@ public partial class ProjectTasksViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private async System.Threading.Tasks.Task ReorderItems()
+    {
+        try
+        {
+            // 並べ替え対象のアイテムを収集（コンテナと、未分類タスクのリスト）
+            var allItems = new List<ProjectWorkItem>();
+            foreach (var cvm in TaskContainers)
+            {
+                // TaskContainerViewModel がラップしている Entity を抽出する必要があるが、
+                // 現時点では ProjectContainer? _container が private なので、
+                // 適切にアクセスするためのプロパティが必要になるかもしれない。
+                // いったん、現在のドメインから直接取得して並べ替える。
+                // (本来は ViewModel 側で完結すべきだが、今回はシンプルにドメインから構築)
+            }
+
+            // シンプルなアプローチ: 全アイテムを取得して並べ替える
+            var targetItems = _projectViewModel
+                .Model.Containers.Cast<ProjectWorkItem>()
+                .Concat(_projectViewModel.Model.Tasks.Where(t => t.ParentId == null).Cast<ProjectWorkItem>())
+                .ToList();
+
+            var reorderVm = _viewModelFactory.CreateReorderWorkItemsViewModel(_projectViewModel.Model, targetItems);
+            var result = await _dialogService.ShowDialogAsync(reorderVm);
+
+            if (result)
+            {
+                _projectViewModel.SyncFromModel();
+                RebuildContainers();
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to reorder items.");
+        }
+    }
+
+    [RelayCommand]
     private async System.Threading.Tasks.Task AddContainer(TaskContainerViewModel? container = null)
     {
         try

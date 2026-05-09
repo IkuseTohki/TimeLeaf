@@ -99,6 +99,18 @@ public class ViewModelFactory : IViewModelFactory
         return _serviceProvider.GetRequiredService<AddContainerViewModel>();
     }
 
+    public ReorderWorkItemsViewModel CreateReorderWorkItemsViewModel(
+        Project project,
+        System.Collections.Generic.IEnumerable<ProjectWorkItem> initialItems
+    )
+    {
+        return new ReorderWorkItemsViewModel(
+            project,
+            initialItems,
+            _serviceProvider.GetRequiredService<IUpdateSortOrderUseCase>()
+        );
+    }
+
     public ProjectDashboardViewModel CreateProjectDashboardViewModel(ProjectViewModel projectViewModel)
     {
         return new ProjectDashboardViewModel(

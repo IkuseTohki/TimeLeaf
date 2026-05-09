@@ -1,0 +1,71 @@
+﻿<UserControl x:Class="TimeLeaf.Views.ReorderWorkItemsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:TimeLeaf.ViewModels"
+             Width="{StaticResource DialogWidthMedium}"
+             Height="450"
+             d:DataContext="{d:DesignInstance vm:ReorderWorkItemsViewModel}"
+             mc:Ignorable="d">
+    <Grid Margin="0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Style="{StaticResource FormTitleTextStyle}" Text="表示順序の調整" />
+
+        <Grid Grid.Row="1" Margin="0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <!-- アイテムリスト -->
+            <ListBox Grid.Column="0"
+                     ItemsSource="{Binding Items}"
+                     SelectedItem="{Binding SelectedItem}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="4,2">
+                            <TextBlock VerticalAlignment="Center" Text="{Binding Name}" />
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <!-- 操作ボタン（右側） -->
+            <StackPanel Grid.Column="1"
+                        Margin="12,0,0,0"
+                        VerticalAlignment="Top">
+                <Button Command="{Binding MoveUpCommand}"
+                        Content="↑"
+                        Style="{StaticResource IconButtonStyle}"
+                        ToolTip="上へ移動" />
+                <Button Margin="0,8,0,0"
+                        Command="{Binding MoveDownCommand}"
+                        Content="↓"
+                        Style="{StaticResource IconButtonStyle}"
+                        ToolTip="下へ移動" />
+            </StackPanel>
+        </Grid>
+
+        <!-- フッターボタン -->
+        <StackPanel Grid.Row="2"
+                    Margin="{StaticResource FormFooterMargin}"
+                    HorizontalAlignment="Right"
+                    Orientation="Horizontal">
+            <Button Width="100"
+                    Command="{Binding ConfirmCommand}"
+                    Content="順序を確定"
+                    Style="{StaticResource PrimaryButtonStyle}" />
+            <Button Width="80"
+                    Margin="{StaticResource ButtonLeftMargin}"
+                    Command="{Binding CancelCommand}"
+                    Content="キャンセル"
+                    Style="{StaticResource SecondaryButtonStyle}" />
+        </StackPanel>
+    </Grid>
+</UserControl>

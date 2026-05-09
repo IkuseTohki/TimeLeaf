@@ -288,6 +288,7 @@ public partial class App : Application
             sp.GetRequiredService<ISaveProjectUseCase>(),
             sp.GetRequiredService<ILogger<AddContainerUseCase>>()
         ));
+        services.AddTransient<IUpdateSortOrderUseCase, UpdateSortOrderUseCase>();
         services.AddTransient<IAddCommentUseCase, AddCommentUseCase>();
         services.AddTransient<IAddMilestoneUseCase, AddMilestoneUseCase>();
         services.AddTransient<IDeleteTaskUseCase, DeleteTaskUseCase>();

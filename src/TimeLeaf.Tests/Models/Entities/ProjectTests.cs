@@ -338,4 +338,37 @@ public class ProjectTests
         Assert.AreEqual(1, project.Tasks.Count);
         Assert.AreEqual(0, project.DeletedTaskIds.Count, "再追加されたタスクは削除リストから除去されるべき");
     }
+
+    /// <summary>
+    /// テスト観点: 指定された ID リストの順序に従って、タスクとコンテナが物理的に並べ替えられることを確認する。
+    /// </summary>
+    [TestMethod]
+    public void ReorderWorkItems_ShouldSortInternalCollections()
+    {
+        // Arrange
+        var project = new Project(Guid.Empty);
+        var t1 = new ProjectTask { Id = Guid.NewGuid() };
+        var t2 = new ProjectTask { Id = Guid.NewGuid() };
+        var c1 = new ProjectContainer(Guid.NewGuid(), "Group 1");
+        var c2 = new ProjectContainer(Guid.NewGuid(), "Group 2");
+
+        // 追加順とは逆の順序で登録
+        project.AddTask(t1);
+        project.AddTask(t2);
+        project.AddContainer(c1);
+        project.AddContainer(c2);
+
+        // 期待する順序: [c2, t2, c1, t1]
+        var orderedIds = new List<Guid> { c2.Id, t2.Id, c1.Id, t1.Id };
+
+        // Act
+        // 実装前なのでコンパイルエラー（Red）
+        project.ReorderWorkItems(orderedIds);
+
+        // Assert
+        Assert.AreEqual(c2.Id, project.Containers[0].Id);
+        Assert.AreEqual(c1.Id, project.Containers[1].Id);
+        Assert.AreEqual(t2.Id, project.Tasks[0].Id);
+        Assert.AreEqual(t1.Id, project.Tasks[1].Id);
+    }
 }

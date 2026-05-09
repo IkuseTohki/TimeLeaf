@@ -165,6 +165,39 @@ public class FolderProjectRepositoryTests
         Assert.AreEqual(1, loadedTask.Constraints.Count, "Constraints の要素数が正しいこと");
     }
 
+    [TestMethod]
+    public async System.Threading.Tasks.Task SaveAndLoad_ShouldPreserveSortOrder()
+    {
+        // Arrange
+        var repository = CreateRepository();
+        var projectId = Guid.NewGuid();
+        var project = new Project(Guid.Empty) { Id = projectId };
+        project.UpdateName("SortOrderTest");
+
+        var container = new ProjectContainer(Guid.NewGuid(), "Group 1");
+        project.AddContainer(container);
+
+        var task = new ProjectTask();
+        task.UpdateName("Task 1");
+        project.AddTask(task);
+
+        // Act
+        // 明示的に並べ替えを指示してから保存
+        // 期待する物理順序: [task, container]
+        var orderedIds = new List<Guid> { task.Id, container.Id };
+        project.ReorderWorkItems(orderedIds);
+        await repository.SaveAsync(project, _testUserId.ToString());
+
+        var loadedProject = await repository.LoadAsync(projectId);
+
+        // Assert
+        Assert.IsNotNull(loadedProject);
+
+        // 物理的なリスト内の順序を検証
+        Assert.AreEqual(task.Id, loadedProject.Tasks[0].Id, "タスクリストの先頭が一致すること");
+        Assert.AreEqual(container.Id, loadedProject.Containers[0].Id, "コンテナリストの先頭が一致すること");
+    }
+
     /// <summary>
     /// テスト観点: 内容に変更がない（前回スナップショットと同じ）場合は、新しいファイルを作成しないこと。
     /// </summary>
