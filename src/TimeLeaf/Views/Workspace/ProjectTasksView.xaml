@@ -76,7 +76,7 @@
                 </ItemsControl>
 
                 <!-- Ghost Container (Add Group) -->
-                <Button Command="{Binding AddProjectCommand}" Style="{StaticResource AddGroupButtonStyle}" />
+                <Button Command="{Binding AddContainerCommand}" Style="{StaticResource AddGroupButtonStyle}" />
             </StackPanel>
         </ScrollViewer>
 

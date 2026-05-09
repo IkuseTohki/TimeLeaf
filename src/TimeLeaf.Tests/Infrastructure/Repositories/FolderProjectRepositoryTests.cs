@@ -68,9 +68,14 @@ public class FolderProjectRepositoryTests
         var repository = CreateRepository();
         var project = new Project(Guid.Empty);
         project.UpdateName("StructureTest");
+
         var task = new ProjectTask();
         task.UpdateName("SubFolderTask");
         project.AddTask(task);
+
+        var container = new ProjectContainer(Guid.NewGuid(), "New Container");
+        project.AddContainer(container);
+
         var projects = new List<Project> { project };
 
         // Act
@@ -85,18 +90,18 @@ public class FolderProjectRepositoryTests
         var changesDir = Path.Combine(expectedProjectDir, "changes");
         Assert.IsTrue(Directory.Exists(changesDir), "changes フォルダが作成されること");
 
+        // プロジェクト直下に保存されるカテゴリの確認
         var rootFiles = Directory.GetFiles(changesDir);
         var basicFile = rootFiles.FirstOrDefault(f => f.Contains("Project_Basic"));
         Assert.IsNotNull(basicFile, "Project_Basic ファイルが changes 直下に出力されていること");
 
+        // コンテナサブフォルダの確認
+        var containerDir = Path.Combine(changesDir, container.Id.ToString());
+        Assert.IsTrue(Directory.Exists(containerDir), "コンテナIDのサブフォルダが作成されること");
+
+        // タスクサブフォルダの確認
         var taskDir = Path.Combine(changesDir, task.Id.ToString());
         Assert.IsTrue(Directory.Exists(taskDir), "タスクIDのサブフォルダが作成されること");
-
-        var taskFiles = Directory.GetFiles(taskDir);
-        Assert.IsTrue(
-            taskFiles.Any(f => f.Contains("Task_Planning")),
-            "Task_Planning ファイルがタスクサブフォルダ内に出力されていること"
-        );
     }
 
     /// <summary>

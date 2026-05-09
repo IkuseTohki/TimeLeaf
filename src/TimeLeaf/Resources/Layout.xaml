@@ -19,6 +19,7 @@
     <Thickness x:Key="ViewOuterMargin">24,16,24,24</Thickness>
 
     <!-- フォーム・ダイアログ関連 -->
+    <sys:Double x:Key="DialogWidthSmall">320</sys:Double>
     <sys:Double x:Key="DialogWidthMedium">400</sys:Double>
     <sys:Double x:Key="DialogWidthLarge">480</sys:Double>
     <sys:Double x:Key="MultilineInputHeight">80</sys:Double>

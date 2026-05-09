@@ -246,6 +246,12 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                 Directory.CreateDirectory(projectDir);
             }
 
+            var changesDir = Path.Combine(projectDir, "changes");
+            if (!Directory.Exists(changesDir))
+            {
+                Directory.CreateDirectory(changesDir);
+            }
+
             // .project (Metadata) の保存・更新
             var metaFilePath = Path.Combine(projectDir, ".project");
             var newMetadata = new ProjectMetadataDto(
@@ -280,33 +286,49 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                 await File.WriteAllTextAsync(metaFilePath, _serializer.Serialize(newMetadata));
             }
 
-            var changesDir = Path.Combine(projectDir, "changes");
             var commitTime = DateTime.Now;
 
             // 1. 削除マーカー（Tombstone）の生成
-            foreach (var taskId in project.DeletedTaskIds)
+            var deletedIds = project.DeletedTaskIds.Concat(project.DeletedContainerIds);
+            foreach (var entityId in deletedIds)
             {
-                var taskDir = Path.Combine(changesDir, taskId.ToString());
-                if (!Directory.Exists(taskDir))
-                    Directory.CreateDirectory(taskDir);
+                var entityDir = Path.Combine(changesDir, entityId.ToString());
+                if (!Directory.Exists(entityDir))
+                    Directory.CreateDirectory(entityDir);
 
-                var tombstoneFileName = _fileNameGenerator.Generate(commitTime, userId, "Deleted", taskId);
-                var tombstonePath = Path.Combine(taskDir, tombstoneFileName);
+                var tombstoneFileName = _fileNameGenerator.Generate(commitTime, userId, "Deleted", entityId);
+                var tombstonePath = Path.Combine(entityDir, tombstoneFileName);
 
                 if (!File.Exists(tombstonePath))
                 {
                     await File.WriteAllTextAsync(tombstonePath, "{}");
                     _monitor.MarkFileAsJustWritten(tombstoneFileName);
-                    _logger.LogInformation("Created tombstone for task {TaskId}.", taskId);
+                    _logger.LogInformation("Created tombstone for entity {EntityId}.", entityId);
                 }
             }
 
             // 2. プロジェクト情報の保存 (4カテゴリ)
             var basicSnapshot = new ProjectBasicDto(project.Name, project.Status);
-            await TrySaveCategoryAsync(project.Id, changesDir, "Project_Basic", basicSnapshot, commitTime, userId);
+            await TrySaveCategoryAsync(
+                project.Id,
+                changesDir,
+                "Project_Basic",
+                basicSnapshot,
+                commitTime,
+                userId,
+                isEntity: false
+            );
 
             var descSnapshot = new ProjectDescriptionDto(project.Description);
-            await TrySaveCategoryAsync(project.Id, changesDir, "Project_Description", descSnapshot, commitTime, userId);
+            await TrySaveCategoryAsync(
+                project.Id,
+                changesDir,
+                "Project_Description",
+                descSnapshot,
+                commitTime,
+                userId,
+                isEntity: false
+            );
 
             var milestoneSnapshot = new ProjectMilestonesDto(
                 project.Milestones.Select(m => new MilestoneDto(m.Date, m.Label)).ToList()
@@ -317,13 +339,79 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                 "Project_Milestones",
                 milestoneSnapshot,
                 commitTime,
-                userId
+                userId,
+                isEntity: false
             );
 
             var membersSnapshot = new ProjectMembersDto { AssignedUserIds = project.AssignedUserIds.ToList() };
-            await TrySaveCategoryAsync(project.Id, changesDir, "Project_Members", membersSnapshot, commitTime, userId);
+            await TrySaveCategoryAsync(
+                project.Id,
+                changesDir,
+                "Project_Members",
+                membersSnapshot,
+                commitTime,
+                userId,
+                isEntity: false
+            );
 
-            // 3. タスク情報の保存 (各タスク 3カテゴリ)
+            // 3. コンテナ情報の保存
+            foreach (var container in project.Containers)
+            {
+                var planning = new ContainerPlanningDto(
+                    container.Id,
+                    container.ParentId,
+                    container.Name,
+                    container.PlannedStartDate,
+                    container.PlannedEndDate,
+                    container.Deadline,
+                    container.RequiredDays,
+                    container
+                        .Constraints.Select(c => new TaskConstraintDto(
+                            c.PredecessorId,
+                            c.Type,
+                            c.LagDays,
+                            c.Description
+                        ))
+                        .ToList()
+                );
+                await TrySaveCategoryAsync(
+                    container.Id,
+                    changesDir,
+                    "Container_Planning",
+                    planning,
+                    commitTime,
+                    userId,
+                    isEntity: true
+                );
+
+                var containerDesc = new ContainerDescriptionDto(container.Id, container.Description);
+                await TrySaveCategoryAsync(
+                    container.Id,
+                    changesDir,
+                    "Container_Description",
+                    containerDesc,
+                    commitTime,
+                    userId,
+                    isEntity: true
+                );
+
+                var relations = new ContainerRelationsDto(
+                    container.Id,
+                    container.WatcherIds.ToList(),
+                    container.RelatedTaskIds.ToList()
+                );
+                await TrySaveCategoryAsync(
+                    container.Id,
+                    changesDir,
+                    "Container_Relations",
+                    relations,
+                    commitTime,
+                    userId,
+                    isEntity: true
+                );
+            }
+
+            // 4. タスク情報の保存 (各タスク 3カテゴリ)
             foreach (var task in project.Tasks)
             {
                 var planning = new TaskPlanningDto(
@@ -331,7 +419,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                     task.ParentId,
                     task.Name,
                     task.Priority,
-                    task.ScheduledStartDate,
+                    task.PlannedStartDate,
                     task.Deadline,
                     task.EstimatedCost,
                     task.Assignee,
@@ -350,7 +438,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                     planning,
                     commitTime,
                     userId,
-                    isTask: true
+                    isEntity: true
                 );
 
                 var progress = new TaskProgressDto(
@@ -367,7 +455,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                     progress,
                     commitTime,
                     userId,
-                    isTask: true
+                    isEntity: true
                 );
 
                 var taskDesc = new TaskDescriptionDto(task.Id, task.Description);
@@ -378,10 +466,10 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                     taskDesc,
                     commitTime,
                     userId,
-                    isTask: true
+                    isEntity: true
                 );
 
-                // 4. コメントの保存 (各コメント 1ファイル)
+                // 5. コメントの保存 (各コメント 1ファイル)
                 foreach (var comment in task.Comments)
                 {
                     await TrySaveCommentAsync(project.Id, task.Id, changesDir, comment, userId);
@@ -389,7 +477,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
             }
 
             // 保存完了後、ドメインの状態をリセット
-            project.ClearDeletedTaskIds();
+            project.ClearDeletedIds();
             project.SetUpdatedAt(commitTime);
         }
         catch (Exception ex)
@@ -479,7 +567,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         object data,
         DateTime timestamp,
         string userId,
-        bool isTask = false
+        bool isEntity = false
     )
     {
         var json = _serializer.Serialize(data);
@@ -487,8 +575,8 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         if (_cache.TryGetCategory(entityId, category, out var lastJson) && lastJson == json)
             return;
 
-        // 出力先の決定（タスクならサブフォルダ、プロジェクトなら直下）
-        var targetDir = isTask ? Path.Combine(changesDir, entityId.ToString()) : changesDir;
+        // 出力先の決定（タスク/コンテナならサブフォルダ、プロジェクトなら直下）
+        var targetDir = isEntity ? Path.Combine(changesDir, entityId.ToString()) : changesDir;
         if (!Directory.Exists(targetDir))
             Directory.CreateDirectory(targetDir);
 

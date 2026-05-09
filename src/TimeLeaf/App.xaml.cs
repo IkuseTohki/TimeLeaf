@@ -284,6 +284,10 @@ public partial class App : Application
         services.AddTransient<IFindProjectUseCase, FindProjectUseCase>();
         services.AddTransient<IAddProjectUseCase, AddProjectUseCase>();
         services.AddTransient<IAddTaskUseCase, AddTaskUseCase>();
+        services.AddTransient<IAddContainerUseCase>(sp => new AddContainerUseCase(
+            sp.GetRequiredService<ISaveProjectUseCase>(),
+            sp.GetRequiredService<ILogger<AddContainerUseCase>>()
+        ));
         services.AddTransient<IAddCommentUseCase, AddCommentUseCase>();
         services.AddTransient<IAddMilestoneUseCase, AddMilestoneUseCase>();
         services.AddTransient<IDeleteTaskUseCase, DeleteTaskUseCase>();
@@ -306,6 +310,7 @@ public partial class App : Application
         services.AddTransient<ProfileEditViewModel>(); // Ensure this is registered if not already
         services.AddTransient<AddProjectViewModel>();
         services.AddTransient<AddTaskViewModel>();
+        services.AddTransient<AddContainerViewModel>();
         // Note: ProjectWorkspaceViewModel はファクトリ経由で生成されるため、直接の Transient 登録は不要だが、
         // ファクトリ内での GetRequiredService 用に登録しておく。
         services.AddTransient<ProjectWorkspaceViewModel>();

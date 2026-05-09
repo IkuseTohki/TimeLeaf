@@ -10,47 +10,11 @@ namespace TimeLeaf.Models.Entities;
 /// <summary>
 /// タスクを表すエンティティ。
 /// </summary>
-public class ProjectTask
+public class ProjectTask : ProjectWorkItem
 {
     private readonly List<Comment> _comments = new();
-    private readonly List<TaskConstraint> _constraints = new();
     private readonly List<ProjectTask> _children = new();
     private readonly List<Guid> _dependencies = new();
-
-    /// <summary>
-    /// タスクを一意に識別するID。
-    /// </summary>
-    public Guid Id { get; init; } = Guid.NewGuid();
-
-    /// <summary>
-    /// 親タスクのID。
-    /// </summary>
-    [JsonIgnore]
-    public Guid? ParentId { get; private set; }
-
-    /// <summary>
-    /// 親タスクIDを設定します（リポジトリ復元用）。
-    /// </summary>
-    internal void SetParentId(Guid? parentId)
-    {
-        ParentId = parentId;
-    }
-
-    /// <summary>
-    /// 子タスクのリスト（読み取り専用）。
-    /// </summary>
-    [JsonIgnore]
-    public IReadOnlyList<ProjectTask> Children => _children;
-
-    /// <summary>
-    /// タスク名。
-    /// </summary>
-    public string Name { get; private set; } = string.Empty;
-
-    /// <summary>
-    /// タスクの詳細説明。
-    /// </summary>
-    public string Description { get; private set; } = string.Empty;
 
     /// <summary>
     /// タスクの進捗状態。
@@ -61,16 +25,6 @@ public class ProjectTask
     /// タスクの優先度。
     /// </summary>
     public TaskPriority Priority { get; private set; } = TaskPriority.Medium;
-
-    /// <summary>
-    /// 開始予定日。
-    /// </summary>
-    public DateTime? ScheduledStartDate { get; private set; }
-
-    /// <summary>
-    /// 期限 (Due Date)。
-    /// </summary>
-    public DateTime? Deadline { get; private set; }
 
     /// <summary>
     /// 実際の作業開始日。
@@ -98,15 +52,16 @@ public class ProjectTask
     public string Assignee { get; private set; } = string.Empty;
 
     /// <summary>
-    /// タスク間の制約（依存関係）のリスト（読み取り専用）。
+    /// 予定開始日（ProjectWorkItem.PlannedStartDate へのエイリアス）。
     /// </summary>
-    public IReadOnlyList<TaskConstraint> Constraints => _constraints;
+    [JsonIgnore]
+    public DateTime? ScheduledStartDate => PlannedStartDate;
 
     /// <summary>
-    /// 依存タスクのIDリスト。
+    /// 子タスクのリスト（読み取り専用）。
     /// </summary>
-    [Obsolete("Use Constraints instead.")]
-    public List<Guid> Dependencies => _dependencies;
+    [JsonIgnore]
+    public IReadOnlyList<ProjectTask> Children => _children;
 
     /// <summary>
     /// タスクに関するコメントのリスト（読み取り専用）。
@@ -145,7 +100,7 @@ public class ProjectTask
         this.Description = description;
         this.Status = status;
         this.Priority = priority;
-        this.ScheduledStartDate = scheduledStartDate;
+        this.PlannedStartDate = scheduledStartDate;
         this.Deadline = deadline;
         this.ActualStartDate = actualStartDate;
         this.ActualEndDate = actualEndDate;
@@ -159,24 +114,6 @@ public class ProjectTask
         }
         if (comments != null)
             _comments.AddRange(comments);
-    }
-
-    /// <summary>
-    /// タスク名を更新します。
-    /// </summary>
-    public void UpdateName(string name)
-    {
-        if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentException("Task name cannot be empty.", nameof(name));
-        Name = name;
-    }
-
-    /// <summary>
-    /// タスクの詳細を更新します。
-    /// </summary>
-    public void UpdateDescription(string description)
-    {
-        Description = description ?? string.Empty;
     }
 
     /// <summary>
@@ -215,7 +152,7 @@ public class ProjectTask
     /// </summary>
     public void UpdateSchedule(DateTime? scheduledStart, DateTime? deadline)
     {
-        ScheduledStartDate = scheduledStart;
+        PlannedStartDate = scheduledStart;
         Deadline = deadline;
     }
 
@@ -278,12 +215,9 @@ public class ProjectTask
     /// <summary>
     /// 制約を追加します。
     /// </summary>
-    public void AddConstraint(TaskConstraint constraint)
+    public override void AddConstraint(TaskConstraint constraint)
     {
-        if (constraint == null)
-            throw new ArgumentNullException(nameof(constraint));
-        _constraints.Add(constraint);
-
+        base.AddConstraint(constraint);
         if (!_dependencies.Contains(constraint.PredecessorId))
             _dependencies.Add(constraint.PredecessorId);
     }
@@ -291,7 +225,7 @@ public class ProjectTask
     /// <summary>
     /// 既存の制約を一括で追加します（再ロード時等に使用）。
     /// </summary>
-    public void LoadConstraints(IEnumerable<TaskConstraint> constraints)
+    public override void LoadConstraints(IEnumerable<TaskConstraint> constraints)
     {
         _constraints.Clear();
         _dependencies.Clear();
@@ -314,7 +248,7 @@ public class ProjectTask
         if (child.Id != Guid.Empty && child.Id == this.Id)
             throw new ArgumentException("Cannot add self as child.", nameof(child));
 
-        child.ParentId = this.Id;
+        child.SetParentId(this.Id);
         _children.Add(child);
         AggregateChildren();
     }
@@ -327,7 +261,7 @@ public class ProjectTask
         _children.Clear();
         foreach (var child in children)
         {
-            child.ParentId = this.Id;
+            child.SetParentId(this.Id);
             _children.Add(child);
         }
         AggregateChildren();
@@ -346,7 +280,7 @@ public class ProjectTask
             .Where(c => c.ScheduledStartDate.HasValue)
             .Select(c => c.ScheduledStartDate!.Value)
             .ToList();
-        ScheduledStartDate = starts.Any() ? starts.Min() : null;
+        PlannedStartDate = starts.Any() ? starts.Min() : null;
 
         var ends = _children.Where(c => c.Deadline.HasValue).Select(c => c.Deadline!.Value).ToList();
         Deadline = ends.Any() ? ends.Max() : null;

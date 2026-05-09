@@ -78,12 +78,13 @@ public class ProjectWorkspaceViewModelTests
         _viewModelFactoryMock
             .Setup(x => x.CreateProjectTasksViewModel(It.IsAny<ProjectViewModel>()))
             .Returns(
-                (ProjectViewModel p) =>
+                (ProjectViewModel pvm) =>
                     new ProjectTasksViewModel(
-                        p,
+                        pvm,
                         new Mock<IAddTaskUseCase>().Object,
+                        new Mock<IAddContainerUseCase>().Object,
                         new Mock<IGetProjectMembersUseCase>().Object,
-                        _viewModelFactoryMock.Object,
+                        new Mock<IViewModelFactory>().Object,
                         new Mock<IDialogService>().Object,
                         new DetectProjectRisksUseCase(new CalculateCriticalPathUseCase()),
                         new CalculateFlowLayoutUseCase(),

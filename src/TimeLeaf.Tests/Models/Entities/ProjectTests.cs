@@ -313,7 +313,7 @@ public class ProjectTests
         Assert.AreEqual(taskId, project.DeletedTaskIds[0]);
 
         // Act: クリア
-        project.ClearDeletedTaskIds();
+        project.ClearDeletedIds();
         Assert.AreEqual(0, project.DeletedTaskIds.Count, "クリア後はリストが空になること");
     }
 

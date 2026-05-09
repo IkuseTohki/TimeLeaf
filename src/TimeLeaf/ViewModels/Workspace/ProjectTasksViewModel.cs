@@ -19,6 +19,7 @@ public partial class ProjectTasksViewModel : ObservableObject
 {
     private readonly ProjectViewModel _projectViewModel;
     private readonly IAddTaskUseCase _addTaskUseCase;
+    private readonly IAddContainerUseCase _addContainerUseCase;
     private readonly IGetProjectMembersUseCase _getProjectMembersUseCase;
     private readonly IViewModelFactory _viewModelFactory;
     private readonly LeafKit.UI.Services.IDialogService _dialogService;
@@ -57,6 +58,7 @@ public partial class ProjectTasksViewModel : ObservableObject
     public ProjectTasksViewModel(
         ProjectViewModel projectViewModel,
         IAddTaskUseCase addTaskUseCase,
+        IAddContainerUseCase addContainerUseCase,
         IGetProjectMembersUseCase getProjectMembersUseCase,
         IViewModelFactory viewModelFactory,
         LeafKit.UI.Services.IDialogService dialogService,
@@ -68,6 +70,7 @@ public partial class ProjectTasksViewModel : ObservableObject
     {
         _projectViewModel = projectViewModel;
         _addTaskUseCase = addTaskUseCase;
+        _addContainerUseCase = addContainerUseCase;
         _getProjectMembersUseCase = getProjectMembersUseCase;
         _viewModelFactory = viewModelFactory;
         _dialogService = dialogService;
@@ -81,40 +84,62 @@ public partial class ProjectTasksViewModel : ObservableObject
         RebuildContainers();
     }
 
+    [RelayCommand]
+    private async System.Threading.Tasks.Task AddContainer(TaskContainerViewModel? container = null)
+    {
+        try
+        {
+            var addContainerVm = _viewModelFactory.CreateAddContainerViewModel();
+            var result = await _dialogService.ShowDialogAsync(addContainerVm);
+
+            if (result)
+            {
+                var parentId = container?.Id != Guid.Empty ? container?.Id : null;
+
+                await _addContainerUseCase.ExecuteAsync(
+                    _projectViewModel.Model,
+                    addContainerVm.Name,
+                    addContainerVm.Description,
+                    parentId
+                );
+
+                _projectViewModel.SyncFromModel();
+                RebuildContainers();
+                await ScanRisksAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to add container.");
+        }
+    }
+
     private void RebuildContainers()
     {
         TaskContainers.Clear();
         var allTasks = Tasks.ToList();
 
-        // 1. 親タスク（コンテナ）となるタスクを抽出
-        var parentIds = allTasks
-            .Select(t => t.ParentId)
-            .Where(id => id.HasValue)
-            .Select(id => id!.Value)
-            .Distinct()
-            .ToHashSet();
-        var parents = allTasks.Where(t => parentIds.Contains(t.Id) || t.Model.Children.Any()).ToList();
-
-        // 2. コンテナ作成
-        foreach (var parent in parents)
+        // 1. プロジェクトが保持するコンテナエンティティを基点に表示リストを作成
+        foreach (var container in _projectViewModel.Model.Containers)
         {
-            var children = allTasks.Where(t => t.ParentId == parent.Id).ToList();
-            if (children.Any() || allTasks.Contains(parent))
-            {
-                TaskContainers.Add(
-                    new TaskContainerViewModel(
-                        parent,
-                        new ObservableCollection<ProjectTaskViewModel>(children),
-                        AddTaskToContainerCommand
-                    )
-                );
-            }
+            // このコンテナに属するタスクを抽出
+            var children = allTasks.Where(t => t.ParentId == container.Id).ToList();
+
+            TaskContainers.Add(
+                new TaskContainerViewModel(
+                    container,
+                    new ObservableCollection<ProjectTaskViewModel>(children),
+                    AddTaskToContainerCommand
+                )
+            );
         }
 
-        // 3. 未分類タスク
+        // 2. どのコンテナにも属さない「未分類タスク」を最後に追加
+        var containerIds = _projectViewModel.Model.Containers.Select(c => c.Id).ToHashSet();
         var unclassified = allTasks
-            .Where(t => !t.ParentId.HasValue && !parentIds.Contains(t.Id) && !t.Model.Children.Any())
+            .Where(t => !t.ParentId.HasValue || !containerIds.Contains(t.ParentId.Value))
             .ToList();
+
         if (unclassified.Any())
         {
             TaskContainers.Add(
@@ -227,12 +252,6 @@ public partial class ProjectTasksViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void AddProject()
-    {
-        _ = AddTaskToContainer(null);
-    }
-
-    [RelayCommand]
     private async System.Threading.Tasks.Task AddTaskToContainer(TaskContainerViewModel? container)
     {
         try
@@ -244,7 +263,7 @@ public partial class ProjectTasksViewModel : ObservableObject
             if (result)
             {
                 var assigneeName = addTaskVm.Assignee?.DisplayName ?? string.Empty;
-                var parentId = container?.ParentTask?.Id;
+                var parentId = container?.Id != Guid.Empty ? container?.Id : null;
 
                 await _addTaskUseCase.ExecuteAsync(
                     _projectViewModel.Model,
@@ -269,7 +288,7 @@ public partial class ProjectTasksViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to add task.");
+            _logger.LogError(ex, "Failed to add task to container.");
         }
     }
 

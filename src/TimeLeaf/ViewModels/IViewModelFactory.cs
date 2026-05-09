@@ -22,7 +22,7 @@ public interface IViewModelFactory
     ProjectTaskViewModel CreateProjectTaskViewModel(ProjectTask task);
     AddProjectViewModel CreateAddProjectViewModel();
     AddTaskViewModel CreateAddTaskViewModel(System.Collections.Generic.IEnumerable<User>? teammates = null);
-
+    AddContainerViewModel CreateAddContainerViewModel();
     ProjectDashboardViewModel CreateProjectDashboardViewModel(ProjectViewModel projectViewModel);
     ProjectTasksViewModel CreateProjectTasksViewModel(ProjectViewModel projectViewModel);
     ProjectFlowViewModel CreateProjectFlowViewModel(ProjectViewModel projectViewModel);

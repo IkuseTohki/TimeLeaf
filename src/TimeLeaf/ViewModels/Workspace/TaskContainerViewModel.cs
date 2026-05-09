@@ -3,19 +3,17 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using TimeLeaf.Models.Entities;
 
 namespace TimeLeaf.ViewModels.Workspace;
 
 /// <summary>
-/// タスクをグループ化して表示するためのコンテナ（親タスク）のViewModel。
+/// タスクをグループ化して表示するためのコンテナのViewModel。
+/// ProjectContainer エンティティをラップし、UIに必要な情報を公開する。
 /// </summary>
 public partial class TaskContainerViewModel : ObservableObject
 {
-    /// <summary>
-    /// 親タスクのViewModel。未分類の場合は null。
-    /// </summary>
-    [ObservableProperty]
-    private ProjectTaskViewModel? _parentTask;
+    private readonly ProjectContainer? _container;
 
     /// <summary>
     /// 所属する子タスクのリスト。
@@ -25,12 +23,17 @@ public partial class TaskContainerViewModel : ObservableObject
     /// <summary>
     /// 表示用の名称。
     /// </summary>
-    public string DisplayName => ParentTask?.Name ?? "未分類のタスク";
+    public string DisplayName => _container?.Name ?? "未分類のタスク";
 
     /// <summary>
     /// 未分類のコンテナかどうか。
     /// </summary>
-    public bool IsUnclassified => ParentTask == null;
+    public bool IsUnclassified => _container == null;
+
+    /// <summary>
+    /// 内包するエンティティのID（未分類の場合は Empty）。
+    /// </summary>
+    public Guid Id => _container?.Id ?? Guid.Empty;
 
     /// <summary>
     /// タスクの総数。
@@ -50,16 +53,16 @@ public partial class TaskContainerViewModel : ObservableObject
     /// <summary>
     /// コンストラクタ。
     /// </summary>
-    /// <param name="parentTask">親タスクのViewModel。</param>
-    /// <param name="subTasks">子タスクのViewModelコレクション。</param>
+    /// <param name="container">ラップ対象のコンテナエンティティ。未分類の場合は null。</param>
+    /// <param name="subTasks">このコンテナに属するタスクのコレクション。</param>
     /// <param name="addTaskCommand">タスク追加コマンド。</param>
     public TaskContainerViewModel(
-        ProjectTaskViewModel? parentTask,
+        ProjectContainer? container,
         ObservableCollection<ProjectTaskViewModel> subTasks,
         IRelayCommand addTaskCommand
     )
     {
-        _parentTask = parentTask;
+        _container = container;
         SubTasks = subTasks ?? throw new ArgumentNullException(nameof(subTasks));
         AddTaskCommand = addTaskCommand ?? throw new ArgumentNullException(nameof(addTaskCommand));
     }

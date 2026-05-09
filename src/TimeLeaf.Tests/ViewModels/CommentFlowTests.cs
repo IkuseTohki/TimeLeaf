@@ -198,6 +198,7 @@ public class CommentFlowTests
         var tasksVM = new ProjectTasksViewModel(
             projectVM,
             new Mock<IAddTaskUseCase>().Object,
+            new Mock<IAddContainerUseCase>().Object,
             new Mock<IGetProjectMembersUseCase>().Object,
             new Mock<IViewModelFactory>().Object,
             new Mock<IDialogService>().Object,

@@ -40,11 +40,11 @@ internal class ProjectHistoryReplayer
         var files = ScanChangeFiles(changesDir, projectId);
 
         // 削除マーカー(Tombstone)の検出
-        var deletedTasks = new HashSet<Guid>();
+        var deletedEntities = new HashSet<Guid>();
         var tombstoneFiles = files.Where(f => f.Meta.Category == "Deleted").ToList();
         foreach (var tombstone in tombstoneFiles)
         {
-            deletedTasks.Add(tombstone.EntityId);
+            deletedEntities.Add(tombstone.EntityId);
         }
 
         _logger.LogDebug("Found {ChangeFileCount} change files for project {ProjectId}.", files.Count, projectId);
@@ -52,18 +52,29 @@ internal class ProjectHistoryReplayer
         var project = new Project(createdBy) { Id = projectId, CreatedAt = createdAt };
         var allCommentData = new List<(CommentDto Dto, DateTime Timestamp)>();
         var taskMap = new Dictionary<Guid, ProjectTask>();
+        var containerMap = new Dictionary<Guid, ProjectContainer>();
+        var workItemMap = new Dictionary<Guid, ProjectWorkItem>();
 
         foreach (var file in files)
         {
             // 削除済みエンティティの変更は無視
-            if (deletedTasks.Contains(file.EntityId))
+            if (deletedEntities.Contains(file.EntityId))
                 continue;
 
-            await ApplyChangeAsync(project, taskMap, allCommentData, file.Path, file.EntityId, file.Meta);
+            await ApplyChangeAsync(
+                project,
+                taskMap,
+                containerMap,
+                workItemMap,
+                allCommentData,
+                file.Path,
+                file.EntityId,
+                file.Meta
+            );
         }
 
         AttachComments(taskMap, allCommentData);
-        ResolveHierarchy(taskMap);
+        ResolveHierarchy(workItemMap);
 
         if (files.Any())
         {
@@ -73,16 +84,26 @@ internal class ProjectHistoryReplayer
         return project;
     }
 
-    private void ResolveHierarchy(Dictionary<Guid, ProjectTask> taskMap)
+    private void ResolveHierarchy(Dictionary<Guid, ProjectWorkItem> workItemMap)
     {
-        foreach (var task in taskMap.Values.ToList())
+        foreach (var item in workItemMap.Values.ToList())
         {
-            if (task.ParentId.HasValue && taskMap.TryGetValue(task.ParentId.Value, out var parent))
+            if (item.ParentId.HasValue && workItemMap.TryGetValue(item.ParentId.Value, out var parent))
             {
-                // すでに親の子リストに含まれていない場合のみ追加
-                if (!parent.Children.Any(c => c.Id == task.Id))
+                if (parent is ProjectContainer pc)
                 {
-                    parent.AddChild(task);
+                    if (!pc.Children.Any(c => c.Id == item.Id))
+                    {
+                        pc.AddChild(item);
+                    }
+                }
+                else if (parent is ProjectTask pt && item is ProjectTask ct)
+                {
+                    // 互換性のため、タスク間の親子関係も維持
+                    if (!pt.Children.Any(c => c.Id == ct.Id))
+                    {
+                        pt.AddChild(ct);
+                    }
                 }
             }
         }
@@ -108,6 +129,8 @@ internal class ProjectHistoryReplayer
     private async Task ApplyChangeAsync(
         Project project,
         Dictionary<Guid, ProjectTask> taskMap,
+        Dictionary<Guid, ProjectContainer> containerMap,
+        Dictionary<Guid, ProjectWorkItem> workItemMap,
         List<(CommentDto Dto, DateTime Timestamp)> allCommentData,
         string filePath,
         Guid entityId,
@@ -116,7 +139,7 @@ internal class ProjectHistoryReplayer
     {
         var json = await File.ReadAllTextAsync(filePath);
 
-        // すべてのカテゴリをキャッシュする (コメントは AccumulateComment 内で taskId が判明した後に更新する)
+        // すべてのカテゴリをキャッシュする
         if (meta.Category != "Comment")
         {
             _cache.UpdateCategory(entityId, meta.Category, json);
@@ -136,14 +159,23 @@ internal class ProjectHistoryReplayer
             case "Project_Members":
                 ApplyProjectMembers(project, json);
                 break;
+            case "Container_Planning":
+                ApplyContainerPlanning(project, containerMap, workItemMap, json);
+                break;
+            case "Container_Description":
+                ApplyContainerDescription(project, containerMap, workItemMap, json);
+                break;
+            case "Container_Relations":
+                ApplyContainerRelations(project, containerMap, workItemMap, json);
+                break;
             case "Task_Planning":
-                ApplyTaskPlanning(project, taskMap, json);
+                ApplyTaskPlanning(project, taskMap, workItemMap, json);
                 break;
             case "Task_Progress":
-                ApplyTaskProgress(project, taskMap, json);
+                ApplyTaskProgress(project, taskMap, workItemMap, json);
                 break;
             case "Task_Description":
-                ApplyTaskDescription(project, taskMap, json);
+                ApplyTaskDescription(project, taskMap, workItemMap, json);
                 break;
             case "Comment":
                 AccumulateComment(allCommentData, json, meta.Timestamp);
@@ -182,12 +214,73 @@ internal class ProjectHistoryReplayer
         project.ReplayAssignments(dto.AssignedUserIds);
     }
 
-    private void ApplyTaskPlanning(Project project, Dictionary<Guid, ProjectTask> taskMap, string json)
+    private void ApplyContainerPlanning(
+        Project project,
+        Dictionary<Guid, ProjectContainer> containerMap,
+        Dictionary<Guid, ProjectWorkItem> workItemMap,
+        string json
+    )
+    {
+        var dto = _serializer.Deserialize<ContainerPlanningDto>(json);
+        if (dto == null)
+            return;
+        var container = GetOrCreateContainer(project, containerMap, workItemMap, dto.Id);
+        container.SetParentId(dto.ParentId);
+        container.UpdateName(dto.Name);
+        container.UpdateSchedule(dto.PlannedStartDate, dto.PlannedEndDate, dto.Deadline);
+        container.UpdateRequiredDays(dto.RequiredDays);
+
+        if (dto.Constraints != null)
+        {
+            var constraints = dto.Constraints.Select(c => new TaskConstraint(
+                c.PredecessorId,
+                c.Type,
+                c.LagDays,
+                c.Description
+            ));
+            container.LoadConstraints(constraints);
+        }
+    }
+
+    private void ApplyContainerDescription(
+        Project project,
+        Dictionary<Guid, ProjectContainer> containerMap,
+        Dictionary<Guid, ProjectWorkItem> workItemMap,
+        string json
+    )
+    {
+        var dto = _serializer.Deserialize<ContainerDescriptionDto>(json);
+        if (dto == null)
+            return;
+        var container = GetOrCreateContainer(project, containerMap, workItemMap, dto.Id);
+        container.UpdateDescription(dto.Description);
+    }
+
+    private void ApplyContainerRelations(
+        Project project,
+        Dictionary<Guid, ProjectContainer> containerMap,
+        Dictionary<Guid, ProjectWorkItem> workItemMap,
+        string json
+    )
+    {
+        var dto = _serializer.Deserialize<ContainerRelationsDto>(json);
+        if (dto == null)
+            return;
+        var container = GetOrCreateContainer(project, containerMap, workItemMap, dto.Id);
+        // 現時点では WatcherIds 等の復元のみ（必要に応じてエンティティ側のメソッドを呼び出す）
+    }
+
+    private void ApplyTaskPlanning(
+        Project project,
+        Dictionary<Guid, ProjectTask> taskMap,
+        Dictionary<Guid, ProjectWorkItem> workItemMap,
+        string json
+    )
     {
         var dto = _serializer.Deserialize<TaskPlanningDto>(json);
         if (dto == null)
             return;
-        var task = GetOrCreateTask(project, taskMap, dto.Id);
+        var task = GetOrCreateTask(project, taskMap, workItemMap, dto.Id);
         task.SetParentId(dto.ParentId);
         task.UpdateName(dto.Name);
         task.UpdatePriority(dto.Priority);
@@ -207,23 +300,33 @@ internal class ProjectHistoryReplayer
         }
     }
 
-    private void ApplyTaskProgress(Project project, Dictionary<Guid, ProjectTask> taskMap, string json)
+    private void ApplyTaskProgress(
+        Project project,
+        Dictionary<Guid, ProjectTask> taskMap,
+        Dictionary<Guid, ProjectWorkItem> workItemMap,
+        string json
+    )
     {
         var dto = _serializer.Deserialize<TaskProgressDto>(json);
         if (dto == null)
             return;
-        var task = GetOrCreateTask(project, taskMap, dto.Id);
+        var task = GetOrCreateTask(project, taskMap, workItemMap, dto.Id);
         task.UpdateStatus(dto.Status);
         task.UpdateActualDates(dto.ActualStartDate, dto.ActualEndDate);
         task.UpdateActualCost(dto.ActualCost);
     }
 
-    private void ApplyTaskDescription(Project project, Dictionary<Guid, ProjectTask> taskMap, string json)
+    private void ApplyTaskDescription(
+        Project project,
+        Dictionary<Guid, ProjectTask> taskMap,
+        Dictionary<Guid, ProjectWorkItem> workItemMap,
+        string json
+    )
     {
         var dto = _serializer.Deserialize<TaskDescriptionDto>(json);
         if (dto == null)
             return;
-        var task = GetOrCreateTask(project, taskMap, dto.Id);
+        var task = GetOrCreateTask(project, taskMap, workItemMap, dto.Id);
         task.UpdateDescription(dto.Description);
     }
 
@@ -269,13 +372,35 @@ internal class ProjectHistoryReplayer
         }
     }
 
-    private ProjectTask GetOrCreateTask(Project project, Dictionary<Guid, ProjectTask> map, Guid taskId)
+    private ProjectContainer GetOrCreateContainer(
+        Project project,
+        Dictionary<Guid, ProjectContainer> map,
+        Dictionary<Guid, ProjectWorkItem> workItemMap,
+        Guid containerId
+    )
+    {
+        if (map.TryGetValue(containerId, out var container))
+            return container;
+        var newContainer = new ProjectContainer { Id = containerId };
+        project.AddContainer(newContainer);
+        map[containerId] = newContainer;
+        workItemMap[containerId] = newContainer;
+        return newContainer;
+    }
+
+    private ProjectTask GetOrCreateTask(
+        Project project,
+        Dictionary<Guid, ProjectTask> map,
+        Dictionary<Guid, ProjectWorkItem> workItemMap,
+        Guid taskId
+    )
     {
         if (map.TryGetValue(taskId, out var task))
             return task;
         var newTask = new ProjectTask { Id = taskId };
         project.AddTask(newTask);
         map[taskId] = newTask;
+        workItemMap[taskId] = newTask;
         return newTask;
     }
 }

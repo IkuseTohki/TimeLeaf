@@ -469,7 +469,7 @@ public class ProjectViewModelTests
         Assert.AreEqual(1, projectViewModel.Tasks.Count, "初期状態でVMのタスクが1つであること");
 
         // Act
-        project.ClearTasks();
+        project.ClearAllWorkItems();
         projectViewModel.SyncFromModel();
 
         Assert.AreEqual(0, project.Tasks.Count, "Modelのタスクがクリアされていること");

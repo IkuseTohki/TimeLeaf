@@ -94,6 +94,11 @@ public class ViewModelFactory : IViewModelFactory
         return vm;
     }
 
+    public AddContainerViewModel CreateAddContainerViewModel()
+    {
+        return _serviceProvider.GetRequiredService<AddContainerViewModel>();
+    }
+
     public ProjectDashboardViewModel CreateProjectDashboardViewModel(ProjectViewModel projectViewModel)
     {
         return new ProjectDashboardViewModel(
@@ -108,6 +113,7 @@ public class ViewModelFactory : IViewModelFactory
         return new ProjectTasksViewModel(
             projectViewModel,
             _serviceProvider.GetRequiredService<IAddTaskUseCase>(),
+            _serviceProvider.GetRequiredService<IAddContainerUseCase>(),
             _serviceProvider.GetRequiredService<IGetProjectMembersUseCase>(),
             this,
             _serviceProvider.GetRequiredService<IDialogService>(),

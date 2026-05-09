@@ -12,9 +12,11 @@ namespace TimeLeaf.Models.Entities;
 public class Project
 {
     private readonly List<ProjectTask> _tasks = new();
+    private readonly List<ProjectContainer> _containers = new();
     private readonly List<Milestone> _milestones = new();
     private readonly List<Guid> _assignedUserIds = new();
     private readonly List<Guid> _deletedTaskIds = new();
+    private readonly List<Guid> _deletedContainerIds = new();
 
     /// <summary>
     /// プロジェクトの作成者ID。
@@ -72,6 +74,11 @@ public class Project
     public IReadOnlyList<ProjectTask> Tasks => _tasks;
 
     /// <summary>
+    /// プロジェクトに紐づくコンテナのリスト（読み取り専用）。
+    /// </summary>
+    public IReadOnlyList<ProjectContainer> Containers => _containers;
+
+    /// <summary>
     /// プロジェクトにアサインされているユーザーのID（読み取り専用）。
     /// </summary>
     public IReadOnlyList<Guid> AssignedUserIds => _assignedUserIds;
@@ -80,6 +87,11 @@ public class Project
     /// 論理削除されたタスクのIDリスト（保存後にクリアされるべき作業用状態）。
     /// </summary>
     public IReadOnlyList<Guid> DeletedTaskIds => _deletedTaskIds;
+
+    /// <summary>
+    /// 論理削除されたコンテナのIDリスト（保存後にクリアされるべき作業用状態）。
+    /// </summary>
+    public IReadOnlyList<Guid> DeletedContainerIds => _deletedContainerIds;
 
     /// <summary>
     /// デフォルトコンストラクタ。
@@ -108,6 +120,7 @@ public class Project
         DateTime UpdatedAt,
         Guid CreatedBy,
         List<ProjectTask>? Tasks,
+        List<ProjectContainer>? Containers,
         List<Milestone>? Milestones,
         List<Guid>? AssignedUserIds
     )
@@ -122,6 +135,8 @@ public class Project
 
         if (Tasks != null)
             _tasks.AddRange(Tasks);
+        if (Containers != null)
+            _containers.AddRange(Containers);
         if (Milestones != null)
             _milestones.AddRange(Milestones);
         if (AssignedUserIds != null)
@@ -209,7 +224,6 @@ public class Project
             throw new ArgumentNullException(nameof(task));
         _tasks.Add(task);
 
-        // もし削除済みリストに入っていた場合は、再追加されたとみなして削除リストから除外する
         if (_deletedTaskIds.Contains(task.Id))
         {
             _deletedTaskIds.Remove(task.Id);
@@ -233,19 +247,52 @@ public class Project
     }
 
     /// <summary>
-    /// 削除済みタスクIDの追跡リストをクリアします（保存完了後用）。
+    /// プロジェクトにコンテナを追加します。
     /// </summary>
-    public void ClearDeletedTaskIds()
+    public void AddContainer(ProjectContainer container)
     {
-        _deletedTaskIds.Clear();
+        if (container == null)
+            throw new ArgumentNullException(nameof(container));
+        _containers.Add(container);
+
+        if (_deletedContainerIds.Contains(container.Id))
+        {
+            _deletedContainerIds.Remove(container.Id);
+        }
     }
 
     /// <summary>
-    /// プロジェクトのタスクをすべてクリアします（再ロード用）。
+    /// プロジェクトからコンテナを削除します。
     /// </summary>
-    public void ClearTasks()
+    public void RemoveContainer(Guid containerId)
+    {
+        var container = _containers.FirstOrDefault(c => c.Id == containerId);
+        if (container != null)
+        {
+            _containers.Remove(container);
+            if (!_deletedContainerIds.Contains(containerId))
+            {
+                _deletedContainerIds.Add(containerId);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 削除済みタスク・コンテナIDの追跡リストをクリアします（保存完了後用）。
+    /// </summary>
+    public void ClearDeletedIds()
+    {
+        _deletedTaskIds.Clear();
+        _deletedContainerIds.Clear();
+    }
+
+    /// <summary>
+    /// プロジェクトのタスク・コンテナをすべてクリアします（再ロード用）。
+    /// </summary>
+    public void ClearAllWorkItems()
     {
         _tasks.Clear();
+        _containers.Clear();
     }
 
     /// <summary>
