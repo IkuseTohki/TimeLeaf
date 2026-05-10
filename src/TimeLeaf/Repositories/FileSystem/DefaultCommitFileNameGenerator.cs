@@ -13,7 +13,7 @@ public class DefaultCommitFileNameGenerator : ICommitFileNameGenerator
 
     public string Generate(DateTime timestamp, string userId, string category, Guid? entityId = null)
     {
-        if (category == "Deleted" && entityId.HasValue)
+        if (category == StorageCategories.Deleted && entityId.HasValue)
         {
             return $"{timestamp.ToString(TimeFormat)}_{userId}_{entityId}_{category}.json";
         }
@@ -44,7 +44,7 @@ public class DefaultCommitFileNameGenerator : ICommitFileNameGenerator
 
         // カテゴリ名にGUIDが含まれているか確認（Deletedの場合）
         string category;
-        if (parts.Length >= 6 && parts[parts.Length - 1] == "Deleted")
+        if (parts.Length >= 6 && parts[parts.Length - 1] == StorageCategories.Deleted)
         {
             category = parts[parts.Length - 1];
         }

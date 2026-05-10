@@ -26,6 +26,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
     private readonly IProjectFileSystemSerializer _serializer;
     private readonly ICommitFileNameGenerator _fileNameGenerator;
     private readonly ILogger<FolderProjectRepository> _logger;
+    private readonly ProjectDirectoryResolver _pathResolver;
 
     private readonly IProjectStorageCache _cache = new ProjectStorageCache();
 
@@ -44,6 +45,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         _serializer = serializer;
         _fileNameGenerator = fileNameGenerator;
         _logger = logger;
+        _pathResolver = new ProjectDirectoryResolver(baseDirectory);
 
         _logger.LogInformation(
             "FolderProjectRepository initializing with base directory: {BaseDirectory}",
@@ -240,20 +242,20 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         _logger.LogInformation("Saving project: {ProjectName} ({ProjectId})", project.Name, project.Id);
         try
         {
-            var projectDir = Path.Combine(_baseDirectory, $"{project.Id}_{project.Name}");
+            var projectDir = _pathResolver.GetProjectDirectory(project.Id, project.Name);
             if (!Directory.Exists(projectDir))
             {
                 Directory.CreateDirectory(projectDir);
             }
 
-            var changesDir = Path.Combine(projectDir, "changes");
+            var changesDir = _pathResolver.GetChangesDirectory(project.Id, project.Name);
             if (!Directory.Exists(changesDir))
             {
                 Directory.CreateDirectory(changesDir);
             }
 
             // .project (Metadata) の保存・更新
-            var metaFilePath = Path.Combine(projectDir, ".project");
+            var metaFilePath = _pathResolver.GetMetadataFilePath(project.Id, project.Name);
             var newMetadata = new ProjectMetadataDto(
                 project.Id,
                 project.CreatedAt,
@@ -292,11 +294,16 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
             var deletedIds = project.DeletedTaskIds.Concat(project.DeletedContainerIds);
             foreach (var entityId in deletedIds)
             {
-                var entityDir = Path.Combine(changesDir, entityId.ToString());
+                var entityDir = _pathResolver.GetEntityDirectory(changesDir, entityId);
                 if (!Directory.Exists(entityDir))
                     Directory.CreateDirectory(entityDir);
 
-                var tombstoneFileName = _fileNameGenerator.Generate(commitTime, userId, "Deleted", entityId);
+                var tombstoneFileName = _fileNameGenerator.Generate(
+                    commitTime,
+                    userId,
+                    StorageCategories.Deleted,
+                    entityId
+                );
                 var tombstonePath = Path.Combine(entityDir, tombstoneFileName);
 
                 if (!File.Exists(tombstonePath))
@@ -308,47 +315,41 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
             }
 
             // 2. プロジェクト情報の保存 (4カテゴリ)
-            var basicSnapshot = new ProjectBasicDto(project.Name, project.Status);
             await TrySaveCategoryAsync(
                 project.Id,
                 changesDir,
-                "Project_Basic",
-                basicSnapshot,
+                StorageCategories.ProjectBasic,
+                new ProjectBasicDto(project.Name, project.Status),
                 commitTime,
                 userId,
                 isEntity: false
             );
 
-            var descSnapshot = new ProjectDescriptionDto(project.Description);
             await TrySaveCategoryAsync(
                 project.Id,
                 changesDir,
-                "Project_Description",
-                descSnapshot,
+                StorageCategories.ProjectDescription,
+                new ProjectDescriptionDto(project.Description),
                 commitTime,
                 userId,
                 isEntity: false
             );
 
-            var milestoneSnapshot = new ProjectMilestonesDto(
-                project.Milestones.Select(m => new MilestoneDto(m.Date, m.Label)).ToList()
-            );
             await TrySaveCategoryAsync(
                 project.Id,
                 changesDir,
-                "Project_Milestones",
-                milestoneSnapshot,
+                StorageCategories.ProjectMilestones,
+                new ProjectMilestonesDto(project.Milestones.Select(m => new MilestoneDto(m.Date, m.Label)).ToList()),
                 commitTime,
                 userId,
                 isEntity: false
             );
 
-            var membersSnapshot = new ProjectMembersDto { AssignedUserIds = project.AssignedUserIds.ToList() };
             await TrySaveCategoryAsync(
                 project.Id,
                 changesDir,
-                "Project_Members",
-                membersSnapshot,
+                StorageCategories.ProjectMembers,
+                new ProjectMembersDto { AssignedUserIds = project.AssignedUserIds.ToList() },
                 commitTime,
                 userId,
                 isEntity: false
@@ -356,15 +357,13 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
 
             // 2.1 表示順序の保存 (コンテナ -> タスクの順で現在の物理的な並びを保存)
             var orderedIds = project.Containers.Select(c => c.Id).Concat(project.Tasks.Select(t => t.Id)).ToList();
-
             if (orderedIds.Any())
             {
-                var sortOrderSnapshot = new ProjectSortOrderDto(orderedIds);
                 await TrySaveCategoryAsync(
                     project.Id,
                     changesDir,
-                    "Project_SortOrder",
-                    sortOrderSnapshot,
+                    StorageCategories.ProjectSortOrder,
+                    new ProjectSortOrderDto(orderedIds),
                     commitTime,
                     userId,
                     isEntity: false
@@ -394,7 +393,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                 await TrySaveCategoryAsync(
                     container.Id,
                     changesDir,
-                    "Container_Planning",
+                    StorageCategories.ContainerPlanning,
                     planning,
                     commitTime,
                     userId,
@@ -405,7 +404,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                 await TrySaveCategoryAsync(
                     container.Id,
                     changesDir,
-                    "Container_Description",
+                    StorageCategories.ContainerDescription,
                     containerDesc,
                     commitTime,
                     userId,
@@ -420,7 +419,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                 await TrySaveCategoryAsync(
                     container.Id,
                     changesDir,
-                    "Container_Relations",
+                    StorageCategories.ContainerRelations,
                     relations,
                     commitTime,
                     userId,
@@ -451,7 +450,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                 await TrySaveCategoryAsync(
                     task.Id,
                     changesDir,
-                    "Task_Planning",
+                    StorageCategories.TaskPlanning,
                     planning,
                     commitTime,
                     userId,
@@ -468,7 +467,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                 await TrySaveCategoryAsync(
                     task.Id,
                     changesDir,
-                    "Task_Progress",
+                    StorageCategories.TaskProgress,
                     progress,
                     commitTime,
                     userId,
@@ -479,7 +478,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                 await TrySaveCategoryAsync(
                     task.Id,
                     changesDir,
-                    "Task_Description",
+                    StorageCategories.TaskDescription,
                     taskDesc,
                     commitTime,
                     userId,
@@ -529,7 +528,7 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
 
         // タスクIDごとのサブフォルダを作成
         var taskDir = Path.Combine(changesDir, taskId.ToString());
-        var fileName = _fileNameGenerator.Generate(comment.CreatedAt, userId, "Comment");
+        var fileName = _fileNameGenerator.Generate(comment.CreatedAt, userId, StorageCategories.Comment);
         var fullPath = Path.Combine(taskDir, fileName);
 
         // 物理ファイルによる重複チェック

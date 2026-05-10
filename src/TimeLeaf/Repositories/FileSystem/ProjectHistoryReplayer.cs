@@ -41,7 +41,7 @@ internal class ProjectHistoryReplayer
 
         // 削除マーカー(Tombstone)の検出
         var deletedEntities = new HashSet<Guid>();
-        var tombstoneFiles = files.Where(f => f.Meta.Category == "Deleted").ToList();
+        var tombstoneFiles = files.Where(f => f.Meta.Category == StorageCategories.Deleted).ToList();
         foreach (var tombstone in tombstoneFiles)
         {
             deletedEntities.Add(tombstone.EntityId);
@@ -62,7 +62,7 @@ internal class ProjectHistoryReplayer
             if (deletedEntities.Contains(file.EntityId))
                 continue;
 
-            if (file.Meta.Category == "Project_SortOrder")
+            if (file.Meta.Category == StorageCategories.ProjectSortOrder)
             {
                 // 最新の順序ファイルのみを記憶しておく
                 latestSortOrderJson = await File.ReadAllTextAsync(file.Path);
@@ -159,44 +159,44 @@ internal class ProjectHistoryReplayer
         var json = await File.ReadAllTextAsync(filePath);
 
         // すべてのカテゴリをキャッシュする
-        if (meta.Category != "Comment")
+        if (meta.Category != StorageCategories.Comment)
         {
             _cache.UpdateCategory(entityId, meta.Category, json);
         }
 
         switch (meta.Category)
         {
-            case "Project_Basic":
+            case StorageCategories.ProjectBasic:
                 ApplyProjectBasic(project, json);
                 break;
-            case "Project_Description":
+            case StorageCategories.ProjectDescription:
                 ApplyProjectDescription(project, json);
                 break;
-            case "Project_Milestones":
+            case StorageCategories.ProjectMilestones:
                 ApplyProjectMilestones(project, json);
                 break;
-            case "Project_Members":
+            case StorageCategories.ProjectMembers:
                 ApplyProjectMembers(project, json);
                 break;
-            case "Container_Planning":
+            case StorageCategories.ContainerPlanning:
                 ApplyContainerPlanning(project, containerMap, workItemMap, json);
                 break;
-            case "Container_Description":
+            case StorageCategories.ContainerDescription:
                 ApplyContainerDescription(project, containerMap, workItemMap, json);
                 break;
-            case "Container_Relations":
+            case StorageCategories.ContainerRelations:
                 ApplyContainerRelations(project, containerMap, workItemMap, json);
                 break;
-            case "Task_Planning":
+            case StorageCategories.TaskPlanning:
                 ApplyTaskPlanning(project, taskMap, workItemMap, json);
                 break;
-            case "Task_Progress":
+            case StorageCategories.TaskProgress:
                 ApplyTaskProgress(project, taskMap, workItemMap, json);
                 break;
-            case "Task_Description":
+            case StorageCategories.TaskDescription:
                 ApplyTaskDescription(project, taskMap, workItemMap, json);
                 break;
-            case "Comment":
+            case StorageCategories.Comment:
                 AccumulateComment(allCommentData, json, meta.Timestamp);
                 break;
         }
