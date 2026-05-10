@@ -8,58 +8,84 @@
              Height="450"
              d:DataContext="{d:DesignInstance vm:ReorderWorkItemsViewModel}"
              mc:Ignorable="d">
-    <Grid Margin="0">
+    <Grid Margin="5,0">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Style="{StaticResource FormTitleTextStyle}" Text="表示順序の調整" />
+        <!-- タイトル -->
+        <TextBlock Style="{StaticResource FormTitleTextStyle}" Text="コンテナの並び替え" />
 
-        <Grid Grid.Row="1" Margin="0,12">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
+        <!-- 説明文 -->
+        <TextBlock Grid.Row="1"
+                   Margin="0,0,0,15"
+                   Style="{StaticResource MetaBaseStyle}"
+                   Text="上下の矢印ボタンを使用して、表示順序を変更します。"
+                   TextWrapping="Wrap" />
 
-            <!-- アイテムリスト -->
-            <ListBox Grid.Column="0"
-                     ItemsSource="{Binding Items}"
-                     SelectedItem="{Binding SelectedItem}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Grid Margin="4,2">
-                            <TextBlock VerticalAlignment="Center" Text="{Binding Name}" />
-                        </Grid>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+        <!-- アイテムリスト -->
+        <ListBox Grid.Row="2"
+                 ItemsSource="{Binding Items}"
+                 SelectedItem="{Binding SelectedItem}"
+                 Style="{StaticResource ReorderListBoxStyle}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
 
-            <!-- 操作ボタン（右側） -->
-            <StackPanel Grid.Column="1"
-                        Margin="12,0,0,0"
-                        VerticalAlignment="Top">
-                <Button Command="{Binding MoveUpCommand}"
-                        Content="↑"
-                        Style="{StaticResource IconButtonStyle}"
-                        ToolTip="上へ移動" />
-                <Button Margin="0,8,0,0"
-                        Command="{Binding MoveDownCommand}"
-                        Content="↓"
-                        Style="{StaticResource IconButtonStyle}"
-                        ToolTip="下へ移動" />
-            </StackPanel>
-        </Grid>
+                        <!-- 移動ボタン（左側） -->
+                        <StackPanel Grid.Column="0"
+                                    Margin="0,0,10,0"
+                                    VerticalAlignment="Center"
+                                    Orientation="Vertical">
+                            <Button Command="{Binding DataContext.MoveUpCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    CommandParameter="{Binding}"
+                                    Style="{StaticResource SmallIconButtonStyle}"
+                                    ToolTip="上へ移動">
+                                <Path Width="10"
+                                      Height="10"
+                                      Data="{StaticResource ArrowUpIconGeometry}"
+                                      Fill="{DynamicResource BrandPrimaryBrush}"
+                                      Stretch="Uniform" />
+                            </Button>
+                            <Button Command="{Binding DataContext.MoveDownCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    CommandParameter="{Binding}"
+                                    Style="{StaticResource SmallIconButtonStyle}"
+                                    ToolTip="下へ移動">
+                                <Path Width="10"
+                                      Height="10"
+                                      Data="{StaticResource ArrowDownIconGeometry}"
+                                      Fill="{DynamicResource BrandPrimaryBrush}"
+                                      Stretch="Uniform" />
+                            </Button>
+                        </StackPanel>
+
+                        <!-- アイテム名 -->
+                        <TextBlock Grid.Column="1"
+                                   VerticalAlignment="Center"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                   Text="{Binding Name}"
+                                   TextTrimming="CharacterEllipsis" />
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
 
         <!-- フッターボタン -->
-        <StackPanel Grid.Row="2"
+        <StackPanel Grid.Row="3"
                     Margin="{StaticResource FormFooterMargin}"
                     HorizontalAlignment="Right"
                     Orientation="Horizontal">
-            <Button Width="100"
+            <Button Width="90"
                     Command="{Binding ConfirmCommand}"
-                    Content="順序を確定"
+                    Content="保存する"
                     Style="{StaticResource PrimaryButtonStyle}" />
             <Button Width="80"
                     Margin="{StaticResource ButtonLeftMargin}"

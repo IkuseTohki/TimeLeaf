@@ -42,38 +42,50 @@ public partial class ReorderWorkItemsViewModel : ObservableObject, IDialogViewMo
     }
 
     /// <summary>
-    /// 選択されたアイテムを一つ上に移動します。
+    /// 指定されたアイテム（または選択されたアイテム）を一つ上に移動します。
     /// </summary>
     [RelayCommand(CanExecute = nameof(CanMoveUp))]
-    private void MoveUp()
+    private void MoveUp(ProjectWorkItem? item)
     {
-        if (SelectedItem == null)
+        var target = item ?? SelectedItem;
+        if (target == null)
             return;
-        int index = Items.IndexOf(SelectedItem);
+
+        int index = Items.IndexOf(target);
         if (index > 0)
         {
             Items.Move(index, index - 1);
         }
     }
 
-    private bool CanMoveUp() => SelectedItem != null && Items.IndexOf(SelectedItem) > 0;
+    private bool CanMoveUp(ProjectWorkItem? item)
+    {
+        var target = item ?? SelectedItem;
+        return target != null && Items.IndexOf(target) > 0;
+    }
 
     /// <summary>
-    /// 選択されたアイテムを一つ下に移動します。
+    /// 指定されたアイテム（または選択されたアイテム）を一つ下に移動します。
     /// </summary>
     [RelayCommand(CanExecute = nameof(CanMoveDown))]
-    private void MoveDown()
+    private void MoveDown(ProjectWorkItem? item)
     {
-        if (SelectedItem == null)
+        var target = item ?? SelectedItem;
+        if (target == null)
             return;
-        int index = Items.IndexOf(SelectedItem);
+
+        int index = Items.IndexOf(target);
         if (index >= 0 && index < Items.Count - 1)
         {
             Items.Move(index, index + 1);
         }
     }
 
-    private bool CanMoveDown() => SelectedItem != null && Items.IndexOf(SelectedItem) < Items.Count - 1;
+    private bool CanMoveDown(ProjectWorkItem? item)
+    {
+        var target = item ?? SelectedItem;
+        return target != null && Items.IndexOf(target) < Items.Count - 1;
+    }
 
     /// <summary>
     /// 変更を確定し、永続化します。

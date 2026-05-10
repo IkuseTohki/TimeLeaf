@@ -439,4 +439,49 @@
         </Setter>
     </Style>
 
+    <!-- ====================================================================== -->
+    <!-- Reorder View Components -->
+    <!-- ====================================================================== -->
+
+    <!-- 並び替えリストの項目スタイル（カード風） -->
+    <Style x:Key="ReorderItemStyle" TargetType="ListBoxItem">
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Margin" Value="0,0,0,4" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                    <Border x:Name="OuterBorder"
+                            Padding="8,6"
+                            Background="{DynamicResource SurfaceLayer1Brush}"
+                            BorderBrush="{DynamicResource OutlineBaseBrush}"
+                            BorderThickness="1"
+                            CornerRadius="12">
+                        <ContentPresenter />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="OuterBorder" Property="Background" Value="{DynamicResource StateHoverBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="OuterBorder" Property="BorderBrush" Value="{DynamicResource BrandPrimaryBrush}" />
+                            <Setter TargetName="OuterBorder" Property="Background" Value="{DynamicResource SidebarSelectedBackgroundBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- 並び替えリスト全体のスタイル -->
+    <Style x:Key="ReorderListBoxStyle" TargetType="ListBox">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="ItemContainerStyle" Value="{StaticResource ReorderItemStyle}" />
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+    </Style>
+
 </ResourceDictionary>
