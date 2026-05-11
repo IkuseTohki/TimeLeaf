@@ -484,4 +484,48 @@
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
     </Style>
 
+    <!-- 並び替え用ゴーストボタンスタイル -->
+    <Style x:Key="ReorderGhostButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="8,4" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="Opacity" Value="0.4" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <StackPanel x:Name="Root"
+                                Background="Transparent"
+                                Orientation="Horizontal">
+                        <Path x:Name="Icon"
+                              Width="12"
+                              Height="12"
+                              VerticalAlignment="Center"
+                              Data="{StaticResource ListIconGeometry}"
+                              Fill="{DynamicResource TextPrimaryBrush}"
+                              Stretch="Uniform" />
+                        <TextBlock x:Name="Text"
+                                   Margin="6,0,0,0"
+                                   VerticalAlignment="Center"
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                   Text="{TemplateBinding Content}" />
+                    </StackPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Root" Property="Opacity" Value="1.0" />
+                            <Setter Property="Opacity" Value="1.0" />
+                            <Setter TargetName="Text" Property="Foreground" Value="{DynamicResource BrandPrimaryBrush}" />
+                            <Setter TargetName="Icon" Property="Fill" Value="{DynamicResource BrandPrimaryBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Opacity" Value="0.7" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>
