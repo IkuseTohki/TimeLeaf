@@ -94,6 +94,11 @@ public class ViewModelFactory : IViewModelFactory
         return vm;
     }
 
+    public AddMilestoneViewModel CreateAddMilestoneViewModel()
+    {
+        return _serviceProvider.GetRequiredService<AddMilestoneViewModel>();
+    }
+
     public AddContainerViewModel CreateAddContainerViewModel()
     {
         return _serviceProvider.GetRequiredService<AddContainerViewModel>();
@@ -116,6 +121,8 @@ public class ViewModelFactory : IViewModelFactory
         return new ProjectDashboardViewModel(
             projectViewModel,
             _serviceProvider.GetRequiredService<IAddMilestoneUseCase>(),
+            _serviceProvider.GetRequiredService<IDialogService>(),
+            this,
             _serviceProvider.GetRequiredService<ILogger<ProjectDashboardViewModel>>()
         );
     }

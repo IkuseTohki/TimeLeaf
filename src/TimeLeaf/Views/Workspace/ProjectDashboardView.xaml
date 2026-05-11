@@ -59,79 +59,76 @@
                 </Border>
             </UniformGrid>
 
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+            <!-- マイルストーン -->
+            <StackPanel>
+                <Grid Margin="0,0,0,12">
+                    <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                        <Path Width="16"
+                              Height="16"
+                              Margin="0,0,8,0"
+                              Data="{StaticResource MilestoneIconGeometry}"
+                              Fill="{DynamicResource BrandPrimaryBrush}"
+                              Stretch="Uniform" />
+                        <TextBlock Margin="0"
+                                   VerticalAlignment="Center"
+                                   Style="{StaticResource DashboardSectionHeaderStyle}"
+                                   Text="マイルストーン" />
+                    </StackPanel>
+                    <Button Command="{Binding AddMilestoneCommand}"
+                            Style="{StaticResource DashboardAddMilestoneButtonStyle}"
+                            ToolTip="マイルストーン追加"
+                            Visibility="{Binding IsAssignedToMe, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Path Width="10"
+                              Height="10"
+                              Data="{StaticResource AddIconGeometry}"
+                              Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                              Stretch="Uniform" />
+                    </Button>
+                </Grid>
+                <Border Padding="16,16,16,4" Style="{StaticResource DashboardCardStyle}">
+                    <ItemsControl ItemsSource="{Binding Milestones}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="16" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="20" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
 
-                <!-- 左カラム: マイルストーン -->
-                <StackPanel Grid.Column="0" Margin="0,0,24,0">
-                    <TextBlock Style="{StaticResource DashboardSectionHeaderStyle}" Text="🏳️ マイルストーン" />
-                    <Border Padding="16,16,16,4" Style="{StaticResource DashboardCardStyle}">
-                        <ItemsControl ItemsSource="{Binding Milestones}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="16" />
-                                        </Grid.RowDefinitions>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="20" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
+                                    <!-- タイムラインの縦線 -->
+                                    <Rectangle Grid.RowSpan="3"
+                                               Grid.Column="0"
+                                               Style="{StaticResource HomeMilestoneTimelineLineStyle}" />
 
-                                        <!-- タイムラインの縦線 -->
-                                        <Rectangle Grid.RowSpan="3"
-                                                   Grid.Column="0"
-                                                   Style="{StaticResource HomeMilestoneTimelineLineStyle}" />
+                                    <!-- 1行目: 日付(曜日) -->
+                                    <StackPanel Grid.Row="0"
+                                                Grid.Column="1"
+                                                Margin="8,0,0,2"
+                                                Orientation="Horizontal">
+                                        <TextBlock Style="{StaticResource HomeMilestoneDateStyle}" Text="{Binding Date, StringFormat={}{0:MM/dd (ddd)}}" />
+                                    </StackPanel>
 
-                                        <!-- 1行目: 日付(曜日) -->
-                                        <StackPanel Grid.Row="0"
-                                                    Grid.Column="1"
-                                                    Margin="8,0,0,2"
-                                                    Orientation="Horizontal">
-                                            <TextBlock Style="{StaticResource HomeMilestoneDateStyle}" Text="{Binding Date, StringFormat={}{0:MM/dd (ddd)}}" />
-                                        </StackPanel>
+                                    <!-- タイムラインの丸（ドット） -->
+                                    <Ellipse Grid.Row="1"
+                                             Grid.Column="0"
+                                             Style="{StaticResource HomeMilestoneTimelineDotStyle}" />
 
-                                        <!-- タイムラインの丸（ドット） -->
-                                        <Ellipse Grid.Row="1"
-                                                 Grid.Column="0"
-                                                 Style="{StaticResource HomeMilestoneTimelineDotStyle}" />
-
-                                        <!-- 2行目: マイルストーン名 -->
-                                        <TextBlock Grid.Row="1"
-                                                   Grid.Column="1"
-                                                   Style="{StaticResource HomeMilestoneLabelStyle}"
-                                                   Text="{Binding Label}" />
-                                    </Grid>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </Border>
-                </StackPanel>
-
-                <!-- 右カラム: マイルストーン追加（簡易） -->
-                <StackPanel Grid.Column="1">
-                    <TextBlock Style="{StaticResource DashboardSectionHeaderStyle}" Text="＋ マイルストーン追加" />
-                    <Border Style="{StaticResource DashboardCardStyle}">
-                        <StackPanel>
-                            <c:LeafDatePicker Margin="0,0,0,8"
-                                              Placeholder="Pick milestone date"
-                                              SelectedDate="{Binding NewMilestoneDate, Mode=TwoWay}" />
-                            <TextBox Margin="0,0,0,8"
-                                     Style="{StaticResource OrganicTextBoxStyle}"
-                                     Tag="名称を入力..."
-                                     Text="{Binding NewMilestoneLabel, UpdateSourceTrigger=PropertyChanged}" />
-                            <Button Command="{Binding AddMilestoneCommand}"
-                                    Content="追加"
-                                    Style="{StaticResource PrimaryButtonStyle}" />
-                        </StackPanel>
-                    </Border>
-                </StackPanel>
-            </Grid>
+                                    <!-- 2行目: マイルストーン名 -->
+                                    <TextBlock Grid.Row="1"
+                                               Grid.Column="1"
+                                               Style="{StaticResource HomeMilestoneLabelStyle}"
+                                               Text="{Binding Label}" />
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Border>
+            </StackPanel>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

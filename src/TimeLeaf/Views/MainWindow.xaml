@@ -114,10 +114,9 @@
                                         ToolTip="新規プロジェクト作成">
                                     <Path Width="10"
                                           Height="10"
-                                          Data="M0,5 L10,5 M5,0 L5,10"
-                                          Stretch="Uniform"
-                                          Stroke="{DynamicResource BrandForegroundBrush}"
-                                          StrokeThickness="2" />
+                                          Data="{StaticResource AddIconGeometry}"
+                                          Fill="{DynamicResource BrandForegroundBrush}"
+                                          Stretch="Uniform" />
                                 </Button>
                             </Grid>
 

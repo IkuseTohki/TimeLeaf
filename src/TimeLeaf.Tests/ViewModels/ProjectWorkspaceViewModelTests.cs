@@ -70,6 +70,8 @@ public class ProjectWorkspaceViewModelTests
                     new ProjectDashboardViewModel(
                         p,
                         new Mock<IAddMilestoneUseCase>().Object,
+                        new Mock<IDialogService>().Object,
+                        _viewModelFactoryMock.Object,
                         new Mock<ILogger<ProjectDashboardViewModel>>().Object
                     )
             );

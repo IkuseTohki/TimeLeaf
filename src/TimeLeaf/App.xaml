@@ -37,6 +37,9 @@
             <DataTemplate DataType="{x:Type viewModels:AddTaskViewModel}">
                 <views:AddTaskView />
             </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModels:AddMilestoneViewModel}">
+                <views:AddMilestoneView />
+            </DataTemplate>
             <DataTemplate DataType="{x:Type viewModels:AddContainerViewModel}">
                 <views:AddContainerView />
             </DataTemplate>

@@ -2,6 +2,7 @@ using System;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using LeafKit.UI.Services;
 using Microsoft.Extensions.Logging;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.UseCases;
@@ -15,76 +16,54 @@ public partial class ProjectDashboardViewModel : ObservableObject
 {
     private readonly ProjectViewModel _projectViewModel;
     private readonly IAddMilestoneUseCase _addMilestoneUseCase;
+    private readonly IDialogService _dialogService;
+    private readonly IViewModelFactory _viewModelFactory;
     private readonly ILogger<ProjectDashboardViewModel> _logger;
 
-    public string ProjectName
-    {
-        get => _projectViewModel.Name;
-        set { }
-    }
-    public string Description
-    {
-        get => _projectViewModel.Description;
-        set { }
-    }
+    public string ProjectName => _projectViewModel.Name;
+    public string Description => _projectViewModel.Description;
     public ObservableCollection<Milestone> Milestones => _projectViewModel.Milestones;
 
-    public int TotalTaskCount
-    {
-        get => _projectViewModel.TotalTaskCount;
-        set { }
-    }
-    public int CompletedTaskCount
-    {
-        get => _projectViewModel.CompletedTaskCount;
-        set { }
-    }
-    public double CompletionPercentage
-    {
-        get => _projectViewModel.CompletionPercentage;
-        set { }
-    }
-    public double TotalEstimatedCost
-    {
-        get => _projectViewModel.TotalEstimatedCost;
-        set { }
-    }
-    public double TotalActualCost
-    {
-        get => _projectViewModel.TotalActualCost;
-        set { }
-    }
+    public int TotalTaskCount => _projectViewModel.TotalTaskCount;
+    public int CompletedTaskCount => _projectViewModel.CompletedTaskCount;
+    public double CompletionPercentage => _projectViewModel.CompletionPercentage;
+    public double TotalEstimatedCost => _projectViewModel.TotalEstimatedCost;
+    public double TotalActualCost => _projectViewModel.TotalActualCost;
 
-    [ObservableProperty]
-    private DateTime _newMilestoneDate = DateTime.Today;
-
-    [ObservableProperty]
-    private string _newMilestoneLabel = string.Empty;
+    public bool IsAssignedToMe => _projectViewModel.IsAssignedToMe;
 
     public ProjectDashboardViewModel(
         ProjectViewModel projectViewModel,
         IAddMilestoneUseCase addMilestoneUseCase,
+        IDialogService dialogService,
+        IViewModelFactory viewModelFactory,
         ILogger<ProjectDashboardViewModel> logger
     )
     {
         _projectViewModel = projectViewModel;
         _addMilestoneUseCase = addMilestoneUseCase;
+        _dialogService = dialogService;
+        _viewModelFactory = viewModelFactory;
         _logger = logger;
     }
 
     [RelayCommand]
     private async System.Threading.Tasks.Task AddMilestone()
     {
-        if (string.IsNullOrWhiteSpace(NewMilestoneLabel))
-            return;
-
         try
         {
-            await _addMilestoneUseCase.ExecuteAsync(_projectViewModel.Model, NewMilestoneDate, NewMilestoneLabel);
-            _projectViewModel.SyncFromModel();
+            var addMilestoneVm = _viewModelFactory.CreateAddMilestoneViewModel();
+            var result = await _dialogService.ShowDialogAsync(addMilestoneVm);
 
-            NewMilestoneLabel = string.Empty;
-            NewMilestoneDate = DateTime.Today;
+            if (result)
+            {
+                await _addMilestoneUseCase.ExecuteAsync(
+                    _projectViewModel.Model,
+                    addMilestoneVm.Date,
+                    addMilestoneVm.Label
+                );
+                _projectViewModel.SyncFromModel();
+            }
         }
         catch (Exception ex)
         {

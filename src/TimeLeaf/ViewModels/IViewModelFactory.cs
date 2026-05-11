@@ -22,6 +22,7 @@ public interface IViewModelFactory
     ProjectTaskViewModel CreateProjectTaskViewModel(ProjectTask task);
     AddProjectViewModel CreateAddProjectViewModel();
     AddTaskViewModel CreateAddTaskViewModel(System.Collections.Generic.IEnumerable<User>? teammates = null);
+    AddMilestoneViewModel CreateAddMilestoneViewModel();
     AddContainerViewModel CreateAddContainerViewModel();
     ReorderWorkItemsViewModel CreateReorderWorkItemsViewModel(
         Project project,
