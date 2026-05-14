@@ -184,7 +184,7 @@
     <Style x:Key="SidebarEmptyStateTextStyle" TargetType="TextBlock">
         <Setter Property="Margin" Value="16,8,16,0" />
         <Setter Property="FontStyle" Value="Italic" />
-        <Setter Property="Foreground" Value="White" />
+        <Setter Property="Foreground" Value="{DynamicResource SidebarTextBrush}" />
         <Setter Property="Opacity" Value="0.4" />
         <Setter Property="TextAlignment" Value="Center" />
     </Style>
@@ -635,12 +635,16 @@
     <Style x:Key="FormTitleTextStyle"
            BasedOn="{StaticResource HeaderBaseStyle}"
            TargetType="TextBlock">
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="Margin" Value="0,0,0,20" />
     </Style>
 
     <Style x:Key="FormLabelTextStyle"
            BasedOn="{StaticResource LabelBaseStyle}"
-           TargetType="TextBlock" />
+           TargetType="TextBlock">
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
 
     <Style x:Key="SettingsContainerStyle" TargetType="StackPanel">
         <Setter Property="MaxWidth" Value="500" />
@@ -687,6 +691,41 @@
     <Style x:Key="SetupFooterStyle" TargetType="StackPanel">
         <Setter Property="HorizontalAlignment" Value="Right" />
         <Setter Property="Orientation" Value="Horizontal" />
+    </Style>
+
+    <!-- ====================================================================== -->
+    <!-- Dialog Common Layouts -->
+    <!-- ====================================================================== -->
+
+    <!-- ダイアログ共通：ルートコンテナのスタイル -->
+    <Style x:Key="DialogRootGridStyle" TargetType="Grid">
+        <Setter Property="Margin" Value="16, 0" />
+    </Style>
+
+    <Style x:Key="DialogRootStackPanelStyle" TargetType="StackPanel">
+        <Setter Property="Margin" Value="16, 0" />
+    </Style>
+
+    <!-- ダイアログ共通：フッターボタンエリアのスタイル -->
+    <Style x:Key="DialogFooterStackPanelStyle" TargetType="StackPanel">
+        <Setter Property="Margin" Value="{StaticResource FormFooterMargin}" />
+        <Setter Property="HorizontalAlignment" Value="Right" />
+        <Setter Property="Orientation" Value="Horizontal" />
+    </Style>
+
+    <!-- ダイアログ共通：アクションボタンスタイル -->
+    <Style x:Key="DialogActionButtonStyle"
+           BasedOn="{StaticResource PrimaryButtonStyle}"
+           TargetType="Button">
+        <Setter Property="Width" Value="90" />
+    </Style>
+
+    <!-- ダイアログ共通：キャンセルボタンスタイル -->
+    <Style x:Key="DialogCancelButtonStyle"
+           BasedOn="{StaticResource SecondaryButtonStyle}"
+           TargetType="Button">
+        <Setter Property="Width" Value="90" />
+        <Setter Property="Margin" Value="{StaticResource ButtonLeftMargin}" />
     </Style>
 
     <!-- ====================================================================== -->

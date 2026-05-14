@@ -52,10 +52,6 @@
         </Style.Resources>
     </Style>
 
-    <Style x:Key="ModernTextBoxStyle"
-           BasedOn="{StaticResource OrganicTextBoxStyle}"
-           TargetType="TextBox" />
-
     <!-- 検索用入力欄（ClearableTextBox 等）のスタイル -->
     <Style x:Key="SearchTextBoxStyle" TargetType="Control">
         <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />
@@ -72,7 +68,7 @@
         <Setter Property="FontSize" Value="12" />
         <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
-        <Setter Property="Margin" Value="0,0,0,12" />
+        <Setter Property="Margin" Value="{StaticResource FormItemMargin}" />
     </Style>
 
     <Style BasedOn="{StaticResource {x:Type ComboBoxItem}}" TargetType="ComboBoxItem">

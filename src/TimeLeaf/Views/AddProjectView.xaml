@@ -1,4 +1,4 @@
-<UserControl x:Class="TimeLeaf.Views.AddProjectView"
+﻿<UserControl x:Class="TimeLeaf.Views.AddProjectView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -7,16 +7,18 @@
              Width="{StaticResource DialogWidthMedium}"
              d:DataContext="{d:DesignInstance vm:AddProjectViewModel}"
              mc:Ignorable="d">
-    <StackPanel Margin="0">
+    <StackPanel Style="{StaticResource DialogRootStackPanelStyle}">
         <TextBlock Style="{StaticResource FormTitleTextStyle}" Text="プロジェクト作成" />
 
         <Label Content="プロジェクト名" Style="{StaticResource FirstSectionHeaderLabelStyle}" />
-        <TextBox Style="{StaticResource ModernTextBoxStyle}"
+        <TextBox Margin="{StaticResource FormItemMargin}"
+                 Style="{StaticResource ModernTextBoxStyle}"
                  Tag="例：新機能のプロトタイプ作成"
                  Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
 
         <Label Content="概要" Style="{StaticResource SectionHeaderLabelStyle}" />
         <TextBox Height="{StaticResource MultilineInputHeightSmall}"
+                 Margin="{StaticResource FormItemMargin}"
                  AcceptsReturn="True"
                  Style="{StaticResource ModernTextBoxStyle}"
                  Tag="プロジェクトの目的や背景を記入してください..."
@@ -24,18 +26,13 @@
                  TextWrapping="Wrap" />
 
         <!-- フッターボタン -->
-        <StackPanel Margin="{StaticResource FormFooterMargin}"
-                    HorizontalAlignment="Right"
-                    Orientation="Horizontal">
-            <Button Width="80"
-                    Command="{Binding ConfirmCommand}"
-                    Content="作成する"
-                    Style="{StaticResource PrimaryButtonStyle}" />
-            <Button Width="80"
-                    Margin="{StaticResource ButtonLeftMargin}"
-                    Command="{Binding CancelCommand}"
+        <StackPanel Style="{StaticResource DialogFooterStackPanelStyle}">
+            <Button Command="{Binding ConfirmCommand}"
+                    Content="作成"
+                    Style="{StaticResource DialogActionButtonStyle}" />
+            <Button Command="{Binding CancelCommand}"
                     Content="キャンセル"
-                    Style="{StaticResource SecondaryButtonStyle}" />
+                    Style="{StaticResource DialogCancelButtonStyle}" />
         </StackPanel>
     </StackPanel>
 </UserControl>

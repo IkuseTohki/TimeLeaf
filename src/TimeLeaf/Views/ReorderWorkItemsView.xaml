@@ -8,7 +8,7 @@
              Height="450"
              d:DataContext="{d:DesignInstance vm:ReorderWorkItemsViewModel}"
              mc:Ignorable="d">
-    <Grid Margin="5,0">
+    <Grid Style="{StaticResource DialogRootGridStyle}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -21,7 +21,7 @@
 
         <!-- 説明文 -->
         <TextBlock Grid.Row="1"
-                   Margin="0,0,0,15"
+                   Margin="0,0,0,20"
                    Style="{StaticResource MetaBaseStyle}"
                    Text="上下の矢印ボタンを使用して、表示順序を変更します。"
                    TextWrapping="Wrap" />
@@ -79,19 +79,13 @@
         </ListBox>
 
         <!-- フッターボタン -->
-        <StackPanel Grid.Row="3"
-                    Margin="{StaticResource FormFooterMargin}"
-                    HorizontalAlignment="Right"
-                    Orientation="Horizontal">
-            <Button Width="90"
-                    Command="{Binding ConfirmCommand}"
-                    Content="保存する"
-                    Style="{StaticResource PrimaryButtonStyle}" />
-            <Button Width="80"
-                    Margin="{StaticResource ButtonLeftMargin}"
-                    Command="{Binding CancelCommand}"
+        <StackPanel Grid.Row="3" Style="{StaticResource DialogFooterStackPanelStyle}">
+            <Button Command="{Binding ConfirmCommand}"
+                    Content="保存"
+                    Style="{StaticResource DialogActionButtonStyle}" />
+            <Button Command="{Binding CancelCommand}"
                     Content="キャンセル"
-                    Style="{StaticResource SecondaryButtonStyle}" />
+                    Style="{StaticResource DialogCancelButtonStyle}" />
         </StackPanel>
     </Grid>
 </UserControl>

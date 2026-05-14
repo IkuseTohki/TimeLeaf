@@ -7,10 +7,9 @@
              d:DataContext="{d:DesignInstance vm:ApplicationSettingsViewModel}"
              d:DesignHeight="400"
              d:DesignWidth="600"
-             Background="{DynamicResource WindowBackgroundBrush}"
              mc:Ignorable="d">
 
-    <Grid Style="{StaticResource ViewHeaderGridStyle}">
+    <Grid Style="{StaticResource DialogRootGridStyle}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -18,14 +17,16 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <TextBlock Style="{StaticResource ViewHeaderTitleStyle}" Text="アプリケーション設定" />
+        <TextBlock Style="{StaticResource FormTitleTextStyle}" Text="アプリケーション設定" />
 
         <!-- Content -->
         <StackPanel Grid.Row="1" Style="{StaticResource SettingsContainerStyle}">
             <!-- Storage Settings -->
             <GroupBox Header="データ保存場所" Style="{StaticResource SettingsGroupBoxStyle}">
                 <StackPanel>
-                    <TextBlock Style="{StaticResource FormLabelTextStyle}" Text="現在の保存先フォルダ:" />
+                    <TextBlock Margin="{StaticResource FormLabelMargin}"
+                               Style="{StaticResource FormLabelTextStyle}"
+                               Text="現在の保存先フォルダ:" />
                     <Grid Margin="0,0,0,8">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -49,7 +50,9 @@
             <!-- Appearance Settings -->
             <GroupBox Header="外観" Style="{StaticResource SettingsGroupBoxStyle}">
                 <StackPanel>
-                    <TextBlock Style="{StaticResource FormLabelTextStyle}" Text="テーマ:" />
+                    <TextBlock Margin="{StaticResource FormLabelMargin}"
+                               Style="{StaticResource FormLabelTextStyle}"
+                               Text="テーマ:" />
                     <ComboBox Width="200"
                               HorizontalAlignment="Left"
                               SelectedValue="{Binding SelectedTheme}"
@@ -86,19 +89,13 @@
         </StackPanel>
 
         <!-- Footer Buttons -->
-        <StackPanel Grid.Row="2"
-                    Margin="0,16,0,0"
-                    HorizontalAlignment="Right"
-                    Orientation="Horizontal">
-            <Button Width="90"
-                    Command="{Binding SaveCommand}"
+        <StackPanel Grid.Row="2" Style="{StaticResource DialogFooterStackPanelStyle}">
+            <Button Command="{Binding SaveCommand}"
                     Content="保存"
-                    Style="{StaticResource PrimaryButtonStyle}" />
-            <Button Width="90"
-                    Margin="12,0,0,0"
-                    Command="{Binding CancelCommand}"
+                    Style="{StaticResource DialogActionButtonStyle}" />
+            <Button Command="{Binding CancelCommand}"
                     Content="キャンセル"
-                    Style="{StaticResource SecondaryButtonStyle}" />
+                    Style="{StaticResource DialogCancelButtonStyle}" />
         </StackPanel>
     </Grid>
 </UserControl>

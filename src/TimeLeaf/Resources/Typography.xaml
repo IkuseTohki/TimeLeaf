@@ -33,7 +33,7 @@
 
     <!-- セクション見出し用ラベル -->
     <Style x:Key="SectionHeaderLabelBaseStyle" TargetType="Label">
-        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontSize" Value="11" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
         <Setter Property="Padding" Value="0" />
@@ -42,13 +42,13 @@
     <Style x:Key="SectionHeaderLabelStyle"
            BasedOn="{StaticResource SectionHeaderLabelBaseStyle}"
            TargetType="Label">
-        <Setter Property="Margin" Value="0,0,0,8" />
+        <Setter Property="Margin" Value="{StaticResource FormLabelMargin}" />
     </Style>
 
     <Style x:Key="FirstSectionHeaderLabelStyle"
            BasedOn="{StaticResource SectionHeaderLabelBaseStyle}"
            TargetType="Label">
-        <Setter Property="Margin" Value="0" />
+        <Setter Property="Margin" Value="{StaticResource FormLabelMargin}" />
     </Style>
 
     <!-- ====================================================================== -->

@@ -71,16 +71,18 @@
             </Grid>
         </DataTemplate>
     </UserControl.Resources>
-    <StackPanel Margin="0">
+    <StackPanel Style="{StaticResource DialogRootStackPanelStyle}">
         <TextBlock Style="{StaticResource FormTitleTextStyle}" Text="タスク作成" />
 
         <Label Content="タスク名" Style="{StaticResource FirstSectionHeaderLabelStyle}" />
-        <TextBox Style="{StaticResource ModernTextBoxStyle}"
+        <TextBox Margin="{StaticResource FormItemMargin}"
+                 Style="{StaticResource ModernTextBoxStyle}"
                  Tag="例：UIプロトタイプの作成"
                  Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
 
         <Label Content="詳細" Style="{StaticResource SectionHeaderLabelStyle}" />
         <TextBox Height="{StaticResource MultilineInputHeight}"
+                 Margin="{StaticResource FormItemMargin}"
                  AcceptsReturn="True"
                  Style="{StaticResource ModernTextBoxStyle}"
                  Tag="作業の具体的な内容や目的を記入してください..."
@@ -101,21 +103,24 @@
             <!-- ステータス -->
             <StackPanel Grid.Row="0" Grid.Column="0">
                 <Label Content="ステータス" Style="{StaticResource SectionHeaderLabelStyle}" />
-                <lk:InteractiveChipsPicker ItemsSource="{Binding TaskStatusValues}"
+                <lk:InteractiveChipsPicker Margin="{StaticResource FormItemMargin}"
+                                           ItemsSource="{Binding TaskStatusValues}"
                                            Orientation="Horizontal"
                                            SelectedItem="{Binding Status, Mode=TwoWay}" />
             </StackPanel>
 
             <StackPanel Grid.Row="0" Grid.Column="2">
                 <Label Content="優先度" Style="{StaticResource SectionHeaderLabelStyle}" />
-                <lk:InteractiveChipsPicker ItemsSource="{Binding TaskPriorityValues}"
+                <lk:InteractiveChipsPicker Margin="{StaticResource FormItemMargin}"
+                                           ItemsSource="{Binding TaskPriorityValues}"
                                            Orientation="Horizontal"
                                            SelectedItem="{Binding Priority, Mode=TwoWay}" />
             </StackPanel>
 
             <StackPanel Grid.Row="1" Grid.Column="0">
                 <Label Content="担当者" Style="{StaticResource SectionHeaderLabelStyle}" />
-                <c:LeafSearchableSelector DisplayMemberPath="DisplayName"
+                <c:LeafSearchableSelector Margin="{StaticResource FormItemMargin}"
+                                          DisplayMemberPath="DisplayName"
                                           ItemTemplate="{StaticResource TeammateItemTemplate}"
                                           ItemsSource="{Binding Teammates}"
                                           Placeholder="担当者を選択..."
@@ -125,28 +130,26 @@
 
             <StackPanel Grid.Row="1" Grid.Column="2">
                 <Label Content="期限" Style="{StaticResource SectionHeaderLabelStyle}" />
-                <c:LeafDatePicker Placeholder="Select due date..." SelectedDate="{Binding DueDate}" />
+                <c:LeafDatePicker Margin="{StaticResource FormItemMargin}"
+                                  Placeholder="Select due date..."
+                                  SelectedDate="{Binding DueDate}" />
             </StackPanel>
         </Grid>
 
         <Label Content="見積工数 (h)" Style="{StaticResource SectionHeaderLabelStyle}" />
-        <TextBox Style="{StaticResource ModernTextBoxStyle}"
+        <TextBox Margin="{StaticResource FormItemMargin}"
+                 Style="{StaticResource ModernTextBoxStyle}"
                  Tag="例：1.5"
                  Text="{Binding EstimatedWorkHours, UpdateSourceTrigger=PropertyChanged}" />
 
         <!-- フッターボタン -->
-        <StackPanel Margin="{StaticResource FormFooterMargin}"
-                    HorizontalAlignment="Right"
-                    Orientation="Horizontal">
-            <Button Width="80"
-                    Command="{Binding ConfirmCommand}"
-                    Content="作成する"
-                    Style="{StaticResource PrimaryButtonStyle}" />
-            <Button Width="80"
-                    Margin="{StaticResource ButtonLeftMargin}"
-                    Command="{Binding CancelCommand}"
+        <StackPanel Style="{StaticResource DialogFooterStackPanelStyle}">
+            <Button Command="{Binding ConfirmCommand}"
+                    Content="作成"
+                    Style="{StaticResource DialogActionButtonStyle}" />
+            <Button Command="{Binding CancelCommand}"
                     Content="キャンセル"
-                    Style="{StaticResource SecondaryButtonStyle}" />
+                    Style="{StaticResource DialogCancelButtonStyle}" />
         </StackPanel>
     </StackPanel>
 </UserControl>

@@ -115,7 +115,7 @@
                                     <Path Width="10"
                                           Height="10"
                                           Data="{StaticResource AddIconGeometry}"
-                                          Fill="{DynamicResource BrandForegroundBrush}"
+                                          Fill="{DynamicResource SidebarTextBrush}"
                                           Stretch="Uniform" />
                                 </Button>
                             </Grid>

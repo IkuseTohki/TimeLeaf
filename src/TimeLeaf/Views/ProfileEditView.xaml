@@ -7,16 +7,16 @@
              Width="320"
              d:DataContext="{d:DesignInstance vm:ProfileEditViewModel}"
              mc:Ignorable="d">
-    <StackPanel Margin="0">
+    <StackPanel Style="{StaticResource DialogRootStackPanelStyle}">
         <TextBlock Style="{StaticResource FormTitleTextStyle}" Text="プロフィール編集" />
 
         <Label Content="表示名" Style="{StaticResource FirstSectionHeaderLabelStyle}" />
-        <TextBox Margin="0,0,0,20"
+        <TextBox Margin="{StaticResource FormItemMargin}"
                  Style="{StaticResource OrganicTextBoxStyle}"
                  Text="{Binding DisplayName, UpdateSourceTrigger=PropertyChanged}" />
 
         <Label Content="テーマカラー" Style="{StaticResource SectionHeaderLabelStyle}" />
-        <Grid Margin="0,0,0,24">
+        <Grid Margin="{StaticResource FormItemMargin}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
@@ -30,21 +30,18 @@
         </Grid>
 
         <Label Content="アイコンパス (相対)" Style="{StaticResource SectionHeaderLabelStyle}" />
-        <TextBox Margin="0,0,0,32"
+        <TextBox Margin="{StaticResource FormItemMargin}"
                  Style="{StaticResource OrganicTextBoxStyle}"
                  Text="{Binding IconPath, UpdateSourceTrigger=PropertyChanged}" />
 
         <!-- フッターボタン -->
-        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-            <Button Width="90"
-                    Command="{Binding SaveCommand}"
+        <StackPanel Style="{StaticResource DialogFooterStackPanelStyle}">
+            <Button Command="{Binding SaveCommand}"
                     Content="保存"
-                    Style="{StaticResource PrimaryButtonStyle}" />
-            <Button Width="90"
-                    Margin="12,0,0,0"
-                    Command="{Binding CancelCommand}"
+                    Style="{StaticResource DialogActionButtonStyle}" />
+            <Button Command="{Binding CancelCommand}"
                     Content="キャンセル"
-                    Style="{StaticResource SecondaryButtonStyle}" />
+                    Style="{StaticResource DialogCancelButtonStyle}" />
         </StackPanel>
     </StackPanel>
 </UserControl>
