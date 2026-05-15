@@ -1,8 +1,13 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:c="http://schemas.leafkit.com/wpf/ui/controls"
+                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-                    xmlns:li="clr-namespace:LeafKit.UI.Behaviors.Interactions;assembly=LeafKit.UI">
+                    xmlns:li="clr-namespace:LeafKit.UI.Behaviors.Interactions;assembly=LeafKit.UI"
+                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                    xmlns:wv="clr-namespace:TimeLeaf.Views.Workspace"
+                    xmlns:wvm="clr-namespace:TimeLeaf.ViewModels.Workspace"
+                    mc:Ignorable="d">
 
     <!-- ====================================================================== -->
     <!-- Project Workspace & Dashboard -->
@@ -318,6 +323,38 @@
         <Setter Property="Padding" Value="0" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Tag" Value="{Binding DataContext, RelativeSource={RelativeSource AncestorType=wv:ProjectTasksView}}" />
+        <Setter Property="ContextMenu">
+            <Setter.Value>
+                <ContextMenu x:Name="TaskContextMenu">
+                    <MenuItem Header="コンテナへ移動" ItemsSource="{Binding PlacementTarget.Tag.AvailableContainers, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                        <MenuItem.ItemContainerStyle>
+                            <Style TargetType="MenuItem">
+                                <Setter Property="Header" Value="{Binding Name}" />
+                                <Setter Property="Command" Value="{Binding PlacementTarget.Tag.MoveTaskCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                <Setter Property="CommandParameter">
+                                    <Setter.Value>
+                                        <MultiBinding Converter="{StaticResource MoveTaskArgsConverter}">
+                                            <Binding Path="PlacementTarget.DataContext" RelativeSource="{RelativeSource AncestorType=ContextMenu}" />
+                                            <Binding Path="Id" />
+                                        </MultiBinding>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </MenuItem.ItemContainerStyle>
+                    </MenuItem>
+                    <Separator />
+                    <MenuItem Command="{Binding PlacementTarget.Tag.MoveTaskCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" Header="未分類へ移動">
+                        <MenuItem.CommandParameter>
+                            <MultiBinding Converter="{StaticResource MoveTaskArgsConverter}">
+                                <Binding Path="PlacementTarget.DataContext" RelativeSource="{RelativeSource AncestorType=ContextMenu}" />
+                                <Binding Source="{x:Null}" />
+                            </MultiBinding>
+                        </MenuItem.CommandParameter>
+                    </MenuItem>
+                </ContextMenu>
+            </Setter.Value>
+        </Setter>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ListBoxItem">

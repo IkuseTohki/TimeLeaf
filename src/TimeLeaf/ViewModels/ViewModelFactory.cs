@@ -133,6 +133,7 @@ public class ViewModelFactory : IViewModelFactory
             projectViewModel,
             _serviceProvider.GetRequiredService<IAddTaskUseCase>(),
             _serviceProvider.GetRequiredService<IAddContainerUseCase>(),
+            _serviceProvider.GetRequiredService<IMoveTaskUseCase>(),
             _serviceProvider.GetRequiredService<IGetProjectMembersUseCase>(),
             this,
             _serviceProvider.GetRequiredService<IDialogService>(),

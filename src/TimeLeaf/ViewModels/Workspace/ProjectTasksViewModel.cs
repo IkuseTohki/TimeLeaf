@@ -13,6 +13,13 @@ using TimeLeaf.UseCases;
 namespace TimeLeaf.ViewModels.Workspace;
 
 /// <summary>
+/// タスク移動コマンドの引数。
+/// </summary>
+/// <param name="Task">移動対象のタスク。</param>
+/// <param name="NewParentId">移動先のコンテナID（nullの場合は未分類）。</param>
+public record MoveTaskArgs(ProjectTaskViewModel Task, Guid? NewParentId);
+
+/// <summary>
 /// プロジェクトのタスク一覧と操作を担当するViewModel。
 /// </summary>
 public partial class ProjectTasksViewModel : ObservableObject
@@ -20,6 +27,7 @@ public partial class ProjectTasksViewModel : ObservableObject
     private readonly ProjectViewModel _projectViewModel;
     private readonly IAddTaskUseCase _addTaskUseCase;
     private readonly IAddContainerUseCase _addContainerUseCase;
+    private readonly IMoveTaskUseCase _moveTaskUseCase;
     private readonly IGetProjectMembersUseCase _getProjectMembersUseCase;
     private readonly IViewModelFactory _viewModelFactory;
     private readonly LeafKit.UI.Services.IDialogService _dialogService;
@@ -53,12 +61,18 @@ public partial class ProjectTasksViewModel : ObservableObject
     [ObservableProperty]
     private ObservableCollection<TaskEdgeViewModel> _edges = new();
 
+    /// <summary>
+    /// 移動先候補となるコンテナのリスト。
+    /// </summary>
+    public ObservableCollection<ProjectContainer> AvailableContainers => new(_projectViewModel.Model.Containers);
+
     public ObservableCollection<TaskContainerViewModel> TaskContainers { get; } = new();
 
     public ProjectTasksViewModel(
         ProjectViewModel projectViewModel,
         IAddTaskUseCase addTaskUseCase,
         IAddContainerUseCase addContainerUseCase,
+        IMoveTaskUseCase moveTaskUseCase,
         IGetProjectMembersUseCase getProjectMembersUseCase,
         IViewModelFactory viewModelFactory,
         LeafKit.UI.Services.IDialogService dialogService,
@@ -71,6 +85,7 @@ public partial class ProjectTasksViewModel : ObservableObject
         _projectViewModel = projectViewModel;
         _addTaskUseCase = addTaskUseCase;
         _addContainerUseCase = addContainerUseCase;
+        _moveTaskUseCase = moveTaskUseCase;
         _getProjectMembersUseCase = getProjectMembersUseCase;
         _viewModelFactory = viewModelFactory;
         _dialogService = dialogService;
@@ -82,6 +97,31 @@ public partial class ProjectTasksViewModel : ObservableObject
         InitializeNodePositions();
         SyncEdges();
         RebuildContainers();
+    }
+
+    [RelayCommand]
+    private async System.Threading.Tasks.Task MoveTask(MoveTaskArgs args)
+    {
+        if (args == null || args.Task == null)
+            return;
+
+        try
+        {
+            _logger.LogInformation("Moving task {TaskId} to parent {ParentId}", args.Task.Id, args.NewParentId);
+
+            await _moveTaskUseCase.ExecuteAsync(_projectViewModel.Model, args.Task.Id, args.NewParentId);
+
+            // UIの状態を同期
+            _projectViewModel.SyncFromModel();
+            RebuildContainers();
+
+            // リスクのスキャンも再実行（階層変更による制約への影響を考慮）
+            await ScanRisksAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to move task.");
+        }
     }
 
     [RelayCommand]

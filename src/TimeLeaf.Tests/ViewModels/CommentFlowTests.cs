@@ -199,6 +199,7 @@ public class CommentFlowTests
             projectVM,
             new Mock<IAddTaskUseCase>().Object,
             new Mock<IAddContainerUseCase>().Object,
+            new Mock<IMoveTaskUseCase>().Object,
             new Mock<IGetProjectMembersUseCase>().Object,
             new Mock<IViewModelFactory>().Object,
             new Mock<IDialogService>().Object,

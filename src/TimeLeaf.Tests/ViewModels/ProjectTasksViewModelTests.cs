@@ -18,6 +18,7 @@ public class ProjectTasksViewModelTests
 {
     private Mock<IAddTaskUseCase> _addTaskUseCaseMock = null!;
     private Mock<IAddContainerUseCase> _addContainerUseCaseMock = null!;
+    private Mock<IMoveTaskUseCase> _moveTaskUseCaseMock = null!;
     private Mock<IGetProjectMembersUseCase> _getProjectMembersUseCaseMock = null!;
     private Mock<IViewModelFactory> _viewModelFactoryMock = null!;
     private Mock<IUserService> _userServiceMock = null!;
@@ -32,6 +33,7 @@ public class ProjectTasksViewModelTests
     {
         _addTaskUseCaseMock = new Mock<IAddTaskUseCase>();
         _addContainerUseCaseMock = new Mock<IAddContainerUseCase>();
+        _moveTaskUseCaseMock = new Mock<IMoveTaskUseCase>();
         _getProjectMembersUseCaseMock = new Mock<IGetProjectMembersUseCase>();
         _viewModelFactoryMock = new Mock<IViewModelFactory>();
         _userServiceMock = new Mock<IUserService>();
@@ -80,6 +82,7 @@ public class ProjectTasksViewModelTests
             _projectViewModel,
             _addTaskUseCaseMock.Object,
             _addContainerUseCaseMock.Object,
+            _moveTaskUseCaseMock.Object,
             _getProjectMembersUseCaseMock.Object,
             _viewModelFactoryMock.Object,
             _dialogServiceMock.Object,
