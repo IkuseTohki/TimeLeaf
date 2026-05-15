@@ -28,6 +28,7 @@ public partial class ProjectTasksViewModel : ObservableObject
     private readonly IAddTaskUseCase _addTaskUseCase;
     private readonly IAddContainerUseCase _addContainerUseCase;
     private readonly IMoveTaskUseCase _moveTaskUseCase;
+    private readonly IDeleteTaskUseCase _deleteTaskUseCase;
     private readonly IGetProjectMembersUseCase _getProjectMembersUseCase;
     private readonly IViewModelFactory _viewModelFactory;
     private readonly LeafKit.UI.Services.IDialogService _dialogService;
@@ -73,6 +74,7 @@ public partial class ProjectTasksViewModel : ObservableObject
         IAddTaskUseCase addTaskUseCase,
         IAddContainerUseCase addContainerUseCase,
         IMoveTaskUseCase moveTaskUseCase,
+        IDeleteTaskUseCase deleteTaskUseCase,
         IGetProjectMembersUseCase getProjectMembersUseCase,
         IViewModelFactory viewModelFactory,
         LeafKit.UI.Services.IDialogService dialogService,
@@ -86,6 +88,7 @@ public partial class ProjectTasksViewModel : ObservableObject
         _addTaskUseCase = addTaskUseCase;
         _addContainerUseCase = addContainerUseCase;
         _moveTaskUseCase = moveTaskUseCase;
+        _deleteTaskUseCase = deleteTaskUseCase;
         _getProjectMembersUseCase = getProjectMembersUseCase;
         _viewModelFactory = viewModelFactory;
         _dialogService = dialogService;
@@ -121,6 +124,32 @@ public partial class ProjectTasksViewModel : ObservableObject
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to move task.");
+        }
+    }
+
+    [RelayCommand]
+    private async System.Threading.Tasks.Task DeleteTask(ProjectTaskViewModel? task)
+    {
+        if (task == null)
+            return;
+
+        try
+        {
+            // TODO: 確認ダイアログの表示を検討（現在は即時削除）
+            _logger.LogInformation("Deleting task {TaskId}: {TaskName}", task.Id, task.Name);
+
+            await _deleteTaskUseCase.ExecuteAsync(_projectViewModel.Model, task.Id);
+
+            // UIの状態を同期
+            _projectViewModel.SyncFromModel();
+            RebuildContainers();
+
+            // リスクのスキャンも再実行
+            await ScanRisksAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to delete task.");
         }
     }
 

@@ -134,6 +134,7 @@ public class ViewModelFactory : IViewModelFactory
             _serviceProvider.GetRequiredService<IAddTaskUseCase>(),
             _serviceProvider.GetRequiredService<IAddContainerUseCase>(),
             _serviceProvider.GetRequiredService<IMoveTaskUseCase>(),
+            _serviceProvider.GetRequiredService<IDeleteTaskUseCase>(),
             _serviceProvider.GetRequiredService<IGetProjectMembersUseCase>(),
             this,
             _serviceProvider.GetRequiredService<IDialogService>(),

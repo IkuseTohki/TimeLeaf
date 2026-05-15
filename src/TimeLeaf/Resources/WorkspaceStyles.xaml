@@ -452,6 +452,22 @@
                             </MultiBinding>
                         </MenuItem.CommandParameter>
                     </MenuItem>
+                    <Separator Margin="4,2" />
+                    <MenuItem Padding="8,4"
+                              Command="{Binding PlacementTarget.Tag.DeleteTaskCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                              Header="削除">
+                        <MenuItem.Icon>
+                            <TextBlock Foreground="{DynamicResource TextPrimaryBrush}" Text="🗑️" />
+                        </MenuItem.Icon>
+                        <MenuItem.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Foreground="{DynamicResource TextPrimaryBrush}" Text="{Binding}" />
+                            </DataTemplate>
+                        </MenuItem.HeaderTemplate>
+                        <MenuItem.CommandParameter>
+                            <Binding Path="PlacementTarget.DataContext" RelativeSource="{RelativeSource AncestorType=ContextMenu}" />
+                        </MenuItem.CommandParameter>
+                    </MenuItem>
                 </ContextMenu>
             </Setter.Value>
         </Setter>
