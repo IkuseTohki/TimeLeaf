@@ -34,6 +34,12 @@
     <Thickness x:Key="FormLabelMargin">0,0,0,4</Thickness>
     <Thickness x:Key="FormSectionMargin">0,0,0,24</Thickness>
 
+    <!-- タスクカード用定数 -->
+    <Thickness x:Key="TaskCardPadding">20,12</Thickness>
+    <Thickness x:Key="TaskCardInfoMargin">0,4,0,0</Thickness>
+    <Thickness x:Key="TaskCardSelectedMargin">12,8</Thickness>
+    <Thickness x:Key="TaskCardSelectedPadding">16</Thickness>
+
     <!-- ====================================================================== -->
     <!-- Common Effects -->
     <!-- ====================================================================== -->

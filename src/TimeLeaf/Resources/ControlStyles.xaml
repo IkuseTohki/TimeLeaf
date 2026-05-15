@@ -122,4 +122,123 @@
         </Setter>
     </Style>
 
+    <!-- ====================================================================== -->
+    <!-- Menu & ContextMenu Styles -->
+    <!-- ====================================================================== -->
+
+    <!-- TimeLeaf標準のMenuItemスタイル -->
+    <Style x:Key="TimeLeafMenuItemStyle" TargetType="MenuItem">
+        <Setter Property="Padding" Value="8,6" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="MenuItem">
+                    <Border x:Name="ItemBorder"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            CornerRadius="4">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="Icon" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="Shortcut" />
+                                <ColumnDefinition Width="13" />
+                            </Grid.ColumnDefinitions>
+                            <ContentPresenter x:Name="Icon"
+                                              Margin="8,0"
+                                              VerticalAlignment="Center"
+                                              ContentSource="Icon"
+                                              TextBlock.Foreground="{DynamicResource TextPrimaryBrush}" />
+                            <ContentPresenter Grid.Column="1"
+                                              Margin="{TemplateBinding Padding}"
+                                              VerticalAlignment="Center"
+                                              ContentSource="Header"
+                                              RecognizesAccessKey="True"
+                                              TextBlock.Foreground="{DynamicResource TextPrimaryBrush}" />
+                            <TextBlock x:Name="Arrow"
+                                       Grid.Column="3"
+                                       VerticalAlignment="Center"
+                                       FontSize="10"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       Text="›"
+                                       Visibility="Collapsed" />
+                            <Popup x:Name="SubMenuPopup"
+                                   AllowsTransparency="True"
+                                   Focusable="False"
+                                   IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}"
+                                   Placement="Right"
+                                   VerticalOffset="-4">
+                                <Border Background="{DynamicResource SurfaceBaseBrush}"
+                                        BorderBrush="{DynamicResource OutlineBaseBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="4">
+                                    <Border.Effect>
+                                        <DropShadowEffect BlurRadius="8"
+                                                          Opacity="0.1"
+                                                          ShadowDepth="1" />
+                                    </Border.Effect>
+                                    <ScrollViewer Margin="2" Style="{DynamicResource {ComponentResourceKey ResourceId=MenuScrollViewer, TypeInTargetAssembly={x:Type FrameworkElement}}}">
+                                        <ItemsPresenter Grid.IsSharedSizeScope="True" RenderOptions.ClearTypeHint="Enabled" />
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource StateHoverBrush}" />
+                        </Trigger>
+                        <Trigger Property="HasItems" Value="True">
+                            <Setter TargetName="Arrow" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- TimeLeaf標準のContextMenuスタイル -->
+    <Style x:Key="TimeLeafContextMenuStyle" TargetType="ContextMenu">
+        <Setter Property="Padding" Value="4" />
+        <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ContextMenu">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="4">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="8"
+                                              Opacity="0.1"
+                                              ShadowDepth="1" />
+                        </Border.Effect>
+                        <ItemsPresenter Margin="{TemplateBinding Padding}" Grid.IsSharedSizeScope="True" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <!-- ContextMenu内のMenuItemにスタイルを適用 -->
+        <Style.Resources>
+            <Style BasedOn="{StaticResource TimeLeafMenuItemStyle}" TargetType="MenuItem" />
+            <Style x:Key="{x:Static MenuItem.SeparatorStyleKey}" TargetType="Separator">
+                <Setter Property="Background" Value="{DynamicResource OutlineBaseBrush}" />
+                <Setter Property="Height" Value="1" />
+                <Setter Property="Margin" Value="4,2" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Separator">
+                            <Border Background="{TemplateBinding Background}" SnapsToDevicePixels="True" />
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </Style.Resources>
+    </Style>
+
+    <!-- アプリ全体のデフォルトとして適用 -->
+    <Style BasedOn="{StaticResource TimeLeafMenuItemStyle}" TargetType="MenuItem" />
+    <Style BasedOn="{StaticResource TimeLeafContextMenuStyle}" TargetType="ContextMenu" />
+
 </ResourceDictionary>
