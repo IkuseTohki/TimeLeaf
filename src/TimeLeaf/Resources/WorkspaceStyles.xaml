@@ -326,10 +326,107 @@
         <Setter Property="Tag" Value="{Binding DataContext, RelativeSource={RelativeSource AncestorType=wv:ProjectTasksView}}" />
         <Setter Property="ContextMenu">
             <Setter.Value>
-                <ContextMenu x:Name="TaskContextMenu">
+                <ContextMenu x:Name="TaskContextMenu"
+                             Padding="4"
+                             Background="{DynamicResource SurfaceBaseBrush}"
+                             BorderBrush="{DynamicResource OutlineBaseBrush}"
+                             BorderThickness="1">
+                    <ContextMenu.Resources>
+                        <!-- MenuItem の共通スタイル：ホバー時のはみ出し修正と角丸の適用 -->
+                        <Style TargetType="MenuItem">
+                            <Setter Property="Padding" Value="8,6" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="MenuItem">
+                                        <Border x:Name="ItemBorder"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                CornerRadius="4">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" SharedSizeGroup="Icon" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" SharedSizeGroup="Shortcut" />
+                                                    <ColumnDefinition Width="13" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <ContentPresenter x:Name="Icon"
+                                                                  Margin="8,0"
+                                                                  VerticalAlignment="Center"
+                                                                  ContentSource="Icon"
+                                                                  TextBlock.Foreground="{DynamicResource TextPrimaryBrush}" />
+                                                <ContentPresenter Grid.Column="1"
+                                                                  Margin="{TemplateBinding Padding}"
+                                                                  VerticalAlignment="Center"
+                                                                  ContentSource="Header"
+                                                                  RecognizesAccessKey="True"
+                                                                  TextBlock.Foreground="{DynamicResource TextPrimaryBrush}" />
+                                                <TextBlock x:Name="Arrow"
+                                                           Grid.Column="3"
+                                                           VerticalAlignment="Center"
+                                                           FontSize="10"
+                                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                                           Text="›"
+                                                           Visibility="Collapsed" />
+
+                                                <!-- サブメニュー用のポップアップ -->
+                                                <Popup x:Name="SubMenuPopup"
+                                                       AllowsTransparency="True"
+                                                       Focusable="False"
+                                                       IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}"
+                                                       Placement="Right"
+                                                       VerticalOffset="-4">
+                                                    <Border Background="{DynamicResource SurfaceBaseBrush}"
+                                                            BorderBrush="{DynamicResource OutlineBaseBrush}"
+                                                            BorderThickness="1"
+                                                            CornerRadius="4">
+                                                        <Border.Effect>
+                                                            <DropShadowEffect BlurRadius="8"
+                                                                              Opacity="0.1"
+                                                                              ShadowDepth="1" />
+                                                        </Border.Effect>
+                                                        <ScrollViewer Margin="2" Style="{DynamicResource {ComponentResourceKey ResourceId=MenuScrollViewer, TypeInTargetAssembly={x:Type FrameworkElement}}}">
+                                                            <ItemsPresenter Grid.IsSharedSizeScope="True" RenderOptions.ClearTypeHint="Enabled" />
+                                                        </ScrollViewer>
+                                                    </Border>
+                                                </Popup>
+                                            </Grid>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsHighlighted" Value="True">
+                                                <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource StateHoverBrush}" />
+                                            </Trigger>
+                                            <Trigger Property="HasItems" Value="True">
+                                                <Setter TargetName="Arrow" Property="Visibility" Value="Visible" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ContextMenu.Resources>
+                    <ContextMenu.Template>
+                        <ControlTemplate TargetType="ContextMenu">
+                            <Border Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="8">
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="8"
+                                                      Opacity="0.1"
+                                                      ShadowDepth="1" />
+                                </Border.Effect>
+                                <ItemsPresenter Margin="{TemplateBinding Padding}" Grid.IsSharedSizeScope="True" />
+                            </Border>
+                        </ControlTemplate>
+                    </ContextMenu.Template>
+
                     <MenuItem Header="コンテナへ移動" ItemsSource="{Binding PlacementTarget.Tag.AvailableContainers, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                        <MenuItem.Icon>
+                            <TextBlock Text="📂" />
+                        </MenuItem.Icon>
                         <MenuItem.ItemContainerStyle>
-                            <Style TargetType="MenuItem">
+                            <Style BasedOn="{StaticResource {x:Type MenuItem}}" TargetType="MenuItem">
                                 <Setter Property="Header" Value="{Binding Name}" />
                                 <Setter Property="Command" Value="{Binding PlacementTarget.Tag.MoveTaskCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
                                 <Setter Property="CommandParameter">
@@ -343,8 +440,11 @@
                             </Style>
                         </MenuItem.ItemContainerStyle>
                     </MenuItem>
-                    <Separator />
+                    <Separator Margin="4,2" />
                     <MenuItem Command="{Binding PlacementTarget.Tag.MoveTaskCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" Header="未分類へ移動">
+                        <MenuItem.Icon>
+                            <TextBlock Text="🍃" />
+                        </MenuItem.Icon>
                         <MenuItem.CommandParameter>
                             <MultiBinding Converter="{StaticResource MoveTaskArgsConverter}">
                                 <Binding Path="PlacementTarget.DataContext" RelativeSource="{RelativeSource AncestorType=ContextMenu}" />
