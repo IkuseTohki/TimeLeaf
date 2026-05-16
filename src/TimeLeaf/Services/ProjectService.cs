@@ -120,6 +120,15 @@ public class ProjectService : IProjectService, IDisposable
         await SaveProjectAsync(project);
     }
 
+    public async Task DeleteContainerAsync(Project project, Guid containerId)
+    {
+        if (project == null)
+            throw new ArgumentNullException(nameof(project));
+
+        project.RemoveContainerRecursively(containerId);
+        await SaveProjectAsync(project);
+    }
+
     private async void OnProjectExternalChanged(Guid projectId)
     {
         _logger.LogInformation("External change detected for project {ProjectId}. Re-syncing...", projectId);

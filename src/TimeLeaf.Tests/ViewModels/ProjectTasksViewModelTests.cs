@@ -20,6 +20,7 @@ public class ProjectTasksViewModelTests
     private Mock<IAddContainerUseCase> _addContainerUseCaseMock = null!;
     private Mock<IMoveTaskUseCase> _moveTaskUseCaseMock = null!;
     private Mock<IDeleteTaskUseCase> _deleteTaskUseCaseMock = null!;
+    private Mock<IDeleteContainerUseCase> _deleteContainerUseCaseMock = null!;
     private Mock<IGetProjectMembersUseCase> _getProjectMembersUseCaseMock = null!;
     private Mock<IViewModelFactory> _viewModelFactoryMock = null!;
     private Mock<IUserService> _userServiceMock = null!;
@@ -36,6 +37,7 @@ public class ProjectTasksViewModelTests
         _addContainerUseCaseMock = new Mock<IAddContainerUseCase>();
         _moveTaskUseCaseMock = new Mock<IMoveTaskUseCase>();
         _deleteTaskUseCaseMock = new Mock<IDeleteTaskUseCase>();
+        _deleteContainerUseCaseMock = new Mock<IDeleteContainerUseCase>();
         _getProjectMembersUseCaseMock = new Mock<IGetProjectMembersUseCase>();
         _viewModelFactoryMock = new Mock<IViewModelFactory>();
         _userServiceMock = new Mock<IUserService>();
@@ -86,6 +88,7 @@ public class ProjectTasksViewModelTests
             _addContainerUseCaseMock.Object,
             _moveTaskUseCaseMock.Object,
             _deleteTaskUseCaseMock.Object,
+            _deleteContainerUseCaseMock.Object,
             _getProjectMembersUseCaseMock.Object,
             _viewModelFactoryMock.Object,
             _dialogServiceMock.Object,

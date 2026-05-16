@@ -371,4 +371,72 @@ public class ProjectTests
         Assert.AreEqual(t2.Id, project.Tasks[0].Id);
         Assert.AreEqual(t1.Id, project.Tasks[1].Id);
     }
+
+    /// <summary>
+    /// テスト観点: コンテナを削除した際、その中のタスクもすべて削除され、DeletedTaskIds に記録されることを確認する。
+    /// </summary>
+    [TestMethod]
+    public void RemoveContainerRecursively_WithChildren_DeletesAllDescendants()
+    {
+        // Arrange
+        var project = new Project(Guid.Empty);
+        var container = new ProjectContainer(Guid.NewGuid(), "Parent Container");
+        var task1 = new ProjectTask { Id = Guid.NewGuid() };
+        var task2 = new ProjectTask { Id = Guid.NewGuid() };
+
+        project.AddContainer(container);
+        project.AddTask(task1);
+        project.AddTask(task2);
+
+        container.AddChild(task1);
+        container.AddChild(task2);
+
+        // Act
+        project.RemoveContainerRecursively(container.Id);
+
+        // Assert
+        Assert.AreEqual(0, project.Containers.Count, "コンテナが削除されていること");
+        Assert.AreEqual(0, project.Tasks.Count, "中のタスクもすべて削除されていること");
+
+        Assert.IsTrue(project.DeletedContainerIds.Contains(container.Id));
+        Assert.IsTrue(project.DeletedTaskIds.Contains(task1.Id));
+        Assert.IsTrue(project.DeletedTaskIds.Contains(task2.Id));
+    }
+
+    /// <summary>
+    /// テスト観点: 入れ子になったコンテナを削除した際、すべての階層のアイテムが削除されることを確認する。
+    /// </summary>
+    [TestMethod]
+    public void RemoveContainerRecursively_WithNestedContainers_DeletesAllDeeply()
+    {
+        // Arrange
+        var project = new Project(Guid.Empty);
+        var c1 = new ProjectContainer(Guid.NewGuid(), "C1");
+        var c2 = new ProjectContainer(Guid.NewGuid(), "C2");
+        var t1 = new ProjectTask { Id = Guid.NewGuid() };
+        var t2 = new ProjectTask { Id = Guid.NewGuid() };
+
+        project.AddContainer(c1);
+        project.AddContainer(c2);
+        project.AddTask(t1);
+        project.AddTask(t2);
+
+        c1.AddChild(t1);
+        c1.AddChild(c2);
+        c2.AddChild(t2);
+
+        // Hierarchy: C1 -> [t1, C2 -> [t2]]
+
+        // Act
+        project.RemoveContainerRecursively(c1.Id);
+
+        // Assert
+        Assert.AreEqual(0, project.Containers.Count);
+        Assert.AreEqual(0, project.Tasks.Count);
+
+        Assert.IsTrue(project.DeletedContainerIds.Contains(c1.Id));
+        Assert.IsTrue(project.DeletedContainerIds.Contains(c2.Id));
+        Assert.IsTrue(project.DeletedTaskIds.Contains(t1.Id));
+        Assert.IsTrue(project.DeletedTaskIds.Contains(t2.Id));
+    }
 }

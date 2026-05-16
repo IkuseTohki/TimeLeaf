@@ -87,6 +87,7 @@ public class ProjectWorkspaceViewModelTests
                         new Mock<IAddContainerUseCase>().Object,
                         new Mock<IMoveTaskUseCase>().Object,
                         new Mock<IDeleteTaskUseCase>().Object,
+                        new Mock<IDeleteContainerUseCase>().Object,
                         new Mock<IGetProjectMembersUseCase>().Object,
                         new Mock<IViewModelFactory>().Object,
                         new Mock<IDialogService>().Object,

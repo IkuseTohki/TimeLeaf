@@ -46,6 +46,11 @@ public interface IProjectService
     Task DeleteTaskAsync(Project project, Guid taskId);
 
     /// <summary>
+    /// コンテナを削除します。
+    /// </summary>
+    Task DeleteContainerAsync(Project project, Guid containerId);
+
+    /// <summary>
     /// プロジェクトが追加された際に発生します。
     /// </summary>
     event Action<Project>? ProjectAdded;

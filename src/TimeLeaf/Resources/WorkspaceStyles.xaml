@@ -306,6 +306,7 @@
     </Style>
 
     <Style x:Key="TaskContainerHeaderStyle" TargetType="Border">
+        <Setter Property="Background" Value="Transparent" />
         <Setter Property="Padding" Value="16,12" />
         <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
         <Setter Property="BorderThickness" Value="0,0,0,1" />

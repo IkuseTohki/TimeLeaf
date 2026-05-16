@@ -93,7 +93,7 @@
     <!-- Reorder Work Items View Components -->
     <!-- ====================================================================== -->
 
-    <!-- アイテム内の小さな移動ボタン用のスタイル -->
+    <!-- 小さなボタン用のスタイル -->
     <Style x:Key="SmallIconButtonStyle" TargetType="Button">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />

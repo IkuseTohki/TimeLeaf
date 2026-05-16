@@ -47,6 +47,16 @@ public class ProjectContainer : ProjectWorkItem
     }
 
     /// <summary>
+    /// 子要素を削除します。
+    /// </summary>
+    public void RemoveChild(ProjectWorkItem child)
+    {
+        if (child == null)
+            return;
+        _children.Remove(child);
+    }
+
+    /// <summary>
     /// 子要素を一括で読み込みます。
     /// </summary>
     public void LoadChildren(IEnumerable<ProjectWorkItem> children)

@@ -51,19 +51,28 @@ public partial class TaskContainerViewModel : ObservableObject
     public IRelayCommand AddTaskCommand { get; }
 
     /// <summary>
+    /// このコンテナを削除するコマンド。
+    /// </summary>
+    public IRelayCommand DeleteContainerCommand { get; }
+
+    /// <summary>
     /// コンストラクタ。
     /// </summary>
     /// <param name="container">ラップ対象のコンテナエンティティ。未分類の場合は null。</param>
     /// <param name="subTasks">このコンテナに属するタスクのコレクション。</param>
     /// <param name="addTaskCommand">タスク追加コマンド。</param>
+    /// <param name="deleteContainerCommand">コンテナ削除コマンド。</param>
     public TaskContainerViewModel(
         ProjectContainer? container,
         ObservableCollection<ProjectTaskViewModel> subTasks,
-        IRelayCommand addTaskCommand
+        IRelayCommand addTaskCommand,
+        IRelayCommand deleteContainerCommand
     )
     {
         _container = container;
         SubTasks = subTasks ?? throw new ArgumentNullException(nameof(subTasks));
         AddTaskCommand = addTaskCommand ?? throw new ArgumentNullException(nameof(addTaskCommand));
+        DeleteContainerCommand =
+            deleteContainerCommand ?? throw new ArgumentNullException(nameof(deleteContainerCommand));
     }
 }

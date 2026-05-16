@@ -28,7 +28,7 @@
                                 <Grid>
                                     <StackPanel>
                                         <!-- Container Header -->
-                                        <Border Style="{StaticResource TaskContainerHeaderStyle}">
+                                        <Border x:Name="HeaderBorder" Style="{StaticResource TaskContainerHeaderStyle}">
                                             <Grid>
                                                 <StackPanel Orientation="Horizontal">
                                                     <TextBlock VerticalAlignment="Center"
@@ -47,6 +47,19 @@
                                                             </MultiBinding>
                                                         </TextBlock.Text>
                                                     </TextBlock>
+
+                                                    <Button x:Name="DeleteContainerBtn"
+                                                            Margin="8,0,0,0"
+                                                            HorizontalAlignment="Right"
+                                                            Command="{Binding DeleteContainerCommand}"
+                                                            CommandParameter="{Binding}"
+                                                            Cursor="Hand"
+                                                            Opacity="0"
+                                                            Style="{StaticResource IconButton}"
+                                                            ToolTip="コンテナを削除"
+                                                            Visibility="Collapsed">
+                                                        <Path Data="{StaticResource DeleteIconGeometry}" Style="{StaticResource SmallIconPathStyle}" />
+                                                    </Button>
                                                 </StackPanel>
                                             </Grid>
                                         </Border>
@@ -176,6 +189,22 @@
                                     <Setter TargetName="AddTaskBtn" Property="Background" Value="{DynamicResource StateHoverBrush}" />
                                     <Setter TargetName="AddTaskBtn" Property="Opacity" Value="0.6" />
                                 </Trigger>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding IsMouseOver, ElementName=HeaderBorder}" Value="True" />
+                                        <Condition Binding="{Binding IsUnclassified}" Value="False" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter TargetName="DeleteContainerBtn" Property="Visibility" Value="Visible" />
+                                    <Setter TargetName="DeleteContainerBtn" Property="Opacity" Value="1" />
+                                </MultiDataTrigger>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding IsMouseOver, ElementName=DeleteContainerBtn}" Value="True" />
+                                        <Condition Binding="{Binding IsUnclassified}" Value="False" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter TargetName="DeleteContainerBtn" Property="Visibility" Value="Visible" />
+                                    <Setter TargetName="DeleteContainerBtn" Property="Opacity" Value="1" />
+                                </MultiDataTrigger>
                             </DataTemplate.Triggers>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>

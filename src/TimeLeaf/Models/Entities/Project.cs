@@ -238,6 +238,13 @@ public class Project
         var task = _tasks.FirstOrDefault(t => t.Id == taskId);
         if (task != null)
         {
+            // 親コンテナからの削除
+            if (task.ParentId.HasValue)
+            {
+                var parent = _containers.FirstOrDefault(c => c.Id == task.ParentId.Value);
+                parent?.RemoveChild(task);
+            }
+
             _tasks.Remove(task);
             if (!_deletedTaskIds.Contains(taskId))
             {
@@ -269,12 +276,46 @@ public class Project
         var container = _containers.FirstOrDefault(c => c.Id == containerId);
         if (container != null)
         {
+            // 親コンテナからの削除
+            if (container.ParentId.HasValue)
+            {
+                var parent = _containers.FirstOrDefault(c => c.Id == container.ParentId.Value);
+                parent?.RemoveChild(container);
+            }
+
             _containers.Remove(container);
             if (!_deletedContainerIds.Contains(containerId))
             {
                 _deletedContainerIds.Add(containerId);
             }
         }
+    }
+
+    /// <summary>
+    /// コンテナとその中のすべてのアイテムを再帰的に削除します。
+    /// </summary>
+    public void RemoveContainerRecursively(Guid containerId)
+    {
+        var container = _containers.FirstOrDefault(c => c.Id == containerId);
+        if (container == null)
+            return;
+
+        // 子要素を再帰的に削除
+        var children = container.Children.ToList();
+        foreach (var child in children)
+        {
+            if (child is ProjectTask task)
+            {
+                RemoveTask(task.Id);
+            }
+            else if (child is ProjectContainer subContainer)
+            {
+                RemoveContainerRecursively(subContainer.Id);
+            }
+        }
+
+        // 自分自身を削除
+        RemoveContainer(containerId);
     }
 
     /// <summary>

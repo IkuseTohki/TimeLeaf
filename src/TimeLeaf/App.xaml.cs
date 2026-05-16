@@ -292,6 +292,7 @@ public partial class App : Application
         services.AddTransient<IAddCommentUseCase, AddCommentUseCase>();
         services.AddTransient<IAddMilestoneUseCase, AddMilestoneUseCase>();
         services.AddTransient<IDeleteTaskUseCase, DeleteTaskUseCase>();
+        services.AddTransient<IDeleteContainerUseCase, DeleteContainerUseCase>();
         services.AddTransient<IMoveTaskUseCase, MoveTaskUseCase>();
         services.AddTransient<ICheckTaskDeadlinesUseCase, CheckTaskDeadlinesUseCase>();
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();

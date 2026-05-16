@@ -29,6 +29,7 @@ public partial class ProjectTasksViewModel : ObservableObject
     private readonly IAddContainerUseCase _addContainerUseCase;
     private readonly IMoveTaskUseCase _moveTaskUseCase;
     private readonly IDeleteTaskUseCase _deleteTaskUseCase;
+    private readonly IDeleteContainerUseCase _deleteContainerUseCase;
     private readonly IGetProjectMembersUseCase _getProjectMembersUseCase;
     private readonly IViewModelFactory _viewModelFactory;
     private readonly LeafKit.UI.Services.IDialogService _dialogService;
@@ -75,6 +76,7 @@ public partial class ProjectTasksViewModel : ObservableObject
         IAddContainerUseCase addContainerUseCase,
         IMoveTaskUseCase moveTaskUseCase,
         IDeleteTaskUseCase deleteTaskUseCase,
+        IDeleteContainerUseCase deleteContainerUseCase,
         IGetProjectMembersUseCase getProjectMembersUseCase,
         IViewModelFactory viewModelFactory,
         LeafKit.UI.Services.IDialogService dialogService,
@@ -89,6 +91,7 @@ public partial class ProjectTasksViewModel : ObservableObject
         _addContainerUseCase = addContainerUseCase;
         _moveTaskUseCase = moveTaskUseCase;
         _deleteTaskUseCase = deleteTaskUseCase;
+        _deleteContainerUseCase = deleteContainerUseCase;
         _getProjectMembersUseCase = getProjectMembersUseCase;
         _viewModelFactory = viewModelFactory;
         _dialogService = dialogService;
@@ -150,6 +153,42 @@ public partial class ProjectTasksViewModel : ObservableObject
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to delete task.");
+        }
+    }
+
+    [RelayCommand]
+    private async System.Threading.Tasks.Task DeleteContainer(TaskContainerViewModel? container)
+    {
+        if (container == null || container.IsUnclassified)
+            return;
+
+        try
+        {
+            var message =
+                $"コンテナ '{container.DisplayName}' を削除しますか？\nコンテナ内のすべてのタスクも削除されます。";
+            var result = _dialogService.ShowConfirmationDialog(message, "コンテナの削除");
+
+            if (result)
+            {
+                _logger.LogInformation(
+                    "Deleting container {ContainerId}: {ContainerName}",
+                    container.Id,
+                    container.DisplayName
+                );
+
+                await _deleteContainerUseCase.ExecuteAsync(_projectViewModel.Model, container.Id);
+
+                // UIの状態を同期
+                _projectViewModel.SyncFromModel();
+                RebuildContainers();
+
+                // リスクのスキャンも再実行
+                await ScanRisksAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to delete container.");
         }
     }
 
@@ -235,7 +274,8 @@ public partial class ProjectTasksViewModel : ObservableObject
                 new TaskContainerViewModel(
                     container,
                     new ObservableCollection<ProjectTaskViewModel>(children),
-                    AddTaskToContainerCommand
+                    AddTaskToContainerCommand,
+                    DeleteContainerCommand
                 )
             );
         }
@@ -252,7 +292,8 @@ public partial class ProjectTasksViewModel : ObservableObject
                 new TaskContainerViewModel(
                     null,
                     new ObservableCollection<ProjectTaskViewModel>(unclassified),
-                    AddTaskToContainerCommand
+                    AddTaskToContainerCommand,
+                    DeleteContainerCommand
                 )
             );
         }
