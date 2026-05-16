@@ -79,6 +79,7 @@
     <!-- LeafDatePicker の上書き -->
     <Style TargetType="{x:Type c:LeafDatePicker}">
         <Setter Property="MinHeight" Value="28" />
+        <Setter Property="MinWidth" Value="130" />
         <Setter Property="Padding" Value="10,0" />
     </Style>
 

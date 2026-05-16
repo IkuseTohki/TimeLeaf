@@ -25,8 +25,8 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <!-- 左側: メインエリア（可変幅） -->
-                <ColumnDefinition Width="180" />
-                <!-- 右側: プロパティ欄 (幅180) -->
+                <ColumnDefinition Width="200" />
+                <!-- 右側: プロパティ欄 -->
             </Grid.ColumnDefinitions>
 
             <!-- 外部変更通知バナー -->
@@ -225,18 +225,46 @@
                         <Separator Margin="0,0,0,16" Background="{DynamicResource OutlineBaseBrush}" />
 
                         <TextBlock Style="{StaticResource TaskPanelSectionHeaderStyle}" Text="スケジュール" />
-                        <StackPanel Margin="0,0,0,12">
-                            <TextBlock Style="{StaticResource TaskPanelMetaLabelStyle}" Text="期限" />
-                            <c:LeafDatePicker Placeholder="Set deadline" SelectedDate="{Binding Task.Deadline}" />
-                        </StackPanel>
-                        <StackPanel Margin="0,0,0,12">
-                            <TextBlock Style="{StaticResource TaskPanelMetaLabelStyle}" Text="実績開始" />
-                            <c:LeafDatePicker Placeholder="Actual start" SelectedDate="{Binding Task.ActualStartDate}" />
-                        </StackPanel>
-                        <StackPanel Margin="0,0,0,16">
-                            <TextBlock Style="{StaticResource TaskPanelMetaLabelStyle}" Text="実績終了" />
-                            <c:LeafDatePicker Placeholder="Actual end" SelectedDate="{Binding Task.ActualEndDate}" />
-                        </StackPanel>
+
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="MetaLabel" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock VerticalAlignment="Center"
+                                       Style="{StaticResource TaskPanelMetaLabelStyle}"
+                                       Text="期限" />
+                            <c:LeafDatePicker Grid.Column="1"
+                                              HorizontalAlignment="Left"
+                                              Placeholder="Set deadline"
+                                              SelectedDate="{Binding Task.Deadline}" />
+                        </Grid>
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="MetaLabel" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock VerticalAlignment="Center"
+                                       Style="{StaticResource TaskPanelMetaLabelStyle}"
+                                       Text="実績開始" />
+                            <c:LeafDatePicker Grid.Column="1"
+                                              HorizontalAlignment="Left"
+                                              Placeholder="Actual start"
+                                              SelectedDate="{Binding Task.ActualStartDate}" />
+                        </Grid>
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="MetaLabel" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock VerticalAlignment="Center"
+                                       Style="{StaticResource TaskPanelMetaLabelStyle}"
+                                       Text="実績終了" />
+                            <c:LeafDatePicker Grid.Column="1"
+                                              HorizontalAlignment="Left"
+                                              Placeholder="Actual end"
+                                              SelectedDate="{Binding Task.ActualEndDate}" />
+                        </Grid>
 
                         <Separator Margin="0,0,0,16" Background="{DynamicResource OutlineBaseBrush}" />
 

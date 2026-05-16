@@ -80,7 +80,7 @@
 
     <Style x:Key="SmallIconPathStyle"
            BasedOn="{StaticResource IconPathStyle}"
-        TargetType="Path">
+           TargetType="Path">
         <Setter Property="Width" Value="12" />
         <Setter Property="Height" Value="12" />
     </Style>
