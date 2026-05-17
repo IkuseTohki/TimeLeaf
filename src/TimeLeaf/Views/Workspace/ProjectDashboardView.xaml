@@ -107,7 +107,7 @@
                 <StackPanel Margin="{StaticResource ContentRightMargin}">
                     <Grid Margin="{StaticResource ContentLabelMargin}">
                         <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                            <Path Margin="0,0,8,0"
+                            <Path Margin="{StaticResource IconRightMargin}"
                                   VerticalAlignment="Center"
                                   Data="{StaticResource MilestoneIconGeometry}"
                                   Style="{DynamicResource IconPathStyle}" />
@@ -116,15 +116,15 @@
                                        Style="{StaticResource DashboardSectionHeaderStyle}"
                                        Text="マイルストーン" />
                         </StackPanel>
-                        <Button Command="{Binding AddMilestoneCommand}"
+                        <Button HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                Command="{Binding AddMilestoneCommand}"
                                 Style="{StaticResource DashboardAddMilestoneButtonStyle}"
                                 ToolTip="マイルストーン追加"
                                 Visibility="{Binding IsAssignedToMe, Converter={StaticResource BooleanToVisibilityConverter}}">
-                            <Path Width="10"
-                                  Height="10"
-                                  Data="{StaticResource AddIconGeometry}"
+                            <Path Data="{StaticResource AddIconGeometry}"
                                   Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
-                                  Stretch="Uniform" />
+                                  Style="{DynamicResource SmallIconPathStyle}" />
                         </Button>
                     </Grid>
                     <Border Style="{StaticResource DashboardCardStyle}">
@@ -167,7 +167,7 @@
                 <StackPanel>
                     <Grid Margin="{StaticResource ContentLabelMargin}">
                         <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                            <TextBlock Margin="0,0,8,0"
+                            <TextBlock Margin="{StaticResource IconRightMargin}"
                                        VerticalAlignment="Center"
                                        Style="{StaticResource IconTextStyle}"
                                        Text="🚨" />

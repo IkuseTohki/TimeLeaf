@@ -35,6 +35,7 @@
     <Thickness x:Key="FormSectionMargin">0,0,0,24</Thickness>
 
     <!-- 項目間の余白 -->
+    <Thickness x:Key="IconRightMargin">0,0,8,0</Thickness>
     <Thickness x:Key="ContentRightMargin">0,0,12,0</Thickness>
     <Thickness x:Key="ContentBottomMargin">0,0,0,20</Thickness>
     <Thickness x:Key="ContentLabelMargin">0,0,0,8</Thickness>
