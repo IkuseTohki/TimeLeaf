@@ -11,29 +11,26 @@
              mc:Ignorable="d">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Style="{StaticResource ViewMainContainerStyle}">
-            <!-- プロジェクト説明 -->
-            <Border Margin="0,0,0,20" Style="{StaticResource DashboardCardStyle}">
-                <StackPanel>
-                    <TextBlock Style="{StaticResource DashboardSectionHeaderStyle}" Text="プロジェクトについて" />
-                    <TextBlock Style="{StaticResource DashboardDescriptionTextStyle}" Text="{Binding Description}" />
-                </StackPanel>
-            </Border>
+            <!-- プロジェクト概要 -->
+            <StackPanel Margin="{StaticResource ContentBottomMargin}" >
+                <TextBlock Style="{StaticResource DashboardDescriptionTextStyle}" Text="{Binding Description}" />
+            </StackPanel>
 
             <!-- 統計情報 (Stats) -->
-            <UniformGrid Margin="0,0,0,20" Columns="4">
-                <Border Style="{StaticResource DashboardStatsCardStyle}">
+            <UniformGrid Margin="{StaticResource ContentBottomMargin}" Columns="4">
+                <Border Margin="{StaticResource ContentRightMargin}" Style="{StaticResource SurfaceCardStyle}">
                     <StackPanel>
                         <TextBlock Style="{StaticResource StatsLabelStyle}" Text="全タスク" />
                         <TextBlock Style="{StaticResource StatsValueStyle}" Text="{Binding TotalTaskCount}" />
                     </StackPanel>
                 </Border>
-                <Border Style="{StaticResource DashboardStatsCardStyle}">
+                <Border Margin="{StaticResource ContentRightMargin}" Style="{StaticResource SurfaceCardStyle}">
                     <StackPanel>
                         <TextBlock Style="{StaticResource StatsLabelStyle}" Text="完了済み" />
                         <TextBlock Style="{StaticResource StatsValueStyle}" Text="{Binding CompletedTaskCount}" />
                     </StackPanel>
                 </Border>
-                <Border Style="{StaticResource DashboardStatsCardStyle}">
+                <Border Margin="{StaticResource ContentRightMargin}" Style="{StaticResource SurfaceCardStyle}">
                     <StackPanel>
                         <TextBlock Style="{StaticResource StatsLabelStyle}" Text="進捗率" />
                         <TextBlock Style="{StaticResource StatsValueStyle}">
@@ -45,7 +42,7 @@
                         </TextBlock>
                     </StackPanel>
                 </Border>
-                <Border Style="{StaticResource DashboardCardStyle}">
+                <Border Style="{StaticResource SurfaceCardStyle}">
                     <StackPanel>
                         <TextBlock Style="{StaticResource StatsLabelStyle}" Text="実績工数" />
                         <TextBlock Style="{StaticResource StatsValueStyle}">
@@ -59,76 +56,103 @@
                 </Border>
             </UniformGrid>
 
-            <!-- マイルストーン -->
-            <StackPanel>
-                <Grid Margin="0,0,0,12">
-                    <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                        <Path Width="16"
-                              Height="16"
-                              Margin="0,0,8,0"
-                              Data="{StaticResource MilestoneIconGeometry}"
-                              Fill="{DynamicResource BrandPrimaryBrush}"
-                              Stretch="Uniform" />
-                        <TextBlock Margin="0"
-                                   VerticalAlignment="Center"
-                                   Style="{StaticResource DashboardSectionHeaderStyle}"
-                                   Text="マイルストーン" />
-                    </StackPanel>
-                    <Button Command="{Binding AddMilestoneCommand}"
-                            Style="{StaticResource DashboardAddMilestoneButtonStyle}"
-                            ToolTip="マイルストーン追加"
-                            Visibility="{Binding IsAssignedToMe, Converter={StaticResource BooleanToVisibilityConverter}}">
-                        <Path Width="10"
-                              Height="10"
-                              Data="{StaticResource AddIconGeometry}"
-                              Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
-                              Stretch="Uniform" />
-                    </Button>
-                </Grid>
-                <Border Padding="16,16,16,4" Style="{StaticResource DashboardCardStyle}">
-                    <ItemsControl ItemsSource="{Binding Milestones}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="16" />
-                                    </Grid.RowDefinitions>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="20" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
+            <!-- マイルストーンと期限タスク -->
+            <UniformGrid Columns="2">
+                <StackPanel Margin="{StaticResource ContentRightMargin}">
+                    <Grid Margin="{StaticResource ContentLabelMargin}">
+                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                            <Path Margin="0,0,8,0"
+                                  VerticalAlignment="Center"
+                                  Data="{StaticResource MilestoneIconGeometry}"
+                                  Style="{DynamicResource IconPathStyle}" />
+                            <TextBlock Margin="0"
+                                       VerticalAlignment="Center"
+                                       Style="{StaticResource DashboardSectionHeaderStyle}"
+                                       Text="マイルストーン" />
+                        </StackPanel>
+                        <Button Command="{Binding AddMilestoneCommand}"
+                                Style="{StaticResource DashboardAddMilestoneButtonStyle}"
+                                ToolTip="マイルストーン追加"
+                                Visibility="{Binding IsAssignedToMe, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <Path Width="10"
+                                  Height="10"
+                                  Data="{StaticResource AddIconGeometry}"
+                                  Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                  Stretch="Uniform" />
+                        </Button>
+                    </Grid>
+                    <Border Padding="16,16,16,4" Style="{StaticResource SurfaceCardStyle}">
+                        <ItemsControl ItemsSource="{Binding Milestones}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="16" />
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="20" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Rectangle Grid.RowSpan="3"
+                                                   Grid.Column="0"
+                                                   Style="{StaticResource HomeMilestoneTimelineLineStyle}" />
+                                        <StackPanel Grid.Row="0"
+                                                    Grid.Column="1"
+                                                    Margin="8,0,0,2"
+                                                    Orientation="Horizontal">
+                                            <TextBlock Style="{StaticResource HomeMilestoneDateStyle}" Text="{Binding Date, StringFormat={}{0:MM/dd (ddd)}}" />
+                                        </StackPanel>
+                                        <Ellipse Grid.Row="1"
+                                                 Grid.Column="0"
+                                                 Style="{StaticResource HomeMilestoneTimelineDotStyle}" />
+                                        <TextBlock Grid.Row="1"
+                                                   Grid.Column="1"
+                                                   Style="{StaticResource HomeMilestoneLabelStyle}"
+                                                   Text="{Binding Label}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Border>
+                </StackPanel>
 
-                                    <!-- タイムラインの縦線 -->
-                                    <Rectangle Grid.RowSpan="3"
-                                               Grid.Column="0"
-                                               Style="{StaticResource HomeMilestoneTimelineLineStyle}" />
-
-                                    <!-- 1行目: 日付(曜日) -->
-                                    <StackPanel Grid.Row="0"
-                                                Grid.Column="1"
-                                                Margin="8,0,0,2"
-                                                Orientation="Horizontal">
-                                        <TextBlock Style="{StaticResource HomeMilestoneDateStyle}" Text="{Binding Date, StringFormat={}{0:MM/dd (ddd)}}" />
-                                    </StackPanel>
-
-                                    <!-- タイムラインの丸（ドット） -->
-                                    <Ellipse Grid.Row="1"
-                                             Grid.Column="0"
-                                             Style="{StaticResource HomeMilestoneTimelineDotStyle}" />
-
-                                    <!-- 2行目: マイルストーン名 -->
-                                    <TextBlock Grid.Row="1"
-                                               Grid.Column="1"
-                                               Style="{StaticResource HomeMilestoneLabelStyle}"
-                                               Text="{Binding Label}" />
-                                </Grid>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </Border>
-            </StackPanel>
+                <StackPanel>
+                    <Grid Margin="{StaticResource ContentLabelMargin}">
+                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                            <TextBlock Margin="0,0,8,0"
+                                       VerticalAlignment="Center"
+                                       Style="{StaticResource IconTextStyle}"
+                                       Text="🚨" />
+                            <TextBlock Margin="0"
+                                       VerticalAlignment="Center"
+                                       Style="{StaticResource DashboardSectionHeaderStyle}"
+                                       Text="期限が近いタスク" />
+                        </StackPanel>
+                    </Grid>
+                    <Border Padding="{StaticResource CardPadding}" Style="{StaticResource SurfaceCardStyle}">
+                        <ItemsControl ItemsSource="{Binding UpcomingTasks}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Style="{StaticResource HomeDeadlineItemStyle}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                                   Text="{Binding Name}" />
+                                        <TextBlock Grid.Column="1"
+                                                   Foreground="{DynamicResource WarningBrush}"
+                                                   Text="{Binding Deadline, StringFormat={}{0:MM/dd}}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Border>
+                </StackPanel>
+            </UniformGrid>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

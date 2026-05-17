@@ -51,13 +51,6 @@
         <Setter Property="FontSize" Value="15" />
     </Style>
 
-    <!-- ダッシュボード：カードの基本スタイル (OrganicCardStyle + Padding) -->
-    <Style x:Key="DashboardCardStyle"
-           BasedOn="{StaticResource OrganicCardStyle}"
-           TargetType="Border">
-        <Setter Property="Padding" Value="16" />
-    </Style>
-
     <!-- ダッシュボード：プロジェクト説明テキストのスタイル -->
     <Style x:Key="DashboardDescriptionTextStyle"
            BasedOn="{StaticResource LabelBaseStyle}"
@@ -67,13 +60,6 @@
         <Setter Property="FontWeight" Value="Normal" />
         <Setter Property="LineHeight" Value="20" />
         <Setter Property="TextWrapping" Value="Wrap" />
-    </Style>
-
-    <!-- ダッシュボード：統計情報カードのスタイル (DashboardCardStyle + Margin) -->
-    <Style x:Key="DashboardStatsCardStyle"
-           BasedOn="{StaticResource DashboardCardStyle}"
-           TargetType="Border">
-        <Setter Property="Margin" Value="0,0,12,0" />
     </Style>
 
     <!-- ダッシュボード：マイルストーン追加ボタンのスタイル -->

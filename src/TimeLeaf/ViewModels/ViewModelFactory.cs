@@ -121,6 +121,7 @@ public class ViewModelFactory : IViewModelFactory
         return new ProjectDashboardViewModel(
             projectViewModel,
             _serviceProvider.GetRequiredService<IAddMilestoneUseCase>(),
+            _serviceProvider.GetRequiredService<IGetProjectUpcomingDeadlinesUseCase>(),
             _serviceProvider.GetRequiredService<IDialogService>(),
             this,
             _serviceProvider.GetRequiredService<ILogger<ProjectDashboardViewModel>>()

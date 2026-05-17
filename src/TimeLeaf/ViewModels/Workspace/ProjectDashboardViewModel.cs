@@ -16,6 +16,7 @@ public partial class ProjectDashboardViewModel : ObservableObject
 {
     private readonly ProjectViewModel _projectViewModel;
     private readonly IAddMilestoneUseCase _addMilestoneUseCase;
+    private readonly IGetProjectUpcomingDeadlinesUseCase _getProjectUpcomingDeadlinesUseCase;
     private readonly IDialogService _dialogService;
     private readonly IViewModelFactory _viewModelFactory;
     private readonly ILogger<ProjectDashboardViewModel> _logger;
@@ -23,6 +24,7 @@ public partial class ProjectDashboardViewModel : ObservableObject
     public string ProjectName => _projectViewModel.Name;
     public string Description => _projectViewModel.Description;
     public ObservableCollection<Milestone> Milestones => _projectViewModel.Milestones;
+    public ObservableCollection<ProjectTask> UpcomingTasks { get; } = new();
 
     public int TotalTaskCount => _projectViewModel.TotalTaskCount;
     public int CompletedTaskCount => _projectViewModel.CompletedTaskCount;
@@ -35,6 +37,7 @@ public partial class ProjectDashboardViewModel : ObservableObject
     public ProjectDashboardViewModel(
         ProjectViewModel projectViewModel,
         IAddMilestoneUseCase addMilestoneUseCase,
+        IGetProjectUpcomingDeadlinesUseCase getProjectUpcomingDeadlinesUseCase,
         IDialogService dialogService,
         IViewModelFactory viewModelFactory,
         ILogger<ProjectDashboardViewModel> logger
@@ -42,9 +45,22 @@ public partial class ProjectDashboardViewModel : ObservableObject
     {
         _projectViewModel = projectViewModel;
         _addMilestoneUseCase = addMilestoneUseCase;
+        _getProjectUpcomingDeadlinesUseCase = getProjectUpcomingDeadlinesUseCase;
         _dialogService = dialogService;
         _viewModelFactory = viewModelFactory;
         _logger = logger;
+
+        LoadUpcomingTasks();
+    }
+
+    private void LoadUpcomingTasks()
+    {
+        UpcomingTasks.Clear();
+        var tasks = _getProjectUpcomingDeadlinesUseCase.Execute(_projectViewModel.Model, 3);
+        foreach (var task in tasks)
+        {
+            UpcomingTasks.Add(task);
+        }
     }
 
     [RelayCommand]

@@ -295,6 +295,7 @@ public partial class App : Application
         services.AddTransient<IDeleteContainerUseCase, DeleteContainerUseCase>();
         services.AddTransient<IMoveTaskUseCase, MoveTaskUseCase>();
         services.AddTransient<ICheckTaskDeadlinesUseCase, CheckTaskDeadlinesUseCase>();
+        services.AddTransient<IGetProjectUpcomingDeadlinesUseCase, GetProjectUpcomingDeadlinesUseCase>();
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
         services.AddTransient<ISyncUserIdentityUseCase, SyncUserIdentityUseCase>();
         services.AddTransient<IJoinProjectUseCase, JoinProjectUseCase>();
