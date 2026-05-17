@@ -74,6 +74,12 @@
         <Setter Property="Foreground" Value="{DynamicResource BrandPrimaryBrush}" />
     </Style>
 
+    <Style x:Key="DashboardCardStyle"
+           BasedOn="{StaticResource OrganicCardStyle}"
+           TargetType="Border">
+        <Setter Property="Padding" Value="8" />
+    </Style>
+
     <!-- ====================================================================== -->
     <!-- Task Board & Detail Panel -->
     <!-- ====================================================================== -->
@@ -284,6 +290,7 @@
     <!-- ====================================================================== -->
     <!-- ProjectTasksView Specific Styles (Extracted for Workspace-wide use) -->
     <!-- ====================================================================== -->
+
     <Style x:Key="TaskContainerCardStyle" TargetType="Border">
         <Setter Property="Margin" Value="0,0,0,20" />
         <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />

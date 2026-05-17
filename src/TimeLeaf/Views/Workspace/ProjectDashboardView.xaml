@@ -12,47 +12,93 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Style="{StaticResource ViewMainContainerStyle}">
             <!-- プロジェクト概要 -->
-            <StackPanel Margin="{StaticResource ContentBottomMargin}" >
+            <StackPanel Margin="{StaticResource ContentBottomMargin}">
                 <TextBlock Style="{StaticResource DashboardDescriptionTextStyle}" Text="{Binding Description}" />
             </StackPanel>
 
             <!-- 統計情報 (Stats) -->
             <UniformGrid Margin="{StaticResource ContentBottomMargin}" Columns="4">
-                <Border Margin="{StaticResource ContentRightMargin}" Style="{StaticResource SurfaceCardStyle}">
-                    <StackPanel>
-                        <TextBlock Style="{StaticResource StatsLabelStyle}" Text="全タスク" />
-                        <TextBlock Style="{StaticResource StatsValueStyle}" Text="{Binding TotalTaskCount}" />
-                    </StackPanel>
+                <Border Margin="{StaticResource ContentRightMargin}" Style="{StaticResource DashboardCardStyle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Path Grid.Column="0"
+                              Margin="{StaticResource ContentRightMargin}"
+                              VerticalAlignment="Center"
+                              Data="{StaticResource TaskIconGeometry}"
+                              Style="{StaticResource BigIconPathStyle}" />
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Style="{StaticResource StatsLabelStyle}" Text="全タスク" />
+                            <TextBlock Style="{StaticResource StatsValueStyle}" Text="{Binding TotalTaskCount}" />
+                        </StackPanel>
+                    </Grid>
                 </Border>
-                <Border Margin="{StaticResource ContentRightMargin}" Style="{StaticResource SurfaceCardStyle}">
-                    <StackPanel>
-                        <TextBlock Style="{StaticResource StatsLabelStyle}" Text="完了済み" />
-                        <TextBlock Style="{StaticResource StatsValueStyle}" Text="{Binding CompletedTaskCount}" />
-                    </StackPanel>
+                <Border Margin="{StaticResource ContentRightMargin}" Style="{StaticResource DashboardCardStyle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Path Grid.Column="0"
+                              Margin="{StaticResource ContentRightMargin}"
+                              VerticalAlignment="Center"
+                              Data="{StaticResource CompletedIconGeometry}"
+                              Style="{StaticResource BigIconPathStyle}" />
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Style="{StaticResource StatsLabelStyle}" Text="完了済み" />
+                            <TextBlock Style="{StaticResource StatsValueStyle}" Text="{Binding CompletedTaskCount}" />
+                        </StackPanel>
+                    </Grid>
                 </Border>
-                <Border Margin="{StaticResource ContentRightMargin}" Style="{StaticResource SurfaceCardStyle}">
-                    <StackPanel>
-                        <TextBlock Style="{StaticResource StatsLabelStyle}" Text="進捗率" />
-                        <TextBlock Style="{StaticResource StatsValueStyle}">
-                            <TextBlock.Text>
-                                <MultiBinding Converter="{StaticResource StringFormatMultiConverter}" StringFormat="{}{0:F0}%">
-                                    <Binding Mode="OneWay" Path="CompletionPercentage" />
-                                </MultiBinding>
-                            </TextBlock.Text>
-                        </TextBlock>
-                    </StackPanel>
+                <Border Margin="{StaticResource ContentRightMargin}" Style="{StaticResource DashboardCardStyle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <c:DonutChart Grid.Column="0"
+                                      Width="20"
+                                      Height="20"
+                                      Margin="{StaticResource ContentRightMargin}"
+                                      VerticalAlignment="Center"
+                                      StrokeThickness="3"
+                                      Value="{Binding CompletionPercentage}" />
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Style="{StaticResource StatsLabelStyle}" Text="進捗率" />
+                            <TextBlock Style="{StaticResource StatsValueStyle}">
+                                <TextBlock.Text>
+                                    <MultiBinding Converter="{StaticResource StringFormatMultiConverter}" StringFormat="{}{0:F0}%">
+                                        <Binding Mode="OneWay" Path="CompletionPercentage" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </StackPanel>
+                    </Grid>
                 </Border>
-                <Border Style="{StaticResource SurfaceCardStyle}">
-                    <StackPanel>
-                        <TextBlock Style="{StaticResource StatsLabelStyle}" Text="実績工数" />
-                        <TextBlock Style="{StaticResource StatsValueStyle}">
-                            <TextBlock.Text>
-                                <MultiBinding Converter="{StaticResource StringFormatMultiConverter}" StringFormat="{}{0:F1}h">
-                                    <Binding Mode="OneWay" Path="TotalActualCost" />
-                                </MultiBinding>
-                            </TextBlock.Text>
-                        </TextBlock>
-                    </StackPanel>
+                <Border Style="{StaticResource DashboardCardStyle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Path Grid.Column="0"
+                              Margin="{StaticResource ContentRightMargin}"
+                              VerticalAlignment="Center"
+                              Data="{StaticResource EffortIconGeometry}"
+                              Style="{StaticResource BigIconPathStyle}" />
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Style="{StaticResource StatsLabelStyle}" Text="実績工数" />
+                            <TextBlock Style="{StaticResource StatsValueStyle}">
+                                <TextBlock.Text>
+                                    <MultiBinding Converter="{StaticResource StringFormatMultiConverter}" StringFormat="{}{0:F1}h">
+                                        <Binding Mode="OneWay" Path="TotalActualCost" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </StackPanel>
+                    </Grid>
                 </Border>
             </UniformGrid>
 
@@ -81,7 +127,7 @@
                                   Stretch="Uniform" />
                         </Button>
                     </Grid>
-                    <Border Padding="16,16,16,4" Style="{StaticResource SurfaceCardStyle}">
+                    <Border Style="{StaticResource DashboardCardStyle}">
                         <ItemsControl ItemsSource="{Binding Milestones}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
@@ -131,7 +177,7 @@
                                        Text="期限が近いタスク" />
                         </StackPanel>
                     </Grid>
-                    <Border Padding="{StaticResource CardPadding}" Style="{StaticResource SurfaceCardStyle}">
+                    <Border Style="{StaticResource DashboardCardStyle}">
                         <ItemsControl ItemsSource="{Binding UpcomingTasks}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>

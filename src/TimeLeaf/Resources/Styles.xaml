@@ -83,6 +83,13 @@
         <Setter Property="Stretch" Value="Uniform" />
     </Style>
 
+    <Style x:Key="BigIconPathStyle"
+           BasedOn="{StaticResource IconPathStyle}"
+           TargetType="Path">
+        <Setter Property="Width" Value="20" />
+        <Setter Property="Height" Value="20" />
+    </Style>
+
     <Style x:Key="SmallIconPathStyle"
            BasedOn="{StaticResource IconPathStyle}"
            TargetType="Path">
