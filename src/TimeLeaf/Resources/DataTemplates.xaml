@@ -67,7 +67,7 @@
                 <DataGridTemplateColumn Width="Auto">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <CheckBox IsChecked="{Binding IsCompleted, Mode=OneWay}" Style="{StaticResource AllTasksFilterCheckBoxStyle}" />
+                            <CheckBox VerticalAlignment="Center" IsChecked="{Binding IsCompleted, Mode=OneWay}" Style="{StaticResource AllTasksFilterCheckBoxStyle}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -88,13 +88,25 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTextColumn Width="150"
-                                    Binding="{Binding ProjectName}"
-                                    Header="Project" />
+                <DataGridTemplateColumn Width="150" Header="Project">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock VerticalAlignment="Center"
+                                       Style="{StaticResource AllTasksPropertyValueStyle}"
+                                       Text="{Binding ProjectName}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
 
-                <DataGridTextColumn Width="120"
-                                    Binding="{Binding AssigneeName}"
-                                    Header="Assignee" />
+                <DataGridTemplateColumn Width="120" Header="Assignee">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock VerticalAlignment="Center"
+                                       Style="{StaticResource AllTasksPropertyValueStyle}"
+                                       Text="{Binding AssigneeName}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
 
                 <DataGridTemplateColumn Width="100" Header="Due Date">
                     <DataGridTemplateColumn.CellTemplate>
@@ -102,7 +114,6 @@
                             <TextBlock VerticalAlignment="Center" Text="{Binding Deadline, StringFormat={}{0:MMM dd\, yyyy}}">
                                 <TextBlock.Style>
                                     <Style BasedOn="{StaticResource AllTasksPropertyValueStyle}" TargetType="TextBlock">
-                                        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Deadline, Converter={StaticResource DeadlineToBrushConverter}}" Value="Overdue">
                                                 <Setter Property="Foreground" Value="{DynamicResource DeadlineOverdueBrush}" />
@@ -156,7 +167,6 @@
                             <TextBlock VerticalAlignment="Center" Text="{Binding Status}">
                                 <TextBlock.Style>
                                     <Style BasedOn="{StaticResource AllTasksPropertyValueStyle}" TargetType="TextBlock">
-                                        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Status}" Value="{x:Static me:TaskStatus.InProgress}">
                                                 <Setter Property="Foreground" Value="{DynamicResource StatusInProgressBrush}" />
