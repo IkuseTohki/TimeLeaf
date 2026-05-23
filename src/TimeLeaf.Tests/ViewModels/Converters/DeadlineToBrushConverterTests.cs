@@ -18,65 +18,64 @@ public class DeadlineToBrushConverterTests
     }
 
     [TestMethod]
-    public void Convert_Overdue_ShouldReturnCrimson()
+    public void Convert_Overdue_ShouldReturnOverdue()
     {
         // Arrange
         var yesterday = DateTime.Today.AddDays(-1);
 
         // Act
-        var result = _converter.Convert(yesterday, typeof(Brush), null!, CultureInfo.InvariantCulture);
+        var result = _converter.Convert(yesterday, typeof(string), null!, CultureInfo.InvariantCulture);
 
         // Assert
-        Assert.AreEqual(Brushes.Crimson, result);
+        Assert.AreEqual("Overdue", result);
     }
 
     [TestMethod]
-    public void Convert_Today_ShouldReturnOrangeRed()
+    public void Convert_Today_ShouldReturnToday()
     {
         // Arrange
         var today = DateTime.Today;
 
         // Act
-        var result = _converter.Convert(today, typeof(Brush), null!, CultureInfo.InvariantCulture);
+        var result = _converter.Convert(today, typeof(string), null!, CultureInfo.InvariantCulture);
 
         // Assert
-        Assert.AreEqual(Brushes.OrangeRed, result);
+        Assert.AreEqual("Today", result);
     }
 
     [TestMethod]
-    public void Convert_NearFuture_ShouldReturnOrange()
+    public void Convert_NearFuture_ShouldReturnNear()
     {
         // Arrange
         var threeDaysLater = DateTime.Today.AddDays(3);
 
         // Act
-        var result = _converter.Convert(threeDaysLater, typeof(Brush), null!, CultureInfo.InvariantCulture);
+        var result = _converter.Convert(threeDaysLater, typeof(string), null!, CultureInfo.InvariantCulture);
 
         // Assert
-        Assert.AreEqual(Brushes.Orange, result);
+        Assert.AreEqual("Near", result);
     }
 
     [TestMethod]
-    public void Convert_FarFuture_ShouldReturnBlack_InUnitTestEnvironment()
+    public void Convert_FarFuture_ShouldReturnFuture()
     {
         // Arrange
         var nextWeek = DateTime.Today.AddDays(7);
 
         // Act
-        var result = _converter.Convert(nextWeek, typeof(Brush), null!, CultureInfo.InvariantCulture);
+        var result = _converter.Convert(nextWeek, typeof(string), null!, CultureInfo.InvariantCulture);
 
         // Assert
-        // ユニットテスト環境では Application.Current が null のため、?? Brushes.Black が適用される
-        Assert.AreEqual(Brushes.Black, result);
+        Assert.AreEqual("Future", result);
     }
 
     [TestMethod]
-    public void Convert_InvalidValue_ShouldReturnBlack_InUnitTestEnvironment()
+    public void Convert_InvalidValue_ShouldReturnNone()
     {
         // Act
-        var result = _converter.Convert("NotADateTime", typeof(Brush), null!, CultureInfo.InvariantCulture);
+        var result = _converter.Convert("NotADateTime", typeof(string), null!, CultureInfo.InvariantCulture);
 
         // Assert
-        Assert.AreEqual(Brushes.Black, result);
+        Assert.AreEqual("None", result);
     }
 }

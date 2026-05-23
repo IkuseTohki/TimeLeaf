@@ -286,7 +286,7 @@
                     <Button Margin="0,0,8,0"
                             Command="{Binding DeleteCommand}"
                             Style="{StaticResource IconButton}">
-                        <Path Data="{StaticResource DeleteIconGeometry}" Style="{StaticResource IconPathStyle}" />
+                        <Path Data="{StaticResource DeleteIconGeometry}" Style="{StaticResource IconPathBrandStyle}" />
                     </Button>
                     <Button MinWidth="80"
                             Margin="0,0,8,0"

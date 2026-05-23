@@ -28,7 +28,7 @@
                               Margin="{StaticResource ContentRightMargin}"
                               VerticalAlignment="Center"
                               Data="{StaticResource TaskIconGeometry}"
-                              Style="{StaticResource BigIconPathStyle}" />
+                              Style="{StaticResource LargeIconPathBrandStyle}" />
                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
                             <TextBlock Style="{StaticResource StatsLabelStyle}" Text="全タスク" />
                             <TextBlock Style="{StaticResource StatsValueStyle}" Text="{Binding TotalTaskCount}" />
@@ -45,7 +45,7 @@
                               Margin="{StaticResource ContentRightMargin}"
                               VerticalAlignment="Center"
                               Data="{StaticResource CompletedIconGeometry}"
-                              Style="{StaticResource BigIconPathStyle}" />
+                              Style="{StaticResource LargeIconPathBrandStyle}" />
                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
                             <TextBlock Style="{StaticResource StatsLabelStyle}" Text="完了済み" />
                             <TextBlock Style="{StaticResource StatsValueStyle}" Text="{Binding CompletedTaskCount}" />
@@ -87,7 +87,7 @@
                               Margin="{StaticResource ContentRightMargin}"
                               VerticalAlignment="Center"
                               Data="{StaticResource EffortIconGeometry}"
-                              Style="{StaticResource BigIconPathStyle}" />
+                              Style="{StaticResource LargeIconPathBrandStyle}" />
                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
                             <TextBlock Style="{StaticResource StatsLabelStyle}" Text="実績工数" />
                             <TextBlock Style="{StaticResource StatsValueStyle}">
@@ -110,7 +110,7 @@
                             <Path Margin="{StaticResource IconRightMargin}"
                                   VerticalAlignment="Center"
                                   Data="{StaticResource MilestoneIconGeometry}"
-                                  Style="{DynamicResource IconPathStyle}" />
+                                  Style="{DynamicResource IconPathBrandStyle}" />
                             <TextBlock Margin="0"
                                        VerticalAlignment="Center"
                                        Style="{StaticResource DashboardSectionHeaderStyle}"
@@ -124,7 +124,7 @@
                                 Visibility="{Binding IsAssignedToMe, Converter={StaticResource BooleanToVisibilityConverter}}">
                             <Path Data="{StaticResource AddIconGeometry}"
                                   Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
-                                  Style="{DynamicResource SmallIconPathStyle}" />
+                                  Style="{DynamicResource SmallIconPathBrandStyle}" />
                         </Button>
                     </Grid>
                     <Border Style="{StaticResource DashboardCardStyle}">

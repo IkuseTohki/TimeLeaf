@@ -13,4 +13,22 @@
 
     <SolidColorBrush x:Key="GlobalSidebarBackgroundBrush" Color="{StaticResource SurfaceLayer1Color}" />
 
+    <!-- Semantic Brushes for Tasks -->
+    <SolidColorBrush x:Key="PriorityHighBrush" Color="#FF5252" />
+    <SolidColorBrush x:Key="PriorityMediumBrush" Color="#81C784" />
+    <SolidColorBrush x:Key="PriorityLowBrush" Color="#94A3B8" />
+
+    <SolidColorBrush x:Key="StatusCompletedBrush" Color="#94A3B8" />
+    <SolidColorBrush x:Key="StatusInReviewBrush" Color="#B39DDB" />
+    <SolidColorBrush x:Key="StatusInProgressBrush" Color="{StaticResource BrandPrimaryColor}" />
+
+    <SolidColorBrush x:Key="DeadlineOverdueBrush" Color="#FF5252" />
+    <SolidColorBrush x:Key="DeadlineTodayBrush" Color="#FFAB40" />
+    <SolidColorBrush x:Key="DeadlineNearBrush" Color="#FFD740" />
+
+    <SolidColorBrush x:Key="ProgressBarBlankBrush" Color="#3E3E42" />
+    <SolidColorBrush x:Key="FlowBackgroundBrush" Color="#1E293B" />
+
+    <SolidColorBrush x:Key="AllTasksProjectCardBackgroundBrush" Color="#1E293B" />
+
 </ResourceDictionary>

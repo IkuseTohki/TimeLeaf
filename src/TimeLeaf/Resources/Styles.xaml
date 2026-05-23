@@ -11,7 +11,7 @@
     <!-- オーガニックなカード（Border）スタイル -->
     <Style x:Key="OrganicCardStyle" TargetType="Border">
         <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />
-        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="CornerRadius" Value="{DynamicResource CardCornerRadius}" />
         <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Effect">
@@ -74,7 +74,7 @@
         <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
     </Style>
 
-    <Style x:Key="IconPathStyle" TargetType="Path">
+    <Style x:Key="IconPathBrandStyle" TargetType="Path">
         <Setter Property="Fill" Value="Transparent" />
         <Setter Property="Stroke" Value="{DynamicResource BrandPrimaryBrush}" />
         <Setter Property="StrokeThickness" Value="1" />
@@ -83,15 +83,35 @@
         <Setter Property="Stretch" Value="Uniform" />
     </Style>
 
-    <Style x:Key="BigIconPathStyle"
-           BasedOn="{StaticResource IconPathStyle}"
+    <Style x:Key="LargeIconPathBrandStyle"
+           BasedOn="{StaticResource IconPathBrandStyle}"
            TargetType="Path">
         <Setter Property="Width" Value="20" />
         <Setter Property="Height" Value="20" />
     </Style>
 
-    <Style x:Key="SmallIconPathStyle"
-           BasedOn="{StaticResource IconPathStyle}"
+    <Style x:Key="SmallIconPathBrandStyle"
+           BasedOn="{StaticResource IconPathBrandStyle}"
+           TargetType="Path">
+        <Setter Property="Width" Value="12" />
+        <Setter Property="Height" Value="12" />
+    </Style>
+
+    <Style x:Key="IconPathSecondaryStyle"
+           BasedOn="{StaticResource IconPathBrandStyle}"
+           TargetType="Path">
+        <Setter Property="Stroke" Value="{DynamicResource TextSecondaryBrush}" />
+    </Style>
+
+    <Style x:Key="LargeIconPathSecondaryStyle"
+           BasedOn="{StaticResource IconPathSecondaryStyle}"
+           TargetType="Path">
+        <Setter Property="Width" Value="20" />
+        <Setter Property="Height" Value="20" />
+    </Style>
+
+    <Style x:Key="SmallIconPathSecondaryStyle"
+           BasedOn="{StaticResource IconPathSecondaryStyle}"
            TargetType="Path">
         <Setter Property="Width" Value="12" />
         <Setter Property="Height" Value="12" />
@@ -317,7 +337,7 @@
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="FontSize" Value="11" />
         <Setter Property="FontWeight" Value="Bold" />
-        <Setter Property="Foreground" Value="White" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandForegroundBrush}" />
     </Style>
 
     <Style x:Key="UserMenuNameTextStyle" TargetType="TextBlock">
@@ -498,178 +518,6 @@
         <Setter Property="Margin" Value="0,0,0,12" />
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="FontSize" Value="36" />
-    </Style>
-
-    <!-- ====================================================================== -->
-    <!-- All Tasks View Components -->
-    <!-- ====================================================================== -->
-
-    <Style x:Key="AllTasksTimelineGroupIconBorderStyle" TargetType="Border">
-        <Setter Property="Width" Value="48" />
-        <Setter Property="Height" Value="48" />
-        <Setter Property="Background" Value="White" />
-        <Setter Property="CornerRadius" Value="12" />
-        <Setter Property="Effect" Value="{StaticResource AllTasksShadowEffect}" />
-    </Style>
-
-    <Style x:Key="AllTasksTimelineVerticalLineStyle" TargetType="Rectangle">
-        <Setter Property="Width" Value="2" />
-        <Setter Property="Margin" Value="23,20,0,-20" />
-        <Setter Property="HorizontalAlignment" Value="Left" />
-        <Setter Property="Fill" Value="{DynamicResource BrandPrimaryBrush}" />
-        <Setter Property="Opacity" Value="0.1" />
-    </Style>
-
-    <Style x:Key="AllTasksTimelineMarkerStyle" TargetType="Ellipse">
-        <Setter Property="Width" Value="12" />
-        <Setter Property="Height" Value="12" />
-        <Setter Property="Margin" Value="18,14,0,0" />
-        <Setter Property="HorizontalAlignment" Value="Left" />
-        <Setter Property="VerticalAlignment" Value="Top" />
-        <Setter Property="Fill" Value="{DynamicResource BrandPrimaryBrush}" />
-        <Setter Property="Stroke" Value="White" />
-        <Setter Property="StrokeThickness" Value="2" />
-    </Style>
-
-    <Style x:Key="AllTasksTimelineCardStyle" TargetType="Border">
-        <Setter Property="Margin" Value="40,0,0,0" />
-        <Setter Property="Padding" Value="20" />
-        <Setter Property="Background" Value="White" />
-        <Setter Property="CornerRadius" Value="20" />
-        <Setter Property="Effect" Value="{StaticResource AllTasksShadowEffect}" />
-    </Style>
-
-    <Style x:Key="AllTasksTimelineTimeTextStyle"
-           BasedOn="{StaticResource MetaBaseStyle}"
-           TargetType="TextBlock">
-        <Setter Property="FontSize" Value="10" />
-        <Setter Property="FontWeight" Value="Bold" />
-        <Setter Property="Opacity" Value="0.5" />
-    </Style>
-
-    <Style x:Key="AllTasksProjectCardStyle" TargetType="Border">
-        <Setter Property="Width" Value="340" />
-        <Setter Property="Margin" Value="0,0,24,24" />
-        <Setter Property="Padding" Value="24" />
-        <Setter Property="Background" Value="White" />
-        <Setter Property="CornerRadius" Value="24" />
-        <Setter Property="Effect" Value="{StaticResource AllTasksShadowEffect}" />
-    </Style>
-
-    <Style x:Key="AllTasksProjectIconBorderStyle" TargetType="Border">
-        <Setter Property="Width" Value="48" />
-        <Setter Property="Height" Value="48" />
-        <Setter Property="Background" Value="{DynamicResource BrandPrimaryHoverBrush}" />
-        <Setter Property="CornerRadius" Value="12" />
-        <Setter Property="HorizontalAlignment" Value="Left" />
-    </Style>
-
-    <Style x:Key="AllTasksProjectProgressBarStyle" TargetType="ProgressBar">
-        <Setter Property="Height" Value="4" />
-        <Setter Property="Margin" Value="0,8,0,0" />
-    </Style>
-
-    <Style x:Key="AllTasksStatusIconStyle" TargetType="Border">
-        <Setter Property="Width" Value="32" />
-        <Setter Property="Height" Value="32" />
-        <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />
-        <Setter Property="CornerRadius" Value="16" />
-    </Style>
-
-    <Style x:Key="AllTasksTaskNameStyle"
-           BasedOn="{StaticResource HeaderBaseStyle}"
-           TargetType="TextBlock">
-        <Setter Property="FontSize" Value="13" />
-    </Style>
-
-    <Style x:Key="AllTasksProjectLabelStyle"
-           BasedOn="{StaticResource MetaBaseStyle}"
-           TargetType="TextBlock">
-        <Setter Property="FontWeight" Value="SemiBold" />
-        <Setter Property="FontSize" Value="9" />
-        <Setter Property="Foreground" Value="{DynamicResource BrandPrimaryBrush}" />
-        <Setter Property="Opacity" Value="0.8" />
-    </Style>
-
-    <Style x:Key="AllTasksPropertyLabelStyle"
-           BasedOn="{StaticResource MetaBaseStyle}"
-           TargetType="TextBlock" />
-
-    <Style x:Key="AllTasksPropertyValueStyle"
-           BasedOn="{StaticResource LabelBaseStyle}"
-           TargetType="TextBlock">
-        <Setter Property="Margin" Value="0,1,0,0" />
-        <Setter Property="FontSize" Value="11" />
-    </Style>
-
-    <Style x:Key="AllTasksFilterItemStyle" TargetType="FrameworkElement">
-        <Setter Property="Margin" Value="0,0,16,0" />
-        <Setter Property="VerticalAlignment" Value="Center" />
-    </Style>
-
-    <Style x:Key="AllTasksSearchBoxStyle"
-           BasedOn="{StaticResource SearchTextBoxStyle}"
-           TargetType="Control">
-        <Setter Property="Width" Value="200" />
-        <Setter Property="Margin" Value="0,0,16,0" />
-        <Setter Property="VerticalAlignment" Value="Center" />
-    </Style>
-
-    <Style x:Key="AllTasksFilterCheckBoxStyle"
-           BasedOn="{StaticResource FormCheckBoxStyle}"
-           TargetType="CheckBox">
-        <Setter Property="VerticalAlignment" Value="Center" />
-    </Style>
-
-    <Style x:Key="AllTasksGridIconStyle" TargetType="TextBlock">
-        <Setter Property="Margin" Value="0,0,12,0" />
-        <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="FontSize" Value="14" />
-    </Style>
-
-    <Style x:Key="AllTasksGridTaskNameStyle" TargetType="TextBlock">
-        <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="FontSize" Value="12" />
-        <Setter Property="FontWeight" Value="SemiBold" />
-    </Style>
-
-    <Style x:Key="AllTasksTaskOpenButtonStyle"
-           BasedOn="{StaticResource RoundButtonStyle}"
-           TargetType="Button">
-        <Setter Property="MinHeight" Value="{StaticResource ButtonHeightSmall}" />
-        <Setter Property="Margin" Value="16,0,0,0" />
-        <Setter Property="Padding" Value="8,2" />
-    </Style>
-
-    <Style x:Key="AllTasksTaskItemMainColumnStyle" TargetType="FrameworkElement">
-        <Setter Property="Margin" Value="20,0,0,0" />
-        <Setter Property="VerticalAlignment" Value="Center" />
-    </Style>
-
-    <Style x:Key="AllTasksTaskItemSubColumnStyle" TargetType="FrameworkElement">
-        <Setter Property="Margin" Value="16,0,0,0" />
-        <Setter Property="VerticalAlignment" Value="Center" />
-    </Style>
-
-    <Style x:Key="AllTasksDataGridRowStyle" TargetType="DataGridRow">
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="BorderThickness" Value="0,0,0,1" />
-        <Setter Property="BorderBrush" Value="{DynamicResource SurfaceLayer1Brush}" />
-        <Style.Resources>
-            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
-                             Opacity="0.1"
-                             Color="{Binding Source={StaticResource BrandPrimaryColor}}" />
-            <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}"
-                             Opacity="0.05"
-                             Color="{Binding Source={StaticResource BrandPrimaryColor}}" />
-            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="{Binding Source={StaticResource BrandPrimaryColor}}" />
-        </Style.Resources>
-        <Style.Triggers>
-            <Trigger Property="IsSelected" Value="True">
-                <Setter Property="Foreground" Value="{DynamicResource BrandPrimaryBrush}" />
-                <Setter Property="FontWeight" Value="SemiBold" />
-            </Trigger>
-        </Style.Triggers>
     </Style>
 
     <!-- ====================================================================== -->

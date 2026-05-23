@@ -5,10 +5,14 @@
                     xmlns:me="clr-namespace:TimeLeaf.Models.Enums"
                     xmlns:vm="clr-namespace:TimeLeaf.ViewModels">
 
-    <!-- 内部でのリソース解決のため Styles と Converters をマージ -->
+    <!-- 内部でのリソース解決のため各リソースをマージ -->
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="Converters.xaml" />
+        <ResourceDictionary Source="Layout.xaml" />
+        <ResourceDictionary Source="Typography.xaml" />
+        <ResourceDictionary Source="ControlStyles.xaml" />
         <ResourceDictionary Source="Styles.xaml" />
+        <ResourceDictionary Source="WorkspaceStyles.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <!-- ユーザーアバター表示用共通テンプレート -->
@@ -32,7 +36,7 @@
                        VerticalAlignment="Center"
                        FontSize="12"
                        FontWeight="Bold"
-                       Foreground="White"
+                       Foreground="{DynamicResource BrandForegroundBrush}"
                        Text="{Binding DisplayName[0], FallbackValue='?'}"
                        Visibility="{Binding Visibility, ElementName=AvatarImage, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
         </Grid>
@@ -95,10 +99,26 @@
                 <DataGridTemplateColumn Width="100" Header="Due Date">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock VerticalAlignment="Center"
-                                       Foreground="{Binding Deadline, Converter={StaticResource DeadlineToBrushConverter}}"
-                                       Style="{StaticResource AllTasksPropertyValueStyle}"
-                                       Text="{Binding Deadline, StringFormat={}{0:MMM dd\, yyyy}}" />
+                            <TextBlock VerticalAlignment="Center" Text="{Binding Deadline, StringFormat={}{0:MMM dd\, yyyy}}">
+                                <TextBlock.Style>
+                                    <Style BasedOn="{StaticResource AllTasksPropertyValueStyle}" TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Deadline, Converter={StaticResource DeadlineToBrushConverter}}" Value="Overdue">
+                                                <Setter Property="Foreground" Value="{DynamicResource DeadlineOverdueBrush}" />
+                                                <Setter Property="FontWeight" Value="Bold" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Deadline, Converter={StaticResource DeadlineToBrushConverter}}" Value="Today">
+                                                <Setter Property="Foreground" Value="{DynamicResource DeadlineTodayBrush}" />
+                                                <Setter Property="FontWeight" Value="Bold" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Deadline, Converter={StaticResource DeadlineToBrushConverter}}" Value="Near">
+                                                <Setter Property="Foreground" Value="{DynamicResource DeadlineNearBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -109,8 +129,21 @@
                             <StackPanel Orientation="Horizontal" Style="{StaticResource AllTasksFilterItemStyle}">
                                 <Ellipse Width="8"
                                          Height="8"
-                                         Margin="0,0,8,0"
-                                         Fill="{Binding PriorityBrush}" />
+                                         Margin="0,0,8,0">
+                                    <Ellipse.Style>
+                                        <Style TargetType="Ellipse">
+                                            <Setter Property="Fill" Value="{DynamicResource PriorityLowBrush}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Priority}" Value="{x:Static me:TaskPriority.High}">
+                                                    <Setter Property="Fill" Value="{DynamicResource PriorityHighBrush}" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Priority}" Value="{x:Static me:TaskPriority.Medium}">
+                                                    <Setter Property="Fill" Value="{DynamicResource PriorityMediumBrush}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Ellipse.Style>
+                                </Ellipse>
                                 <TextBlock Style="{StaticResource MetaBaseStyle}" Text="{Binding Priority}" />
                             </StackPanel>
                         </DataTemplate>
@@ -120,10 +153,24 @@
                 <DataGridTemplateColumn Width="100" Header="Status">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock VerticalAlignment="Center"
-                                       Foreground="{Binding StatusBrush}"
-                                       Style="{StaticResource AllTasksPropertyValueStyle}"
-                                       Text="{Binding Status}" />
+                            <TextBlock VerticalAlignment="Center" Text="{Binding Status}">
+                                <TextBlock.Style>
+                                    <Style BasedOn="{StaticResource AllTasksPropertyValueStyle}" TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Status}" Value="{x:Static me:TaskStatus.InProgress}">
+                                                <Setter Property="Foreground" Value="{DynamicResource StatusInProgressBrush}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Status}" Value="{x:Static me:TaskStatus.Completed}">
+                                                <Setter Property="Foreground" Value="{DynamicResource StatusCompletedBrush}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Status}" Value="{x:Static me:TaskStatus.InReview}">
+                                                <Setter Property="Foreground" Value="{DynamicResource StatusInReviewBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -136,7 +183,7 @@
         <ItemsControl ItemsSource="{Binding AllTasksView}">
             <ItemsControl.Template>
                 <ControlTemplate TargetType="ItemsControl">
-                    <ScrollViewer Padding="40,20">
+                    <ScrollViewer Padding="{StaticResource ViewOuterMargin}">
                         <ItemsPresenter />
                     </ScrollViewer>
                 </ControlTemplate>
@@ -149,17 +196,14 @@
                                 <Border Style="{StaticResource AllTasksTimelineGroupIconBorderStyle}">
                                     <TextBlock HorizontalAlignment="Center"
                                                VerticalAlignment="Center"
-                                               FontSize="24"
+                                               Style="{StaticResource TitleBaseStyle}"
                                                Text="📅" />
                                 </Border>
                                 <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
-                                    <TextBlock FontSize="20"
-                                               FontWeight="Bold"
-                                               Foreground="{DynamicResource BrandPrimaryBrush}"
+                                    <TextBlock Foreground="{DynamicResource BrandPrimaryBrush}"
+                                               Style="{StaticResource HeaderBaseStyle}"
                                                Text="{Binding Name}" />
-                                    <TextBlock Opacity="0.6"
-                                               Style="{StaticResource MetaBaseStyle}"
-                                               Text="Upcoming Milestones" />
+                                    <TextBlock Style="{StaticResource MetaBaseStyle}" Text="Upcoming Milestones" />
                                 </StackPanel>
                             </StackPanel>
                         </DataTemplate>
@@ -168,7 +212,7 @@
             </ItemsControl.GroupStyle>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Grid Margin="24,0,0,20">
+                    <Grid Style="{StaticResource AllTasksTimelineItemGridStyle}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
@@ -190,22 +234,17 @@
                                 <StackPanel>
                                     <StackPanel Margin="0,0,0,8" Orientation="Horizontal">
                                         <TextBlock Style="{StaticResource AllTasksTimelineTimeTextStyle}" Text="{Binding Deadline, StringFormat={}{0:HH:mm}}" />
-                                        <Border Margin="12,0"
-                                                Padding="8,1"
-                                                Background="{DynamicResource ButtonSecondaryBackgroundBrush}"
-                                                CornerRadius="8">
-                                            <TextBlock FontSize="10"
-                                                       FontWeight="Bold"
+                                        <Border Style="{StaticResource AllTasksTimelineProjectLabelBorderStyle}">
+                                            <TextBlock FontWeight="Bold"
                                                        Foreground="{DynamicResource TextPrimaryBrush}"
+                                                       Style="{StaticResource MetaBaseStyle}"
                                                        Text="{Binding ProjectName}" />
                                         </Border>
                                     </StackPanel>
-                                    <TextBlock FontSize="16"
-                                               FontWeight="Bold"
-                                               Foreground="{DynamicResource BrandPrimaryBrush}"
+                                    <TextBlock Foreground="{DynamicResource BrandPrimaryBrush}"
+                                               Style="{StaticResource HeaderBaseStyle}"
                                                Text="{Binding Name}" />
                                     <TextBlock Margin="0,4,0,0"
-                                               Opacity="0.6"
                                                Style="{StaticResource MetaBaseStyle}"
                                                Text="{Binding Description}" />
                                 </StackPanel>
@@ -215,11 +254,7 @@
                                         Command="{Binding DataContext.SelectTaskCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                         CommandParameter="{Binding}"
                                         Style="{StaticResource IconButtonStyle}">
-                                    <Path Width="12"
-                                          Height="12"
-                                          Data="{StaticResource ChevronRightIconGeometry}"
-                                          Fill="{DynamicResource TextSecondaryBrush}"
-                                          Stretch="Uniform" />
+                                    <Path Data="{StaticResource ChevronRightIconGeometry}" Style="{StaticResource SmallIconPathSecondaryStyle}" />
                                 </Button>
                             </Grid>
                         </Border>
@@ -231,7 +266,7 @@
 
     <!-- 3. Grid View (Project Cards) -->
     <DataTemplate x:Key="AllTasksGridTemplate">
-        <ScrollViewer Padding="32">
+        <ScrollViewer Padding="{StaticResource ViewOuterMargin}">
             <ItemsControl ItemsSource="{Binding Projects}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -247,59 +282,65 @@
                                         <Path Width="24"
                                               Height="24"
                                               Data="{StaticResource TreeSproutLeafGeometry}"
-                                              Fill="White"
+                                              Fill="{DynamicResource BrandForegroundBrush}"
                                               Stretch="Uniform" />
                                     </Border>
                                     <TextBlock HorizontalAlignment="Right"
-                                               FontSize="10"
                                                FontWeight="Bold"
-                                               Opacity="0.4"
                                                Style="{StaticResource MetaBaseStyle}"
                                                Text="ACTIVE" />
                                 </Grid>
 
-                                <TextBlock FontSize="20"
-                                           FontWeight="Bold"
-                                           Foreground="{DynamicResource BrandPrimaryBrush}"
+                                <TextBlock Foreground="{DynamicResource BrandPrimaryBrush}"
+                                           Style="{StaticResource TitleBaseStyle}"
                                            Text="{Binding Name}" />
                                 <TextBlock Margin="0,4,0,24"
-                                           Opacity="0.6"
                                            Style="{StaticResource MetaBaseStyle}"
                                            Text="{Binding Description}" />
 
                                 <!-- Progress -->
                                 <StackPanel Margin="0,0,0,24">
                                     <Grid>
-                                        <TextBlock FontSize="11"
-                                                   FontWeight="Bold"
+                                        <TextBlock FontWeight="Bold"
                                                    Foreground="{DynamicResource BrandPrimaryBrush}"
+                                                   Style="{StaticResource MetaBaseStyle}"
                                                    Text="Growth Phase" />
                                         <TextBlock HorizontalAlignment="Right"
-                                                   FontSize="11"
                                                    FontWeight="Bold"
                                                    Foreground="{DynamicResource BrandPrimaryBrush}"
-                                                   Text="{Binding Progress, StringFormat={}{0}%}" />
+                                                   Style="{StaticResource MetaBaseStyle}"
+                                                   Text="{Binding CompletionPercentage, StringFormat={}{0:0}%}" />
                                     </Grid>
                                     <ProgressBar Maximum="100"
                                                  Style="{StaticResource AllTasksProjectProgressBarStyle}"
-                                                 Value="{Binding Progress}" />
+                                                 Value="{Binding CompletionPercentage}" />
                                 </StackPanel>
 
                                 <!-- Recent Tasks -->
                                 <TextBlock Margin="0,0,0,12"
                                            FontSize="10"
                                            FontWeight="ExtraBold"
-                                           Opacity="0.4"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
                                            Text="HIGH PRIORITY SEEDS" />
                                 <ItemsControl ItemsSource="{Binding Tasks}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Border Margin="0,0,0,8"
-                                                    Padding="12"
-                                                    Background="{DynamicResource SurfaceLayer1Brush}"
-                                                    BorderBrush="{Binding PriorityBrush}"
-                                                    BorderThickness="4,0,0,0"
-                                                    CornerRadius="12">
+                                            <Border>
+                                                <Border.Style>
+                                                    <Style BasedOn="{StaticResource AllTasksGridTaskCardStyle}" TargetType="Border">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Priority}" Value="{x:Static me:TaskPriority.High}">
+                                                                <Setter Property="BorderBrush" Value="{DynamicResource PriorityHighBrush}" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Priority}" Value="{x:Static me:TaskPriority.Medium}">
+                                                                <Setter Property="BorderBrush" Value="{DynamicResource PriorityMediumBrush}" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Priority}" Value="{x:Static me:TaskPriority.Low}">
+                                                                <Setter Property="BorderBrush" Value="{DynamicResource PriorityLowBrush}" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Border.Style>
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="Auto" />
@@ -334,7 +375,7 @@
             <!-- 選択時のカード外枠（通常は非表示・マージンなし） -->
             <Border x:Name="CardBorder"
                     Margin="0"
-                    Padding="20,12"
+                    Padding="{StaticResource TaskCardPadding}"
                     Background="Transparent"
                     BorderBrush="{DynamicResource BorderLightBrush}"
                     BorderThickness="0,0,0,1"
@@ -361,9 +402,9 @@
 
                         <!-- 詳細情報（選択時のみ表示） -->
                         <StackPanel x:Name="DetailInfo"
-                                    Margin="0,8,0,0"
+                                    Margin="{StaticResource TaskCardInfoMargin}"
                                     Visibility="Collapsed">
-                            <TextBlock FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}">
+                            <TextBlock Style="{StaticResource MetaBaseStyle}">
                                 <Run Text="👤 " />
                                 <Run Text="{Binding AssigneeName, TargetNullValue='未設定'}" />
                                 <Run Text="  📅 " />
@@ -377,12 +418,12 @@
         <ControlTemplate.Triggers>
             <!-- 選択状態：カード化 -->
             <Trigger Property="IsSelected" Value="True">
-                <Setter TargetName="CardBorder" Property="Margin" Value="12,8" />
-                <Setter TargetName="CardBorder" Property="Padding" Value="20,16" />
-                <Setter TargetName="CardBorder" Property="Background" Value="White" />
+                <Setter TargetName="CardBorder" Property="Margin" Value="{StaticResource TaskCardSelectedMargin}" />
+                <Setter TargetName="CardBorder" Property="Padding" Value="{StaticResource TaskCardSelectedPadding}" />
+                <Setter TargetName="CardBorder" Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />
                 <Setter TargetName="CardBorder" Property="BorderBrush" Value="{DynamicResource BrandPrimaryBrush}" />
                 <Setter TargetName="CardBorder" Property="BorderThickness" Value="1" />
-                <Setter TargetName="CardBorder" Property="CornerRadius" Value="12" />
+                <Setter TargetName="CardBorder" Property="CornerRadius" Value="{DynamicResource ContainerCornerRadius}" />
                 <Setter TargetName="DetailInfo" Property="Visibility" Value="Visible" />
                 <Setter TargetName="TaskNameText" Property="FontWeight" Value="Bold" />
                 <Setter TargetName="TaskNameText" Property="Foreground" Value="{DynamicResource BrandPrimaryBrush}" />

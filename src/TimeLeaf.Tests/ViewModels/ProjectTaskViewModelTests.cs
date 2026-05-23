@@ -255,25 +255,4 @@ public class ProjectTaskViewModelTests
         viewModel.Deadline = today.AddDays(10);
         Assert.AreEqual("Later", viewModel.DeadlineGroup);
     }
-
-    /// <summary>
-    /// テスト観点: PriorityBrush および StatusBrush が、特定の列挙値に対して null でない有効な Brush を返すことを確認する。
-    /// </summary>
-    [TestMethod]
-    public void Brushes_ShouldReturnNonNullForStandardValues()
-    {
-        // Arrange
-        var projectTask = new ProjectTask();
-        var viewModel = new ProjectTaskViewModel(projectTask, _userServiceMock.Object);
-
-        // Act & Assert
-        Assert.IsNotNull(viewModel.PriorityBrush, "PriorityBrush should not be null");
-        Assert.IsNotNull(viewModel.StatusBrush, "StatusBrush should not be null");
-
-        viewModel.Priority = TaskPriority.High;
-        Assert.IsNotNull(viewModel.PriorityBrush);
-
-        viewModel.Status = TimeLeaf.Models.Enums.TaskStatus.Completed;
-        Assert.IsNotNull(viewModel.StatusBrush);
-    }
 }

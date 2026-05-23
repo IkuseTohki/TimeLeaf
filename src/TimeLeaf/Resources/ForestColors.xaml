@@ -13,6 +13,19 @@
 
     <SolidColorBrush x:Key="GlobalSidebarBackgroundBrush" Color="{StaticResource BrandPrimaryColor}" />
 
+    <!-- Semantic Brushes for Tasks -->
+    <SolidColorBrush x:Key="PriorityHighBrush" Color="#B03A2E" />
+    <SolidColorBrush x:Key="PriorityMediumBrush" Color="#2D5A27" />
+    <SolidColorBrush x:Key="PriorityLowBrush" Color="#737A71" />
+
+    <SolidColorBrush x:Key="StatusCompletedBrush" Color="#737A71" />
+    <SolidColorBrush x:Key="StatusInReviewBrush" Color="#6A5ACD" />
+    <SolidColorBrush x:Key="StatusInProgressBrush" Color="{StaticResource BrandPrimaryColor}" />
+
+    <SolidColorBrush x:Key="DeadlineOverdueBrush" Color="#B03A2E" />
+    <SolidColorBrush x:Key="DeadlineTodayBrush" Color="#D35400" />
+    <SolidColorBrush x:Key="DeadlineNearBrush" Color="#E67E22" />
+
     <SolidColorBrush x:Key="ProgressBarBlankBrush" Color="#E8F0E6" />
 
     <LinearGradientBrush x:Key="NotificationPaneBackgroundBrush" StartPoint="1,0.5" EndPoint="0,0.5">
@@ -21,6 +34,8 @@
     </LinearGradientBrush>
 
     <SolidColorBrush x:Key="FlowBackgroundBrush" Color="#FAFAFA" />
+
+    <SolidColorBrush x:Key="AllTasksProjectCardBackgroundBrush" Color="#E0EDD5" />
 
     <!-- 4. 形状・定数 (角丸) -->
     <CornerRadius x:Key="ControlCornerRadius">20</CornerRadius>

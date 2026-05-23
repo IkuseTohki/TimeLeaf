@@ -238,8 +238,61 @@
         </Style.Resources>
     </Style>
 
+    <!-- ====================================================================== -->
+    <!-- DataGrid Styles -->
+    <!-- ====================================================================== -->
+
+    <Style x:Key="TimeLeafDataGridHeaderStyle" TargetType="DataGridColumnHeader">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="BorderThickness" Value="0,0,0,1" />
+        <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
+    </Style>
+
+    <Style x:Key="TimeLeafDataGridCellStyle" TargetType="DataGridCell">
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="DataGridCell">
+                    <Border Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            SnapsToDevicePixels="True">
+                        <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="Foreground" Value="{DynamicResource BrandPrimaryBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="TimeLeafDataGridStyle" TargetType="DataGrid">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="GridLinesVisibility" Value="None" />
+        <Setter Property="HeadersVisibility" Value="Column" />
+        <Setter Property="AutoGenerateColumns" Value="False" />
+        <Setter Property="CanUserAddRows" Value="False" />
+        <Setter Property="IsReadOnly" Value="True" />
+        <Setter Property="ColumnHeaderStyle" Value="{StaticResource TimeLeafDataGridHeaderStyle}" />
+        <Setter Property="CellStyle" Value="{StaticResource TimeLeafDataGridCellStyle}" />
+        <Setter Property="RowBackground" Value="Transparent" />
+        <Setter Property="AlternatingRowBackground" Value="Transparent" />
+    </Style>
+
     <!-- アプリ全体のデフォルトとして適用 -->
     <Style BasedOn="{StaticResource TimeLeafMenuItemStyle}" TargetType="MenuItem" />
     <Style BasedOn="{StaticResource TimeLeafContextMenuStyle}" TargetType="ContextMenu" />
+    <Style BasedOn="{StaticResource TimeLeafDataGridStyle}" TargetType="DataGrid" />
 
 </ResourceDictionary>

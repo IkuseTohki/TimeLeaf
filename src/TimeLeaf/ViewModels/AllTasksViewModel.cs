@@ -22,11 +22,6 @@ public partial class AllTasksViewModel : ObservableObject
     private AllTasksViewMode _currentViewMode = AllTasksViewMode.List;
 
     /// <summary>
-    /// 再帰的な DataTemplate 適用を避けるために ContentControl の Content にバインドされるオブジェクト。
-    /// </summary>
-    public object CurrentSubViewContext => this;
-
-    /// <summary>
     /// 表示モード切替用のナビゲーション項目。
     /// </summary>
     public List<ViewModeItem> ViewModeItems { get; } =

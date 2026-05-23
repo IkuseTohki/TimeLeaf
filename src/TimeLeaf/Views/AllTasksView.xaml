@@ -24,7 +24,7 @@
                 <TextBlock Style="{StaticResource ViewHeaderSubTitleStyle}" Text="{Binding AllTasks.Count, StringFormat=\{0\} active tasks}" />
             </StackPanel>
 
-            <!-- 表示モード切替（ProjectWorkspaceView と同じく Style 指定を外してデフォルトを適用） -->
+            <!-- 表示モード切替 -->
             <c:LeafTabSelector Margin="0,0,24,0"
                                HorizontalAlignment="Center"
                                VerticalAlignment="Bottom"
@@ -33,10 +33,8 @@
                                SelectedValue="{Binding CurrentViewMode}"
                                SelectedValuePath="Value" />
 
-            <!-- 検索・フィルター・表示モード切替 -->
-            <StackPanel HorizontalAlignment="Right"
-                        VerticalAlignment="Bottom"
-                        Orientation="Horizontal">
+            <!-- 検索・フィルター -->
+            <StackPanel Style="{StaticResource AllTasksHeaderActionContainerStyle}">
 
                 <c:ClearableTextBox Style="{StaticResource AllTasksSearchBoxStyle}"
                                     Tag="🔍 Search tasks..."
@@ -49,7 +47,7 @@
         </Grid>
 
         <!-- メインコンテンツ -->
-        <ContentControl Grid.Row="1" Content="{Binding CurrentSubViewContext}">
+        <ContentControl Grid.Row="1" Content="{Binding}">
             <ContentControl.Style>
                 <Style TargetType="ContentControl">
                     <Setter Property="ContentTemplate" Value="{StaticResource AllTasksListTemplate}" />

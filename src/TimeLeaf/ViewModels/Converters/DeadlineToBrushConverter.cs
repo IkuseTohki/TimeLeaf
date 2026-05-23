@@ -7,7 +7,7 @@ using System.Windows.Media;
 namespace TimeLeaf.ViewModels.Converters;
 
 /// <summary>
-/// 期限（DateTime?）を、緊急度に応じた色（Brush）に変換するコンバーター。
+/// 期限（DateTime?）を、緊急度に応じた状態名（string）に変換するコンバーター。
 /// </summary>
 public class DeadlineToBrushConverter : IValueConverter
 {
@@ -19,15 +19,16 @@ public class DeadlineToBrushConverter : IValueConverter
             var diff = (deadline.Date - today).TotalDays;
 
             if (diff < 0)
-                return Brushes.Crimson; // 期限切れ
+                return "Overdue";
             if (diff == 0)
-                return Brushes.OrangeRed; // 今日
+                return "Today";
             if (diff <= 3)
-                return Brushes.Orange; // 直近
+                return "Near";
+
+            return "Future";
         }
 
-        // デフォルトの色（リソースから取得するのが理想的だが、ここでは標準のテキスト色を想定）
-        return Application.Current?.Resources["TextPrimaryBrush"] as Brush ?? Brushes.Black;
+        return "None";
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

@@ -58,7 +58,7 @@
                                                             Style="{StaticResource IconButton}"
                                                             ToolTip="コンテナを削除"
                                                             Visibility="Collapsed">
-                                                        <Path Data="{StaticResource DeleteIconGeometry}" Style="{StaticResource SmallIconPathStyle}" />
+                                                        <Path Data="{StaticResource DeleteIconGeometry}" Style="{StaticResource SmallIconPathBrandStyle}" />
                                                     </Button>
                                                 </StackPanel>
                                             </Grid>
