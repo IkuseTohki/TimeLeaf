@@ -67,7 +67,7 @@
                 <DataGridTemplateColumn Width="Auto">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <CheckBox VerticalAlignment="Center" IsChecked="{Binding IsCompleted, Mode=OneWay}" Style="{StaticResource AllTasksFilterCheckBoxStyle}" />
+                            <CheckBox IsChecked="{Binding IsCompleted, Mode=OneWay}" Style="{StaticResource AllTasksFilterCheckBoxStyle}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -140,7 +140,8 @@
                             <StackPanel Orientation="Horizontal" Style="{StaticResource AllTasksFilterItemStyle}">
                                 <Ellipse Width="8"
                                          Height="8"
-                                         Margin="0,0,8,0">
+                                         Margin="0,0,8,0"
+                                         VerticalAlignment="Center">
                                     <Ellipse.Style>
                                         <Style TargetType="Ellipse">
                                             <Setter Property="Fill" Value="{DynamicResource PriorityLowBrush}" />
@@ -155,7 +156,9 @@
                                         </Style>
                                     </Ellipse.Style>
                                 </Ellipse>
-                                <TextBlock Style="{StaticResource MetaBaseStyle}" Text="{Binding Priority}" />
+                                <TextBlock VerticalAlignment="Center"
+                                           Style="{StaticResource MetaBaseStyle}"
+                                           Text="{Binding Priority}" />
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
