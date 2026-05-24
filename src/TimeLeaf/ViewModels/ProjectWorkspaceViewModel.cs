@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -13,7 +14,7 @@ namespace TimeLeaf.ViewModels;
 /// <summary>
 /// 特定のプロジェクト内のナビゲーションと各サブビューの管理を担当する親ViewModel。
 /// </summary>
-public partial class ProjectWorkspaceViewModel : ObservableObject
+public partial class ProjectWorkspaceViewModel : ObservableObject, IDisposable
 {
     private readonly ProjectViewModel _projectViewModel;
     private readonly System.Collections.ObjectModel.ObservableCollection<ProjectViewModel> _projects;
@@ -108,23 +109,27 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
         ProjectTaskViewModel.GlobalRequestDetail += OnGlobalRequestDetail;
 
         // ProjectViewModel の変更（アサイン状態）を監視
-        _projectViewModel.PropertyChanged += (s, e) =>
-        {
-            if (e.PropertyName == nameof(ProjectViewModel.IsAssignedToMe))
-            {
-                OnPropertyChanged(nameof(IsUserAssigned));
-            }
-        };
+        _projectViewModel.PropertyChanged += OnProjectViewModelPropertyChanged;
 
         // 初期表示としてダッシュボードを設定
         CurrentSubViewModel = _viewModelFactory.CreateProjectDashboardViewModel(_projectViewModel);
 
         // 通知カウントの同期
-        _notificationService.UnreadCountChanged += (s, e) => UpdateUnreadCount();
+        _notificationService.UnreadCountChanged += OnUnreadCountChanged;
         UpdateUnreadCount();
 
         _logger.LogInformation("ProjectWorkspaceViewModel initialized for project {ProjectId}.", _projectViewModel.Id);
     }
+
+    private void OnProjectViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ProjectViewModel.IsAssignedToMe))
+        {
+            OnPropertyChanged(nameof(IsUserAssigned));
+        }
+    }
+
+    private void OnUnreadCountChanged(object? sender, EventArgs e) => UpdateUnreadCount();
 
     private void OnGlobalRequestDetail(object? sender, ProjectTaskViewModel task)
     {
@@ -156,6 +161,12 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
         if (CurrentSubViewModel is ProjectTasksViewModel oldTasksVm)
         {
             oldTasksVm.TaskDetailRequested -= OnTaskDetailRequested;
+        }
+
+        // 破棄可能な場合は Dispose
+        if (CurrentSubViewModel is IDisposable disposable)
+        {
+            disposable.Dispose();
         }
 
         if (CurrentViewName != viewName)
@@ -205,6 +216,13 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
     public void OpenTaskDetail(ProjectTaskViewModel task)
     {
         _logger.LogInformation("Navigating to task detail for {TaskName} within main content area.", task.Name);
+
+        // 既存のサブビューを破棄
+        if (CurrentSubViewModel is IDisposable disposable)
+        {
+            disposable.Dispose();
+        }
+
         var detailVm = _viewModelFactory.CreateTaskDetailViewModel(_projectViewModel, task);
 
         // 閉じる要求（戻る要求）をハンドル
@@ -222,6 +240,20 @@ public partial class ProjectWorkspaceViewModel : ObservableObject
     {
         _logger.LogInformation("Closing task detail and returning to task list.");
         SwitchSubView("Tasks");
+    }
+
+    public void Dispose()
+    {
+        _logger.LogInformation("Disposing ProjectWorkspaceViewModel for project {ProjectId}.", _projectViewModel.Id);
+
+        ProjectTaskViewModel.GlobalRequestDetail -= OnGlobalRequestDetail;
+        _projectViewModel.PropertyChanged -= OnProjectViewModelPropertyChanged;
+        _notificationService.UnreadCountChanged -= OnUnreadCountChanged;
+
+        if (CurrentSubViewModel is IDisposable disposable)
+        {
+            disposable.Dispose();
+        }
     }
 }
 

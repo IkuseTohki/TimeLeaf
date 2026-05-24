@@ -14,7 +14,7 @@ namespace TimeLeaf.ViewModels;
 /// <summary>
 /// 全プロジェクトのタスクを横断的に管理・表示するためのViewModel。
 /// </summary>
-public partial class AllTasksViewModel : ObservableObject
+public partial class AllTasksViewModel : ObservableObject, IDisposable
 {
     private readonly ObservableCollection<ProjectViewModel> _projects;
 
@@ -81,6 +81,14 @@ public partial class AllTasksViewModel : ObservableObject
 
         // プロジェクトリストの変更を監視
         _projects.CollectionChanged += OnProjectsCollectionChanged;
+
+        // グローバルなタスク詳細表示リクエストを購読
+        ProjectTaskViewModel.GlobalRequestDetail += OnGlobalRequestDetail;
+    }
+
+    private void OnGlobalRequestDetail(object? sender, ProjectTaskViewModel task)
+    {
+        SelectTask(task);
     }
 
     private void ApplyGrouping()
@@ -228,6 +236,24 @@ public partial class AllTasksViewModel : ObservableObject
         {
             AllTasks.Add(t);
         }
+    }
+
+    public void Dispose()
+    {
+        // プロジェクトリストの監視解除
+        _projects.CollectionChanged -= OnProjectsCollectionChanged;
+
+        foreach (var project in _projects)
+        {
+            project.Tasks.CollectionChanged -= OnTasksCollectionChanged;
+            foreach (var task in project.Tasks)
+            {
+                task.PropertyChanged -= OnTaskPropertyChanged;
+            }
+        }
+
+        // グローバルイベントの購読解除
+        ProjectTaskViewModel.GlobalRequestDetail -= OnGlobalRequestDetail;
     }
 }
 

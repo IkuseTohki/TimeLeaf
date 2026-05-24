@@ -79,9 +79,7 @@
                                        Style="{StaticResource LabelBaseStyle}"
                                        Text="{Binding Name}">
                                 <TextBlock.InputBindings>
-                                    <MouseBinding Command="{Binding DataContext.OpenTaskDetailWindowCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                                  CommandParameter="{Binding}"
-                                                  MouseAction="LeftDoubleClick" />
+                                    <MouseBinding Command="{Binding RequestDetailCommand}" MouseAction="LeftDoubleClick" />
                                 </TextBlock.InputBindings>
                             </TextBlock>
                         </DataTemplate>
@@ -238,6 +236,9 @@
                         <Ellipse Style="{StaticResource AllTasksTimelineMarkerStyle}" />
 
                         <Border Grid.Column="1" Style="{StaticResource AllTasksTimelineCardStyle}">
+                            <Border.InputBindings>
+                                <MouseBinding Command="{Binding RequestDetailCommand}" MouseAction="LeftDoubleClick" />
+                            </Border.InputBindings>
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
@@ -354,6 +355,9 @@
                                                         </Style.Triggers>
                                                     </Style>
                                                 </Border.Style>
+                                                <Border.InputBindings>
+                                                    <MouseBinding Command="{Binding RequestDetailCommand}" MouseAction="LeftDoubleClick" />
+                                                </Border.InputBindings>
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="Auto" />

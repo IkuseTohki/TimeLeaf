@@ -47,6 +47,14 @@ public partial class MainViewModel : ObservableObject
     partial void OnNavigationContextChanged(MainNavigationContext value)
     {
         _logger.LogInformation("NavigationContext changed to {Context}", value);
+
+        // 既存の ViewModel を破棄（IDisposable の場合）
+        if (CurrentViewModel is IDisposable disposable)
+        {
+            _logger.LogDebug("Disposing old ViewModel: {ViewModelType}", CurrentViewModel.GetType().Name);
+            disposable.Dispose();
+        }
+
         switch (value)
         {
             case MainNavigationContext.Home:
@@ -350,11 +358,27 @@ public partial class MainViewModel : ObservableObject
     /// </summary>
     /// <param name="projectViewModel">遷移先プロジェクト。</param>
     /// <param name="task">遷移時に直接開くタスク（オプション）。</param>
+    /// <summary>
+    /// 指定されたプロジェクト（およびオプションでタスク）へ遷移します。
+    /// </summary>
+    /// <param name="projectViewModel">遷移先プロジェクト。</param>
+    /// <param name="task">遷移時に直接開くタスク（オプション）。</param>
     public void NavigateToProject(ProjectViewModel projectViewModel, ProjectTaskViewModel? task)
     {
         if (projectViewModel == null)
             return;
         _logger.LogInformation("Navigating to project {ProjectId} (Task: {TaskId})", projectViewModel.Id, task?.Id);
+
+        // 既存の ViewModel を破棄（IDisposable の場合）
+        // NavigationContext が変わらない場合、OnNavigationContextChanged が呼ばれないため、ここで明示的に行う
+        if (CurrentViewModel is IDisposable disposable)
+        {
+            _logger.LogDebug(
+                "Disposing old ViewModel before navigating to project: {ViewModelType}",
+                CurrentViewModel.GetType().Name
+            );
+            disposable.Dispose();
+        }
 
         // Context を先にセットし、その後に ViewModel をセットする
         NavigationContext = MainNavigationContext.ProjectDetail;

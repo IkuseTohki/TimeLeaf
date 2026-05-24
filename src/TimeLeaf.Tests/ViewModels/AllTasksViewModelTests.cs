@@ -279,4 +279,41 @@ public class AllTasksViewModelTests
         Assert.IsTrue(viewModel.ViewModeItems.Any(i => i.Value == AllTasksViewMode.Timeline));
         Assert.IsTrue(viewModel.ViewModeItems.Any(i => i.Value == AllTasksViewMode.Grid));
     }
+
+    /// <summary>
+    /// テスト観点: ProjectTaskViewModel の GlobalRequestDetail イベントが発生した際に、
+    /// AllTasksViewModel がそれを検知して RequestNavigation イベントを発生させることを確認する。
+    /// </summary>
+    [TestMethod]
+    public void GlobalRequestDetail_ShouldTriggerRequestNavigation()
+    {
+        // Arrange
+        var p = new Project(Guid.Empty) { Id = Guid.NewGuid() };
+        p.UpdateName("Target Project");
+        var t = new ProjectTask();
+        t.UpdateName("Target Task");
+        p.AddTask(t);
+
+        var pvm = CreateProjectViewModel(p);
+        var projects = new ObservableCollection<ProjectViewModel> { pvm };
+        var viewModel = new AllTasksViewModel(projects);
+
+        var taskVm = pvm.Tasks[0];
+
+        ProjectViewModel? navigatedProject = null;
+        ProjectTaskViewModel? navigatedTask = null;
+        viewModel.RequestNavigation += (s, e) =>
+        {
+            navigatedProject = e.Project;
+            navigatedTask = e.Task;
+        };
+
+        // Act
+        taskVm.RequestDetailCommand.Execute(null);
+
+        // Assert
+        Assert.IsNotNull(navigatedProject, "RequestNavigation イベントが発生すること");
+        Assert.AreEqual(pvm, navigatedProject, "正しいプロジェクトが渡されること");
+        Assert.AreEqual(taskVm, navigatedTask, "正しいタスクが渡されること");
+    }
 }
