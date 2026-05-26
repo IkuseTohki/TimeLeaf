@@ -49,6 +49,9 @@
             <DataTemplate DataType="{x:Type viewModels:ProfileEditViewModel}">
                 <views:ProfileEditView />
             </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModels:UserManagementViewModel}">
+                <views:UserManagementView />
+            </DataTemplate>
             <DataTemplate DataType="{x:Type viewModels:ApplicationSettingsViewModel}">
                 <views:ApplicationSettingsView />
             </DataTemplate>

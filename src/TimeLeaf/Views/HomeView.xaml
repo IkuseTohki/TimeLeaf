@@ -46,6 +46,9 @@
                         <Button Command="{Binding UserMenu.EditProfileCommand}"
                                 Content="プロフィール設定"
                                 Style="{DynamicResource MenuButtonStyle}" />
+                        <Button Command="{Binding UserMenu.ManageUsersCommand}"
+                                Content="ユーザー管理"
+                                Style="{DynamicResource MenuButtonStyle}" />
                         <Button Command="{Binding UserMenu.OpenSettingsCommand}"
                                 Content="アプリケーション設定"
                                 Style="{DynamicResource MenuButtonStyle}" />

@@ -212,4 +212,13 @@ public class ViewModelFactory : IViewModelFactory
     {
         return _serviceProvider.GetRequiredService<ProfileEditViewModel>();
     }
+
+    public UserManagementViewModel CreateUserManagementViewModel()
+    {
+        return new UserManagementViewModel(
+            _userService,
+            _identityService,
+            _serviceProvider.GetRequiredService<IDialogService>()
+        );
+    }
 }

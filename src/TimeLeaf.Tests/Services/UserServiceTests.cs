@@ -1,5 +1,7 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Repositories;
@@ -142,5 +144,50 @@ public class UserServiceTests
 
         // Assert
         Assert.AreEqual(invalidId, result);
+    }
+
+    /// <summary>
+    /// テスト観点: GetActiveUsersAsync が削除されていないユーザーのみを返すことを確認する。
+    /// </summary>
+    [TestMethod]
+    public async Task GetActiveUsersAsync_ShouldReturnOnlyNonDeletedUsers()
+    {
+        // Arrange
+        var user1 = new User(Guid.NewGuid(), "Active User", "#000000", "", false);
+        var user2 = new User(Guid.NewGuid(), "Deleted User", "#000000", "", true);
+
+        _userRepositoryMock.Setup(r => r.GetAllUsersAsync()).ReturnsAsync(new[] { user1, user2 });
+
+        // Act
+        var result = await _userService.GetActiveUsersAsync();
+
+        // Assert
+        Assert.AreEqual(1, result.Count());
+        Assert.IsTrue(result.Any(u => u.Id == user1.Id));
+        Assert.IsFalse(result.Any(u => u.Id == user2.Id));
+    }
+
+    /// <summary>
+    /// テスト観点: DeleteUserAsync がユーザーを論理削除し、リポジトリに保存することを確認する。
+    /// </summary>
+    [TestMethod]
+    public async Task DeleteUserAsync_ShouldMarkAsDeletedAndSave()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var user = new User(userId, "To Be Deleted", "#000000", "", false);
+
+        _userRepositoryMock.Setup(r => r.GetUserAsync(userId)).ReturnsAsync(user);
+
+        // Act
+        await _userService.DeleteUserAsync(userId);
+
+        // Assert
+        Assert.IsTrue(user.IsDeleted, "ユーザーが論理削除状態になっていること");
+        _userRepositoryMock.Verify(
+            r => r.SaveUserAsync(It.Is<User>(u => u.Id == userId && u.IsDeleted)),
+            Times.Once,
+            "削除済みプロフィールが保存されること"
+        );
     }
 }

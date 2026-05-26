@@ -28,18 +28,25 @@ public class User
     public string IconPath { get; private set; }
 
     /// <summary>
+    /// 論理削除されているかどうかを示すフラグ。
+    /// </summary>
+    public bool IsDeleted { get; private set; }
+
+    /// <summary>
     /// User エンティティの新しいインスタンスを初期化します。
     /// </summary>
     /// <param name="id">ユーザーの一意なID。</param>
     /// <param name="displayName">表示名。</param>
     /// <param name="themeColor">テーマカラー。</param>
     /// <param name="iconPath">アイコン画像パス。</param>
-    public User(Guid id, string displayName, string themeColor, string iconPath)
+    /// <param name="isDeleted">論理削除フラグ。</param>
+    public User(Guid id, string displayName, string themeColor, string iconPath, bool isDeleted = false)
     {
         Id = id;
         DisplayName = displayName ?? throw new ArgumentNullException(nameof(displayName));
         ThemeColor = themeColor ?? throw new ArgumentNullException(nameof(themeColor));
         IconPath = iconPath ?? throw new ArgumentNullException(nameof(iconPath));
+        IsDeleted = isDeleted;
     }
 
     /// <summary>
@@ -53,5 +60,21 @@ public class User
         DisplayName = displayName ?? throw new ArgumentNullException(nameof(displayName));
         ThemeColor = themeColor ?? throw new ArgumentNullException(nameof(themeColor));
         IconPath = iconPath ?? throw new ArgumentNullException(nameof(iconPath));
+    }
+
+    /// <summary>
+    /// ユーザーを論理削除状態にします。
+    /// </summary>
+    public void MarkAsDeleted()
+    {
+        IsDeleted = true;
+    }
+
+    /// <summary>
+    /// ユーザーを論理削除状態から復帰させます。
+    /// </summary>
+    public void Restore()
+    {
+        IsDeleted = false;
     }
 }

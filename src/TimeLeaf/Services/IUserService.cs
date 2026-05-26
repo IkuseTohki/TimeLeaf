@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TimeLeaf.Models.Entities;
 
@@ -17,6 +18,18 @@ public interface IUserService
     /// <param name="userId">ユーザーID。</param>
     /// <returns>ユーザー情報。存在しない場合は null。</returns>
     Task<User?> GetUserAsync(Guid userId);
+
+    /// <summary>
+    /// 削除済みを含まないすべてのアクティブなユーザーを取得します。
+    /// </summary>
+    /// <returns>アクティブなユーザーのリスト。</returns>
+    Task<IEnumerable<User>> GetActiveUsersAsync();
+
+    /// <summary>
+    /// ユーザーを論理削除します。
+    /// </summary>
+    /// <param name="userId">削除対象のユーザーID。</param>
+    Task DeleteUserAsync(Guid userId);
 
     /// <summary>
     /// ユーザーIDから表示名を同期的に取得します（キャッシュヒット時のみ名前、未キャッシュ時はIDを返却）。

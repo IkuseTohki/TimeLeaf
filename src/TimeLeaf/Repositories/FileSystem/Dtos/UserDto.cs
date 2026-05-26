@@ -29,6 +29,11 @@ public class UserDto
     public string IconPath { get; set; } = string.Empty;
 
     /// <summary>
+    /// 論理削除フラグ。
+    /// </summary>
+    public bool IsDeleted { get; set; }
+
+    /// <summary>
     /// プロフィールの最終更新日時。
     /// </summary>
     public DateTime UpdatedAt { get; set; }
@@ -44,6 +49,7 @@ public class UserDto
             DisplayName = user.DisplayName,
             ThemeColor = user.ThemeColor,
             IconPath = user.IconPath,
+            IsDeleted = user.IsDeleted,
             UpdatedAt = updatedAt,
         };
     }
@@ -53,6 +59,6 @@ public class UserDto
     /// </summary>
     public User ToEntity()
     {
-        return new User(Id, DisplayName, ThemeColor, IconPath);
+        return new User(Id, DisplayName, ThemeColor, IconPath, IsDeleted);
     }
 }

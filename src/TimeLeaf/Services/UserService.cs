@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TimeLeaf.Models.Entities;
@@ -55,6 +56,24 @@ public class UserService : IUserService, IDisposable
         }
 
         return user;
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<User>> GetActiveUsersAsync()
+    {
+        var allUsers = await _userRepository.GetAllUsersAsync();
+        return allUsers.Where(u => !u.IsDeleted);
+    }
+
+    /// <inheritdoc />
+    public async Task DeleteUserAsync(Guid userId)
+    {
+        var user = await GetUserAsync(userId);
+        if (user != null)
+        {
+            user.MarkAsDeleted();
+            await _userRepository.SaveUserAsync(user);
+        }
     }
 
     public string GetUserName(string userIdString)

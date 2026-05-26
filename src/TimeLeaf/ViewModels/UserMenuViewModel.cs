@@ -74,6 +74,15 @@ public partial class UserMenuViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private async System.Threading.Tasks.Task ManageUsers()
+    {
+        CloseRequested?.Invoke();
+        var manageUsersVm = _viewModelFactory.CreateUserManagementViewModel();
+        await manageUsersVm.LoadAsync();
+        await _dialogService.ShowDialogAsync(manageUsersVm);
+    }
+
+    [RelayCommand]
     private async System.Threading.Tasks.Task OpenSettings()
     {
         CloseRequested?.Invoke();

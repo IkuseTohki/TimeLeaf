@@ -36,14 +36,19 @@ public class SyncUserIdentityUseCase : ISyncUserIdentityUseCase
         if (existingProfile == null)
         {
             // 3. 存在しない場合のみ、初期プロフィールを作成して保存
-            // (名前やカラーは IdentityService が生成した初期値をそのまま使用)
             await _userRepository.SaveUserAsync(myIdentity);
         }
         else
         {
             // 4. 存在する場合、メモリ上のアイデンティティを既存プロフィールの内容で更新しておく
-            // (これにより、UI で表示される自分の名前が root/users/ の内容と一致する)
             myIdentity.UpdateProfile(existingProfile.DisplayName, existingProfile.ThemeColor, existingProfile.IconPath);
+
+            // 5. 削除済みフラグが立っている場合は、自動的に復帰させて保存し直す (Self-healing)
+            if (existingProfile.IsDeleted)
+            {
+                myIdentity.Restore();
+                await _userRepository.SaveUserAsync(myIdentity);
+            }
         }
     }
 }

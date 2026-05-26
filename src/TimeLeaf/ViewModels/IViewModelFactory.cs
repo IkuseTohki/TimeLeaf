@@ -45,4 +45,5 @@ public interface IViewModelFactory
 
     ApplicationSettingsViewModel CreateApplicationSettingsViewModel();
     ProfileEditViewModel CreateProfileEditViewModel();
+    UserManagementViewModel CreateUserManagementViewModel();
 }

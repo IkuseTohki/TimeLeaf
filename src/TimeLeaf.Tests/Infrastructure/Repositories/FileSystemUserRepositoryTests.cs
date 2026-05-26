@@ -113,4 +113,23 @@ public class FileSystemUserRepositoryTests
         Assert.IsTrue(users.Any(u => u.Id == user1.Id));
         Assert.IsTrue(users.Any(u => u.Id == user2.Id));
     }
+
+    /// <summary>
+    /// テスト観点: 論理削除フラグを含めて保存・読み込みができることを確認する。
+    /// </summary>
+    [TestMethod]
+    public async Task SaveAndGet_WithIsDeleted_ShouldSucceed()
+    {
+        // Arrange
+        var repository = new FileSystemUserRepository(_usersDir);
+        var user = new User(Guid.NewGuid(), "削除予定ユーザー", "#888888", "", true);
+
+        // Act
+        await repository.SaveUserAsync(user);
+        var loadedUser = await repository.GetUserAsync(user.Id);
+
+        // Assert
+        Assert.IsNotNull(loadedUser);
+        Assert.IsTrue(loadedUser.IsDeleted);
+    }
 }

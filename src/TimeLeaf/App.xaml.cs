@@ -311,7 +311,8 @@ public partial class App : Application
         // ViewModel の登録
         services.AddTransient<MainViewModel>();
         services.AddTransient<ApplicationSettingsViewModel>();
-        services.AddTransient<ProfileEditViewModel>(); // Ensure this is registered if not already
+        services.AddTransient<ProfileEditViewModel>();
+        services.AddTransient<UserManagementViewModel>();
         services.AddTransient<AddProjectViewModel>();
         services.AddTransient<AddTaskViewModel>();
         services.AddTransient<AddMilestoneViewModel>();
