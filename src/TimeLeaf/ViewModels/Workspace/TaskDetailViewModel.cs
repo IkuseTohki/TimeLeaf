@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LeafKit.UI.Services;
@@ -24,6 +27,7 @@ public partial class TaskDetailViewModel : ObservableObject, IDialogViewModel, I
     private readonly IDialogService _dialogService;
     private readonly IUserService _userService;
     private readonly IProjectService _projectService;
+    private readonly IGetProjectMembersUseCase _getProjectMembersUseCase;
     private readonly ILogger<TaskDetailViewModel> _logger;
 
     private readonly ProjectTaskViewModel _workingTaskViewModel;
@@ -31,6 +35,12 @@ public partial class TaskDetailViewModel : ObservableObject, IDialogViewModel, I
 
     [ObservableProperty]
     private string _newCommentContent = string.Empty;
+
+    [ObservableProperty]
+    private ObservableCollection<User> _availableTeammates = new();
+
+    [ObservableProperty]
+    private User? _selectedAssignee;
 
     [ObservableProperty]
     private bool _isDirty;
@@ -56,7 +66,8 @@ public partial class TaskDetailViewModel : ObservableObject, IDialogViewModel, I
         IDialogService dialogService,
         IUserService userService,
         IProjectService projectService,
-        ILogger<TaskDetailViewModel> logger
+        ILogger<TaskDetailViewModel> logger,
+        IGetProjectMembersUseCase getProjectMembersUseCase
     )
     {
         _projectViewModel = projectViewModel;
@@ -68,6 +79,7 @@ public partial class TaskDetailViewModel : ObservableObject, IDialogViewModel, I
         _userService = userService;
         _projectService = projectService;
         _logger = logger;
+        _getProjectMembersUseCase = getProjectMembersUseCase;
 
         // 作業用コピーの作成
         _workingTask = _taskViewModel.Model.Clone();
@@ -80,7 +92,24 @@ public partial class TaskDetailViewModel : ObservableObject, IDialogViewModel, I
         _projectService.ProjectUpdated += OnProjectServiceProjectUpdated;
     }
 
-    private void OnProjectServiceProjectUpdated(Models.Entities.Project project)
+    public async Task LoadMembersAsync()
+    {
+        var members = await _getProjectMembersUseCase.ExecuteAsync(_projectViewModel.Model);
+        AvailableTeammates = new ObservableCollection<User>(members);
+
+        // 現在の担当者をセット
+        SelectedAssignee = AvailableTeammates.FirstOrDefault(u => u.Id == Task.Assignee);
+    }
+
+    partial void OnSelectedAssigneeChanged(User? value)
+    {
+        if (Task.Assignee != value?.Id)
+        {
+            Task.Assignee = value?.Id;
+        }
+    }
+
+    private void OnProjectServiceProjectUpdated(Project project)
     {
         if (project.Id == _projectViewModel.Model.Id)
         {
@@ -110,6 +139,11 @@ public partial class TaskDetailViewModel : ObservableObject, IDialogViewModel, I
         if (importantProperties.Contains(e.PropertyName))
         {
             IsDirty = true;
+        }
+
+        if (e.PropertyName == nameof(ProjectTaskViewModel.Assignee))
+        {
+            SelectedAssignee = AvailableTeammates.FirstOrDefault(u => u.Id == Task.Assignee);
         }
     }
 

@@ -25,6 +25,7 @@ public abstract class MainViewModelTestBase
     protected Mock<ICheckTaskDeadlinesUseCase> CheckDeadlinesUseCaseMock = new();
     protected Mock<IDialogService> DialogServiceMock = new();
     protected Mock<IIdentityService> IdentityServiceMock = new();
+    protected Mock<IUserService> UserServiceMock = new();
     protected Mock<IApplicationSettingsRepository> ApplicationSettingsRepositoryMock = new();
     protected ApplicationSettings ApplicationSettings = new();
     protected Mock<ILogger<MainViewModel>> LoggerMock = new();
@@ -46,6 +47,7 @@ public abstract class MainViewModelTestBase
             CheckDeadlinesUseCaseMock.Object,
             DialogServiceMock.Object,
             IdentityServiceMock.Object,
+            UserServiceMock.Object,
             ApplicationSettingsRepositoryMock.Object,
             ApplicationSettings,
             LoggerMock.Object

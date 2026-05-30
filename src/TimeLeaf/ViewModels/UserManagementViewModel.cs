@@ -28,7 +28,8 @@ public partial class UserManagementViewModel : ObservableObject, IDialogViewMode
     public UserManagementViewModel(
         IUserService userService,
         IIdentityService identityService,
-        IDialogService dialogService)
+        IDialogService dialogService
+    )
     {
         _userService = userService;
         _identityService = identityService;
@@ -59,7 +60,8 @@ public partial class UserManagementViewModel : ObservableObject, IDialogViewMode
     {
         var confirmed = _dialogService.ShowConfirmationDialog(
             $"{userVm.DisplayName} を削除してもよろしいですか？\nこの操作はファイル共有を通じて他メンバーにも波及します。",
-            "ユーザーの削除");
+            "ユーザーの削除"
+        );
 
         if (confirmed)
         {

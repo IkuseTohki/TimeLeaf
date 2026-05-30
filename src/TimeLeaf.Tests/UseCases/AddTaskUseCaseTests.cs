@@ -37,7 +37,7 @@ public class AddTaskUseCaseTests
         var description = "Description";
         var status = TimeLeaf.Models.Enums.TaskStatus.InProgress;
         var priority = TaskPriority.High;
-        var assignee = "User A";
+        var assignee = Guid.NewGuid();
 
         // Act
         await useCase.ExecuteAsync(
@@ -100,7 +100,7 @@ public class AddTaskUseCaseTests
             null,
             0,
             0,
-            ""
+            null
         );
 
         // Assert

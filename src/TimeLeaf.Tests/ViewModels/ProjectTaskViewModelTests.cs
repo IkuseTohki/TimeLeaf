@@ -206,10 +206,10 @@ public class ProjectTaskViewModelTests
         // Arrange
         var projectTask = new ProjectTask();
         var viewModel = new ProjectTaskViewModel(projectTask, _userServiceMock.Object);
-        var userId = Guid.NewGuid().ToString();
+        var userId = Guid.NewGuid();
         var expectedName = "Test User";
 
-        _userServiceMock.Setup(s => s.GetUserName(userId)).Returns(expectedName);
+        _userServiceMock.Setup(s => s.GetUserName(userId.ToString())).Returns(expectedName);
 
         var receivedNames = new List<string>();
         viewModel.PropertyChanged += (s, e) => receivedNames.Add(e.PropertyName!);
@@ -221,6 +221,29 @@ public class ProjectTaskViewModelTests
         Assert.AreEqual(expectedName, viewModel.AssigneeName);
         CollectionAssert.Contains(receivedNames, nameof(ProjectTaskViewModel.Assignee));
         CollectionAssert.Contains(receivedNames, nameof(ProjectTaskViewModel.AssigneeName));
+    }
+
+    /// <summary>
+    /// テスト観点: 担当者の変更時に、アバター用のイニシャルと色が正しく更新されることを確認する。
+    /// </summary>
+    [TestMethod]
+    public async System.Threading.Tasks.Task Assignee_ShouldUpdateAvatarProperties()
+    {
+        // Arrange
+        var projectTask = new ProjectTask();
+        var viewModel = new ProjectTaskViewModel(projectTask, _userServiceMock.Object);
+        var userId = Guid.NewGuid();
+        var user = new User(userId, "田中 太郎", "#FF0000", "");
+
+        _userServiceMock.Setup(s => s.GetUserAsync(userId)).ReturnsAsync(user);
+
+        // Act
+        viewModel.Assignee = userId;
+        await System.Threading.Tasks.Task.Delay(100); // 非同期のプロパティ更新を待機
+
+        // Assert
+        Assert.AreEqual("田", viewModel.AssigneeInitial);
+        Assert.AreEqual("#FF0000", viewModel.AssigneeColor);
     }
 
     /// <summary>

@@ -102,6 +102,7 @@ public class MainNavigationTests
             _checkDeadlinesUseCaseMock.Object,
             _dialogServiceMock.Object,
             _identityServiceMock.Object,
+            _userServiceMock.Object,
             _settingsRepoMock.Object,
             _settings,
             _loggerMock.Object

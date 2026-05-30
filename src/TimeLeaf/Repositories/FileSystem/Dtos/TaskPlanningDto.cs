@@ -15,6 +15,6 @@ internal record TaskPlanningDto(
     DateTime? ScheduledStartDate,
     DateTime? Deadline,
     double EstimatedCost,
-    string Assignee,
+    Guid? Assignee,
     List<TaskConstraintDto> Constraints
 );

@@ -149,7 +149,8 @@ public class FolderProjectRepositoryTests
         var depTaskId = Guid.NewGuid();
         var mainTask = new ProjectTask();
         mainTask.UpdateName("MainTask");
-        mainTask.AssignTo("user123");
+        var assigneeId = Guid.NewGuid();
+        mainTask.AssignTo(assigneeId);
         mainTask.AddConstraint(new TaskConstraint(depTaskId));
         project.AddTask(mainTask);
 
@@ -161,7 +162,7 @@ public class FolderProjectRepositoryTests
         Assert.IsNotNull(loadedProject);
         var loadedTask = loadedProject.Tasks.FirstOrDefault(t => t.Id == mainTask.Id);
         Assert.IsNotNull(loadedTask);
-        Assert.AreEqual("user123", loadedTask.Assignee, "Assignee が正しく復元されること");
+        Assert.AreEqual(assigneeId, loadedTask.Assignee, "Assignee が正しく復元されること");
         Assert.AreEqual(1, loadedTask.Constraints.Count, "Constraints の要素数が正しいこと");
     }
 

@@ -128,10 +128,25 @@ public class MainViewModelTests
             _checkDeadlinesUseCaseMock.Object,
             _dialogServiceMock.Object,
             _identityServiceMock.Object,
+            _userServiceMock.Object,
             _settingsRepoMock.Object,
             _settings,
             _loggerMock.Object
         );
+    }
+
+    /// <summary>
+    /// テスト観点: 初期化時に UserService のキャッシュウォームアップが実行されることを確認する。
+    /// </summary>
+    [TestMethod]
+    public async Task Initialize_ShouldPreloadUserService()
+    {
+        // Act
+        var viewModel = CreateViewModel();
+        await Task.Delay(100);
+
+        // Assert
+        _userServiceMock.Verify(x => x.PreloadAsync(), Times.Once);
     }
 
     /// <summary>
@@ -321,7 +336,8 @@ public class MainViewModelTests
             new Mock<IDialogService>().Object,
             new Mock<IUserService>().Object,
             new Mock<IProjectService>().Object,
-            new Mock<ILogger<TaskDetailViewModel>>().Object
+            new Mock<ILogger<TaskDetailViewModel>>().Object,
+            new Mock<IGetProjectMembersUseCase>().Object
         ).Object;
         _viewModelFactoryMock
             .Setup(x => x.CreateTaskDetailViewModel(projectViewModel, taskViewModel))

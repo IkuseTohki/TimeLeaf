@@ -57,7 +57,7 @@ public class ProjectTaskTests
     {
         // Arrange
         var task = new ProjectTask();
-        var assignee = "user1";
+        var assignee = Guid.NewGuid();
 
         // Act
         task.AssignTo(assignee);
@@ -230,6 +230,7 @@ public class ProjectTaskTests
     public void Clone_ShouldCreateDeepCopy()
     {
         // Arrange
+        var assigneeId = Guid.NewGuid();
         var original = new ProjectTask(
             Guid.NewGuid(),
             "Original Task",
@@ -242,7 +243,7 @@ public class ProjectTaskTests
             null,
             10.0,
             2.0,
-            "Assignee",
+            assigneeId,
             new System.Collections.Generic.List<TaskConstraint> { new TaskConstraint(Guid.NewGuid()) },
             new System.Collections.Generic.List<Comment>()
         );
@@ -255,6 +256,7 @@ public class ProjectTaskTests
         Assert.AreNotSame(original, clone);
         Assert.AreEqual(original.Id, clone.Id);
         Assert.AreEqual(original.Name, clone.Name);
+        Assert.AreEqual(original.Assignee, clone.Assignee);
         Assert.AreEqual(original.Constraints.Count, clone.Constraints.Count);
         // TaskConstraint は record（不変）のため、参照が同一であっても問題ないが、
         // リスト自体は別物であることを確認する
@@ -280,10 +282,11 @@ public class ProjectTaskTests
             null,
             0,
             0,
-            "",
+            null,
             null,
             null
         );
+        var assigneeId = Guid.NewGuid();
         var source = new ProjectTask(
             target.Id,
             "New Name",
@@ -296,7 +299,7 @@ public class ProjectTaskTests
             DateTime.Now,
             10,
             5,
-            "user1",
+            assigneeId,
             null,
             null
         );
@@ -309,6 +312,6 @@ public class ProjectTaskTests
         Assert.AreEqual("New Desc", target.Description);
         Assert.AreEqual(TaskStatus.Completed, target.Status);
         Assert.AreEqual(TaskPriority.High, target.Priority);
-        Assert.AreEqual("user1", target.Assignee);
+        Assert.AreEqual(assigneeId, target.Assignee);
     }
 }

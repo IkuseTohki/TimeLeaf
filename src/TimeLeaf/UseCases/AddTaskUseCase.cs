@@ -30,7 +30,7 @@ public class AddTaskUseCase : IAddTaskUseCase
         DateTime? actualEndDate,
         double estimatedCost,
         double actualCost,
-        string assignee
+        Guid? assignee
     )
     {
         var task = new ProjectTask();

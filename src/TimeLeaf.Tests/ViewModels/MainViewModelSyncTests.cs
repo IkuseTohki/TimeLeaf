@@ -110,6 +110,7 @@ public class MainViewModelSyncTests
             checkDeadlinesUseCaseMock.Object,
             dialogServiceMock.Object,
             identityServiceMock.Object,
+            _userServiceMock.Object,
             settingsRepoMock.Object,
             settings,
             loggerMock.Object

@@ -131,9 +131,9 @@ public partial class ProjectWorkspaceViewModel : ObservableObject, IDisposable
 
     private void OnUnreadCountChanged(object? sender, EventArgs e) => UpdateUnreadCount();
 
-    private void OnGlobalRequestDetail(object? sender, ProjectTaskViewModel task)
+    private async void OnGlobalRequestDetail(object? sender, ProjectTaskViewModel task)
     {
-        OpenTaskDetail(task);
+        await OpenTaskDetail(task);
     }
 
     private void UpdateUnreadCount()
@@ -203,9 +203,9 @@ public partial class ProjectWorkspaceViewModel : ObservableObject, IDisposable
         return vm!;
     }
 
-    private void OnTaskDetailRequested(object? sender, ProjectTaskViewModel task)
+    private async void OnTaskDetailRequested(object? sender, ProjectTaskViewModel task)
     {
-        OpenTaskDetail(task);
+        await OpenTaskDetail(task);
     }
 
     /// <summary>
@@ -213,7 +213,7 @@ public partial class ProjectWorkspaceViewModel : ObservableObject, IDisposable
     /// </summary>
     /// <param name="task">表示対象のタスクViewModel。</param>
     [RelayCommand]
-    public void OpenTaskDetail(ProjectTaskViewModel task)
+    public async System.Threading.Tasks.Task OpenTaskDetail(ProjectTaskViewModel task)
     {
         _logger.LogInformation("Navigating to task detail for {TaskName} within main content area.", task.Name);
 
@@ -224,6 +224,7 @@ public partial class ProjectWorkspaceViewModel : ObservableObject, IDisposable
         }
 
         var detailVm = _viewModelFactory.CreateTaskDetailViewModel(_projectViewModel, task);
+        await detailVm.LoadMembersAsync();
 
         // 閉じる要求（戻る要求）をハンドル
         detailVm.RequestClose += (result) => CloseTaskDetail();

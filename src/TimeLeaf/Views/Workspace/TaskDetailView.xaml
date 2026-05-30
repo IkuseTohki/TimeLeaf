@@ -11,6 +11,7 @@
              MinHeight="400"
              d:DataContext="{d:DesignInstance wvm:TaskDetailViewModel}"
              mc:Ignorable="d">
+    <UserControl.Resources />
     <Grid Background="{DynamicResource SurfaceBaseBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -215,11 +216,13 @@
                             <TextBlock VerticalAlignment="Center"
                                        Style="{StaticResource TaskPanelMetaLabelStyle}"
                                        Text="担当者" />
-                            <TextBlock Grid.Column="2"
-                                       VerticalAlignment="Center"
-                                       FontWeight="Bold"
-                                       Foreground="{DynamicResource TextPrimaryBrush}"
-                                       Text="{Binding Task.Assignee}" />
+                            <c:LeafSearchableSelector Grid.Column="2"
+                                                      DisplayMemberPath="DisplayName"
+                                                      ItemTemplate="{StaticResource TeammateItemTemplate}"
+                                                      ItemsSource="{Binding AvailableTeammates}"
+                                                      Placeholder="担当者を選択..."
+                                                      SelectedItem="{Binding SelectedAssignee}"
+                                                      SelectedTemplate="{StaticResource TeammateSelectedTemplate}" />
                         </Grid>
 
                         <Separator Margin="0,0,0,16" Background="{DynamicResource OutlineBaseBrush}" />

@@ -1,6 +1,7 @@
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using TimeLeaf.Repositories.FileSystem.Converters;
 
 namespace TimeLeaf.Repositories.FileSystem;
 
@@ -14,7 +15,7 @@ public class JsonProjectFileSystemSerializer : IProjectFileSystemSerializer
         PropertyNameCaseInsensitive = true,
         WriteIndented = true,
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping, // 日本語をエスケープせずに保存
-        Converters = { new JsonStringEnumConverter() }, // Enum を文字列で保存
+        Converters = { new JsonStringEnumConverter(), new FlexibleNullableGuidConverter() },
     };
 
     public string Serialize<T>(T dto)

@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Threading.Tasks;
 using LeafKit.UI.Services;
 using Microsoft.Extensions.Logging;
@@ -24,6 +26,7 @@ public class TaskDetailViewModelTests
     private Mock<IUserService> _userServiceMock = null!;
     private Mock<IJoinProjectUseCase> _joinProjectUseCaseMock = null!;
     private Mock<IViewModelFactory> _viewModelFactoryMock = null!;
+    private Mock<IGetProjectMembersUseCase> _getProjectMembersUseCaseMock = null!;
 
     private Mock<IProjectService> _projectServiceMock = null!;
 
@@ -42,6 +45,7 @@ public class TaskDetailViewModelTests
         _userServiceMock = new Mock<IUserService>();
         _joinProjectUseCaseMock = new Mock<IJoinProjectUseCase>();
         _viewModelFactoryMock = new Mock<IViewModelFactory>();
+        _getProjectMembersUseCaseMock = new Mock<IGetProjectMembersUseCase>();
         _viewModelFactoryMock
             .Setup(x => x.CreateProjectTaskViewModel(It.IsAny<ProjectTask>()))
             .Returns((ProjectTask t) => new ProjectTaskViewModel(t, _userServiceMock.Object));
@@ -68,7 +72,7 @@ public class TaskDetailViewModelTests
             null,
             0,
             0,
-            "",
+            null,
             null,
             null
         );
@@ -84,7 +88,8 @@ public class TaskDetailViewModelTests
             _dialogServiceMock.Object,
             _userServiceMock.Object,
             _projectServiceMock.Object,
-            _loggerMock.Object
+            _loggerMock.Object,
+            _getProjectMembersUseCaseMock.Object
         );
     }
 
@@ -293,7 +298,7 @@ public class TaskDetailViewModelTests
     }
 
     [TestMethod]
-    public void AddCommentCommand_CanExecute_ShouldReturnFalse_WhenContentIsEmpty()
+    public async Task AddCommentCommand_CanExecute_ShouldReturnFalse_WhenContentIsEmpty()
     {
         // Arrange
         _viewModel.NewCommentContent = "";
@@ -306,5 +311,36 @@ public class TaskDetailViewModelTests
 
         // Assert
         Assert.IsTrue(_viewModel.AddCommentCommand.CanExecute(null));
+    }
+
+    /// <summary>
+    /// テスト観点: 担当者選択用のメンバーリストが正しく取得されることを確認する。
+    /// </summary>
+    [TestMethod]
+    public async Task LoadMembers_ShouldFetchFromUseCase()
+    {
+        // Arrange
+        var members = new List<User> { new User(Guid.NewGuid(), "User1", "#000", "") };
+        _getProjectMembersUseCaseMock.Setup(x => x.ExecuteAsync(_projectViewModel.Model)).ReturnsAsync(members);
+
+        var viewModel = new TaskDetailViewModel(
+            _projectViewModel,
+            _taskViewModel,
+            _addCommentUseCaseMock.Object,
+            _saveProjectUseCaseMock.Object,
+            _deleteTaskUseCaseMock.Object,
+            _dialogServiceMock.Object,
+            _userServiceMock.Object,
+            _projectServiceMock.Object,
+            _loggerMock.Object,
+            _getProjectMembersUseCaseMock.Object
+        );
+
+        // Act
+        await viewModel.LoadMembersAsync();
+
+        // Assert
+        Assert.AreEqual(1, viewModel.AvailableTeammates.Count);
+        Assert.AreEqual("User1", viewModel.AvailableTeammates[0].DisplayName);
     }
 }

@@ -409,7 +409,7 @@ public partial class ProjectTasksViewModel : ObservableObject
 
             if (result)
             {
-                var assigneeName = addTaskVm.Assignee?.DisplayName ?? string.Empty;
+                var assigneeId = addTaskVm.Assignee?.Id;
                 var parentId = container?.Id != Guid.Empty ? container?.Id : null;
 
                 await _addTaskUseCase.ExecuteAsync(
@@ -425,7 +425,7 @@ public partial class ProjectTasksViewModel : ObservableObject
                     null, // actualEndDate
                     addTaskVm.EstimatedWorkHours ?? 0,
                     0, // actualCost
-                    assigneeName
+                    assigneeId
                 );
 
                 _projectViewModel.SyncFromModel();

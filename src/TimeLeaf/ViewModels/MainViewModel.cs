@@ -37,6 +37,7 @@ public partial class MainViewModel : ObservableObject
     private readonly ICheckTaskDeadlinesUseCase _checkDeadlinesUseCase;
     private readonly IDialogService _dialogService;
     private readonly IIdentityService _identityService;
+    private readonly IUserService _userService;
     private readonly IApplicationSettingsRepository _settingsRepo;
     private readonly ApplicationSettings _settings;
     private readonly ILogger<MainViewModel> _logger;
@@ -158,6 +159,7 @@ public partial class MainViewModel : ObservableObject
         ICheckTaskDeadlinesUseCase checkDeadlinesUseCase,
         IDialogService dialogService,
         IIdentityService identityService,
+        IUserService userService,
         IApplicationSettingsRepository settingsRepo,
         ApplicationSettings settings,
         ILogger<MainViewModel> logger
@@ -177,6 +179,7 @@ public partial class MainViewModel : ObservableObject
         _checkDeadlinesUseCase = checkDeadlinesUseCase;
         _dialogService = dialogService;
         _identityService = identityService;
+        _userService = userService;
         _settingsRepo = settingsRepo;
         _settings = settings;
         _logger = logger;
@@ -298,6 +301,9 @@ public partial class MainViewModel : ObservableObject
 
     private async System.Threading.Tasks.Task InitializeAsync()
     {
+        _logger.LogInformation("Warming up UserService cache");
+        await _userService.PreloadAsync();
+
         _logger.LogInformation("Loading initial projects via ProjectService");
         _saveCoordinator.IsEnabled = false;
         try
@@ -387,7 +393,7 @@ public partial class MainViewModel : ObservableObject
 
         if (task != null)
         {
-            workspaceVm.OpenTaskDetail(task);
+            _ = workspaceVm.OpenTaskDetail(task);
         }
 
         CurrentViewModel = workspaceVm;

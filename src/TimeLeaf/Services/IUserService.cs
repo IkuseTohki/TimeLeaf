@@ -12,6 +12,12 @@ namespace TimeLeaf.Services;
 public interface IUserService
 {
     /// <summary>
+    /// すべてのユーザー情報をリポジトリから一括で読み込み、キャッシュを初期化します。
+    /// アプリケーション起動時のパフォーマンス向上のために使用します。
+    /// </summary>
+    Task PreloadAsync();
+
+    /// <summary>
     /// 指定されたIDのユーザー情報を取得します。
     /// キャッシュにあればそれを返し、なければリポジトリから取得してキャッシュします。
     /// </summary>

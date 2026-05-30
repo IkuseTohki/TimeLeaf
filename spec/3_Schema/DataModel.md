@@ -55,8 +55,8 @@
 - **名前 (`Name`):** string (MUST)
 - **詳細説明 (`Description`):** string (Markdown対応 / MAY)
 - **優先度 (`Priority`):** int または enum (緊急度・重要度)
-- **作業担当者 (`AssigneeId`):** Guid?
-- **レビュアー (`ReviewerId`):** Guid?
+- **作業担当者 (`Assignee`):** Guid?
+- **レビュアー (`Reviewer`):** Guid?
 - **ウォッチャー (`WatcherIds`):** List<Guid>
 
 **【スケジュールと工数】**
@@ -117,6 +117,7 @@
 - **表示名 (`DisplayName`):** string (MUST)
 - **テーマカラー (`ThemeColor`):** string (SHOULD)
 - **アイコンパス (`IconPath`):** string (MAY)
+- **論理削除 (`IsDeleted`):** bool (MUST / デフォルト: `false`)
 - **更新日時 (`UpdatedAt`):** DateTime (MUST)
 
 ## 4. Comment (インライン・コメント)

@@ -232,7 +232,8 @@ public class ProjectWorkspaceViewModelTests
             new Mock<IDialogService>().Object,
             _userServiceMock.Object,
             new Mock<IProjectService>().Object,
-            new Mock<ILogger<TaskDetailViewModel>>().Object
+            new Mock<ILogger<TaskDetailViewModel>>().Object,
+            new Mock<IGetProjectMembersUseCase>().Object
         );
 
         _viewModelFactoryMock.Setup(x => x.CreateTaskDetailViewModel(_projectViewModel, taskVm)).Returns(detailVm);

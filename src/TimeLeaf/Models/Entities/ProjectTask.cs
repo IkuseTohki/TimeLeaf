@@ -49,7 +49,7 @@ public class ProjectTask : ProjectWorkItem
     /// <summary>
     /// 作業担当者。
     /// </summary>
-    public string Assignee { get; private set; } = string.Empty;
+    public Guid? Assignee { get; private set; }
 
     /// <summary>
     /// 予定開始日（ProjectWorkItem.PlannedStartDate へのエイリアス）。
@@ -89,7 +89,7 @@ public class ProjectTask : ProjectWorkItem
         DateTime? actualEndDate,
         double estimatedCost,
         double actualCost,
-        string assignee,
+        Guid? assignee,
         List<TaskConstraint>? constraints,
         List<Comment>? comments
     )
@@ -188,9 +188,9 @@ public class ProjectTask : ProjectWorkItem
     /// <summary>
     /// 担当者を更新します。
     /// </summary>
-    public void AssignTo(string assignee)
+    public void AssignTo(Guid? assignee)
     {
-        Assignee = assignee ?? string.Empty;
+        Assignee = assignee;
     }
 
     /// <summary>

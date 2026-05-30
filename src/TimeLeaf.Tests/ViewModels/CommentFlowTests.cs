@@ -124,6 +124,7 @@ public class CommentFlowTests
             checkDeadlinesUseCaseMock.Object,
             _dialogServiceMock.Object,
             _identityServiceMock.Object,
+            _userServiceMock.Object,
             settingsRepoMock.Object,
             settings,
             loggerMock.Object
@@ -169,7 +170,8 @@ public class CommentFlowTests
             new Mock<IDialogService>().Object,
             _userServiceMock.Object,
             new Mock<IProjectService>().Object,
-            new Mock<ILogger<TaskDetailViewModel>>().Object
+            new Mock<ILogger<TaskDetailViewModel>>().Object,
+            new Mock<IGetProjectMembersUseCase>().Object
         );
 
         var commentContent = "New Test Comment";

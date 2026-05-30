@@ -15,6 +15,7 @@
     <tlcv:DeadlineToBrushConverter x:Key="DeadlineToBrushConverter" />
     <tlcv:PriorityToVisibilityConverter x:Key="PriorityToVisibilityConverter" />
     <tlcv:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+    <tlcv:UserInitialConverter x:Key="UserInitialConverter" />
     <tlcv:MoveTaskArgsConverter x:Key="MoveTaskArgsConverter" />
     <lk:EqualityToBooleanConverter x:Key="EqualityToBooleanConverter" />
     <lk:ComparisonConverter x:Key="ComparisonConverter" />

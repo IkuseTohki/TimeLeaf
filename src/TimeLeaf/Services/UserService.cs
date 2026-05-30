@@ -27,6 +27,16 @@ public class UserService : IUserService, IDisposable
         _userRepository.UserChanged += OnRepositoryUserChanged;
     }
 
+    /// <inheritdoc />
+    public async Task PreloadAsync()
+    {
+        var users = await _userRepository.GetAllUsersAsync();
+        foreach (var user in users)
+        {
+            _cache[user.Id] = user;
+        }
+    }
+
     private async void OnRepositoryUserChanged(object? sender, Guid userId)
     {
         // ファイルが更新されたら再取得してキャッシュを更新

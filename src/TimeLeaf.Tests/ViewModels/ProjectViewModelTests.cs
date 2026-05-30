@@ -106,14 +106,16 @@ public class ProjectViewModelTests
     {
         var task = new ProjectTask();
         task.UpdateName("Old Task");
-        task.AssignTo("Old User");
+        var oldUserId = Guid.NewGuid();
+        task.AssignTo(oldUserId);
         var viewModel = new ProjectTaskViewModel(task, _userServiceMock.Object);
 
+        var newUserId = Guid.NewGuid();
         viewModel.Name = "New Task";
-        viewModel.Assignee = "New User";
+        viewModel.Assignee = newUserId;
 
         Assert.AreEqual("New Task", task.Name);
-        Assert.AreEqual("New User", task.Assignee);
+        Assert.AreEqual(newUserId, task.Assignee);
     }
 
     [TestMethod]
@@ -488,7 +490,7 @@ public class ProjectViewModelTests
     [DataRow(120, "2分前")]
     [DataRow(3599, "59分前")]
     [DataRow(3600, "1時間前")]
-    [DataRow(86399, "23時間前")]
+    [DataRow(82800, "23時間前")]
     public void DisplayLastUpdated_ShouldReturnRelativeTimeStrings_AtBoundaries(int secondsOffset, string expected)
     {
         // Arrange

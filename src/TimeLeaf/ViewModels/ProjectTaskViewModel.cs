@@ -178,7 +178,7 @@ public partial class ProjectTaskViewModel : ObservableObject, IDisposable
         }
     }
 
-    public string Assignee
+    public Guid? Assignee
     {
         get => _projectTask.Assignee;
         set
@@ -188,6 +188,7 @@ public partial class ProjectTaskViewModel : ObservableObject, IDisposable
                 _projectTask.AssignTo(value);
                 OnPropertyChanged(nameof(Assignee));
                 OnPropertyChanged(nameof(AssigneeName));
+                _ = UpdateAssigneePropertiesAsync();
             }
         }
     }
@@ -197,14 +198,62 @@ public partial class ProjectTaskViewModel : ObservableObject, IDisposable
     /// </summary>
     public string AssigneeName
     {
-        get => _userService.GetUserName(Assignee);
+        get => _userService.GetUserName(Assignee?.ToString() ?? string.Empty);
         set
         {
-            var userId = _userService.GetUserIdByName(value);
-            if (userId != null)
+            var userIdStr = _userService.GetUserIdByName(value);
+            if (Guid.TryParse(userIdStr, out var userId))
             {
                 Assignee = userId;
             }
+            else
+            {
+                Assignee = null;
+            }
+        }
+    }
+
+    [ObservableProperty]
+    private string _assigneeInitial = "?";
+
+    [ObservableProperty]
+    private string _assigneeColor = "#72796e";
+
+    private System.Threading.CancellationTokenSource? _assigneeUpdateCts;
+
+    private async System.Threading.Tasks.Task UpdateAssigneePropertiesAsync()
+    {
+        _assigneeUpdateCts?.Cancel();
+        _assigneeUpdateCts = new System.Threading.CancellationTokenSource();
+        var ct = _assigneeUpdateCts.Token;
+
+        try
+        {
+            if (Assignee.HasValue)
+            {
+                var user = await _userService.GetUserAsync(Assignee.Value);
+                if (ct.IsCancellationRequested)
+                    return;
+
+                if (user != null)
+                {
+                    AssigneeInitial = string.IsNullOrEmpty(user.DisplayName) ? "?" : user.DisplayName.Substring(0, 1);
+                    AssigneeColor = user.ThemeColor;
+                    return;
+                }
+            }
+        }
+        catch (OperationCanceledException) { }
+        catch (Exception ex)
+        {
+            // ロギングは必要だが、ここではデフォルト値に戻す
+            System.Diagnostics.Debug.WriteLine($"Failed to update assignee properties: {ex.Message}");
+        }
+
+        if (!ct.IsCancellationRequested)
+        {
+            AssigneeInitial = "?";
+            AssigneeColor = "#72796e";
         }
     }
 
@@ -274,6 +323,7 @@ public partial class ProjectTaskViewModel : ObservableObject, IDisposable
         _projectTask = projectTask ?? throw new ArgumentNullException(nameof(projectTask));
         _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         SyncComments();
+        _ = UpdateAssigneePropertiesAsync();
     }
 
     private void SyncComments()
@@ -308,6 +358,7 @@ public partial class ProjectTaskViewModel : ObservableObject, IDisposable
 
         _projectTask = newModel;
         SyncComments();
+        _ = UpdateAssigneePropertiesAsync();
 
         OnPropertyChanged(nameof(Name));
         OnPropertyChanged(nameof(Description));
