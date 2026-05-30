@@ -43,6 +43,22 @@
     </ControlTemplate>
 
     <!-- ============================================================ -->
+    <!-- Global DataTemplates for Enums -->
+    <!-- ============================================================ -->
+
+    <DataTemplate DataType="{x:Type me:TaskStatus}">
+        <TextBlock Text="{Binding Converter={StaticResource EnumToDisplayNameConverter}}" />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type me:TaskPriority}">
+        <TextBlock Text="{Binding Converter={StaticResource EnumToDisplayNameConverter}}" />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type me:ProjectStatus}">
+        <TextBlock Text="{Binding Converter={StaticResource EnumToDisplayNameConverter}}" />
+    </DataTemplate>
+
+    <!-- ============================================================ -->
     <!-- Teammate / User Selection Templates -->
     <!-- ============================================================ -->
 
@@ -137,7 +153,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Width="*" Header="Task Name">
+                <DataGridTemplateColumn Width="*" Header="タスク名">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock VerticalAlignment="Center"
@@ -151,7 +167,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Width="150" Header="Project">
+                <DataGridTemplateColumn Width="150" Header="プロジェクト">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock VerticalAlignment="Center"
@@ -161,7 +177,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Width="120" Header="Assignee">
+                <DataGridTemplateColumn Width="120" Header="担当者">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock VerticalAlignment="Center"
@@ -171,7 +187,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Width="100" Header="Due Date">
+                <DataGridTemplateColumn Width="100" Header="期限">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock VerticalAlignment="Center" Text="{Binding Deadline, StringFormat={}{0:MMM dd\, yyyy}}">
@@ -197,7 +213,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Width="100" Header="Priority">
+                <DataGridTemplateColumn Width="100" Header="優先度">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" Style="{StaticResource AllTasksFilterItemStyle}">
@@ -221,16 +237,16 @@
                                 </Ellipse>
                                 <TextBlock VerticalAlignment="Center"
                                            Style="{StaticResource MetaBaseStyle}"
-                                           Text="{Binding Priority}" />
+                                           Text="{Binding Priority, Converter={StaticResource EnumToDisplayNameConverter}}" />
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Width="100" Header="Status">
+                <DataGridTemplateColumn Width="100" Header="ステータス">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock VerticalAlignment="Center" Text="{Binding Status}">
+                            <TextBlock VerticalAlignment="Center" Text="{Binding Status, Converter={StaticResource EnumToDisplayNameConverter}}">
                                 <TextBlock.Style>
                                     <Style BasedOn="{StaticResource AllTasksPropertyValueStyle}" TargetType="TextBlock">
                                         <Style.Triggers>
