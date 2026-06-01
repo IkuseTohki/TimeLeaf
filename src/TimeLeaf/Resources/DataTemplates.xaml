@@ -68,7 +68,6 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
             <Border Width="32"
@@ -77,29 +76,12 @@
                 <ContentControl Template="{StaticResource PersonAvatarTemplate}" />
             </Border>
 
-            <StackPanel Grid.Column="1"
-                        Margin="12,0"
-                        VerticalAlignment="Center">
-                <TextBlock FontWeight="SemiBold"
-                           Foreground="{DynamicResource TextPrimaryBrush}"
-                           Text="{Binding DisplayName}" />
-            </StackPanel>
-
-            <!-- 選択チェックマーク -->
-            <Path x:Name="CheckMark"
-                  Grid.Column="2"
-                  Width="14"
-                  Height="14"
-                  Data="{StaticResource CheckIconGeometry}"
-                  Fill="{DynamicResource BrandPrimaryBrush}"
-                  Stretch="Uniform"
-                  Visibility="Collapsed" />
+            <TextBlock Grid.Column="1"
+                       Margin="12,0"
+                       VerticalAlignment="Center"
+                       Style="{StaticResource TextBaseStyle}"
+                       Text="{Binding DisplayName}" />
         </Grid>
-        <DataTemplate.Triggers>
-            <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
-                <Setter TargetName="CheckMark" Property="Visibility" Value="Visible" />
-            </DataTrigger>
-        </DataTemplate.Triggers>
     </DataTemplate>
 
     <!-- セレクター用選択済みテンプレート（ヘッダー表示） -->
@@ -118,10 +100,60 @@
                        Margin="6,0"
                        VerticalAlignment="Center"
                        Foreground="{DynamicResource TextPrimaryBrush}"
-                       Style="{StaticResource LabelBaseStyle}"
+                       Style="{StaticResource TextBaseStyle}"
                        Text="{Binding DisplayName}" />
         </Grid>
     </DataTemplate>
+
+    <!-- コンパクト版: セレクター用アイテムテンプレート -->
+    <DataTemplate x:Key="TeammateItemCompactTemplate">
+        <Grid Margin="2,1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Width="20"
+                    Height="20"
+                    Background="Transparent">
+                <ContentControl Template="{StaticResource PersonAvatarTemplate}" />
+            </Border>
+
+            <TextBlock Grid.Column="1"
+                       Margin="8,0"
+                       VerticalAlignment="Center"
+                       Style="{StaticResource TextBaseStyle}"
+                       Text="{Binding DisplayName}" />
+        </Grid>
+    </DataTemplate>
+
+    <!-- コンパクト版: セレクター用選択済みテンプレート -->
+    <DataTemplate x:Key="TeammateSelectedCompactTemplate">
+        <Grid x:Name="SelectedContent">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Border Width="16"
+                    Height="16"
+                    VerticalAlignment="Center">
+                <ContentControl Template="{StaticResource PersonAvatarTemplate}" />
+            </Border>
+            <TextBlock Grid.Column="1"
+                       Margin="4,0"
+                       VerticalAlignment="Center"
+                       Style="{StaticResource TextBaseStyle}"
+                       Text="{Binding DisplayName}" />
+        </Grid>
+    </DataTemplate>
+
+    <!-- コンパクト版: ListBoxItem スタイル -->
+    <Style x:Key="TeammateItemContainerCompactStyle"
+           BasedOn="{StaticResource SearchableSelectorListBoxItemStyle}"
+           TargetType="ListBoxItem">
+        <Setter Property="Padding" Value="8,4" />
+        <Setter Property="Margin" Value="0,0" />
+    </Style>
 
     <!-- ============================================================ -->
     <!-- All Tasks View Templates -->

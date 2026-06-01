@@ -61,11 +61,12 @@
                 <Label Content="担当者" Style="{StaticResource SectionHeaderLabelStyle}" />
                 <c:LeafSearchableSelector Margin="{StaticResource FormItemMargin}"
                                           DisplayMemberPath="DisplayName"
-                                          ItemTemplate="{StaticResource TeammateItemTemplate}"
+                                          ItemContainerStyle="{StaticResource TeammateItemContainerCompactStyle}"
+                                          ItemTemplate="{StaticResource TeammateItemCompactTemplate}"
                                           ItemsSource="{Binding Teammates}"
                                           Placeholder="担当者を選択..."
                                           SelectedItem="{Binding Assignee}"
-                                          SelectedTemplate="{StaticResource TeammateSelectedTemplate}" />
+                                          SelectedTemplate="{StaticResource TeammateSelectedCompactTemplate}" />
             </StackPanel>
 
             <StackPanel Grid.Row="1" Grid.Column="2">

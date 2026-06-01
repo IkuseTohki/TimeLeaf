@@ -25,6 +25,12 @@
         <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
     </Style>
 
+    <!-- 標準テキスト: テキスト -->
+    <Style x:Key="TextBaseStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    </Style>
+
     <!-- 補足テキスト: 注釈、メタ情報、タイムスタンプ -->
     <Style x:Key="MetaBaseStyle" TargetType="TextBlock">
         <Setter Property="FontSize" Value="10" />
