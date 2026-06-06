@@ -250,6 +250,20 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock VerticalAlignment="Center"
                                        Style="{StaticResource TextBlockWorkspaceTaskPanelMetaLabelStyle}"
+                                       Text="予定開始日" />
+                            <c:LeafDatePicker Grid.Column="1"
+                                              HorizontalAlignment="Left"
+                                              Placeholder="Set start date"
+                                              SelectedDate="{Binding Task.ScheduledStartDate}" />
+                        </Grid>
+
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="MetaLabel" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock VerticalAlignment="Center"
+                                       Style="{StaticResource TextBlockWorkspaceTaskPanelMetaLabelStyle}"
                                        Text="期限" />
                             <c:LeafDatePicker Grid.Column="1"
                                               HorizontalAlignment="Left"

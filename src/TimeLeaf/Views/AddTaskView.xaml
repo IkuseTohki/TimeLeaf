@@ -58,15 +58,10 @@
             </StackPanel>
 
             <StackPanel Grid.Row="1" Grid.Column="0">
-                <Label Content="担当者" Style="{StaticResource LabelFormSectionHeaderStyle}" />
-                <c:LeafSearchableSelector Margin="{StaticResource FormItemMargin}"
-                                          DisplayMemberPath="DisplayName"
-                                          ItemContainerStyle="{StaticResource TeammateItemContainerCompactStyle}"
-                                          ItemTemplate="{StaticResource TeammateItemCompactTemplate}"
-                                          ItemsSource="{Binding Teammates}"
-                                          Placeholder="担当者を選択..."
-                                          SelectedItem="{Binding Assignee}"
-                                          SelectedTemplate="{StaticResource TeammateSelectedCompactTemplate}" />
+                <Label Content="予定開始日" Style="{StaticResource LabelFormSectionHeaderStyle}" />
+                <c:LeafDatePicker Margin="{StaticResource FormItemMargin}"
+                                  Placeholder="Select start date..."
+                                  SelectedDate="{Binding PlannedStartDate}" />
             </StackPanel>
 
             <StackPanel Grid.Row="1" Grid.Column="2">
@@ -76,6 +71,16 @@
                                   SelectedDate="{Binding DueDate}" />
             </StackPanel>
         </Grid>
+
+        <Label Content="担当者" Style="{StaticResource LabelFormSectionHeaderStyle}" />
+        <c:LeafSearchableSelector Margin="{StaticResource FormItemMargin}"
+                                  DisplayMemberPath="DisplayName"
+                                  ItemContainerStyle="{StaticResource TeammateItemContainerCompactStyle}"
+                                  ItemTemplate="{StaticResource TeammateItemCompactTemplate}"
+                                  ItemsSource="{Binding Teammates}"
+                                  Placeholder="担当者を選択..."
+                                  SelectedItem="{Binding Assignee}"
+                                  SelectedTemplate="{StaticResource TeammateSelectedCompactTemplate}" />
 
         <Label Content="見積工数 (h)" Style="{StaticResource LabelFormSectionHeaderStyle}" />
         <TextBox Margin="{StaticResource FormItemMargin}"

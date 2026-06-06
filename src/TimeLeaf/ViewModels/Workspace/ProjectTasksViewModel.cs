@@ -419,7 +419,7 @@ public partial class ProjectTasksViewModel : ObservableObject
                     addTaskVm.Status,
                     addTaskVm.Priority,
                     parentId,
-                    null, // scheduledStartDate
+                    addTaskVm.PlannedStartDate,
                     addTaskVm.DueDate,
                     null, // actualStartDate
                     null, // actualEndDate

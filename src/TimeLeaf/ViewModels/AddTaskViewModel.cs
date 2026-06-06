@@ -40,6 +40,9 @@ public partial class AddTaskViewModel : ObservableObject, IDialogViewModel, IDis
     private DateTime? _dueDate;
 
     [ObservableProperty]
+    private DateTime? _plannedStartDate;
+
+    [ObservableProperty]
     private double? _estimatedWorkHours;
 
     public AddTaskViewModel()
