@@ -6,7 +6,18 @@
              d:DesignHeight="450"
              d:DesignWidth="800"
              mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Resources/Tokens/Layout.xaml" />
+                <ResourceDictionary Source="/Resources/Tokens/Typography.xaml" />
+                <ResourceDictionary Source="/Resources/Controls/Text.xaml" />
+                <ResourceDictionary Source="/Resources/Controls/Containers.xaml" />
+                <ResourceDictionary Source="/Resources/Components/WorkspaceView.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
     <Grid>
-        <TextBlock Style="{StaticResource ViewPlaceholderTextStyle}" Text="Timeline View" />
+        <TextBlock Style="{StaticResource TextBlockViewPlaceholderStyle}" Text="Timeline View" />
     </Grid>
 </UserControl>

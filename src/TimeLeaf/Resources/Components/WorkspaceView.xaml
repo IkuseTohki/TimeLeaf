@@ -1,0 +1,383 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="http://schemas.leafkit.com/wpf/ui/controls">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="../Tokens/Layout.xaml" />
+        <ResourceDictionary Source="../Tokens/Typography.xaml" />
+        <ResourceDictionary Source="../Controls/Text.xaml" />
+        <ResourceDictionary Source="../Controls/Buttons.xaml" />
+        <ResourceDictionary Source="../Controls/Inputs.xaml" />
+        <ResourceDictionary Source="../Controls/Containers.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <!-- ====================================================================== -->
+    <!-- Workspace Layout -->
+    <!-- ====================================================================== -->
+
+    <!-- プロジェクト名のタイトルスタイル -->
+    <Style x:Key="TextBlockWorkspaceTitleStyle"
+           BasedOn="{StaticResource TextBlockViewHeaderTitleStyle}"
+           TargetType="TextBlock" />
+
+    <!-- プロジェクト状態（進行中など）のテキストスタイル -->
+    <Style x:Key="RunWorkspaceStatusStyle" TargetType="Run">
+        <Setter Property="BaselineAlignment" Value="Center" />
+        <Setter Property="FontSize" Value="{StaticResource FontSizeCaption}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    </Style>
+
+    <!-- ====================================================================== -->
+    <!-- Dashboard Components -->
+    <!-- ====================================================================== -->
+
+    <Style x:Key="TextBlockWorkspaceDashboardDescriptionStyle"
+           BasedOn="{StaticResource TextBlockLabelBaseStyle}"
+           TargetType="TextBlock">
+        <Setter Property="Margin" Value="0,8,0,0" />
+        <Setter Property="FontSize" Value="{StaticResource FontSizeSubHeader}" />
+        <Setter Property="FontWeight" Value="{StaticResource FontWeightNormal}" />
+        <Setter Property="LineHeight" Value="20" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <Style x:Key="ButtonWorkspaceDashboardAddMilestoneStyle"
+           BasedOn="{StaticResource ButtonIconStyle}"
+           TargetType="Button">
+        <Setter Property="Width" Value="16" />
+        <Setter Property="Height" Value="16" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandPrimaryBrush}" />
+    </Style>
+
+    <Style x:Key="BorderWorkspaceDashboardCardStyle"
+           BasedOn="{StaticResource OrganicCardStyle}"
+           TargetType="Border">
+        <Setter Property="Padding" Value="{StaticResource Thickness30}" />
+    </Style>
+
+    <!-- ====================================================================== -->
+    <!-- Task Components -->
+    <!-- ====================================================================== -->
+
+    <Style x:Key="TextBlockWorkspaceTaskGroupTitleStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
+        <Setter Property="FontWeight" Value="{StaticResource FontWeightEmphasis}" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandPrimaryBrush}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <!-- タスクパネル：ヘッダー境界のスタイル -->
+    <Style x:Key="BorderWorkspaceTaskPanelHeaderStyle" TargetType="Border">
+        <Setter Property="Padding" Value="16,16,16,12" />
+        <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
+        <Setter Property="BorderThickness" Value="0,0,0,1" />
+    </Style>
+
+    <!-- タスクパネル：タイトルのスタイル -->
+    <Style x:Key="TextBlockWorkspaceTaskPanelTitleStyle"
+           BasedOn="{StaticResource TextBlockHeaderBaseStyle}"
+           TargetType="TextBlock">
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <!-- タスク詳細：タイトルのスタイル (TaskDetailView用) -->
+    <Style x:Key="EditableLabelWorkspaceTaskDetailTitleStyle" TargetType="c:EditableLabel">
+        <Setter Property="FontSize" Value="{StaticResource FontSizeDisplay}" />
+        <Setter Property="FontWeight" Value="{StaticResource FontWeightEmphasis}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    </Style>
+
+    <!-- タスクパネル：閉じるボタンのスタイル -->
+    <Style x:Key="ButtonWorkspaceTaskPanelCloseStyle" TargetType="Button">
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="FontSize" Value="{StaticResource FontSizeTitle}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+        <Setter Property="Cursor" Value="Hand" />
+    </Style>
+
+    <!-- タスクパネル：値表示のスタイル -->
+    <Style x:Key="TextBlockWorkspaceTaskPanelValueStyle"
+           BasedOn="{StaticResource TextBlockLabelBaseStyle}"
+           TargetType="TextBlock">
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontWeight" Value="{StaticResource FontWeightNormal}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Setter Property="Margin" Value="0,0,0,12" />
+    </Style>
+
+    <!-- タスクパネル：フッターエリアのスタイル -->
+    <Style x:Key="BorderWorkspaceTaskPanelFooterStyle" TargetType="Border">
+        <Setter Property="Padding" Value="16,12" />
+        <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
+        <Setter Property="BorderThickness" Value="0,1,0,0" />
+    </Style>
+
+    <!-- タスクパネル：フッターヒントテキストのスタイル -->
+    <Style x:Key="TextBlockWorkspaceTaskPanelFooterHintStyle"
+           BasedOn="{StaticResource TextBlockMetaBaseStyle}"
+           TargetType="TextBlock">
+        <Setter Property="TextAlignment" Value="Center" />
+    </Style>
+
+    <Style x:Key="TextBlockWorkspaceTaskCommentAuthorStyle"
+           BasedOn="{StaticResource TextBlockMetaBaseStyle}"
+           TargetType="TextBlock">
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontSize" Value="11" />
+    </Style>
+
+    <!-- ====================================================================== -->
+    <!-- Comment Components -->
+    <!-- ====================================================================== -->
+
+    <!-- タスクパネル：コメント内容の境界スタイル -->
+    <Style x:Key="BorderWorkspaceTaskCommentContentStyle" TargetType="Border">
+        <Setter Property="Padding" Value="{StaticResource Thickness30}" />
+        <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />
+        <Setter Property="CornerRadius" Value="0,8,8,8" />
+        <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <!-- コメント入力エリア：外枠スタイル -->
+    <Style x:Key="BorderWorkspaceTaskCommentInputAreaStyle" TargetType="Border">
+        <Setter Property="Padding" Value="0,8,0,0" />
+        <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
+        <Setter Property="BorderThickness" Value="0,1,0,0" />
+    </Style>
+
+    <!-- コメント入力エリア：送信ボタンスタイル -->
+    <Style x:Key="ButtonWorkspaceTaskCommentSendStyle"
+           BasedOn="{StaticResource ButtonPrimaryStyle}"
+           TargetType="Button">
+        <Setter Property="Height" Value="30" />
+        <Setter Property="Width" Value="30" />
+        <Setter Property="Padding" Value="8,2" />
+    </Style>
+
+    <!-- ====================================================================== -->
+    <!-- Button Styles (Workspace Specific) -->
+    <!-- ====================================================================== -->
+
+    <Style x:Key="ButtonWorkspaceTaskAddStyle" TargetType="Button">
+        <Setter Property="Height" Value="2" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Opacity" Value="0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="BtnBorder" Background="{TemplateBinding Background}">
+                        <TextBlock x:Name="AddIcon"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   FontSize="16"
+                                   Foreground="{DynamicResource BrandPrimaryBrush}"
+                                   RenderTransformOrigin="0.5,0.5"
+                                   Text="＋" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Opacity" Value="1.0" />
+                            <Setter TargetName="AddIcon" Property="RenderTransform">
+                                <Setter.Value>
+                                    <ScaleTransform ScaleX="1.2" ScaleY="1.2" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="ButtonWorkspaceAddGroupStyle" TargetType="Button">
+        <Setter Property="Margin" Value="0,10,0,20" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid>
+                        <Rectangle x:Name="Root"
+                                   Fill="Transparent"
+                                   RadiusX="12"
+                                   RadiusY="12"
+                                   SnapsToDevicePixels="True"
+                                   Stroke="{DynamicResource OutlineBaseBrush}"
+                                   StrokeDashArray="4 2"
+                                   StrokeThickness="2" />
+                        <TextBlock x:Name="AddText"
+                                   Margin="20"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   Text="+ 新規グループを作成" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Root" Property="Stroke" Value="{DynamicResource BrandPrimaryBrush}" />
+                            <Setter TargetName="Root" Property="Fill" Value="{DynamicResource StateHoverBrush}" />
+                            <Setter TargetName="AddText" Property="Foreground" Value="{DynamicResource BrandPrimaryBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="ButtonWorkspaceReorderGhostStyle" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="8,4" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="Opacity" Value="0.4" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <StackPanel x:Name="Root"
+                                Background="Transparent"
+                                Orientation="Horizontal">
+                        <Path x:Name="Icon"
+                              Width="12"
+                              Height="12"
+                              VerticalAlignment="Center"
+                              Data="{StaticResource ListIconGeometry}"
+                              Fill="{DynamicResource TextPrimaryBrush}"
+                              Stretch="Uniform" />
+                        <TextBlock x:Name="Text"
+                                   Margin="6,0,0,0"
+                                   VerticalAlignment="Center"
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                   Text="{TemplateBinding Content}" />
+                    </StackPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Root" Property="Opacity" Value="1.0" />
+                            <Setter Property="Opacity" Value="1.0" />
+                            <Setter TargetName="Text" Property="Foreground" Value="{DynamicResource BrandPrimaryBrush}" />
+                            <Setter TargetName="Icon" Property="Fill" Value="{DynamicResource BrandPrimaryBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Opacity" Value="0.7" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ====================================================================== -->
+    <!-- Editable Controls Overrides -->
+    <!-- ====================================================================== -->
+
+    <!-- EditableTextBlock の外観（カード風）デザイン -->
+    <Style x:Key="BorderEditableTextBlockCardStyle" TargetType="Border">
+        <Setter Property="Padding" Value="16" />
+        <Setter Property="Background" Value="{DynamicResource SurfaceLayer1Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="{DynamicResource CardCornerRadius}" />
+    </Style>
+
+    <!-- EditableTextBlock のヘッダーテキスト -->
+    <Style x:Key="TextBlockEditableTextBlockHeaderStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="{StaticResource FontSizeSubHeader}" />
+        <Setter Property="FontWeight" Value="{StaticResource FontWeightEmphasis}" />
+        <Setter Property="Foreground" Value="{DynamicResource BrandPrimaryBrush}" />
+        <Setter Property="Margin" Value="0,0,0,8" />
+    </Style>
+
+    <!-- EditableTextBlock の内容テキスト -->
+    <Style x:Key="TextBlockEditableTextBlockContentStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Setter Property="LineHeight" Value="20" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <!-- EditableTextBlock の編集ボタン -->
+    <Style x:Key="BorderEditableTextBlockEditButtonStyle" TargetType="Border">
+        <Setter Property="Padding" Value="8,4" />
+        <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="12" />
+    </Style>
+
+    <!-- Semantic Aliases for backward compatibility -->
+    <Style x:Key="ProjectWorkspaceTitleStyle"
+           BasedOn="{StaticResource TextBlockWorkspaceTitleStyle}"
+           TargetType="TextBlock" />
+    <Style x:Key="ProjectStatusTextStyle"
+           BasedOn="{StaticResource RunWorkspaceStatusStyle}"
+           TargetType="Run" />
+    <Style x:Key="DashboardDescriptionTextStyle"
+           BasedOn="{StaticResource TextBlockWorkspaceDashboardDescriptionStyle}"
+           TargetType="TextBlock" />
+    <Style x:Key="DashboardAddMilestoneButtonStyle"
+           BasedOn="{StaticResource ButtonWorkspaceDashboardAddMilestoneStyle}"
+           TargetType="Button" />
+    <Style x:Key="DashboardCardStyle"
+           BasedOn="{StaticResource BorderWorkspaceDashboardCardStyle}"
+           TargetType="Border" />
+    <Style x:Key="TaskGroupTitleStyle"
+           BasedOn="{StaticResource TextBlockWorkspaceTaskGroupTitleStyle}"
+           TargetType="TextBlock" />
+    <Style x:Key="TaskPanelHeaderStyle"
+           BasedOn="{StaticResource BorderWorkspaceTaskPanelHeaderStyle}"
+           TargetType="Border" />
+    <Style x:Key="TaskPanelTitleStyle"
+           BasedOn="{StaticResource TextBlockWorkspaceTaskPanelTitleStyle}"
+           TargetType="TextBlock" />
+    <Style x:Key="TaskDetailTitleStyle"
+           BasedOn="{StaticResource EditableLabelWorkspaceTaskDetailTitleStyle}"
+           TargetType="c:EditableLabel" />
+    <Style x:Key="TaskPanelCloseButtonStyle"
+           BasedOn="{StaticResource ButtonWorkspaceTaskPanelCloseStyle}"
+           TargetType="Button" />
+    <Style x:Key="TaskPanelValueStyle"
+           BasedOn="{StaticResource TextBlockWorkspaceTaskPanelValueStyle}"
+           TargetType="TextBlock" />
+    <Style x:Key="TaskPanelFooterStyle"
+           BasedOn="{StaticResource BorderWorkspaceTaskPanelFooterStyle}"
+           TargetType="Border" />
+    <Style x:Key="TaskPanelFooterHintStyle"
+           BasedOn="{StaticResource TextBlockWorkspaceTaskPanelFooterHintStyle}"
+           TargetType="TextBlock" />
+    <Style x:Key="TaskCommentAuthorStyle"
+           BasedOn="{StaticResource TextBlockWorkspaceTaskCommentAuthorStyle}"
+           TargetType="TextBlock" />
+    <Style x:Key="TaskCommentContentStyle"
+           BasedOn="{StaticResource BorderWorkspaceTaskCommentContentStyle}"
+           TargetType="Border" />
+    <Style x:Key="TaskCommentInputAreaStyle"
+           BasedOn="{StaticResource BorderWorkspaceTaskCommentInputAreaStyle}"
+           TargetType="Border" />
+    <Style x:Key="TaskCommentButtonStyle"
+           BasedOn="{StaticResource ButtonWorkspaceTaskCommentSendStyle}"
+           TargetType="Button" />
+    <Style x:Key="EditableTextBlockCardStyle"
+           BasedOn="{StaticResource BorderEditableTextBlockCardStyle}"
+           TargetType="Border" />
+    <Style x:Key="EditableTextBlockHeaderStyle"
+           BasedOn="{StaticResource TextBlockEditableTextBlockHeaderStyle}"
+           TargetType="TextBlock" />
+    <Style x:Key="EditableTextBlockContentStyle"
+           BasedOn="{StaticResource TextBlockEditableTextBlockContentStyle}"
+           TargetType="TextBlock" />
+    <Style x:Key="EditableTextBlockEditButtonStyle"
+           BasedOn="{StaticResource BorderEditableTextBlockEditButtonStyle}"
+           TargetType="Border" />
+
+</ResourceDictionary>

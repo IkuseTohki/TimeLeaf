@@ -10,6 +10,22 @@
              d:DesignHeight="600"
              d:DesignWidth="800"
              mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Resources/Tokens/Layout.xaml" />
+                <ResourceDictionary Source="/Resources/Tokens/Typography.xaml" />
+                <ResourceDictionary Source="/Resources/Controls/Text.xaml" />
+                <ResourceDictionary Source="/Resources/Controls/Buttons.xaml" />
+                <ResourceDictionary Source="/Resources/Controls/Containers.xaml" />
+                <ResourceDictionary Source="/Resources/Components/Sidebar.xaml" />
+                <ResourceDictionary Source="/Resources/Components/UserMenu.xaml" />
+                <ResourceDictionary Source="/Resources/Components/Dialogs.xaml" />
+                <ResourceDictionary Source="/Resources/Components/Notifications.xaml" />
+                <ResourceDictionary Source="/Resources/Components/HomeView.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -19,8 +35,8 @@
         <!-- ヘッダーエリア -->
         <Grid Style="{StaticResource ViewHeaderGridStyle}">
             <StackPanel VerticalAlignment="Bottom">
-                <TextBlock Style="{StaticResource ViewHeaderTitleStyle}" Text="森の広場 (Home)" />
-                <TextBlock Style="{StaticResource ViewHeaderSubTitleStyle}" Text="全プロジェクトの状況を俯瞰しています。" />
+                <TextBlock Style="{StaticResource TextBlockViewHeaderTitleStyle}" Text="森の広場 (Home)" />
+                <TextBlock Style="{StaticResource TextBlockViewHeaderSubTitleStyle}" Text="全プロジェクトの状況を俯瞰しています。" />
             </StackPanel>
 
             <!-- ユーザーメニュー -->
@@ -29,16 +45,16 @@
                         Orientation="Horizontal">
                 <Button x:Name="UserMenuButton"
                         Command="{Binding ToggleUserMenuCommand}"
-                        Style="{StaticResource NaturalUserMenuButtonStyle}">
+                        Style="{StaticResource ButtonUserMenuNaturalStyle}">
                     <StackPanel Orientation="Horizontal">
                         <!-- アバター (イニシャル) -->
-                        <Border Style="{StaticResource UserMenuAvatarBorderStyle}">
-                            <TextBlock Style="{StaticResource UserMenuInitialTextStyle}" Text="{Binding UserMenu.UserInitial}" />
+                        <Border Style="{StaticResource BorderUserMenuAvatarStyle}">
+                            <TextBlock Style="{StaticResource TextBlockUserMenuInitialStyle}" Text="{Binding UserMenu.UserInitial}" />
                         </Border>
                         <!-- ユーザー名 -->
-                        <TextBlock Style="{StaticResource UserMenuNameTextStyle}" Text="{Binding UserMenu.UserName}" />
+                        <TextBlock Style="{StaticResource TextBlockUserMenuNameStyle}" Text="{Binding UserMenu.UserName}" />
                         <!-- 矢印アイコン -->
-                        <Path Style="{StaticResource UserMenuArrowPathStyle}" />
+                        <Path Style="{StaticResource PathUserMenuArrowStyle}" />
                     </StackPanel>
                 </Button>
                 <c:DropdownMenu IsOpen="{Binding IsUserMenuOpen, Mode=TwoWay}" PlacementTarget="{Binding ElementName=UserMenuButton}">
@@ -59,31 +75,31 @@
 
         <!-- メインコンテンツ -->
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <StackPanel Style="{StaticResource ViewMainContainerStyle}">
+            <StackPanel Style="{StaticResource StackPanelViewMainStyle}">
                 <!-- 統計情報 (Stats) -->
-                <UniformGrid Columns="4" Style="{StaticResource HomeStatsGridStyle}">
+                <UniformGrid Columns="4" Style="{StaticResource UniformGridHomeStatsStyle}">
                     <Border Margin="0,0,12,0"
                             Padding="{StaticResource CardPadding}"
                             Style="{StaticResource SurfaceCardStyle}">
                         <StackPanel>
-                            <TextBlock Style="{StaticResource HomeStatsLabelStyle}" Text="未着手のタスク" />
-                            <TextBlock Style="{StaticResource HomeStatsValueStyle}" Text="{Binding NotStartedCount}" />
+                            <TextBlock Style="{StaticResource TextBlockHomeStatsLabelStyle}" Text="未着手のタスク" />
+                            <TextBlock Style="{StaticResource TextBlockHomeStatsValueStyle}" Text="{Binding NotStartedCount}" />
                         </StackPanel>
                     </Border>
                     <Border Margin="0,0,12,0"
                             Padding="{StaticResource CardPadding}"
                             Style="{StaticResource SurfaceCardStyle}">
                         <StackPanel>
-                            <TextBlock Style="{StaticResource HomeStatsLabelStyle}" Text="進行中" />
-                            <TextBlock Style="{StaticResource HomeStatsValueStyle}" Text="{Binding InProgressCount}" />
+                            <TextBlock Style="{StaticResource TextBlockHomeStatsLabelStyle}" Text="進行中" />
+                            <TextBlock Style="{StaticResource TextBlockHomeStatsValueStyle}" Text="{Binding InProgressCount}" />
                         </StackPanel>
                     </Border>
                     <Border Margin="0,0,12,0"
                             Padding="{StaticResource CardPadding}"
                             Style="{StaticResource SurfaceCardStyle}">
                         <StackPanel>
-                            <TextBlock Style="{StaticResource HomeStatsLabelStyle}" Text="今週の完了" />
-                            <TextBlock Style="{StaticResource HomeStatsValueStyle}" Text="{Binding CompletedThisWeekCount}" />
+                            <TextBlock Style="{StaticResource TextBlockHomeStatsLabelStyle}" Text="今週の完了" />
+                            <TextBlock Style="{StaticResource TextBlockHomeStatsValueStyle}" Text="{Binding CompletedThisWeekCount}" />
                         </StackPanel>
                     </Border>
                 </UniformGrid>
@@ -95,15 +111,15 @@
                     </Grid.ColumnDefinitions>
 
                     <!-- 左カラム -->
-                    <StackPanel Grid.Column="0" Style="{StaticResource HomeColumnStyle}">
-                        <Label Content="🚨 期限が近いタスク" Style="{DynamicResource SectionHeaderLabelStyle}" />
+                    <StackPanel Grid.Column="0" Style="{StaticResource StackPanelHomeColumnStyle}">
+                        <Label Content="🚨 期限が近いタスク" Style="{DynamicResource LabelFormSectionHeaderStyle}" />
                         <Border Margin="0,0,0,20"
                                 Padding="{StaticResource CardPadding}"
                                 Style="{StaticResource SurfaceCardStyle}">
                             <ItemsControl ItemsSource="{Binding UpcomingDeadlines}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Grid Style="{StaticResource HomeDeadlineItemStyle}">
+                                        <Grid Style="{StaticResource GridHomeDeadlineItemStyle}">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="Auto" />
@@ -121,7 +137,7 @@
                             </ItemsControl>
                         </Border>
 
-                        <Label Content="🌲 進行中のプロジェクト" Style="{DynamicResource SectionHeaderLabelStyle}" />
+                        <Label Content="🌲 進行中のプロジェクト" Style="{DynamicResource LabelFormSectionHeaderStyle}" />
                         <ItemsControl ItemsSource="{Binding Projects}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -134,9 +150,9 @@
                                             Padding="{StaticResource CardPadding}"
                                             Style="{StaticResource SurfaceCardStyle}">
                                         <StackPanel>
-                                            <TextBlock Style="{StaticResource HomeProjectCardTitleStyle}" Text="{Binding Name}" />
-                                            <TextBlock Style="{StaticResource HomeProjectCardSubTitleStyle}" Text="進行中" />
-                                            <ProgressBar Style="{StaticResource HomeProjectProgressBarStyle}" Value="50" />
+                                            <TextBlock Style="{StaticResource TextBlockHomeProjectCardTitleStyle}" Text="{Binding Name}" />
+                                            <TextBlock Style="{StaticResource TextBlockHomeProjectCardSubTitleStyle}" Text="進行中" />
+                                            <ProgressBar Style="{StaticResource ProgressBarHomeProjectStyle}" Value="50" />
                                         </StackPanel>
                                     </Border>
                                 </DataTemplate>
@@ -146,7 +162,7 @@
 
                     <!-- 右カラム -->
                     <StackPanel Grid.Column="1">
-                        <Label Content="🏳️ マイルストーン" Style="{DynamicResource SectionHeaderLabelStyle}" />
+                        <Label Content="🏳️ マイルストーン" Style="{DynamicResource LabelFormSectionHeaderStyle}" />
                         <Border Margin="0,0,0,20"
                                 Padding="16,16,16,4"
                                 Style="{StaticResource SurfaceCardStyle}">
@@ -168,26 +184,26 @@
                                             <!-- タイムラインの縦線: 3行すべてを貫通させる -->
                                             <Rectangle Grid.RowSpan="3"
                                                        Grid.Column="0"
-                                                       Style="{StaticResource HomeMilestoneTimelineLineStyle}" />
+                                                       Style="{StaticResource RectangleHomeMilestoneTimelineLineStyle}" />
 
                                             <!-- 1行目: 日付(曜日) プロジェクト名 -->
                                             <StackPanel Grid.Row="0"
                                                         Grid.Column="1"
                                                         Margin="8,0,0,2"
                                                         Orientation="Horizontal">
-                                                <TextBlock Style="{StaticResource HomeMilestoneDateStyle}" Text="{Binding Date, StringFormat={}{0:MM/dd (ddd)}}" />
-                                                <TextBlock Style="{StaticResource HomeMilestoneProjectNameStyle}" Text="{Binding ProjectName}" />
+                                                <TextBlock Style="{StaticResource TextBlockHomeMilestoneDateStyle}" Text="{Binding Date, StringFormat={}{0:MM/dd (ddd)}}" />
+                                                <TextBlock Style="{StaticResource TextBlockHomeMilestoneProjectNameStyle}" Text="{Binding ProjectName}" />
                                             </StackPanel>
 
                                             <!-- タイムラインの丸（ドット）: 2行目の中央に配置 -->
                                             <Ellipse Grid.Row="1"
                                                      Grid.Column="0"
-                                                     Style="{StaticResource HomeMilestoneTimelineDotStyle}" />
+                                                     Style="{StaticResource EllipseHomeMilestoneTimelineDotStyle}" />
 
                                             <!-- 2行目: マイルストーン名 -->
                                             <TextBlock Grid.Row="1"
                                                        Grid.Column="1"
-                                                       Style="{StaticResource HomeMilestoneLabelStyle}"
+                                                       Style="{StaticResource TextBlockHomeMilestoneLabelStyle}"
                                                        Text="{Binding Label}" />
                                         </Grid>
                                     </DataTemplate>
@@ -196,7 +212,7 @@
                         </Border>
 
 
-                        <Label Content="🍃 ざわめき" Style="{DynamicResource SectionHeaderLabelStyle}" />
+                        <Label Content="🍃 ざわめき" Style="{DynamicResource LabelFormSectionHeaderStyle}" />
                         <Border Padding="{StaticResource CardPadding}" Style="{StaticResource SurfaceCardStyle}">
                             <TextBlock FontStyle="Italic"
                                        Foreground="{DynamicResource TextSecondaryBrush}"

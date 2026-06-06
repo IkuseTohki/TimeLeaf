@@ -7,16 +7,16 @@
              Width="{StaticResource DialogWidthMedium}"
              d:DataContext="{d:DesignInstance vm:AddProjectViewModel}"
              mc:Ignorable="d">
-    <StackPanel Style="{StaticResource DialogRootStackPanelStyle}">
-        <TextBlock Style="{StaticResource FormTitleTextStyle}" Text="プロジェクト作成" />
+    <StackPanel Style="{StaticResource StackPanelDialogRootStyle}">
+        <TextBlock Style="{StaticResource TextBlockFormTitleStyle}" Text="プロジェクト作成" />
 
-        <Label Content="プロジェクト名" Style="{StaticResource FirstSectionHeaderLabelStyle}" />
+        <Label Content="プロジェクト名" Style="{StaticResource LabelFormFirstSectionHeaderStyle}" />
         <TextBox Margin="{StaticResource FormItemMargin}"
                  Style="{StaticResource ModernTextBoxStyle}"
                  Tag="例：新機能のプロトタイプ作成"
                  Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
 
-        <Label Content="概要" Style="{StaticResource SectionHeaderLabelStyle}" />
+        <Label Content="概要" Style="{StaticResource LabelFormSectionHeaderStyle}" />
         <TextBox Height="{StaticResource MultilineInputHeightSmall}"
                  Margin="{StaticResource FormItemMargin}"
                  AcceptsReturn="True"
@@ -26,13 +26,13 @@
                  TextWrapping="Wrap" />
 
         <!-- フッターボタン -->
-        <StackPanel Style="{StaticResource DialogFooterStackPanelStyle}">
+        <StackPanel Style="{StaticResource StackPanelDialogFooterStyle}">
             <Button Command="{Binding ConfirmCommand}"
                     Content="作成"
-                    Style="{StaticResource DialogActionButtonStyle}" />
+                    Style="{StaticResource ButtonDialogActionStyle}" />
             <Button Command="{Binding CancelCommand}"
                     Content="キャンセル"
-                    Style="{StaticResource DialogCancelButtonStyle}" />
+                    Style="{StaticResource ButtonDialogCancelStyle}" />
         </StackPanel>
     </StackPanel>
 </UserControl>

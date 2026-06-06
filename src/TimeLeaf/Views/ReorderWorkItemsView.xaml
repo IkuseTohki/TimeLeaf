@@ -8,7 +8,7 @@
              Height="450"
              d:DataContext="{d:DesignInstance vm:ReorderWorkItemsViewModel}"
              mc:Ignorable="d">
-    <Grid Style="{StaticResource DialogRootGridStyle}">
+    <Grid Style="{StaticResource GridDialogRootStyle}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -17,7 +17,7 @@
         </Grid.RowDefinitions>
 
         <!-- タイトル -->
-        <TextBlock Style="{StaticResource FormTitleTextStyle}" Text="コンテナの並び替え" />
+        <TextBlock Style="{StaticResource TextBlockFormTitleStyle}" Text="コンテナの並び替え" />
 
         <!-- 説明文 -->
         <TextBlock Grid.Row="1"
@@ -30,7 +30,7 @@
         <ListBox Grid.Row="2"
                  ItemsSource="{Binding Items}"
                  SelectedItem="{Binding SelectedItem}"
-                 Style="{StaticResource ReorderListBoxStyle}">
+                 Style="{StaticResource ListBoxReorderStyle}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid>
@@ -46,7 +46,7 @@
                                     Orientation="Vertical">
                             <Button Command="{Binding DataContext.MoveUpCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                     CommandParameter="{Binding}"
-                                    Style="{StaticResource SmallIconButtonStyle}"
+                                    Style="{StaticResource ButtonIconSmallStyle}"
                                     ToolTip="上へ移動">
                                 <Path Width="10"
                                       Height="10"
@@ -56,7 +56,7 @@
                             </Button>
                             <Button Command="{Binding DataContext.MoveDownCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                     CommandParameter="{Binding}"
-                                    Style="{StaticResource SmallIconButtonStyle}"
+                                    Style="{StaticResource ButtonIconSmallStyle}"
                                     ToolTip="下へ移動">
                                 <Path Width="10"
                                       Height="10"
@@ -79,13 +79,13 @@
         </ListBox>
 
         <!-- フッターボタン -->
-        <StackPanel Grid.Row="3" Style="{StaticResource DialogFooterStackPanelStyle}">
+        <StackPanel Grid.Row="3" Style="{StaticResource StackPanelDialogFooterStyle}">
             <Button Command="{Binding ConfirmCommand}"
                     Content="保存"
-                    Style="{StaticResource DialogActionButtonStyle}" />
+                    Style="{StaticResource ButtonDialogActionStyle}" />
             <Button Command="{Binding CancelCommand}"
                     Content="キャンセル"
-                    Style="{StaticResource DialogCancelButtonStyle}" />
+                    Style="{StaticResource ButtonDialogCancelStyle}" />
         </StackPanel>
     </Grid>
 </UserControl>

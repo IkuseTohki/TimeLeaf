@@ -11,7 +11,20 @@
              MinHeight="400"
              d:DataContext="{d:DesignInstance wvm:TaskDetailViewModel}"
              mc:Ignorable="d">
-    <UserControl.Resources />
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Resources/Tokens/Layout.xaml" />
+                <ResourceDictionary Source="/Resources/Tokens/Typography.xaml" />
+                <ResourceDictionary Source="/Resources/Controls/Text.xaml" />
+                <ResourceDictionary Source="/Resources/Controls/Buttons.xaml" />
+                <ResourceDictionary Source="/Resources/Controls/Containers.xaml" />
+                <ResourceDictionary Source="/Resources/Components/UserMenu.xaml" />
+                <ResourceDictionary Source="/Resources/Components/Sidebar.xaml" />
+                <ResourceDictionary Source="/Resources/Components/WorkspaceView.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
     <Grid Background="{DynamicResource SurfaceBaseBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -100,7 +113,7 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <TextBlock Style="{StaticResource TaskPanelSectionHeaderStyle}" Text="DISCUSSION" />
+                    <TextBlock Style="{StaticResource TextBlockWorkspaceTaskPanelSectionHeaderStyle}" Text="DISCUSSION" />
 
                     <!-- コメント履歴 -->
                     <ScrollViewer Grid.Row="1"
@@ -114,16 +127,16 @@
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
-                                        <Border Background="{Binding AuthorColor}" Style="{StaticResource TaskCommentAvatarStyle}">
+                                        <Border Background="{Binding AuthorColor}" Style="{StaticResource BorderWorkspaceTaskCommentAvatarStyle}">
                                             <TextBlock Foreground="White"
-                                                       Style="{StaticResource UserAvatarInitialStyle}"
+                                                       Style="{StaticResource TextBlockUserAvatarInitialStyle}"
                                                        Text="{Binding AuthorInitial}" />
                                         </Border>
                                         <StackPanel Grid.Column="1" Margin="8,0,0,0">
                                             <Grid Margin="0,0,0,2">
                                                 <TextBlock Style="{StaticResource TaskCommentAuthorStyle}" Text="{Binding AuthorName}" />
                                                 <TextBlock HorizontalAlignment="Right"
-                                                           Style="{StaticResource TaskPanelMetaLabelStyle}"
+                                                           Style="{StaticResource TextBlockWorkspaceTaskPanelMetaLabelStyle}"
                                                            Text="{Binding CreatedAt, StringFormat={}{0:MM/dd HH:mm}}" />
                                             </Grid>
                                             <Border Style="{StaticResource TaskCommentContentStyle}">
@@ -149,7 +162,7 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <TextBox AcceptsReturn="True"
-                                     Style="{StaticResource TaskCommentTextBoxStyle}"
+                                     Style="{StaticResource TextBoxWorkspaceTaskCommentStyle}"
                                      Tag="メッセージを送信..."
                                      Text="{Binding NewCommentContent, UpdateSourceTrigger=PropertyChanged}" />
                             <Button Grid.Column="1"
@@ -170,10 +183,10 @@
             <!-- 右側: プロパティ サイドバー -->
             <Border Grid.Row="1"
                     Grid.Column="1"
-                    Style="{StaticResource TaskDetailSidebarStyle}">
+                    Style="{StaticResource BorderWorkspaceTaskDetailSidebarStyle}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Grid.IsSharedSizeScope="True">
-                        <TextBlock Style="{StaticResource TaskPanelSectionHeaderStyle}" Text="プロパティ" />
+                        <TextBlock Style="{StaticResource TextBlockWorkspaceTaskPanelSectionHeaderStyle}" Text="プロパティ" />
 
                         <Grid Margin="0,0,0,5">
                             <Grid.ColumnDefinitions>
@@ -182,7 +195,7 @@
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <TextBlock VerticalAlignment="Center"
-                                       Style="{StaticResource TaskPanelMetaLabelStyle}"
+                                       Style="{StaticResource TextBlockWorkspaceTaskPanelMetaLabelStyle}"
                                        Text="ステータス" />
                             <lk:InteractiveChipsPicker Grid.Column="2"
                                                        HorizontalAlignment="Left"
@@ -198,7 +211,7 @@
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <TextBlock VerticalAlignment="Center"
-                                       Style="{StaticResource TaskPanelMetaLabelStyle}"
+                                       Style="{StaticResource TextBlockWorkspaceTaskPanelMetaLabelStyle}"
                                        Text="優先度" />
                             <lk:InteractiveChipsPicker Grid.Column="2"
                                                        HorizontalAlignment="Left"
@@ -214,7 +227,7 @@
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <TextBlock VerticalAlignment="Center"
-                                       Style="{StaticResource TaskPanelMetaLabelStyle}"
+                                       Style="{StaticResource TextBlockWorkspaceTaskPanelMetaLabelStyle}"
                                        Text="担当者" />
                             <c:LeafSearchableSelector Grid.Column="2"
                                                       DisplayMemberPath="DisplayName"
@@ -228,7 +241,7 @@
 
                         <Separator Margin="0,0,0,16" Background="{DynamicResource OutlineBaseBrush}" />
 
-                        <TextBlock Style="{StaticResource TaskPanelSectionHeaderStyle}" Text="スケジュール" />
+                        <TextBlock Style="{StaticResource TextBlockWorkspaceTaskPanelSectionHeaderStyle}" Text="スケジュール" />
 
                         <Grid Margin="0,0,0,10">
                             <Grid.ColumnDefinitions>
@@ -236,7 +249,7 @@
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <TextBlock VerticalAlignment="Center"
-                                       Style="{StaticResource TaskPanelMetaLabelStyle}"
+                                       Style="{StaticResource TextBlockWorkspaceTaskPanelMetaLabelStyle}"
                                        Text="期限" />
                             <c:LeafDatePicker Grid.Column="1"
                                               HorizontalAlignment="Left"
@@ -249,7 +262,7 @@
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <TextBlock VerticalAlignment="Center"
-                                       Style="{StaticResource TaskPanelMetaLabelStyle}"
+                                       Style="{StaticResource TextBlockWorkspaceTaskPanelMetaLabelStyle}"
                                        Text="実績開始" />
                             <c:LeafDatePicker Grid.Column="1"
                                               HorizontalAlignment="Left"
@@ -262,7 +275,7 @@
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <TextBlock VerticalAlignment="Center"
-                                       Style="{StaticResource TaskPanelMetaLabelStyle}"
+                                       Style="{StaticResource TextBlockWorkspaceTaskPanelMetaLabelStyle}"
                                        Text="実績終了" />
                             <c:LeafDatePicker Grid.Column="1"
                                               HorizontalAlignment="Left"
@@ -272,7 +285,7 @@
 
                         <Separator Margin="0,0,0,16" Background="{DynamicResource OutlineBaseBrush}" />
 
-                        <TextBlock Style="{StaticResource TaskPanelSectionHeaderStyle}" Text="工数 (h)" />
+                        <TextBlock Style="{StaticResource TextBlockWorkspaceTaskPanelSectionHeaderStyle}" Text="工数 (h)" />
                         <controls:TaskCostEditor ActualCost="{Binding Task.ActualCost, Mode=TwoWay}" EstimatedCost="{Binding Task.EstimatedCost, Mode=TwoWay}" />
                     </StackPanel>
                 </ScrollViewer>
@@ -289,7 +302,7 @@
                 <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
                     <Button Margin="0,0,8,0"
                             Command="{Binding DeleteCommand}"
-                            Style="{StaticResource IconButton}">
+                            Style="{StaticResource ButtonIconStyle}">
                         <Path Data="{StaticResource DeleteIconGeometry}" Style="{StaticResource IconPathBrandStyle}" />
                     </Button>
                     <Button MinWidth="80"

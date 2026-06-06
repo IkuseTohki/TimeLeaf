@@ -45,43 +45,44 @@
         <!-- グローバル・サイドバー -->
         <Border x:Name="SidebarBorder"
                 Grid.Column="0"
-                Style="{StaticResource GlobalSidebarBorderStyle}">
+                Style="{StaticResource BorderSidebarGlobalStyle}">
             <Grid>
                 <DockPanel LastChildFill="True">
                     <!-- ブランドロゴエリア -->
-                    <StackPanel DockPanel.Dock="Top" Style="{StaticResource SidebarLogoContainerStyle}">
-                        <Path Data="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z" Style="{StaticResource SidebarLogoPathStyle}" />
-                        <TextBlock Style="{StaticResource SidebarLogoTextStyle}"
+                    <StackPanel DockPanel.Dock="Top" Style="{StaticResource StackPanelSidebarLogoStyle}">
+                        <Path Data="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z" Style="{StaticResource PathSidebarLogoStyle}" />
+                        <TextBlock Style="{StaticResource TextBlockSidebarLogoStyle}"
                                    Text="TimeLeaf"
                                    Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BooleanToVisibilityConverter}}" />
                     </StackPanel>
+
 
                     <!-- ナビゲーションメニュー -->
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <StackPanel>
                             <!-- メインメニュー -->
-                            <Button Command="{Binding NavigateToHomeCommand}" Style="{DynamicResource SidebarButtonStyle}">
+                            <Button Command="{Binding NavigateToHomeCommand}" Style="{DynamicResource ButtonSidebarStyle}">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Style="{StaticResource SidebarIconTextStyle}" Text="🏠" />
+                                    <TextBlock Style="{StaticResource TextBlockSidebarIconStyle}" Text="🏠" />
                                     <TextBlock Margin="12,0,0,0"
                                                VerticalAlignment="Center"
                                                Text="Home"
                                                Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BooleanToVisibilityConverter}}" />
                                 </StackPanel>
                             </Button>
-                            <Button Command="{Binding NavigateToAllTasksCommand}" Style="{DynamicResource SidebarButtonStyle}">
+                            <Button Command="{Binding NavigateToAllTasksCommand}" Style="{DynamicResource ButtonSidebarStyle}">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Style="{StaticResource SidebarIconTextStyle}" Text="📋" />
+                                    <TextBlock Style="{StaticResource TextBlockSidebarIconStyle}" Text="📋" />
                                     <TextBlock Margin="12,0,0,0"
                                                VerticalAlignment="Center"
                                                Text="All Tasks"
                                                Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BooleanToVisibilityConverter}}" />
                                 </StackPanel>
                             </Button>
-                            <Button Command="{Binding NavigateToNotificationsCommand}" Style="{DynamicResource SidebarButtonStyle}">
+                            <Button Command="{Binding NavigateToNotificationsCommand}" Style="{DynamicResource ButtonSidebarStyle}">
                                 <Grid>
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Style="{StaticResource SidebarIconTextStyle}" Text="🔔" />
+                                        <TextBlock Style="{StaticResource TextBlockSidebarIconStyle}" Text="🔔" />
                                         <TextBlock Margin="12,0,0,0"
                                                    VerticalAlignment="Center"
                                                    Text="Notifications"
@@ -91,7 +92,7 @@
                                     <Border Margin="12,-8,0,0"
                                             HorizontalAlignment="Left"
                                             VerticalAlignment="Top"
-                                            Style="{DynamicResource BadgeStyle}"
+                                            Style="{StaticResource BorderNotificationBadgeStyle}"
                                             Visibility="{Binding UnreadNotificationCount, Converter={StaticResource IntToVisibilityConverter}}">
                                         <TextBlock HorizontalAlignment="Center"
                                                    VerticalAlignment="Center"
@@ -106,11 +107,11 @@
                             <!-- プロジェクトセクション見出し -->
                             <Grid Margin="16,16,12,8" VerticalAlignment="Center">
                                 <TextBlock VerticalAlignment="Center"
-                                           Style="{StaticResource SidebarMenuHeaderStyle}"
+                                           Style="{StaticResource TextBlockSidebarMenuHeaderStyle}"
                                            Text="PROJECTS"
                                            Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BooleanToVisibilityConverter}}" />
                                 <Button Command="{Binding AddProjectCommand}"
-                                        Style="{StaticResource SidebarAddButtonStyle}"
+                                        Style="{StaticResource ButtonSidebarAddStyle}"
                                         ToolTip="新規プロジェクト作成">
                                     <Path Width="10"
                                           Height="10"
@@ -126,9 +127,9 @@
                                     <DataTemplate>
                                         <Button Command="{Binding DataContext.NavigateToProjectCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding}"
-                                                Style="{DynamicResource SidebarButtonStyle}">
+                                                Style="{DynamicResource ButtonSidebarStyle}">
                                             <StackPanel Orientation="Horizontal">
-                                                <TextBlock Style="{StaticResource SidebarIconTextStyle}" Text="🌲" />
+                                                <TextBlock Style="{StaticResource TextBlockSidebarIconStyle}" Text="🌲" />
                                                 <TextBlock Margin="12,0,0,0"
                                                            VerticalAlignment="Center"
                                                            Text="{Binding Name}"
@@ -141,7 +142,7 @@
                             </ItemsControl>
 
                             <!-- プロジェクトがない場合の表示 -->
-                            <TextBlock Style="{StaticResource SidebarEmptyStateTextStyle}"
+                            <TextBlock Style="{StaticResource TextBlockSidebarEmptyStyle}"
                                        Text="No projects yet."
                                        Visibility="{Binding Projects.Count, Converter={StaticResource IntToVisibilityConverter}, ConverterParameter='Inverse'}" />
 
@@ -157,7 +158,7 @@
                 Panel.ZIndex="10"
                 Command="{Binding ToggleSidebarCommand}"
                 Content="{Binding IsSidebarExpanded, Converter={StaticResource SidebarToggleIconConverter}}"
-                Style="{StaticResource SidebarCollapseButtonStyle}" />
+                Style="{StaticResource ButtonSidebarCollapseStyle}" />
 
         <!-- メインコンテンツ領域 -->
         <Grid Grid.Column="1">

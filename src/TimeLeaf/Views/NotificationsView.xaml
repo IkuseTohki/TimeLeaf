@@ -20,15 +20,15 @@
               Style="{StaticResource ViewHeaderGridStyle}"
               Visibility="{Binding IsGlobalContext, Converter={StaticResource BooleanToVisibilityConverter}}">
             <StackPanel VerticalAlignment="Bottom">
-                <TextBlock Style="{StaticResource ViewHeaderTitleStyle}" Text="通知センター" />
-                <TextBlock Style="{StaticResource ViewHeaderSubTitleStyle}" Text="期限切れのタスクなどを確認できます。" />
+                <TextBlock Style="{StaticResource TextBlockViewHeaderTitleStyle}" Text="通知センター" />
+                <TextBlock Style="{StaticResource TextBlockViewHeaderSubTitleStyle}" Text="期限切れのタスクなどを確認できます。" />
             </StackPanel>
 
             <Button HorizontalAlignment="Right"
                     VerticalAlignment="Center"
                     Command="{Binding MarkAllAsReadCommand}"
                     Content="すべて既読にする"
-                    Style="{StaticResource RoundButtonStyle}" />
+                    Style="{StaticResource ButtonRoundStyle}" />
         </Grid>
 
         <!-- プロジェクト内アクションエリア（プロジェクト表示時のみ表示） -->
@@ -38,16 +38,16 @@
             <Button HorizontalAlignment="Right"
                     Command="{Binding MarkAllAsReadCommand}"
                     Content="すべて既読にする"
-                    Style="{StaticResource RoundButtonStyle}" />
+                    Style="{StaticResource ButtonRoundStyle}" />
         </Grid>
 
         <!-- 通知リスト -->
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <!-- 通知一覧 -->
-            <ItemsControl ItemsSource="{Binding UnreadNotifications}" Style="{StaticResource ViewMainItemsContainerStyle}">
+            <ItemsControl ItemsSource="{Binding UnreadNotifications}" Style="{StaticResource ItemsControlViewMainStyle}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type vm:NotificationViewModel}">
-                        <Border Style="{StaticResource NotificationCardStyle}">
+                        <Border Style="{StaticResource BorderNotificationCardStyle}">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
@@ -55,9 +55,9 @@
                                 </Grid.ColumnDefinitions>
 
                                 <StackPanel>
-                                    <TextBlock Style="{StaticResource NotificationTitleTextStyle}" Text="{Binding Title}" />
-                                    <TextBlock Style="{StaticResource NotificationMessageTextStyle}" Text="{Binding Message}" />
-                                    <TextBlock Style="{StaticResource NotificationTimestampTextStyle}" Text="{Binding CreatedAt, StringFormat='{}yyyy/MM/dd'}" />
+                                    <TextBlock Style="{StaticResource TextBlockNotificationTitleStyle}" Text="{Binding Title}" />
+                                    <TextBlock Style="{StaticResource TextBlockNotificationMessageStyle}" Text="{Binding Message}" />
+                                    <TextBlock Style="{StaticResource TextBlockNotificationTimestampStyle}" Text="{Binding CreatedAt, StringFormat='{}yyyy/MM/dd'}" />
                                 </StackPanel>
 
                                 <StackPanel Grid.Column="1"
@@ -72,7 +72,7 @@
                                     <Button Width="60"
                                             Command="{Binding MarkAsReadCommand}"
                                             Content="既読"
-                                            Style="{StaticResource RoundButtonStyle}" />
+                                            Style="{StaticResource ButtonRoundStyle}" />
                                 </StackPanel>
                             </Grid>
                         </Border>
@@ -84,10 +84,10 @@
         <!-- 通知がない場合の表示 -->
         <Border Grid.Row="1"
                 Margin="48,16,48,48"
-                Style="{StaticResource NotificationEmptyStateStyle}"
+                Style="{StaticResource BorderNotificationEmptyStyle}"
                 Visibility="{Binding UnreadNotifications.Count, Converter={StaticResource IntToVisibilityConverter}, ConverterParameter='Inverse'}">
             <StackPanel HorizontalAlignment="Center">
-                <TextBlock Style="{StaticResource NotificationEmptyIconStyle}" Text="🍂" />
+                <TextBlock Style="{StaticResource TextBlockNotificationEmptyIconStyle}" Text="🍂" />
                 <TextBlock HorizontalAlignment="Center"
                            Foreground="{DynamicResource TextSecondaryBrush}"
                            Style="{StaticResource LabelBaseStyle}"

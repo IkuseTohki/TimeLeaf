@@ -7,48 +7,49 @@
         Title="TimeLeaf - 初期設定"
         Width="530"
         Height="350"
-        Style="{StaticResource SetupWindowStyle}"
+        Style="{StaticResource WindowSetupStyle}"
         WindowStartupLocation="CenterScreen"
         mc:Ignorable="d">
 
-    <StackPanel Style="{StaticResource SetupContainerStyle}">
+    <StackPanel Style="{StaticResource StackPanelSetupContainerStyle}">
         <!-- Header -->
-        <TextBlock Style="{StaticResource SetupHeaderTextStyle}" Text="TimeLeafへようこそ" />
+        <TextBlock Style="{StaticResource TextBlockSetupHeaderStyle}" Text="TimeLeafへようこそ" />
 
-        <TextBlock Style="{StaticResource SetupDescriptionTextStyle}" Text="プロジェクトデータを保存・同期するフォルダを選択してください。" />
+        <TextBlock Style="{StaticResource TextBlockSetupDescriptionStyle}" Text="プロジェクトデータを保存・同期するフォルダを選択してください。" />
 
-        <TextBlock Style="{StaticResource SetupSubDescriptionTextStyle}" Text="共有フォルダ（OneDriveやDropboxなど）を指定すると、チームメンバーとデータを共有できます。" />
+        <TextBlock Style="{StaticResource TextBlockSetupSubDescriptionStyle}" Text="共有フォルダ（OneDriveやDropboxなど）を指定すると、チームメンバーとデータを共有できます。" />
 
         <!-- Input Area -->
-        <Label Content="データ保存場所 (ルートフォルダ):" Style="{StaticResource FormLabelStyle}" />
+        <Label Content="データ保存場所 (ルートフォルダ):" Style="{StaticResource LabelSectionHeaderBaseStyle}" />
 
-        <Grid Style="{StaticResource SetupInputAreaStyle}">
+        <Grid Style="{StaticResource GridSetupInputAreaStyle}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <TextBox Margin="0,0,10,0"
-                     Style="{StaticResource FormTextBoxStyle}"
+                     Style="{StaticResource TextBoxOrganicStyle}"
                      Text="{Binding StoragePath, UpdateSourceTrigger=PropertyChanged}" />
             <Button Grid.Column="1"
                     Command="{Binding BrowseStoragePathCommand}"
                     Content="参照..."
-                    Style="{DynamicResource ModernButtonStyle}" />
+                    Style="{StaticResource ButtonRoundStyle}" />
         </Grid>
 
-        <TextBlock Style="{StaticResource SetupErrorMessageStyle}" Text="{Binding ErrorMessage}" />
+        <TextBlock Style="{StaticResource TextBlockSetupErrorStyle}" Text="{Binding ErrorMessage}" />
 
         <!-- Footer -->
-        <StackPanel Style="{StaticResource SetupFooterStyle}">
+        <StackPanel Style="{StaticResource StackPanelSetupFooterStyle}">
             <Button Margin="0,0,10,0"
                     Command="{Binding CancelCommand}"
                     Content="キャンセル"
                     IsCancel="true"
-                    Style="{DynamicResource ModernButtonStyle}" />
+                    Style="{StaticResource ButtonSecondaryStyle}" />
             <Button Command="{Binding SaveAndStartCommand}"
                     Content="設定して開始"
                     IsDefault="true"
-                    Style="{DynamicResource PrimaryButtonStyle2}" />
+                    Style="{StaticResource ButtonPrimaryStyle}" />
         </StackPanel>
     </StackPanel>
+
 </Window>

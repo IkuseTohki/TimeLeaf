@@ -7,41 +7,41 @@
              Width="320"
              d:DataContext="{d:DesignInstance vm:ProfileEditViewModel}"
              mc:Ignorable="d">
-    <StackPanel Style="{StaticResource DialogRootStackPanelStyle}">
-        <TextBlock Style="{StaticResource FormTitleTextStyle}" Text="プロフィール編集" />
+    <StackPanel Style="{StaticResource StackPanelDialogRootStyle}">
+        <TextBlock Style="{StaticResource TextBlockFormTitleStyle}" Text="プロフィール編集" />
 
-        <Label Content="表示名" Style="{StaticResource FirstSectionHeaderLabelStyle}" />
+        <Label Content="表示名" Style="{StaticResource LabelFormFirstSectionHeaderStyle}" />
         <TextBox Margin="{StaticResource FormItemMargin}"
-                 Style="{StaticResource OrganicTextBoxStyle}"
+                 Style="{StaticResource TextBoxOrganicStyle}"
                  Text="{Binding DisplayName, UpdateSourceTrigger=PropertyChanged}" />
 
-        <Label Content="テーマカラー" Style="{StaticResource SectionHeaderLabelStyle}" />
+        <Label Content="テーマカラー" Style="{StaticResource LabelFormSectionHeaderStyle}" />
         <Grid Margin="{StaticResource FormItemMargin}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Border Background="{Binding ThemeColor, FallbackValue=Transparent, TargetNullValue=Transparent}" Style="{StaticResource ColorPreviewBorderStyle}" />
+            <Border Background="{Binding ThemeColor, FallbackValue=Transparent, TargetNullValue=Transparent}" Style="{StaticResource BorderColorPreviewStyle}" />
             <TextBox Grid.Column="1"
                      Margin="12,0,0,0"
                      VerticalAlignment="Center"
-                     Style="{StaticResource OrganicTextBoxStyle}"
+                     Style="{StaticResource TextBoxOrganicStyle}"
                      Text="{Binding ThemeColor, UpdateSourceTrigger=PropertyChanged}" />
         </Grid>
 
-        <Label Content="アイコンパス (相対)" Style="{StaticResource SectionHeaderLabelStyle}" />
+        <Label Content="アイコンパス (相対)" Style="{StaticResource LabelFormSectionHeaderStyle}" />
         <TextBox Margin="{StaticResource FormItemMargin}"
-                 Style="{StaticResource OrganicTextBoxStyle}"
+                 Style="{StaticResource TextBoxOrganicStyle}"
                  Text="{Binding IconPath, UpdateSourceTrigger=PropertyChanged}" />
 
         <!-- フッターボタン -->
-        <StackPanel Style="{StaticResource DialogFooterStackPanelStyle}">
+        <StackPanel Style="{StaticResource StackPanelDialogFooterStyle}">
             <Button Command="{Binding SaveCommand}"
                     Content="保存"
-                    Style="{StaticResource DialogActionButtonStyle}" />
+                    Style="{StaticResource ButtonDialogActionStyle}" />
             <Button Command="{Binding CancelCommand}"
                     Content="キャンセル"
-                    Style="{StaticResource DialogCancelButtonStyle}" />
+                    Style="{StaticResource ButtonDialogCancelStyle}" />
         </StackPanel>
     </StackPanel>
 </UserControl>

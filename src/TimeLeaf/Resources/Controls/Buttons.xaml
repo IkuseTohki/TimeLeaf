@@ -1,0 +1,94 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- ====================================================================== -->
+    <!-- Button Styles -->
+    <!-- ====================================================================== -->
+
+    <!-- Semantic Aliases (Redirect to Base Infrastructure) -->
+    <Style x:Key="ButtonPrimaryStyle"
+           BasedOn="{StaticResource PrimaryButtonStyle}"
+           TargetType="Button" />
+    <Style x:Key="ButtonSecondaryStyle"
+           BasedOn="{StaticResource SecondaryButtonStyle}"
+           TargetType="Button" />
+
+    <!-- 角丸の強いボタンスタイル（透過背景） -->
+    <Style x:Key="ButtonRoundStyle"
+           BasedOn="{StaticResource BaseButtonStyle}"
+           TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource StateHoverBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- 危険な操作ボタンのスタイル -->
+    <Style x:Key="ButtonDangerStyle"
+           BasedOn="{StaticResource BaseButtonStyle}"
+           TargetType="Button">
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="Background" Value="#FFEBEE" />
+        <Setter Property="BorderBrush" Value="#FFCDD2" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Foreground" Value="#D32F2F" />
+    </Style>
+
+    <!-- アイコンボタン：背景透過、角丸 -->
+    <Style x:Key="ButtonIconStyle" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="4" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}" CornerRadius="{StaticResource Radius20}">
+                        <ContentPresenter />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource StateHoverBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- 小さなアイコンボタン用のスタイル -->
+    <Style x:Key="ButtonIconSmallStyle" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="2" />
+        <Setter Property="Width" Value="24" />
+        <Setter Property="Height" Value="20" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Border"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="{StaticResource Radius20}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource StateHoverBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.2" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

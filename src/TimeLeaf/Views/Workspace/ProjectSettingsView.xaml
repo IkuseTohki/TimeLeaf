@@ -38,10 +38,10 @@
         </Grid.RowDefinitions>
 
         <!-- Content -->
-        <StackPanel Grid.Row="0" Style="{StaticResource SettingsContainerStyle}">
+        <StackPanel Grid.Row="0" Style="{StaticResource StackPanelSettingsContainerStyle}">
 
             <!-- Lifecycle Management -->
-            <GroupBox Header="ライフサイクル管理" Style="{StaticResource SettingsGroupBoxStyle}">
+            <GroupBox Header="ライフサイクル管理" Style="{StaticResource GroupBoxSettingsStyle}">
                 <StackPanel>
                     <TextBlock Margin="0,0,0,16"
                                Foreground="{DynamicResource TextSecondaryBrush}"
@@ -53,7 +53,7 @@
                                 Content="プロジェクトをアーカイブする"
                                 Style="{StaticResource SecondaryButtonStyle}" />
                         <TextBlock Margin="0,4,0,0"
-                                   Style="{StaticResource SettingsAnnotationStyle}"
+                                   Style="{StaticResource TextBlockSettingsAnnotationStyle}"
                                    Text="※ アーカイブするとプロジェクトは読み取り専用になり、通常のリストから非表示になります。" />
                     </StackPanel>
 
@@ -71,7 +71,7 @@
             </GroupBox>
 
             <!-- Danger Zone -->
-            <GroupBox Header="Danger Zone" Style="{StaticResource DangerGroupBoxStyle}">
+            <GroupBox Header="Danger Zone" Style="{StaticResource GroupBoxDangerStyle}">
                 <StackPanel>
                     <TextBlock Margin="0,0,0,8"
                                FontWeight="Bold"
@@ -80,7 +80,7 @@
 
                     <Button Command="{Binding DeleteCommand}"
                             Content="プロジェクトを削除する"
-                            Style="{StaticResource DangerButtonStyle}" />
+                            Style="{StaticResource ButtonDangerStyle}" />
                 </StackPanel>
             </GroupBox>
 

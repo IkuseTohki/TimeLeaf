@@ -13,7 +13,7 @@
                 MinWidth="140"
                 Padding="12,8"
                 Background="White"
-                BorderBrush="{DynamicResource BorderLightBrush}"
+                BorderBrush="{DynamicResource OutlineBaseBrush}"
                 BorderThickness="1"
                 CornerRadius="8">
             <Border.InputBindings>

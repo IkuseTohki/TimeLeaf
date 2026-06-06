@@ -8,7 +8,7 @@
              Height="300"
              d:DataContext="{d:DesignInstance vm:UserManagementViewModel}"
              mc:Ignorable="d">
-    <Grid Style="{StaticResource DialogRootGridStyle}">
+    <Grid Style="{StaticResource GridDialogRootStyle}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -16,7 +16,7 @@
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0"
-                   Style="{StaticResource FormTitleTextStyle}"
+                   Style="{StaticResource TextBlockFormTitleStyle}"
                    Text="ユーザー管理" />
 
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
@@ -24,7 +24,7 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Border Padding="12"
-                                BorderBrush="{DynamicResource OutlineVariantBrush}"
+                                BorderBrush="{DynamicResource OutlineBaseBrush}"
                                 BorderThickness="0,0,0,1">
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -45,6 +45,7 @@
                                     </Border.Style>
                                     <TextBlock HorizontalAlignment="Center"
                                                VerticalAlignment="Center"
+                                               FontSize="24"
                                                FontWeight="Bold"
                                                Foreground="White"
                                                Text="{Binding UserInitial}" />
@@ -86,10 +87,10 @@
         </ScrollViewer>
 
         <!-- フッターボタン -->
-        <StackPanel Grid.Row="2" Style="{StaticResource DialogFooterStackPanelStyle}">
+        <StackPanel Grid.Row="2" Style="{StaticResource StackPanelDialogFooterStyle}">
             <Button Command="{Binding CloseCommand}"
                     Content="閉じる"
-                    Style="{StaticResource DialogCancelButtonStyle}" />
+                    Style="{StaticResource ButtonDialogCancelStyle}" />
         </StackPanel>
     </Grid>
 </UserControl>

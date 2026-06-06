@@ -8,28 +8,28 @@
              Width="{StaticResource DialogWidthSmall}"
              d:DataContext="{d:DesignInstance vm:AddMilestoneViewModel}"
              mc:Ignorable="d">
-    <StackPanel Style="{StaticResource DialogRootStackPanelStyle}">
-        <TextBlock Style="{StaticResource FormTitleTextStyle}" Text="マイルストーン追加" />
+    <StackPanel Style="{StaticResource StackPanelDialogRootStyle}">
+        <TextBlock Style="{StaticResource TextBlockFormTitleStyle}" Text="マイルストーン追加" />
 
-        <Label Content="日付" Style="{StaticResource FirstSectionHeaderLabelStyle}" />
+        <Label Content="日付" Style="{StaticResource LabelFormFirstSectionHeaderStyle}" />
         <c:LeafDatePicker Margin="{StaticResource FormItemMargin}"
                           Placeholder="日付を選択..."
                           SelectedDate="{Binding Date}" />
 
-        <Label Content="名称" Style="{StaticResource SectionHeaderLabelStyle}" />
+        <Label Content="名称" Style="{StaticResource LabelFormSectionHeaderStyle}" />
         <TextBox Margin="{StaticResource FormItemMargin}"
                  Style="{StaticResource ModernTextBoxStyle}"
                  Tag="マイルストーン名を入力..."
                  Text="{Binding Label, UpdateSourceTrigger=PropertyChanged}" />
 
         <!-- フッターボタン -->
-        <StackPanel Style="{StaticResource DialogFooterStackPanelStyle}">
+        <StackPanel Style="{StaticResource StackPanelDialogFooterStyle}">
             <Button Command="{Binding ConfirmCommand}"
                     Content="追加"
-                    Style="{StaticResource DialogActionButtonStyle}" />
+                    Style="{StaticResource ButtonDialogActionStyle}" />
             <Button Command="{Binding CancelCommand}"
                     Content="キャンセル"
-                    Style="{StaticResource DialogCancelButtonStyle}" />
+                    Style="{StaticResource ButtonDialogCancelStyle}" />
         </StackPanel>
     </StackPanel>
 </UserControl>

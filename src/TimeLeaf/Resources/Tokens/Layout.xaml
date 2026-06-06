@@ -1,0 +1,174 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- ====================================================================== -->
+    <!-- Spacing Scales (Atomic - DOUBLE) -->
+    <!-- ====================================================================== -->
+    <sys:Double x:Key="Spacing10">0</sys:Double>
+    <sys:Double x:Key="Spacing20">4</sys:Double>
+    <sys:Double x:Key="Spacing30">8</sys:Double>
+    <sys:Double x:Key="Spacing40">12</sys:Double>
+    <sys:Double x:Key="Spacing50">16</sys:Double>
+    <sys:Double x:Key="Spacing60">20</sys:Double>
+    <sys:Double x:Key="Spacing70">24</sys:Double>
+    <sys:Double x:Key="Spacing80">32</sys:Double>
+
+    <!-- ====================================================================== -->
+    <!-- Corner Radius Scales (Atomic - CORNER RADIUS) -->
+    <!-- ====================================================================== -->
+    <CornerRadius x:Key="Radius10">0</CornerRadius>
+    <CornerRadius x:Key="Radius20">4</CornerRadius>
+    <CornerRadius x:Key="Radius30">8</CornerRadius>
+    <CornerRadius x:Key="Radius40">10</CornerRadius>
+    <CornerRadius x:Key="Radius50">12</CornerRadius>
+    <CornerRadius x:Key="Radius60">14</CornerRadius>
+    <CornerRadius x:Key="Radius70">16</CornerRadius>
+    <CornerRadius x:Key="RadiusMax">999</CornerRadius>
+
+    <!-- ====================================================================== -->
+    <!-- Size Scales (Atomic - DOUBLE) -->
+    <!-- ====================================================================== -->
+    <sys:Double x:Key="SizeHeight10">22</sys:Double>
+    <sys:Double x:Key="SizeHeight20">28</sys:Double>
+    <sys:Double x:Key="SizeHeight30">32</sys:Double>
+    <sys:Double x:Key="SizeHeight40">36</sys:Double>
+    <sys:Double x:Key="SizeHeight50">60</sys:Double>
+    <sys:Double x:Key="SizeHeight60">80</sys:Double>
+
+    <sys:Double x:Key="SizeWidth100">320</sys:Double>
+    <sys:Double x:Key="SizeWidth200">400</sys:Double>
+    <sys:Double x:Key="SizeWidth300">480</sys:Double>
+
+    <!-- ====================================================================== -->
+    <!-- Thickness Scales (Atomic - THICKNESS) -->
+    <!-- ====================================================================== -->
+    <Thickness x:Key="Thickness10">0,0,0,0</Thickness>
+    <Thickness x:Key="Thickness20">4,4,4,4</Thickness>
+    <Thickness x:Key="Thickness30">8,8,8,8</Thickness>
+    <Thickness x:Key="Thickness40">12,12,12,12</Thickness>
+    <Thickness x:Key="Thickness50">16,16,16,16</Thickness>
+    <Thickness x:Key="Thickness60">20,20,20,20</Thickness>
+    <Thickness x:Key="Thickness70">24,24,24,24</Thickness>
+    <Thickness x:Key="Thickness80">32,32,32,32</Thickness>
+
+    <!-- ====================================================================== -->
+    <!-- Semantic Layout Tokens (Aliases defined as direct values for stability) -->
+    <!-- ====================================================================== -->
+
+    <!-- Corner Radii -->
+    <CornerRadius x:Key="ControlCornerRadius">4</CornerRadius>
+    <CornerRadius x:Key="ContainerCornerRadius">8</CornerRadius>
+    <CornerRadius x:Key="CardCornerRadius">12</CornerRadius>
+    <CornerRadius x:Key="ButtonCornerRadius">4</CornerRadius>
+    <CornerRadius x:Key="ComboBoxItemCornerRadius">8</CornerRadius>
+    <CornerRadius x:Key="RadiusFull">16</CornerRadius>
+
+    <!-- Margins (Thickness) -->
+    <Thickness x:Key="StandardMargin"
+               Bottom="8"
+               Left="8"
+               Right="8"
+               Top="8" />
+    <Thickness x:Key="ViewOuterMargin"
+               Bottom="24"
+               Left="24"
+               Right="24"
+               Top="16" />
+    <Thickness x:Key="SectionMarginBottom"
+               Bottom="20"
+               Left="0"
+               Right="0"
+               Top="0" />
+    <Thickness x:Key="FormItemMargin"
+               Bottom="16"
+               Left="0"
+               Right="0"
+               Top="0" />
+    <Thickness x:Key="FormLabelMargin"
+               Bottom="4"
+               Left="0"
+               Right="0"
+               Top="0" />
+    <Thickness x:Key="FormSectionMargin"
+               Bottom="24"
+               Left="0"
+               Right="0"
+               Top="0" />
+    <Thickness x:Key="FormFooterMargin"
+               Bottom="0"
+               Left="0"
+               Right="0"
+               Top="12" />
+    <Thickness x:Key="ButtonLeftMargin"
+               Bottom="0"
+               Left="8"
+               Right="0"
+               Top="0" />
+    <Thickness x:Key="IconRightMargin"
+               Bottom="0"
+               Left="0"
+               Right="8"
+               Top="0" />
+    <Thickness x:Key="ContentRightMargin"
+               Bottom="0"
+               Left="0"
+               Right="12"
+               Top="0" />
+    <Thickness x:Key="ContentBottomMargin"
+               Bottom="20"
+               Left="0"
+               Right="0"
+               Top="0" />
+    <Thickness x:Key="ContentLabelMargin"
+               Bottom="8"
+               Left="0"
+               Right="0"
+               Top="0" />
+
+    <!-- Padding (Thickness) -->
+    <Thickness x:Key="StandardPadding"
+               Bottom="8"
+               Left="12"
+               Right="12"
+               Top="8" />
+    <Thickness x:Key="CardPadding"
+               Bottom="16"
+               Left="16"
+               Right="16"
+               Top="16" />
+    <Thickness x:Key="TaskCardPadding"
+               Bottom="12"
+               Left="20"
+               Right="20"
+               Top="12" />
+    <Thickness x:Key="TaskCardInfoMargin"
+               Bottom="0"
+               Left="0"
+               Right="0"
+               Top="4" />
+    <Thickness x:Key="TaskCardSelectedMargin"
+               Bottom="8"
+               Left="12"
+               Right="12"
+               Top="8" />
+    <Thickness x:Key="TaskCardSelectedPadding"
+               Bottom="16"
+               Left="16"
+               Right="16"
+               Top="16" />
+
+    <!-- Semantic Sizes -->
+    <sys:Double x:Key="ButtonHeightSmall">22</sys:Double>
+    <sys:Double x:Key="ButtonHeightMedium">28</sys:Double>
+    <sys:Double x:Key="ButtonHeightLarge">36</sys:Double>
+    <sys:Double x:Key="InputHeightMedium">32</sys:Double>
+
+    <sys:Double x:Key="DialogWidthSmall">320</sys:Double>
+    <sys:Double x:Key="DialogWidthMedium">400</sys:Double>
+    <sys:Double x:Key="DialogWidthLarge">480</sys:Double>
+
+    <sys:Double x:Key="MultilineInputHeightSmall">60</sys:Double>
+    <sys:Double x:Key="MultilineInputHeightMedium">80</sys:Double>
+
+</ResourceDictionary>

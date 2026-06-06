@@ -20,5 +20,5 @@
 
     <ComboBox ItemsSource="{Binding Source={StaticResource StatusValues}}"
               SelectedItem="{Binding SelectedStatus, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
-              Style="{DynamicResource CompactFormComboBoxStyle}" />
+              Style="{DynamicResource ComboBoxFormCompactStyle}" />
 </UserControl>

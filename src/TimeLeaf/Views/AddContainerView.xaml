@@ -7,17 +7,17 @@
              Width="{StaticResource DialogWidthSmall}"
              d:DataContext="{d:DesignInstance vm:AddContainerViewModel}"
              mc:Ignorable="d">
-    <StackPanel Style="{StaticResource DialogRootStackPanelStyle}">
-        <TextBlock Style="{StaticResource FormTitleTextStyle}" Text="グループ作成" />
+    <StackPanel Style="{StaticResource StackPanelDialogRootStyle}">
+        <TextBlock Style="{StaticResource TextBlockFormTitleStyle}" Text="グループ作成" />
 
-        <Label Content="グループ名" Style="{StaticResource FirstSectionHeaderLabelStyle}" />
+        <Label Content="グループ名" Style="{StaticResource LabelFormFirstSectionHeaderStyle}" />
         <TextBox Margin="{StaticResource FormItemMargin}"
                  Style="{StaticResource ModernTextBoxStyle}"
                  Tag="例：UIデザイン関連"
                  Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
 
-        <Label Content="説明" Style="{StaticResource SectionHeaderLabelStyle}" />
-        <TextBox Height="{StaticResource MultilineInputHeight}"
+        <Label Content="説明" Style="{StaticResource LabelFormSectionHeaderStyle}" />
+        <TextBox Height="{StaticResource SizeHeight50}"
                  Margin="{StaticResource FormItemMargin}"
                  AcceptsReturn="True"
                  Style="{StaticResource ModernTextBoxStyle}"
@@ -26,13 +26,13 @@
                  TextWrapping="Wrap" />
 
         <!-- フッターボタン -->
-        <StackPanel Style="{StaticResource DialogFooterStackPanelStyle}">
+        <StackPanel Style="{StaticResource StackPanelDialogFooterStyle}">
             <Button Command="{Binding ConfirmCommand}"
                     Content="作成"
-                    Style="{StaticResource DialogActionButtonStyle}" />
+                    Style="{StaticResource ButtonDialogActionStyle}" />
             <Button Command="{Binding CancelCommand}"
                     Content="キャンセル"
-                    Style="{StaticResource DialogCancelButtonStyle}" />
+                    Style="{StaticResource ButtonDialogCancelStyle}" />
         </StackPanel>
     </StackPanel>
 </UserControl>

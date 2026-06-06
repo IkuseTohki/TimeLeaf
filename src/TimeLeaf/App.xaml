@@ -10,24 +10,31 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <!-- Colors (Themes) -->
+                <!-- 1. Design System Tokens (Foundational Constants) -->
+                <ResourceDictionary Source="/Resources/Tokens/Layout.xaml" />
+                <ResourceDictionary Source="/Resources/Tokens/Typography.xaml" />
+                <ResourceDictionary Source="/Resources/Tokens/Colors.xaml" />
+
+                <!-- 2. Themes & Icons (Global Visual State) -->
                 <ResourceDictionary Source="/Resources/ForestColors.xaml" />
                 <ResourceDictionary Source="/Resources/Icons.xaml" />
 
-                <!-- LeafKit.UI Resources -->
+                <!-- 3. Infrastructure (Shared Library Components) -->
                 <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/ControlStyles.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/ComponentStyles.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/FormStyles.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/LayoutStyles.xaml" />
 
-                <!-- App Specific Resources -->
-                <ResourceDictionary Source="Resources/Converters.xaml" />
-                <ResourceDictionary Source="Resources/Layout.xaml" />
-                <ResourceDictionary Source="Resources/Typography.xaml" />
-                <ResourceDictionary Source="Resources/Styles.xaml" />
-                <ResourceDictionary Source="Resources/ControlStyles.xaml" />
-                <ResourceDictionary Source="Resources/WorkspaceStyles.xaml" />
-                <ResourceDictionary Source="Resources/DataTemplates.xaml" />
+                <!-- 4. Global Utilities & Base Styles -->
+                <ResourceDictionary Source="/Resources/Converters.xaml" />
+                <ResourceDictionary Source="/Resources/Common/SharedStyles.xaml" />
+                <ResourceDictionary Source="/Resources/Controls/Text.xaml" />
+                <ResourceDictionary Source="/Resources/Controls/Buttons.xaml" />
+                <ResourceDictionary Source="/Resources/Controls/Inputs.xaml" />
+                <ResourceDictionary Source="/Resources/Controls/Containers.xaml" />
+
+                <!-- 5. App Top-level DataTemplates (ViewModel-to-View mapping) -->
+                <ResourceDictionary Source="/Resources/DataTemplates.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <!-- DataTemplate for Dialog Contents -->

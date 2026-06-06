@@ -1,0 +1,49 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- ====================================================================== -->
+    <!-- Font Size Scales (Atomic) -->
+    <!-- ====================================================================== -->
+    <sys:Double x:Key="FontScale10">10</sys:Double>
+    <sys:Double x:Key="FontScale20">11</sys:Double>
+    <sys:Double x:Key="FontScale30">12</sys:Double>
+    <sys:Double x:Key="FontScale40">14</sys:Double>
+    <sys:Double x:Key="FontScale50">16</sys:Double>
+    <sys:Double x:Key="FontScale60">18</sys:Double>
+    <sys:Double x:Key="FontScale70">20</sys:Double>
+    <sys:Double x:Key="FontScale80">22</sys:Double>
+
+    <!-- ====================================================================== -->
+    <!-- Font Weight Scales (Atomic) -->
+    <!-- ====================================================================== -->
+    <FontWeight x:Key="Weight100">Light</FontWeight>
+    <FontWeight x:Key="Weight400">Normal</FontWeight>
+    <FontWeight x:Key="Weight500">Medium</FontWeight>
+    <FontWeight x:Key="Weight600">SemiBold</FontWeight>
+    <FontWeight x:Key="Weight700">Bold</FontWeight>
+
+    <!-- ====================================================================== -->
+    <!-- Semantic Typography Tokens (Defined directly for stability) -->
+    <!-- ====================================================================== -->
+    <sys:Double x:Key="FontSizeHero">22</sys:Double>
+    <sys:Double x:Key="FontSizeDisplay">20</sys:Double>
+    <sys:Double x:Key="FontSizeTitle">18</sys:Double>
+    <sys:Double x:Key="FontSizeHeader">16</sys:Double>
+    <sys:Double x:Key="FontSizeSubHeader">14</sys:Double>
+    <sys:Double x:Key="FontSizeBody">12</sys:Double>
+    <sys:Double x:Key="FontSizeCaption">11</sys:Double>
+    <sys:Double x:Key="FontSizeMeta">10</sys:Double>
+
+    <FontWeight x:Key="FontWeightEmphasis">Bold</FontWeight>
+    <FontWeight x:Key="FontWeightHeader">SemiBold</FontWeight>
+    <FontWeight x:Key="FontWeightBody">Normal</FontWeight>
+    <FontWeight x:Key="FontWeightLight">Light</FontWeight>
+
+    <FontWeight x:Key="FontWeightNormal">Normal</FontWeight>
+
+    <!-- Font Family -->
+    <FontFamily x:Key="FontFamilyStandard">Meiryo, Segoe UI, sans-serif</FontFamily>
+    <FontFamily x:Key="FontFamilyMonospace">Consolas, Meiryo, monospace</FontFamily>
+
+</ResourceDictionary>
