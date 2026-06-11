@@ -104,6 +104,10 @@
   - `RelatedTaskIds`
 - **[Category: `Container_Description`]** (更新頻度: 低)
   - `Description`
+- **[Category: `Container_SortOrder`]** (更新頻度: 高)
+  - **キー:** `OrderedIds` (List<Guid>)
+  - _マッピング規則:_ `DataModel` における `Container.Children` リストの現在の並び順を、子要素（タスク・コンテナ）のID配列として抽出して保存する。デシリアライズ時は、この配列順に子要素のインスタンスをリストへ配置する。
+  - _設計意図:_ ガントチャート（Timeline）やリストにおけるドラッグ＆ドロップでの並べ替え更新を、他の計画メタデータと分離し、コンフリクトを最小化するため。
 
 ### 4.4 削除マーカー (Tombstone Marker)
 

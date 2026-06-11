@@ -575,7 +575,7 @@
                     <Setter.Value>
                         <DropShadowEffect BlurRadius="15"
                                           Direction="-90"
-                                          Opacity="0.1"
+                                          Opacity="{StaticResource OpacityMuted}"
                                           ShadowDepth="5" />
                     </Setter.Value>
                 </Setter>

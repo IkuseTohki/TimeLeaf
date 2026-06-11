@@ -186,7 +186,7 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Opacity" Value="1.0" />
+                            <Setter Property="Opacity" Value="{StaticResource OpacityFull}" />
                             <Setter TargetName="AddIcon" Property="RenderTransform">
                                 <Setter.Value>
                                     <ScaleTransform ScaleX="1.2" ScaleY="1.2" />
@@ -239,7 +239,7 @@
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Padding" Value="8,4" />
         <Setter Property="HorizontalAlignment" Value="Center" />
-        <Setter Property="Opacity" Value="0.4" />
+        <Setter Property="Opacity" Value="{StaticResource OpacitySubtle}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -264,12 +264,12 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="Root" Property="Opacity" Value="1.0" />
-                            <Setter Property="Opacity" Value="1.0" />
+                            <Setter Property="Opacity" Value="{StaticResource OpacityFull}" />
                             <Setter TargetName="Text" Property="Foreground" Value="{DynamicResource BrandPrimaryBrush}" />
                             <Setter TargetName="Icon" Property="Fill" Value="{DynamicResource BrandPrimaryBrush}" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Opacity" Value="0.7" />
+                            <Setter Property="Opacity" Value="{StaticResource OpacityMedium}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

@@ -14,8 +14,8 @@
 
     <!-- ユーザーアバター（アイコン）の基本スタイル -->
     <Style x:Key="BorderUserAvatarIconStyle" TargetType="Border">
-        <Setter Property="Width" Value="32" />
-        <Setter Property="Height" Value="32" />
+        <Setter Property="Width" Value="{StaticResource AvatarSizeMedium}" />
+        <Setter Property="Height" Value="{StaticResource AvatarSizeMedium}" />
         <Setter Property="Margin" Value="12,0,0,0" />
         <Setter Property="Background" Value="{DynamicResource BrandPrimaryHoverBrush}" />
         <Setter Property="CornerRadius" Value="{StaticResource Radius70}" />
@@ -25,8 +25,8 @@
     <Style x:Key="BorderUserAvatarIconSmallStyle"
            BasedOn="{StaticResource BorderUserAvatarIconStyle}"
            TargetType="Border">
-        <Setter Property="Width" Value="24" />
-        <Setter Property="Height" Value="24" />
+        <Setter Property="Width" Value="{StaticResource AvatarSizeSmall}" />
+        <Setter Property="Height" Value="{StaticResource AvatarSizeSmall}" />
         <Setter Property="Margin" Value="0" />
         <Setter Property="Background" Value="{DynamicResource StateHoverBrush}" />
         <Setter Property="CornerRadius" Value="{StaticResource Radius50}" />
@@ -41,8 +41,8 @@
 
     <!-- ユーザーメニュー内のアバター枠 -->
     <Style x:Key="BorderUserMenuAvatarStyle" TargetType="Border">
-        <Setter Property="Width" Value="24" />
-        <Setter Property="Height" Value="24" />
+        <Setter Property="Width" Value="{StaticResource AvatarSizeSmall}" />
+        <Setter Property="Height" Value="{StaticResource AvatarSizeSmall}" />
         <Setter Property="Background" Value="{DynamicResource BrandPrimaryBrush}" />
         <Setter Property="CornerRadius" Value="{StaticResource Radius50}" />
     </Style>
@@ -144,7 +144,7 @@
                             <Setter TargetName="RootBorder" Property="Background" Value="{DynamicResource StateHoverBrush}" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Opacity" Value="0.8" />
+                            <Setter Property="Opacity" Value="{StaticResource OpacityStrong}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

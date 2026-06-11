@@ -31,7 +31,7 @@
         </Grid.RowDefinitions>
 
         <!-- ヘッダーエリア -->
-        <Grid Style="{StaticResource ViewHeaderGridStyle}">
+        <Grid Style="{StaticResource GridViewHeaderStyle}">
             <StackPanel VerticalAlignment="Bottom">
                 <TextBlock Style="{StaticResource TextBlockViewHeaderTitleStyle}" Text="全タスク一覧 (All Tasks)" />
                 <TextBlock Style="{StaticResource TextBlockViewHeaderSubTitleStyle}" Text="{Binding AllTasks.Count, StringFormat=\{0\} active tasks}" />

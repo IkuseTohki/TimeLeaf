@@ -41,7 +41,7 @@
         </Grid.RowDefinitions>
 
         <!-- ヘッダー (ProjectWorkspaceView 特有のヘッダー) -->
-        <Grid Style="{StaticResource ViewHeaderGridStyle}">
+        <Grid Style="{StaticResource GridViewHeaderStyle}">
             <StackPanel VerticalAlignment="Bottom">
                 <TextBlock Style="{StaticResource ProjectWorkspaceTitleStyle}">
                     <Run Text="{Binding ProjectName, Mode=OneWay}" />

@@ -33,7 +33,7 @@
         </Grid.RowDefinitions>
 
         <!-- ヘッダーエリア -->
-        <Grid Style="{StaticResource ViewHeaderGridStyle}">
+        <Grid Style="{StaticResource GridViewHeaderStyle}">
             <StackPanel VerticalAlignment="Bottom">
                 <TextBlock Style="{StaticResource TextBlockViewHeaderTitleStyle}" Text="森の広場 (Home)" />
                 <TextBlock Style="{StaticResource TextBlockViewHeaderSubTitleStyle}" Text="全プロジェクトの状況を俯瞰しています。" />

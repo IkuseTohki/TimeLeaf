@@ -63,7 +63,7 @@
         <Setter Property="FontSize" Value="9" />
         <Setter Property="FontWeight" Value="{StaticResource FontWeightEmphasis}" />
         <Setter Property="Foreground" Value="{DynamicResource BrandPrimaryBrush}" />
-        <Setter Property="Opacity" Value="0.8" />
+        <Setter Property="Opacity" Value="{StaticResource OpacityStrong}" />
     </Style>
 
     <Style x:Key="EllipseHomeMilestoneTimelineDotStyle" TargetType="Ellipse">
@@ -78,7 +78,7 @@
         <Setter Property="Width" Value="1" />
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="Fill" Value="{DynamicResource BrandPrimaryBrush}" />
-        <Setter Property="Opacity" Value="0.2" />
+        <Setter Property="Opacity" Value="{StaticResource OpacitySubtle}" />
     </Style>
 
     <Style x:Key="TextBlockHomeMilestoneLabelStyle"

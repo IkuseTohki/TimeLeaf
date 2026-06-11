@@ -101,14 +101,14 @@
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="FontWeight" Value="{StaticResource FontWeightEmphasis}" />
         <Setter Property="Foreground" Value="{DynamicResource SidebarTextBrush}" />
-        <Setter Property="Opacity" Value="0.6" />
+        <Setter Property="Opacity" Value="{StaticResource OpacityStrong}" />
     </Style>
 
     <Style x:Key="TextBlockSidebarEmptyStyle" TargetType="TextBlock">
         <Setter Property="Margin" Value="16,8,16,0" />
         <Setter Property="FontStyle" Value="Italic" />
         <Setter Property="Foreground" Value="{DynamicResource SidebarTextBrush}" />
-        <Setter Property="Opacity" Value="0.4" />
+        <Setter Property="Opacity" Value="{StaticResource OpacitySubtle}" />
         <Setter Property="TextAlignment" Value="Center" />
     </Style>
 
@@ -158,10 +158,10 @@
            TargetType="Button">
         <Setter Property="Padding" Value="32,6,16,6" />
         <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
-        <Setter Property="Opacity" Value="0.8" />
+        <Setter Property="Opacity" Value="{StaticResource OpacityStrong}" />
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Opacity" Value="1.0" />
+                <Setter Property="Opacity" Value="{StaticResource OpacityFull}" />
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -204,7 +204,7 @@
                         <Border.Effect>
                             <DropShadowEffect BlurRadius="4"
                                               Direction="-90"
-                                              Opacity="0.1"
+                                              Opacity="{StaticResource OpacityMuted}"
                                               ShadowDepth="1" />
                         </Border.Effect>
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -220,3 +220,4 @@
     </Style>
 
 </ResourceDictionary>
+

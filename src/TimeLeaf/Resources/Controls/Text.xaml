@@ -61,7 +61,7 @@
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="FontSize" Value="{StaticResource FontSizeTitle}" />
         <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
-        <Setter Property="Opacity" Value="0.5" />
+        <Setter Property="Opacity" Value="{StaticResource OpacityMedium}" />
     </Style>
 
     <Style x:Key="TextBlockFatalErrorHeaderStyle"
@@ -88,6 +88,10 @@
         <Setter Property="Margin" Value="0,4,0,0" />
         <Setter Property="FontWeight" Value="{StaticResource FontWeightNormal}" />
     </Style>
+
+    <Style x:Key="TextBlockBodyStyle"
+           BasedOn="{StaticResource TextBlockTextBaseStyle}"
+           TargetType="TextBlock" />
 
     <!-- Semantic Aliases for backward compatibility -->
     <Style x:Key="HeaderBaseStyle"

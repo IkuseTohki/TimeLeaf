@@ -14,6 +14,7 @@ using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 using TimeLeaf.Utilities;
 using TimeLeaf.ViewModels;
+using TimeLeaf.ViewModels.Workspace;
 using TimeLeaf.Views;
 
 namespace TimeLeaf;
@@ -262,6 +263,16 @@ public partial class App : Application
             sp.GetRequiredService<ILogger<FolderProjectRepository>>()
         ));
 
+        // カレンダー設定の登録
+        var calendarPath = Path.Combine(storagePath, "calendar.json");
+        services.AddSingleton<ICalendarRepository>(sp => new FileSystemCalendarRepository(calendarPath));
+        services.AddSingleton<WorkdayService>(sp =>
+        {
+            var repo = sp.GetRequiredService<ICalendarRepository>();
+            var setting = repo.LoadAsync().GetAwaiter().GetResult();
+            return new WorkdayService(setting);
+        });
+
         // LeafKit.UI サービスの登録
         services.AddSingleton<IDialogService, DialogService>();
 
@@ -301,6 +312,7 @@ public partial class App : Application
         services.AddTransient<IJoinProjectUseCase, JoinProjectUseCase>();
         services.AddTransient<ICheckAssignmentUseCase, CheckAssignmentUseCase>();
         services.AddTransient<IGetProjectMembersUseCase, GetProjectMembersUseCase>();
+        services.AddTransient<GetTimelineRowsUseCase>();
         services.AddTransient<CalculateCriticalPathUseCase>();
         services.AddTransient<CalculateFlowLayoutUseCase>();
         services.AddTransient<DetectProjectRisksUseCase>();

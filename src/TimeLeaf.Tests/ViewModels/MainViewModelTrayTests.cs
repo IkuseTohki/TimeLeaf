@@ -168,7 +168,7 @@ public class MainViewModelTrayTests
 
         // Act
         _settings.MinimizeOnClose = false;
-        _settingsRepoMock.Raise(x => x.SettingsChanged += null, null, _settings);
+        _settingsRepoMock.Raise(x => x.SettingsChanged += null!, null!, _settings);
 
         // Assert
         Assert.IsTrue(viewModel.CanExit, "設定変更後にCanExitが更新されること");

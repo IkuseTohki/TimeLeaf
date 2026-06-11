@@ -17,7 +17,7 @@
 
         <!-- グローバルヘッダーエリア（グローバル表示時のみ表示） -->
         <Grid Grid.Row="0"
-              Style="{StaticResource ViewHeaderGridStyle}"
+              Style="{StaticResource GridViewHeaderStyle}"
               Visibility="{Binding IsGlobalContext, Converter={StaticResource BooleanToVisibilityConverter}}">
             <StackPanel VerticalAlignment="Bottom">
                 <TextBlock Style="{StaticResource TextBlockViewHeaderTitleStyle}" Text="通知センター" />

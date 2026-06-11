@@ -74,7 +74,7 @@ public class UserServiceTests
         _userService.UserChanged += (u) => raisedUser = u;
 
         // Act - リポジトリのイベントをシミュレート
-        _userRepositoryMock.Raise(r => r.UserChanged += null, null, userId);
+        _userRepositoryMock.Raise(r => r.UserChanged += null!, null!, userId);
 
         // 非同期の再ロードを待機
         await Task.Delay(100);

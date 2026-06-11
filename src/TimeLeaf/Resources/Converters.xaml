@@ -17,6 +17,15 @@
     <tlcv:InverseBooleanConverter x:Key="InverseBooleanConverter" />
     <tlcv:UserInitialConverter x:Key="UserInitialConverter" />
     <tlcv:EnumToDisplayNameConverter x:Key="EnumToDisplayNameConverter" />
+    <tlcv:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
+    <tlcv:DepthToMarginConverter x:Key="DepthToMarginConverter" />
+    <tlcv:DateToXConverter x:Key="DateToXConverter" />
+    <tlcv:DateRangeToWidthConverter x:Key="DateRangeToWidthConverter" />
+    <tlcv:PercentageToWidthConverter x:Key="PercentageToWidthConverter" />
+    <tlcv:RowsToLightningPathConverter x:Key="RowsToLightningPathConverter" />
+    <tlcv:DateToHeaderFormatConverter x:Key="DateToHeaderFormatConverter" />
+    <tlcv:DateToIsWeekendConverter x:Key="DateToIsWeekendConverter" />
+    <tlcv:DateToDayHeaderTextConverter x:Key="DateToDayHeaderTextConverter" />
     <tlcv:MoveTaskArgsConverter x:Key="MoveTaskArgsConverter" />
     <lk:EqualityToBooleanConverter x:Key="EqualityToBooleanConverter" />
     <lk:ComparisonConverter x:Key="ComparisonConverter" />

@@ -3,7 +3,7 @@
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
     <!-- ====================================================================== -->
-    <!-- Spacing Scales (Atomic - DOUBLE) -->
+    <!-- Spacing Scales (Atomic - Double) -->
     <!-- ====================================================================== -->
     <sys:Double x:Key="Spacing10">0</sys:Double>
     <sys:Double x:Key="Spacing20">4</sys:Double>
@@ -15,7 +15,7 @@
     <sys:Double x:Key="Spacing80">32</sys:Double>
 
     <!-- ====================================================================== -->
-    <!-- Corner Radius Scales (Atomic - CORNER RADIUS) -->
+    <!-- Corner Radius Scales (Atomic - CornerRadius) -->
     <!-- ====================================================================== -->
     <CornerRadius x:Key="Radius10">0</CornerRadius>
     <CornerRadius x:Key="Radius20">4</CornerRadius>
@@ -27,7 +27,7 @@
     <CornerRadius x:Key="RadiusMax">999</CornerRadius>
 
     <!-- ====================================================================== -->
-    <!-- Size Scales (Atomic - DOUBLE) -->
+    <!-- Size Scales (Atomic - Double) -->
     <!-- ====================================================================== -->
     <sys:Double x:Key="SizeHeight10">22</sys:Double>
     <sys:Double x:Key="SizeHeight20">28</sys:Double>
@@ -41,7 +41,13 @@
     <sys:Double x:Key="SizeWidth300">480</sys:Double>
 
     <!-- ====================================================================== -->
-    <!-- Thickness Scales (Atomic - THICKNESS) -->
+    <!-- Row/Header Heights (Atomic) -->
+    <!-- ====================================================================== -->
+    <sys:Double x:Key="RowTimelineNormalHeight">60</sys:Double>
+    <sys:Double x:Key="HeaderStandardNormalHeight">40</sys:Double>
+
+    <!-- ====================================================================== -->
+    <!-- Thickness Scales (Atomic - Thickness) -->
     <!-- ====================================================================== -->
     <Thickness x:Key="Thickness10">0,0,0,0</Thickness>
     <Thickness x:Key="Thickness20">4,4,4,4</Thickness>
@@ -53,7 +59,7 @@
     <Thickness x:Key="Thickness80">32,32,32,32</Thickness>
 
     <!-- ====================================================================== -->
-    <!-- Semantic Layout Tokens (Aliases defined as direct values for stability) -->
+    <!-- Semantic Layout Tokens -->
     <!-- ====================================================================== -->
 
     <!-- Corner Radii -->
@@ -170,5 +176,17 @@
 
     <sys:Double x:Key="MultilineInputHeightSmall">60</sys:Double>
     <sys:Double x:Key="MultilineInputHeightMedium">80</sys:Double>
+
+    <!-- Avatar Sizes -->
+    <sys:Double x:Key="AvatarSizeSmall">24</sys:Double>
+    <sys:Double x:Key="AvatarSizeMedium">32</sys:Double>
+    <sys:Double x:Key="AvatarSizeLarge">40</sys:Double>
+
+    <!-- Opacity Scales -->
+    <sys:Double x:Key="OpacityMuted">0.1</sys:Double>
+    <sys:Double x:Key="OpacitySubtle">0.3</sys:Double>
+    <sys:Double x:Key="OpacityMedium">0.6</sys:Double>
+    <sys:Double x:Key="OpacityStrong">0.8</sys:Double>
+    <sys:Double x:Key="OpacityFull">1.0</sys:Double>
 
 </ResourceDictionary>

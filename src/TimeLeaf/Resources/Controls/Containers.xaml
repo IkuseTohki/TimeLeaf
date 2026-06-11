@@ -16,7 +16,7 @@
             <Setter.Value>
                 <DropShadowEffect BlurRadius="10"
                                   Direction="-90"
-                                  Opacity="0.03"
+                                  Opacity="{StaticResource OpacityMuted}"
                                   ShadowDepth="3" />
             </Setter.Value>
         </Setter>
@@ -34,11 +34,6 @@
     <Style x:Key="GridViewHeaderStyle" TargetType="Grid">
         <Setter Property="Margin" Value="24,16,24,8" />
     </Style>
-
-    <!-- Semantic Aliases for backward compatibility -->
-    <Style x:Key="ViewHeaderGridStyle"
-           BasedOn="{StaticResource GridViewHeaderStyle}"
-           TargetType="Grid" />
 
     <!-- ====================================================================== -->
     <!-- ScrollViewer Styles -->
@@ -193,10 +188,10 @@
         <Setter Property="BorderBrush" Value="{DynamicResource SurfaceLayer1Brush}" />
         <Style.Resources>
             <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
-                             Opacity="0.1"
+                             Opacity="{StaticResource OpacityMuted}"
                              Color="{DynamicResource BrandPrimaryColor}" />
             <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}"
-                             Opacity="0.05"
+                             Opacity="{StaticResource OpacityMuted}"
                              Color="{DynamicResource BrandPrimaryColor}" />
             <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="{DynamicResource BrandPrimaryColor}" />
         </Style.Resources>

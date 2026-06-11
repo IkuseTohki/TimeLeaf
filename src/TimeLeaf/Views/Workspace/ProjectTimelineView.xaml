@@ -1,23 +1,304 @@
 ﻿<UserControl x:Class="TimeLeaf.Views.Workspace.ProjectTimelineView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:behaviors="clr-namespace:TimeLeaf.Behaviors"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:TimeLeaf.Views.Workspace"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:models="clr-namespace:TimeLeaf.Models"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:vms="clr-namespace:TimeLeaf.ViewModels.Workspace"
+             d:DataContext="{d:DesignInstance vms:ProjectTimelineViewModel}"
              d:DesignHeight="450"
              d:DesignWidth="800"
+             Grid.IsSharedSizeScope="True"
              mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Resources/Tokens/Layout.xaml" />
-                <ResourceDictionary Source="/Resources/Tokens/Typography.xaml" />
-                <ResourceDictionary Source="/Resources/Controls/Text.xaml" />
-                <ResourceDictionary Source="/Resources/Controls/Containers.xaml" />
+                <ResourceDictionary Source="/Resources/Converters.xaml" />
+                <ResourceDictionary Source="/Resources/Components/TimelineStyles.xaml" />
                 <ResourceDictionary Source="/Resources/Components/WorkspaceView.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid>
-        <TextBlock Style="{StaticResource TextBlockViewPlaceholderStyle}" Text="Timeline View" />
+
+    <Grid Style="{StaticResource GridTimelineRootStyle}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <!-- Toolbar -->
+            <RowDefinition Height="*" />
+            <!-- Content -->
+        </Grid.RowDefinitions>
+
+        <!-- Toolbar -->
+        <Border Grid.Row="0"
+                Padding="{StaticResource TimelineHeaderPadding}"
+                Style="{StaticResource BorderTimelineHeaderStyle}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            Style="{StaticResource StackPanelTimelineNavigationContainerStyle}">
+                    <RadioButton Content="Dual"
+                                 IsChecked="{Binding CurrentViewMode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:TimelineViewMode.Dual}}"
+                                 Style="{StaticResource RadioButtonTimelineNavigationStyle}" />
+                    <RadioButton Content="Plan"
+                                 IsChecked="{Binding CurrentViewMode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:TimelineViewMode.PlanOnly}}"
+                                 Style="{StaticResource RadioButtonTimelineNavigationStyle}" />
+                    <RadioButton Content="Actual"
+                                 IsChecked="{Binding CurrentViewMode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:TimelineViewMode.ActualOnly}}"
+                                 Style="{StaticResource RadioButtonTimelineNavigationStyle}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main Content: Unified Vertical Scroll -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="{StaticResource TimelineSidebarWidth}" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Sidebar Content -->
+                <StackPanel Grid.Column="0">
+                    <!-- Dummy Header -->
+                    <Border Height="{StaticResource HeaderStandardNormalHeight}"
+                            Background="{DynamicResource SurfaceBaseBrush}"
+                            BorderBrush="{DynamicResource OutlineBaseBrush}"
+                            BorderThickness="0,0,1,1" />
+
+                    <ItemsControl ItemsSource="{Binding Rows}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource BorderTimelineSidebarItemStyle}">
+                                    <StackPanel Margin="{Binding Depth, Converter={StaticResource DepthToMarginConverter}}" Orientation="Horizontal">
+                                        <TextBlock VerticalAlignment="Center" Text="{Binding Name}">
+                                            <TextBlock.Style>
+                                                <Style BasedOn="{StaticResource TextBlockBodyStyle}" TargetType="TextBlock">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsContainer}" Value="True">
+                                                            <Setter Property="FontWeight" Value="Bold" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+
+                <!-- Chart Content: Horizontal Scroll only -->
+                <ScrollViewer Grid.Column="1"
+                              HorizontalScrollBarVisibility="Auto"
+                              VerticalScrollBarVisibility="Disabled">
+                    <b:Interaction.Behaviors>
+                        <behaviors:AutoHorizontalScrollBehavior ScrollOffset="{Binding ScrollOffset}" />
+                    </b:Interaction.Behaviors>
+                    <StackPanel>
+                        <!-- Timeline Date Header -->
+                        <Grid Width="{Binding TotalWidth}">
+                            <ItemsControl ItemsSource="{Binding TimelineDates}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Width="60"
+                                                Height="{StaticResource HeaderStandardNormalHeight}"
+                                                Background="{DynamicResource SurfaceBaseBrush}"
+                                                BorderBrush="{DynamicResource OutlineBaseBrush}"
+                                                BorderThickness="0,0,1,1">
+                                            <Grid VerticalAlignment="Center">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Grid.Row="0"
+                                                           HorizontalAlignment="Center"
+                                                           FontSize="{StaticResource FontSizeMeta}"
+                                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                                           Text="{Binding Converter={StaticResource DateToHeaderFormatConverter}, ConverterParameter=DayOfWeek}" />
+                                                <TextBlock Grid.Row="1"
+                                                           HorizontalAlignment="Center"
+                                                           FontSize="{StaticResource FontSizeHeader}"
+                                                           FontWeight="Bold">
+                                                    <TextBlock.Text>
+                                                        <MultiBinding Converter="{StaticResource DateToDayHeaderTextConverter}">
+                                                            <Binding Path="." />
+                                                            <Binding Path="DataContext.BaseDate" RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+
+                        <Grid Width="{Binding TotalWidth}">
+                            <!-- Background Grid: Weekend highlights and vertical lines -->
+                            <ItemsControl IsHitTestVisible="False" ItemsSource="{Binding TimelineDates}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Style="{StaticResource BorderTimelineGridColumnStyle}" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <ItemsControl ItemsSource="{Binding Rows}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Style="{StaticResource BorderTimelineChartItemStyle}">
+                                            <!-- Row Height is fixed to RowTimelineNormalHeight (60) by Style -->
+                                            <Grid VerticalAlignment="Stretch">
+                                                <!-- Container Bar (Summary) -->
+                                                <Canvas Visibility="{Binding IsContainer, Converter={StaticResource NormalVisibility}}">
+                                                    <Border Canvas.Top="24"
+                                                            Width="{Binding Converter={StaticResource DateRangeToWidthConverter}, ConverterParameter=Planned}"
+                                                            Style="{StaticResource BorderTimelineContainerStyle}">
+                                                        <Canvas.Left>
+                                                            <MultiBinding Converter="{StaticResource DateToXConverter}">
+                                                                <Binding Path="PlannedStart" />
+                                                                <Binding Path="DataContext.BaseDate" RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+                                                            </MultiBinding>
+                                                        </Canvas.Left>
+                                                    </Border>
+                                                </Canvas>
+
+                                                <!-- Task Bars (Planned & Actual) -->
+                                                <Canvas x:Name="TaskCanvas" Visibility="{Binding IsContainer, Converter={StaticResource InverseVisibility}}">
+                                                    <!-- Planned Bar -->
+                                                    <Border x:Name="PlannedBar"
+                                                            Width="{Binding Converter={StaticResource DateRangeToWidthConverter}, ConverterParameter=Planned}"
+                                                            Background="{Binding UserColor, Converter={StaticResource StringToBrushConverter}}">
+                                                        <Canvas.Left>
+                                                            <MultiBinding Converter="{StaticResource DateToXConverter}">
+                                                                <Binding Path="PlannedStart" />
+                                                                <Binding Path="DataContext.BaseDate" RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+                                                            </MultiBinding>
+                                                        </Canvas.Left>
+                                                        <Border.Style>
+                                                            <Style BasedOn="{StaticResource BorderTimelinePlanStyle}" TargetType="Border">
+                                                                <Setter Property="Canvas.Top" Value="20" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding DataContext.CurrentViewMode, RelativeSource={RelativeSource AncestorType=ItemsControl}}" Value="{x:Static models:TimelineViewMode.PlanOnly}">
+                                                                        <Setter Property="Canvas.Top" Value="26" />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding DataContext.CurrentViewMode, RelativeSource={RelativeSource AncestorType=ItemsControl}}" Value="{x:Static models:TimelineViewMode.ActualOnly}">
+                                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Border.Style>
+                                                    </Border>
+
+                                                    <!-- Actual Bar -->
+                                                    <Border x:Name="ActualBar"
+                                                            Width="{Binding Converter={StaticResource DateRangeToWidthConverter}, ConverterParameter=Actual}"
+                                                            Background="{Binding UserColor, Converter={StaticResource StringToBrushConverter}}">
+                                                        <Canvas.Left>
+                                                            <MultiBinding Converter="{StaticResource DateToXConverter}">
+                                                                <Binding Path="ActualStart" />
+                                                                <Binding Path="DataContext.BaseDate" RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+                                                            </MultiBinding>
+                                                        </Canvas.Left>
+                                                        <Border.Style>
+                                                            <Style BasedOn="{StaticResource BorderTimelineActualStyle}" TargetType="Border">
+                                                                <Setter Property="Canvas.Top" Value="32" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding DataContext.CurrentViewMode, RelativeSource={RelativeSource AncestorType=ItemsControl}}" Value="{x:Static models:TimelineViewMode.ActualOnly}">
+                                                                        <Setter Property="Canvas.Top" Value="26" />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding DataContext.CurrentViewMode, RelativeSource={RelativeSource AncestorType=ItemsControl}}" Value="{x:Static models:TimelineViewMode.PlanOnly}">
+                                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Border.Style>
+
+                                                        <!-- Progress Overlay -->
+                                                        <Border HorizontalAlignment="Left"
+                                                                Background="Black"
+                                                                CornerRadius="{StaticResource Radius20}"
+                                                                Opacity="{StaticResource OpacitySubtle}">
+                                                            <Border.Width>
+                                                                <MultiBinding Converter="{StaticResource PercentageToWidthConverter}">
+                                                                    <Binding Path="ProgressPercentage" />
+                                                                    <Binding ElementName="ActualBar" Path="ActualWidth" />
+                                                                </MultiBinding>
+                                                            </Border.Width>
+                                                        </Border>
+                                                    </Border>
+
+                                                    <!-- Assignee Avatar -->
+                                                    <Border Canvas.Top="18"
+                                                            Background="{Binding UserColor, Converter={StaticResource StringToBrushConverter}}"
+                                                            Style="{StaticResource BorderTimelineAvatarStyle}">
+                                                        <Canvas.Left>
+                                                            <MultiBinding Converter="{StaticResource DateToXConverter}" ConverterParameter="{StaticResource TimelineAvatarHorizontalOffset}">
+                                                                <Binding Path="PlannedStart" />
+                                                                <Binding Path="DataContext.BaseDate" RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+                                                            </MultiBinding>
+                                                        </Canvas.Left>
+                                                        <TextBlock HorizontalAlignment="Center"
+                                                                   VerticalAlignment="Center"
+                                                                   FontSize="{StaticResource FontSizeMeta}"
+                                                                   Foreground="{DynamicResource BrandForegroundBrush}"
+                                                                   Text="{Binding UserInitial}" />
+                                                    </Border>
+                                                </Canvas>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <!-- Global Overlays -->
+                            <Canvas IsHitTestVisible="False">
+                                <!-- Today Line: Indicator for current time (positioned at the center of the day column) -->
+                                <Border Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Canvas}}" Style="{StaticResource BorderTimelineTodayLineStyle}">
+                                    <Canvas.Left>
+                                        <MultiBinding Converter="{StaticResource DateToXConverter}" ConverterParameter="30">
+                                            <Binding Path="Today" />
+                                            <Binding Path="BaseDate" />
+                                        </MultiBinding>
+                                    </Canvas.Left>
+                                </Border>
+
+                                <!-- Lightning line: Progress variance -->
+                                <Path Style="{StaticResource PathTimelineLightningStyle}">
+                                    <Path.Data>
+                                        <MultiBinding Converter="{StaticResource RowsToLightningPathConverter}">
+                                            <Binding Path="Rows" />
+                                            <Binding Path="BaseDate" />
+                                            <Binding Path="Today" />
+                                        </MultiBinding>
+                                    </Path.Data>
+                                </Path>
+                            </Canvas>
+                        </Grid>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+        </ScrollViewer>
     </Grid>
 </UserControl>

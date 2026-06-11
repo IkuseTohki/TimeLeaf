@@ -149,7 +149,10 @@ public class ViewModelFactory : IViewModelFactory
 
     public ProjectTimelineViewModel CreateProjectTimelineViewModel(ProjectViewModel projectViewModel)
     {
-        return new ProjectTimelineViewModel(projectViewModel);
+        return new ProjectTimelineViewModel(
+            projectViewModel,
+            _serviceProvider.GetRequiredService<GetTimelineRowsUseCase>()
+        );
     }
 
     public ProjectFlowViewModel CreateProjectFlowViewModel(ProjectViewModel projectViewModel)

@@ -176,7 +176,7 @@
                                                             <Setter TargetName="TaskBorder" Property="Effect">
                                                                 <Setter.Value>
                                                                     <DropShadowEffect BlurRadius="6"
-                                                                                      Opacity="0.1"
+                                                                                      Opacity="{StaticResource OpacityMuted}"
                                                                                       ShadowDepth="2"
                                                                                       Color="{Binding Source={StaticResource BrandPrimaryColor}}" />
                                                                 </Setter.Value>
@@ -199,7 +199,7 @@
                                 <Trigger SourceName="ContainerBorder" Property="IsMouseOver" Value="True">
                                     <Setter TargetName="AddTaskBtn" Property="Height" Value="24" />
                                     <Setter TargetName="AddTaskBtn" Property="Background" Value="{DynamicResource StateHoverBrush}" />
-                                    <Setter TargetName="AddTaskBtn" Property="Opacity" Value="0.6" />
+                                    <Setter TargetName="AddTaskBtn" Property="Opacity" Value="{StaticResource OpacityMedium}" />
                                 </Trigger>
                                 <MultiDataTrigger>
                                     <MultiDataTrigger.Conditions>
@@ -207,7 +207,7 @@
                                         <Condition Binding="{Binding IsUnclassified}" Value="False" />
                                     </MultiDataTrigger.Conditions>
                                     <Setter TargetName="DeleteContainerBtn" Property="Visibility" Value="Visible" />
-                                    <Setter TargetName="DeleteContainerBtn" Property="Opacity" Value="1" />
+                                    <Setter TargetName="DeleteContainerBtn" Property="Opacity" Value="{StaticResource OpacityFull}" />
                                 </MultiDataTrigger>
                                 <MultiDataTrigger>
                                     <MultiDataTrigger.Conditions>
@@ -215,7 +215,7 @@
                                         <Condition Binding="{Binding IsUnclassified}" Value="False" />
                                     </MultiDataTrigger.Conditions>
                                     <Setter TargetName="DeleteContainerBtn" Property="Visibility" Value="Visible" />
-                                    <Setter TargetName="DeleteContainerBtn" Property="Opacity" Value="1" />
+                                    <Setter TargetName="DeleteContainerBtn" Property="Opacity" Value="{StaticResource OpacityFull}" />
                                 </MultiDataTrigger>
                             </DataTemplate.Triggers>
                         </DataTemplate>

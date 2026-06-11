@@ -55,7 +55,7 @@
     <DropShadowEffect x:Key="AllTasksShadowEffect"
                       BlurRadius="10"
                       Direction="-90"
-                      Opacity="0.05"
+                      Opacity="{StaticResource OpacityMuted}"
                       ShadowDepth="2" />
 
 </ResourceDictionary>
