@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="TimeLeaf.Views.Workspace.ProjectTimelineView"
+<UserControl x:Class="TimeLeaf.Views.Workspace.ProjectTimelineView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
@@ -172,9 +172,7 @@
                                             <Grid VerticalAlignment="Stretch">
                                                 <!-- Container Bar (Summary) -->
                                                 <Canvas Visibility="{Binding IsContainer, Converter={StaticResource NormalVisibility}}">
-                                                    <Border Canvas.Top="24"
-                                                            Width="{Binding Converter={StaticResource DateRangeToWidthConverter}, ConverterParameter=Planned}"
-                                                            Style="{StaticResource BorderTimelineContainerStyle}">
+                                                    <Border Width="{Binding Converter={StaticResource DateRangeToWidthConverter}, ConverterParameter=Planned}" Style="{StaticResource BorderTimelineContainerStyle}">
                                                         <Canvas.Left>
                                                             <MultiBinding Converter="{StaticResource DateToXConverter}">
                                                                 <Binding Path="PlannedStart" />
@@ -189,52 +187,27 @@
                                                     <!-- Planned Bar -->
                                                     <Border x:Name="PlannedBar"
                                                             Width="{Binding Converter={StaticResource DateRangeToWidthConverter}, ConverterParameter=Planned}"
-                                                            Background="{Binding UserColor, Converter={StaticResource StringToBrushConverter}}">
+                                                            Background="{Binding UserColor, Converter={StaticResource StringToBrushConverter}}"
+                                                            Style="{StaticResource BorderTimelinePlanStyle}">
                                                         <Canvas.Left>
                                                             <MultiBinding Converter="{StaticResource DateToXConverter}">
                                                                 <Binding Path="PlannedStart" />
                                                                 <Binding Path="DataContext.BaseDate" RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
                                                             </MultiBinding>
                                                         </Canvas.Left>
-                                                        <Border.Style>
-                                                            <Style BasedOn="{StaticResource BorderTimelinePlanStyle}" TargetType="Border">
-                                                                <Setter Property="Canvas.Top" Value="20" />
-                                                                <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding DataContext.CurrentViewMode, RelativeSource={RelativeSource AncestorType=ItemsControl}}" Value="{x:Static models:TimelineViewMode.PlanOnly}">
-                                                                        <Setter Property="Canvas.Top" Value="26" />
-                                                                    </DataTrigger>
-                                                                    <DataTrigger Binding="{Binding DataContext.CurrentViewMode, RelativeSource={RelativeSource AncestorType=ItemsControl}}" Value="{x:Static models:TimelineViewMode.ActualOnly}">
-                                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                                    </DataTrigger>
-                                                                </Style.Triggers>
-                                                            </Style>
-                                                        </Border.Style>
                                                     </Border>
 
                                                     <!-- Actual Bar -->
                                                     <Border x:Name="ActualBar"
                                                             Width="{Binding Converter={StaticResource DateRangeToWidthConverter}, ConverterParameter=Actual}"
-                                                            Background="{Binding UserColor, Converter={StaticResource StringToBrushConverter}}">
+                                                            Background="{Binding UserColor, Converter={StaticResource StringToBrushConverter}}"
+                                                            Style="{StaticResource BorderTimelineActualStyle}">
                                                         <Canvas.Left>
                                                             <MultiBinding Converter="{StaticResource DateToXConverter}">
                                                                 <Binding Path="ActualStart" />
                                                                 <Binding Path="DataContext.BaseDate" RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
                                                             </MultiBinding>
                                                         </Canvas.Left>
-                                                        <Border.Style>
-                                                            <Style BasedOn="{StaticResource BorderTimelineActualStyle}" TargetType="Border">
-                                                                <Setter Property="Canvas.Top" Value="32" />
-                                                                <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding DataContext.CurrentViewMode, RelativeSource={RelativeSource AncestorType=ItemsControl}}" Value="{x:Static models:TimelineViewMode.ActualOnly}">
-                                                                        <Setter Property="Canvas.Top" Value="26" />
-                                                                    </DataTrigger>
-                                                                    <DataTrigger Binding="{Binding DataContext.CurrentViewMode, RelativeSource={RelativeSource AncestorType=ItemsControl}}" Value="{x:Static models:TimelineViewMode.PlanOnly}">
-                                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                                    </DataTrigger>
-                                                                </Style.Triggers>
-                                                            </Style>
-                                                        </Border.Style>
-
                                                         <!-- Progress Overlay -->
                                                         <Border HorizontalAlignment="Left"
                                                                 Background="Black"
@@ -250,9 +223,7 @@
                                                     </Border>
 
                                                     <!-- Assignee Avatar -->
-                                                    <Border Canvas.Top="18"
-                                                            Background="{Binding UserColor, Converter={StaticResource StringToBrushConverter}}"
-                                                            Style="{StaticResource BorderTimelineAvatarStyle}">
+                                                    <Border Background="{Binding UserColor, Converter={StaticResource StringToBrushConverter}}" Style="{StaticResource BorderTimelineAvatarStyle}">
                                                         <Canvas.Left>
                                                             <MultiBinding Converter="{StaticResource DateToXConverter}" ConverterParameter="{StaticResource TimelineAvatarHorizontalOffset}">
                                                                 <Binding Path="PlannedStart" />

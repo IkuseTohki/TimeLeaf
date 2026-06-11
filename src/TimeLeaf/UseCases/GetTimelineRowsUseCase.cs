@@ -34,12 +34,14 @@ namespace TimeLeaf.UseCases
             var itemList = items?.ToList() ?? new List<ProjectWorkItem>();
             var results = new List<TimelineRowModel>();
 
-            if (!itemList.Any()) return results;
+            if (!itemList.Any())
+                return results;
 
             // トップレベルアイテム（親がいない、またはリスト内に親が存在しないアイテム）から開始
-            var rootItems = itemList.Where(t => !t.ParentId.HasValue || !itemList.Any(p => p.Id == t.ParentId.Value))
-                                    .OrderBy(t => t.PlannedStartDate ?? DateTime.MaxValue)
-                                    .ToList();
+            var rootItems = itemList
+                .Where(t => !t.ParentId.HasValue || !itemList.Any(p => p.Id == t.ParentId.Value))
+                .OrderBy(t => t.PlannedStartDate ?? DateTime.MaxValue)
+                .ToList();
 
             foreach (var item in rootItems)
             {
@@ -61,9 +63,10 @@ namespace TimeLeaf.UseCases
             results.Add(model);
 
             // 子アイテムを取得
-            var children = allItems.Where(t => t.ParentId == item.Id)
-                                   .OrderBy(t => t.PlannedStartDate ?? DateTime.MaxValue)
-                                   .ToList();
+            var children = allItems
+                .Where(t => t.ParentId == item.Id)
+                .OrderBy(t => t.PlannedStartDate ?? DateTime.MaxValue)
+                .ToList();
 
             foreach (var child in children)
             {
@@ -71,7 +74,12 @@ namespace TimeLeaf.UseCases
             }
         }
 
-        private TimelineRowModel MapToRow(ProjectWorkItem item, int depth, DateTime today, List<ProjectWorkItem> allItems)
+        private TimelineRowModel MapToRow(
+            ProjectWorkItem item,
+            int depth,
+            DateTime today,
+            List<ProjectWorkItem> allItems
+        )
         {
             var model = new TimelineRowModel
             {
@@ -99,7 +107,7 @@ namespace TimeLeaf.UseCases
                     progress = (int)Math.Min(100, (task.ActualCost / task.EstimatedCost) * 100);
                 }
                 model.ProgressPercentage = progress;
-                
+
                 // ユーザー情報の取得
                 if (task.Assignee.HasValue)
                 {
@@ -107,11 +115,11 @@ namespace TimeLeaf.UseCases
                     // 未キャッシュの場合は IUserService の GetUserName 等の同期メソッドを活用する
                     var userName = _userService.GetUserName(task.Assignee.Value.ToString());
                     model.UserInitial = !string.IsNullOrEmpty(userName) ? userName[0].ToString().ToUpper() : "U";
-                    
+
                     // 色情報の同期取得手段がない場合はデフォルトを使用するが、
                     // 理想的には IUserService に GetUserByCache(Guid) 等があると良い。
                     // 現状はプレースホルダーとしておくか、Serviceを拡張する。
-                    model.UserColor = "#0984e3"; 
+                    model.UserColor = "#0984e3";
                 }
                 else
                 {

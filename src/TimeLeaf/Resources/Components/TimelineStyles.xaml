@@ -1,5 +1,6 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:models="clr-namespace:TimeLeaf.Models"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
     <ResourceDictionary.MergedDictionaries>
@@ -70,9 +71,14 @@
                Right="24"
                Top="0" />
 
-    <!-- Vertical offset for avatar to center it relative to the bar -->
-    <!-- (BarHeight: 8 - AvatarSize: 24) / 2 = -8 -->
-    <sys:Double x:Key="TimelineAvatarVerticalOffset">-8</sys:Double>
+    <!-- Vertical positions for bars within the 60px row -->
+    <sys:Double x:Key="TimelineBarTopPlannedDual">20</sys:Double>
+    <sys:Double x:Key="TimelineBarTopActualDual">32</sys:Double>
+    <sys:Double x:Key="TimelineBarTopSingle">26</sys:Double>
+    <sys:Double x:Key="TimelineBarTopContainer">24</sys:Double>
+
+    <!-- Vertical offset for avatar to center it relative to the dual bars -->
+    <sys:Double x:Key="TimelineAvatarVerticalOffset">18</sys:Double>
 
     <!-- Horizontal offset for avatar (Width: 24) -->
     <sys:Double x:Key="TimelineAvatarHorizontalOffset">-24</sys:Double>
@@ -121,6 +127,15 @@
            BasedOn="{StaticResource BorderTimelineBarBaseStyle}"
            TargetType="Border">
         <Setter Property="Opacity" Value="{StaticResource OpacitySubtle}" />
+        <Setter Property="Canvas.Top" Value="{StaticResource TimelineBarTopPlannedDual}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding DataContext.CurrentViewMode, RelativeSource={RelativeSource AncestorType=ItemsControl}}" Value="{x:Static models:TimelineViewMode.PlanOnly}">
+                <Setter Property="Canvas.Top" Value="{StaticResource TimelineBarTopSingle}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding DataContext.CurrentViewMode, RelativeSource={RelativeSource AncestorType=ItemsControl}}" Value="{x:Static models:TimelineViewMode.ActualOnly}">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
 
     <!-- Visual representation of actual work done, using full opacity for emphasis -->
@@ -128,12 +143,22 @@
            BasedOn="{StaticResource BorderTimelineBarBaseStyle}"
            TargetType="Border">
         <Setter Property="Opacity" Value="{StaticResource OpacityStrong}" />
+        <Setter Property="Canvas.Top" Value="{StaticResource TimelineBarTopActualDual}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding DataContext.CurrentViewMode, RelativeSource={RelativeSource AncestorType=ItemsControl}}" Value="{x:Static models:TimelineViewMode.ActualOnly}">
+                <Setter Property="Canvas.Top" Value="{StaticResource TimelineBarTopSingle}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding DataContext.CurrentViewMode, RelativeSource={RelativeSource AncestorType=ItemsControl}}" Value="{x:Static models:TimelineViewMode.PlanOnly}">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
 
     <!-- Container task styling for summary representation -->
     <Style x:Key="BorderTimelineContainerStyle" TargetType="Border">
         <Setter Property="CornerRadius" Value="{StaticResource Radius10}" />
-        <Setter Property="Height" Value="12" />
+        <Setter Property="Height" Value="{StaticResource Spacing40}" />
+        <Setter Property="Canvas.Top" Value="{StaticResource TimelineBarTopContainer}" />
         <Setter Property="Background" Value="{DynamicResource TextSecondaryBrush}" />
         <Setter Property="Opacity" Value="{StaticResource OpacityStrong}" />
     </Style>
@@ -159,6 +184,7 @@
         <Setter Property="CornerRadius" Value="{StaticResource RadiusMax}" />
         <Setter Property="BorderBrush" Value="{DynamicResource SurfaceBaseBrush}" />
         <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Canvas.Top" Value="{StaticResource TimelineAvatarVerticalOffset}" />
     </Style>
 
 </ResourceDictionary>
