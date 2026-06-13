@@ -42,7 +42,6 @@
     <Color x:Key="Blue400">#60A5FA</Color>
     <Color x:Key="Blue500">#3B82F6</Color>
     <Color x:Key="Blue600">#0078D4</Color>
-    <!-- BrandPrimaryColor -->
     <Color x:Key="Blue700">#0063B1</Color>
     <Color x:Key="Blue800">#1E40AF</Color>
     <Color x:Key="Blue900">#1E3A8A</Color>
