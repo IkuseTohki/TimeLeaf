@@ -16,7 +16,7 @@
             <!-- Navigation Button Style -->
             <Style x:Key="RadioButtonSettingsNavStyle" TargetType="RadioButton">
                 <Setter Property="Height" Value="48" />
-                <Setter Property="Margin" Value="0,0,0,4" />
+                <Setter Property="Margin" Value="0,0,0,8" />
                 <Setter Property="Padding" Value="16,0" />
                 <Setter Property="Background" Value="Transparent" />
                 <Setter Property="BorderThickness" Value="0" />
@@ -25,7 +25,7 @@
                         <ControlTemplate TargetType="RadioButton">
                             <Border x:Name="RootBorder"
                                     Background="{TemplateBinding Background}"
-                                    CornerRadius="{StaticResource Radius30}">
+                                    CornerRadius="{DynamicResource RadiusTab}">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="40" />
@@ -63,6 +63,7 @@
                 <Setter Property="Padding" Value="20" />
                 <Setter Property="Margin" Value="0,0,0,24" />
                 <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />
+                <Setter Property="CornerRadius" Value="{DynamicResource RadiusCard}" />
             </Style>
 
             <!-- Holiday Item Style -->
@@ -72,7 +73,7 @@
                 <Setter Property="Background" Value="{DynamicResource BrandSecondaryBrush}" />
                 <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
                 <Setter Property="BorderThickness" Value="1" />
-                <Setter Property="CornerRadius" Value="{StaticResource RadiusFull}" />
+                <Setter Property="CornerRadius" Value="{DynamicResource RadiusMax}" />
                 <Setter Property="HorizontalAlignment" Value="Left" />
             </Style>
 
@@ -139,7 +140,6 @@
             <!-- Content Area -->
             <Grid Grid.Column="1" Background="{DynamicResource WorkspaceBackgroundBrush}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <!-- Removing the intermediate StackPanel that had the Resource property error -->
                     <Grid Margin="32">
                         <!-- Storage Settings -->
                         <StackPanel Visibility="{Binding SelectedCategory, Converter={StaticResource ComparisonConverter}, ConverterParameter={x:Static vm:SettingsCategory.Storage}}">

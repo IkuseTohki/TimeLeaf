@@ -18,6 +18,7 @@
     <Color x:Key="Slate700">#334155</Color>
     <Color x:Key="Slate800">#1E293B</Color>
     <Color x:Key="Slate900">#0F172A</Color>
+    <Color x:Key="Slate950">#020617</Color>
 
     <!-- Brand / Primary (Greenish) -->
     <Color x:Key="Green50">#F0FDF4</Color>
@@ -30,6 +31,22 @@
     <Color x:Key="Green700">#15803D</Color>
     <Color x:Key="Green800">#166534</Color>
     <Color x:Key="Green900">#14532D</Color>
+    <Color x:Key="Green950">#2D5A27</Color>
+    <Color x:Key="Green1000">#3D6A37</Color>
+
+    <!-- Brand / Primary (Blue) -->
+    <Color x:Key="Blue50">#EFF6FF</Color>
+    <Color x:Key="Blue100">#DBEAFE</Color>
+    <Color x:Key="Blue200">#BFDBFE</Color>
+    <Color x:Key="Blue300">#93C5FD</Color>
+    <Color x:Key="Blue400">#60A5FA</Color>
+    <Color x:Key="Blue500">#3B82F6</Color>
+    <Color x:Key="Blue600">#0078D4</Color>
+    <!-- BrandPrimaryColor -->
+    <Color x:Key="Blue700">#0063B1</Color>
+    <Color x:Key="Blue800">#1E40AF</Color>
+    <Color x:Key="Blue900">#1E3A8A</Color>
+    <Color x:Key="Blue950">#172554</Color>
 
     <!-- Accent / Warning / Error -->
     <Color x:Key="Red500">#EF4444</Color>

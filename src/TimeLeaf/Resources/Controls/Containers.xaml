@@ -9,14 +9,14 @@
     <!-- オーガニックなカード（Border）スタイル -->
     <Style x:Key="OrganicCardStyle" TargetType="Border">
         <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />
-        <Setter Property="CornerRadius" Value="{DynamicResource CardCornerRadius}" />
+        <Setter Property="CornerRadius" Value="{DynamicResource RadiusCard}" />
         <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Effect">
             <Setter.Value>
                 <DropShadowEffect BlurRadius="10"
                                   Direction="-90"
-                                  Opacity="{StaticResource OpacityMuted}"
+                                  Opacity="{DynamicResource OpacityMuted}"
                                   ShadowDepth="3" />
             </Setter.Value>
         </Setter>
@@ -61,7 +61,7 @@
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="{StaticResource Radius20}">
+                            CornerRadius="{DynamicResource RadiusCard}">
                         <ScrollViewer Padding="{TemplateBinding Padding}" Focusable="False">
                             <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                         </ScrollViewer>
@@ -112,7 +112,7 @@
                             Background="{DynamicResource SurfaceLayer1Brush}"
                             BorderBrush="{DynamicResource OutlineBaseBrush}"
                             BorderThickness="1"
-                            CornerRadius="12">
+                            CornerRadius="{DynamicResource RadiusControl}">
                         <ContentPresenter />
                     </Border>
                     <ControlTemplate.Triggers>
@@ -211,10 +211,10 @@
         <Setter Property="BorderBrush" Value="{DynamicResource SurfaceLayer1Brush}" />
         <Style.Resources>
             <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
-                             Opacity="{StaticResource OpacityMuted}"
+                             Opacity="{DynamicResource OpacityMuted}"
                              Color="{DynamicResource BrandPrimaryColor}" />
             <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}"
-                             Opacity="{StaticResource OpacityMuted}"
+                             Opacity="{DynamicResource OpacityMuted}"
                              Color="{DynamicResource BrandPrimaryColor}" />
             <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="{DynamicResource BrandPrimaryColor}" />
         </Style.Resources>

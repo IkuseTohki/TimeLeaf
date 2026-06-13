@@ -178,7 +178,7 @@
                                                                     <DropShadowEffect BlurRadius="6"
                                                                                       Opacity="{StaticResource OpacityMuted}"
                                                                                       ShadowDepth="2"
-                                                                                      Color="{Binding Source={StaticResource BrandPrimaryColor}}" />
+                                                                                      Color="{DynamicResource BrandPrimaryColor}" />
                                                                 </Setter.Value>
                                                             </Setter>
                                                         </DataTrigger>

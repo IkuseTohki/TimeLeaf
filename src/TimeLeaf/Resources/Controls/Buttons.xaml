@@ -67,7 +67,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border Background="{TemplateBinding Background}" CornerRadius="{StaticResource Radius20}">
+                    <Border Background="{TemplateBinding Background}" CornerRadius="{DynamicResource RadiusControl}">
                         <ContentPresenter />
                     </Border>
                     <ControlTemplate.Triggers>
@@ -93,7 +93,7 @@
                 <ControlTemplate TargetType="Button">
                     <Border x:Name="Border"
                             Background="{TemplateBinding Background}"
-                            CornerRadius="{StaticResource Radius20}">
+                            CornerRadius="{DynamicResource RadiusControl}">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Border>
                     <ControlTemplate.Triggers>

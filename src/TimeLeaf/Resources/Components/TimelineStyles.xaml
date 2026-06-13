@@ -9,7 +9,7 @@
 
     <!-- ====================================================================== -->
     <!-- Timeline-specific component styles -->
-    <!-- Use semantic brushes to ensure theme consistency across different states. -->
+    <!-- Use DynamicResource for all brushes to ensure real-time theme support. -->
     <!-- ====================================================================== -->
 
     <!-- Root container background for consistent surface rendering -->
@@ -105,7 +105,7 @@
                     <Border x:Name="RootBorder"
                             Padding="{TemplateBinding Padding}"
                             Background="Transparent"
-                            CornerRadius="{StaticResource Radius20}">
+                            CornerRadius="{DynamicResource RadiusControl}">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Border>
                     <ControlTemplate.Triggers>
@@ -124,7 +124,7 @@
 
     <!-- Bar Styles: Base definitions for task representation -->
     <Style x:Key="BorderTimelineBarBaseStyle" TargetType="Border">
-        <Setter Property="CornerRadius" Value="{StaticResource Radius20}" />
+        <Setter Property="CornerRadius" Value="{DynamicResource RadiusControl}" />
         <Setter Property="Height" Value="{StaticResource Spacing30}" />
     </Style>
 
@@ -132,7 +132,7 @@
     <Style x:Key="BorderTimelinePlanStyle"
            BasedOn="{StaticResource BorderTimelineBarBaseStyle}"
            TargetType="Border">
-        <Setter Property="Opacity" Value="{StaticResource OpacitySubtle}" />
+        <Setter Property="Opacity" Value="{DynamicResource OpacitySubtle}" />
         <Setter Property="Canvas.Top" Value="{StaticResource TimelineBarTopPlannedDual}" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding DataContext.CurrentViewMode, RelativeSource={RelativeSource AncestorType=ItemsControl}}" Value="{x:Static models:TimelineViewMode.PlanOnly}">
@@ -148,7 +148,7 @@
     <Style x:Key="BorderTimelineActualStyle"
            BasedOn="{StaticResource BorderTimelineBarBaseStyle}"
            TargetType="Border">
-        <Setter Property="Opacity" Value="{StaticResource OpacityStrong}" />
+        <Setter Property="Opacity" Value="{DynamicResource OpacityStrong}" />
         <Setter Property="Canvas.Top" Value="{StaticResource TimelineBarTopActualDual}" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding DataContext.CurrentViewMode, RelativeSource={RelativeSource AncestorType=ItemsControl}}" Value="{x:Static models:TimelineViewMode.ActualOnly}">
@@ -162,11 +162,11 @@
 
     <!-- Container task styling for summary representation -->
     <Style x:Key="BorderTimelineContainerStyle" TargetType="Border">
-        <Setter Property="CornerRadius" Value="{StaticResource Radius10}" />
+        <Setter Property="CornerRadius" Value="{DynamicResource RadiusControl}" />
         <Setter Property="Height" Value="{StaticResource Spacing40}" />
         <Setter Property="Canvas.Top" Value="{StaticResource TimelineBarTopContainer}" />
         <Setter Property="Background" Value="{DynamicResource TextSecondaryBrush}" />
-        <Setter Property="Opacity" Value="{StaticResource OpacityStrong}" />
+        <Setter Property="Opacity" Value="{DynamicResource OpacityStrong}" />
     </Style>
 
     <!-- Lightning line: Visual feedback for scheduling variance, highlighting risks -->

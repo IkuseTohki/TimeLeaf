@@ -1,39 +1,66 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/Resources/Tokens/Colors.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/LightColors.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
+    <!-- Theme Marker -->
+    <sys:String x:Key="TimeLeafThemeName">Light</sys:String>
+
     <!-- ====================================================================== -->
-    <!-- Light Theme - Semantic Brushes -->
+    <!-- TimeLeaf Light Theme - Semantic Overrides -->
     <!-- ====================================================================== -->
 
-    <!-- Surfaces -->
-    <SolidColorBrush x:Key="SurfaceBaseBrush" Color="{StaticResource White}" />
-    <SolidColorBrush x:Key="SurfaceLayer1Brush" Color="{StaticResource Slate50}" />
-    <SolidColorBrush x:Key="SurfaceLayer2Brush" Color="{StaticResource White}" />
+    <!-- TimeLeaf Specific Brushes -->
     <SolidColorBrush x:Key="WorkspaceBackgroundBrush" Color="{StaticResource LegacyLightBackground}" />
+    <SolidColorBrush x:Key="TextBaseBrush" Color="{StaticResource Slate900}" />
+    <LinearGradientBrush x:Key="NotificationPaneBackgroundBrush" StartPoint="1,0.5" EndPoint="0,0.5">
+        <GradientStop Offset="0.6" Color="#F2FFFFFF" />
+        <GradientStop Offset="1.0" Color="#00FFFFFF" />
+    </LinearGradientBrush>
 
-    <!-- Brand -->
-    <SolidColorBrush x:Key="BrandPrimaryBrush" Color="{StaticResource Green600}" />
-    <SolidColorBrush x:Key="BrandSecondaryBrush" Color="{StaticResource Green100}" />
-    <SolidColorBrush x:Key="BrandForegroundBrush" Color="{StaticResource White}" />
+    <!-- Sidebar -->
+    <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="{StaticResource Blue600}" />
+    <SolidColorBrush x:Key="SidebarSelectedBackgroundBrush" Color="{StaticResource Blue700}" />
+    <SolidColorBrush x:Key="SidebarTextBrush" Color="{StaticResource Slate100}" />
+    <SolidColorBrush x:Key="SidebarHoverOverlayBrush" Color="#1AFFFFFF" />
+    <SolidColorBrush x:Key="SidebarPressedOverlayBrush" Color="#33FFFFFF" />
 
-    <!-- Text -->
-    <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource Slate900}" />
-    <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource Slate500}" />
-    <SolidColorBrush x:Key="TextDisabledBrush" Color="{StaticResource Slate300}" />
+    <!-- Task Specific Brushes -->
+    <SolidColorBrush x:Key="PriorityHighBrush" Color="{StaticResource Red600}" />
+    <SolidColorBrush x:Key="PriorityMediumBrush" Color="#0078D4" />
+    <SolidColorBrush x:Key="PriorityLowBrush" Color="{StaticResource Slate500}" />
+
+    <SolidColorBrush x:Key="StatusCompletedBrush" Color="{StaticResource Slate500}" />
+    <SolidColorBrush x:Key="StatusInReviewBrush" Color="#483D8B" />
+    <SolidColorBrush x:Key="StatusInProgressBrush" Color="#0078D4" />
+
+    <SolidColorBrush x:Key="DeadlineOverdueBrush" Color="{StaticResource Red600}" />
+    <SolidColorBrush x:Key="DeadlineTodayBrush" Color="{StaticResource Orange600}" />
+    <SolidColorBrush x:Key="DeadlineNearBrush" Color="{StaticResource Amber500}" />
+
+    <SolidColorBrush x:Key="ProgressBarBlankBrush" Color="{StaticResource Green100}" />
+
+    <SolidColorBrush x:Key="FlowBackgroundBrush" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="AllTasksProjectCardBackgroundBrush" Color="{StaticResource Green50}" />
+
+    <!-- Notifications -->
+    <SolidColorBrush x:Key="BadgeBackgroundBrush" Color="#E81123" />
 
     <!-- Feedback -->
     <SolidColorBrush x:Key="ErrorBrush" Color="{StaticResource LegacyErrorRed}" />
     <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource LegacyWarningOrange}" />
     <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource Green600}" />
 
-    <!-- Outline -->
-    <SolidColorBrush x:Key="OutlineBaseBrush" Color="{StaticResource Slate200}" />
-
-    <!-- States -->
-    <SolidColorBrush x:Key="StateHoverBrush" Color="#0A000000" />
-    <SolidColorBrush x:Key="StatePressedBrush" Color="#14000000" />
-    <SolidColorBrush x:Key="StateSelectedBrush" Color="{StaticResource Green50}" />
+    <!-- ====================================================================== -->
+    <!-- Theme-dependent Shapes (Standard feel) -->
+    <!-- ====================================================================== -->
+    <CornerRadius x:Key="RadiusControl">4</CornerRadius>
+    <CornerRadius x:Key="RadiusContainer">8</CornerRadius>
+    <CornerRadius x:Key="RadiusCard">8</CornerRadius>
+    <CornerRadius x:Key="RadiusTab">4</CornerRadius>
 
 </ResourceDictionary>

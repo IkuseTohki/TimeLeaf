@@ -1,39 +1,66 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/Resources/Tokens/Colors.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/ForestColors.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
+    <!-- Theme Marker -->
+    <sys:String x:Key="TimeLeafThemeName">Forest</sys:String>
+
     <!-- ====================================================================== -->
-    <!-- Forest Theme - Semantic Brushes -->
+    <!-- TimeLeaf Forest Theme - Semantic Overrides -->
     <!-- ====================================================================== -->
 
     <!-- Surfaces -->
-    <SolidColorBrush x:Key="SurfaceBaseBrush" Color="{StaticResource White}" />
-    <SolidColorBrush x:Key="SurfaceLayer1Brush" Color="{StaticResource Green50}" />
-    <SolidColorBrush x:Key="SurfaceLayer2Brush" Color="{StaticResource White}" />
     <SolidColorBrush x:Key="WorkspaceBackgroundBrush" Color="#F0F4EF" />
+    <SolidColorBrush x:Key="TextBaseBrush" Color="{StaticResource Slate900}" />
+    <LinearGradientBrush x:Key="NotificationPaneBackgroundBrush" StartPoint="1,0.5" EndPoint="0,0.5">
+        <GradientStop Offset="0.6" Color="#F2FFFFFF" />
+        <GradientStop Offset="1.0" Color="#00FFFFFF" />
+    </LinearGradientBrush>
 
-    <!-- Brand (Deeper Forest Green) -->
-    <SolidColorBrush x:Key="BrandPrimaryBrush" Color="#2D5A27" />
-    <SolidColorBrush x:Key="BrandSecondaryBrush" Color="#E8F0E6" />
-    <SolidColorBrush x:Key="BrandForegroundBrush" Color="{StaticResource White}" />
+    <!-- Sidebar -->
+    <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="{StaticResource Green950}" />
+    <SolidColorBrush x:Key="SidebarSelectedBackgroundBrush" Color="{StaticResource Green1000}" />
+    <SolidColorBrush x:Key="SidebarTextBrush" Color="{StaticResource Slate100}" />
+    <SolidColorBrush x:Key="SidebarHoverOverlayBrush" Color="#1AFFFFFF" />
+    <SolidColorBrush x:Key="SidebarPressedOverlayBrush" Color="#33FFFFFF" />
 
-    <!-- Text -->
-    <SolidColorBrush x:Key="TextPrimaryBrush" Color="#1B3018" />
-    <SolidColorBrush x:Key="TextSecondaryBrush" Color="#5A6359" />
-    <SolidColorBrush x:Key="TextDisabledBrush" Color="#B0B8AF" />
+    <!-- Task Specific Brushes -->
+    <SolidColorBrush x:Key="PriorityHighBrush" Color="#B03A2E" />
+    <SolidColorBrush x:Key="PriorityMediumBrush" Color="#2D5A27" />
+    <SolidColorBrush x:Key="PriorityLowBrush" Color="#737A71" />
+
+    <SolidColorBrush x:Key="StatusCompletedBrush" Color="#737A71" />
+    <SolidColorBrush x:Key="StatusInReviewBrush" Color="#6A5ACD" />
+    <SolidColorBrush x:Key="StatusInProgressBrush" Color="#2D5A27" />
+
+    <SolidColorBrush x:Key="DeadlineOverdueBrush" Color="#B03A2E" />
+    <SolidColorBrush x:Key="DeadlineTodayBrush" Color="#D35400" />
+    <SolidColorBrush x:Key="DeadlineNearBrush" Color="#E67E22" />
+
+    <SolidColorBrush x:Key="ProgressBarBlankBrush" Color="#E8F0E6" />
+
+    <SolidColorBrush x:Key="FlowBackgroundBrush" Color="#FAFAFA" />
+    <SolidColorBrush x:Key="AllTasksProjectCardBackgroundBrush" Color="#E0EDD5" />
+
+    <!-- Notifications -->
+    <SolidColorBrush x:Key="BadgeBackgroundBrush" Color="#C0392B" />
 
     <!-- Feedback -->
     <SolidColorBrush x:Key="ErrorBrush" Color="#B03A2E" />
     <SolidColorBrush x:Key="WarningBrush" Color="#D35400" />
     <SolidColorBrush x:Key="SuccessBrush" Color="#2D5A27" />
 
-    <!-- Outline -->
-    <SolidColorBrush x:Key="OutlineBaseBrush" Color="#D1D9D0" />
-
-    <!-- States -->
-    <SolidColorBrush x:Key="StateHoverBrush" Color="#0D2D5A27" />
-    <SolidColorBrush x:Key="StatePressedBrush" Color="#1A2D5A27" />
-    <SolidColorBrush x:Key="StateSelectedBrush" Color="#26E8F0E6" />
+    <!-- ====================================================================== -->
+    <!-- Theme-dependent Shapes (Organic feel) -->
+    <!-- ====================================================================== -->
+    <CornerRadius x:Key="RadiusControl">20</CornerRadius>
+    <CornerRadius x:Key="RadiusContainer">32</CornerRadius>
+    <CornerRadius x:Key="RadiusCard">16</CornerRadius>
+    <CornerRadius x:Key="RadiusTab">20</CornerRadius>
 
 </ResourceDictionary>

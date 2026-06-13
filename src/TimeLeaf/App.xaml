@@ -10,22 +10,21 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <!-- 1. Design System Tokens (Foundational Constants) -->
+                <!-- [0-2] Tokens -->
                 <ResourceDictionary Source="/Resources/Tokens/Layout.xaml" />
                 <ResourceDictionary Source="/Resources/Tokens/Typography.xaml" />
                 <ResourceDictionary Source="/Resources/Tokens/Colors.xaml" />
 
-                <!-- 2. Themes & Icons (Global Visual State) -->
-                <ResourceDictionary Source="/Resources/ForestColors.xaml" />
+                <!-- [3] Icons -->
                 <ResourceDictionary Source="/Resources/Icons.xaml" />
 
-                <!-- 3. Infrastructure (Shared Library Components) -->
+                <!-- [4-7] Infrastructure (LeafKit.UI) -->
+                <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/LayoutStyles.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/ControlStyles.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/ComponentStyles.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/FormStyles.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/LayoutStyles.xaml" />
 
-                <!-- 4. Global Utilities & Base Styles -->
+                <!-- [8-13] App Styles -->
                 <ResourceDictionary Source="/Resources/Converters.xaml" />
                 <ResourceDictionary Source="/Resources/Common/SharedStyles.xaml" />
                 <ResourceDictionary Source="/Resources/Controls/Text.xaml" />
@@ -33,11 +32,14 @@
                 <ResourceDictionary Source="/Resources/Controls/Inputs.xaml" />
                 <ResourceDictionary Source="/Resources/Controls/Containers.xaml" />
 
-                <!-- 5. App Top-level DataTemplates (ViewModel-to-View mapping) -->
+                <!-- [14] ACTIVE THEME SLOT (Crucial: Overrides everything above) -->
+                <ResourceDictionary Source="/Resources/Themes/Forest.xaml" />
+
+                <!-- [15] App DataTemplates -->
                 <ResourceDictionary Source="/Resources/DataTemplates.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <!-- DataTemplate for Dialog Contents -->
+            <!-- DataTemplates... -->
             <DataTemplate DataType="{x:Type viewModels:AddProjectViewModel}">
                 <views:AddProjectView />
             </DataTemplate>
