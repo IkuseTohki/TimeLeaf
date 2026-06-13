@@ -3,17 +3,10 @@
                     xmlns:lk="clr-namespace:LeafKit.UI.Converters;assembly=LeafKit.UI"
                     xmlns:tlcv="clr-namespace:TimeLeaf.ViewModels.Converters">
 
-    <tlcv:IntToVisibilityConverter x:Key="IntToVisibilityConverter" />
-    <lk:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-    <lk:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
-    <lk:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
-    <lk:StringToBrushConverter x:Key="StringToBrushConverter" />
+    <!-- Value Converters -->
     <tlcv:BooleanToDoubleConverter x:Key="BooleanToDoubleConverter" />
-    <tlcv:SidebarToggleIconConverter x:Key="SidebarToggleIconConverter" />
-    <tlcv:TaskStatusToBoolConverter x:Key="TaskStatusToBoolConverter" />
-    <tlcv:TaskStatusToIconConverter x:Key="TaskStatusToIconConverter" />
     <tlcv:DeadlineToBrushConverter x:Key="DeadlineToBrushConverter" />
-    <tlcv:PriorityToVisibilityConverter x:Key="PriorityToVisibilityConverter" />
+    <tlcv:IntToVisibilityConverter x:Key="IntToVisibilityConverter" />
     <tlcv:InverseBooleanConverter x:Key="InverseBooleanConverter" />
     <tlcv:UserInitialConverter x:Key="UserInitialConverter" />
     <tlcv:EnumToDisplayNameConverter x:Key="EnumToDisplayNameConverter" />
@@ -24,12 +17,19 @@
     <tlcv:PercentageToWidthConverter x:Key="PercentageToWidthConverter" />
     <tlcv:RowsToLightningPathConverter x:Key="RowsToLightningPathConverter" />
     <tlcv:DateToHeaderFormatConverter x:Key="DateToHeaderFormatConverter" />
-    <tlcv:DateToIsWeekendConverter x:Key="DateToIsWeekendConverter" />
+    <tlcv:DateToIsNonWorkdayConverter x:Key="DateToIsNonWorkdayConverter" />
     <tlcv:DateToDayHeaderTextConverter x:Key="DateToDayHeaderTextConverter" />
     <tlcv:MoveTaskArgsConverter x:Key="MoveTaskArgsConverter" />
     <lk:EqualityToBooleanConverter x:Key="EqualityToBooleanConverter" />
     <lk:ComparisonConverter x:Key="ComparisonConverter" />
+    <lk:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    <lk:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
     <lk:StringFormatMultiConverter x:Key="StringFormatMultiConverter" />
+    <tlcv:TaskStatusToIconConverter x:Key="TaskStatusToIconConverter" />
+    <tlcv:TaskStatusToBoolConverter x:Key="TaskStatusToBoolConverter" />
+    <tlcv:SidebarToggleIconConverter x:Key="SidebarToggleIconConverter" />
+    <tlcv:PriorityToVisibilityConverter x:Key="PriorityToVisibilityConverter" />
+    <lk:StringToBrushConverter x:Key="StringToBrushConverter" />
 
     <!-- Semantic Aliases (Defined directly to avoid XAML loader issues) -->
     <lk:BooleanToVisibilityConverter x:Key="NormalVisibility" />

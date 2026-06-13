@@ -151,7 +151,8 @@ public class ViewModelFactory : IViewModelFactory
     {
         return new ProjectTimelineViewModel(
             projectViewModel,
-            _serviceProvider.GetRequiredService<GetTimelineRowsUseCase>()
+            _serviceProvider.GetRequiredService<GetTimelineRowsUseCase>(),
+            _serviceProvider.GetRequiredService<WorkdayService>()
         );
     }
 

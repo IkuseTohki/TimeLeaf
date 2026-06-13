@@ -61,7 +61,7 @@ namespace TimeLeaf.Tests.ViewModels.Workspace
             var workdayService = new WorkdayService(new CalendarSetting());
             var useCase = new GetTimelineRowsUseCase(workdayService, new Mock<IUserService>().Object);
 
-            _viewModel = new ProjectTimelineViewModel(_projectViewModel, useCase);
+            _viewModel = new ProjectTimelineViewModel(_projectViewModel, useCase, workdayService);
         }
 
         [TestMethod]

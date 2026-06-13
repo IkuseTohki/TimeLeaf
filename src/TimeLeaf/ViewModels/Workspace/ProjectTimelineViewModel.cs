@@ -12,10 +12,16 @@ namespace TimeLeaf.ViewModels.Workspace
     /// <summary>
     /// タイムライン画面の表示と操作を制御する ViewModel。
     /// </summary>
-    public partial class ProjectTimelineViewModel : ObservableObject
+    public partial class ProjectTimelineViewModel : ObservableObject, IDisposable
     {
         private readonly ProjectViewModel _projectViewModel;
         private readonly GetTimelineRowsUseCase _getTimelineRowsUseCase;
+
+        /// <summary>
+        /// 稼働日計算サービス。
+        /// XAMLからのバインディング（非稼働日の判定）に使用するため公開。
+        /// </summary>
+        public WorkdayService WorkdayService { get; }
 
         [ObservableProperty]
         private TimelineViewMode _currentViewMode = TimelineViewMode.Dual;
@@ -30,7 +36,7 @@ namespace TimeLeaf.ViewModels.Workspace
         private double _totalWidth;
 
         [ObservableProperty]
-        private DateTime _today = new DateTime(2026, 6, 11);
+        private DateTime _today = DateTime.Today;
 
         [ObservableProperty]
         private DateTime _baseDate;
@@ -40,13 +46,22 @@ namespace TimeLeaf.ViewModels.Workspace
 
         public ProjectTimelineViewModel(
             ProjectViewModel projectViewModel,
-            GetTimelineRowsUseCase getTimelineRowsUseCase
+            GetTimelineRowsUseCase getTimelineRowsUseCase,
+            WorkdayService workdayService
         )
         {
             _projectViewModel = projectViewModel ?? throw new ArgumentNullException(nameof(projectViewModel));
             _getTimelineRowsUseCase =
                 getTimelineRowsUseCase ?? throw new ArgumentNullException(nameof(getTimelineRowsUseCase));
+            WorkdayService = workdayService ?? throw new ArgumentNullException(nameof(workdayService));
 
+            WorkdayService.CalendarChanged += OnCalendarChanged;
+
+            LoadTimelineData();
+        }
+
+        private void OnCalendarChanged()
+        {
             LoadTimelineData();
         }
 
@@ -107,6 +122,11 @@ namespace TimeLeaf.ViewModels.Workspace
             if (scrollDate < BaseDate)
                 scrollDate = BaseDate;
             ScrollOffset = (scrollDate.Date - BaseDate.Date).TotalDays * 60.0;
+        }
+
+        public void Dispose()
+        {
+            WorkdayService.CalendarChanged -= OnCalendarChanged;
         }
     }
 }

@@ -7,10 +7,10 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
 using TimeLeaf.Models;
+using TimeLeaf.Services;
 
 namespace TimeLeaf.ViewModels.Converters
 {
-    // 日付を X 座標に変換 (基準 2026/06/01, 1日=60px)
     // 日付を X 座標に変換
     public class DateToXConverter : IMultiValueConverter
     {
@@ -71,7 +71,6 @@ namespace TimeLeaf.ViewModels.Converters
     }
 
     // 全行データから稲妻線のジオメトリを生成
-    // 全行データから稲妻線のジオメトリを生成
     public class RowsToLightningPathConverter : IMultiValueConverter
     {
         private const double DayWidth = 60.0;
@@ -124,8 +123,6 @@ namespace TimeLeaf.ViewModels.Converters
                     return date.ToString("ddd", culture);
                 if (format == "Day")
                 {
-                    // 1日、またはリストの最初（ViewModel側で制御が必要だが、簡易的には1日か特定条件で判定）
-                    // ここでは単に日を返すが、View側で別バインディングと組み合わせる
                     return date.Day.ToString();
                 }
             }
@@ -156,19 +153,20 @@ namespace TimeLeaf.ViewModels.Converters
             throw new NotImplementedException();
     }
 
-    // 週末かどうかを判定する
-    public class DateToIsWeekendConverter : IValueConverter
+    // 非稼働日（休日・祝日）かどうかを判定する
+    public class DateToIsNonWorkdayConverter : IMultiValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is DateTime date)
+            if (values.Length >= 2 && values[0] is DateTime date && values[1] is WorkdayService workdayService)
             {
-                return date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday;
+                // IsWorkday が false なら「非稼働」なので True を返す
+                return !workdayService.IsWorkday(date);
             }
             return false;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) =>
             throw new NotImplementedException();
     }
 }

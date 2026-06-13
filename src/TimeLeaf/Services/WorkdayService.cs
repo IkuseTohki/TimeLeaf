@@ -8,11 +8,26 @@ namespace TimeLeaf.Services
     /// </summary>
     public class WorkdayService
     {
-        private readonly CalendarSetting _setting;
+        private CalendarSetting _setting;
+
+        /// <summary>
+        /// カレンダー設定が変更された際に発生するイベント。
+        /// </summary>
+        public event Action? CalendarChanged;
 
         public WorkdayService(CalendarSetting setting)
         {
             _setting = setting ?? throw new ArgumentNullException(nameof(setting));
+        }
+
+        /// <summary>
+        /// 設定を最新のものに更新し、変更を通知します。
+        /// </summary>
+        /// <param name="setting">新しいカレンダー設定。</param>
+        public void UpdateSetting(CalendarSetting setting)
+        {
+            _setting = setting ?? throw new ArgumentNullException(nameof(setting));
+            CalendarChanged?.Invoke();
         }
 
         /// <summary>

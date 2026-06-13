@@ -11,13 +11,19 @@ namespace TimeLeaf.Tests.ViewModels;
 public class ApplicationSettingsViewModelTests
 {
     private Mock<IApplicationSettingsRepository> _settingsRepoMock = null!;
+    private Mock<ICalendarRepository> _calendarRepoMock = null!;
     private Mock<IThemeService> _themeServiceMock = null!;
+    private WorkdayService _workdayService = null!;
 
     [TestInitialize]
     public void Setup()
     {
         _settingsRepoMock = new Mock<IApplicationSettingsRepository>();
+        _calendarRepoMock = new Mock<ICalendarRepository>();
         _themeServiceMock = new Mock<IThemeService>();
+        _workdayService = new WorkdayService(new CalendarSetting());
+
+        _calendarRepoMock.Setup(r => r.LoadAsync()).ReturnsAsync(new CalendarSetting());
     }
 
     [TestMethod]
@@ -35,7 +41,13 @@ public class ApplicationSettingsViewModelTests
             MinimizeOnClose = false,
         };
 
-        var viewModel = new ApplicationSettingsViewModel(_settingsRepoMock.Object, _themeServiceMock.Object, settings);
+        var viewModel = new ApplicationSettingsViewModel(
+            _settingsRepoMock.Object,
+            _calendarRepoMock.Object,
+            _themeServiceMock.Object,
+            _workdayService,
+            settings
+        );
 
         Assert.AreEqual(settings.StoragePath, viewModel.StoragePath);
         Assert.AreEqual(settings.Theme, viewModel.SelectedTheme);
@@ -51,7 +63,13 @@ public class ApplicationSettingsViewModelTests
         テスト観点: Saveコマンド実行時、ViewModelのプロパティがModelに反映され、リポジトリのSaveとThemeServiceのApplyThemeが呼ばれることを確認する。
         */
         var settings = new ApplicationSettings();
-        var viewModel = new ApplicationSettingsViewModel(_settingsRepoMock.Object, _themeServiceMock.Object, settings);
+        var viewModel = new ApplicationSettingsViewModel(
+            _settingsRepoMock.Object,
+            _calendarRepoMock.Object,
+            _themeServiceMock.Object,
+            _workdayService,
+            settings
+        );
 
         viewModel.SelectedTheme = "Dark";
         viewModel.EnableOsNotification = true;
