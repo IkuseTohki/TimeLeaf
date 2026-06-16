@@ -71,9 +71,9 @@ namespace TimeLeaf.ViewModels.Workspace
         public void LoadTimelineData()
         {
             var project = _projectViewModel.Model;
-            var workItems = project.Tasks.Cast<ProjectWorkItem>().Concat(project.Containers.Cast<ProjectWorkItem>());
+            var rootContainer = new ProjectRootContainer(project);
 
-            var timelineRows = _getTimelineRowsUseCase.Execute(workItems, Today).ToList();
+            var timelineRows = _getTimelineRowsUseCase.Execute(rootContainer, Today).ToList();
 
             Rows.Clear();
             foreach (var row in timelineRows)

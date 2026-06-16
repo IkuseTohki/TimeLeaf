@@ -4,6 +4,7 @@ using System.Linq;
 using TimeLeaf.Models;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Models.Enums;
+using TimeLeaf.Models.Interfaces;
 using TimeLeaf.Services;
 
 namespace TimeLeaf.UseCases
@@ -23,29 +24,22 @@ namespace TimeLeaf.UseCases
         }
 
         /// <summary>
-        /// 指定されたワークアイテムリストをタイムライン表示用モデルのリストに変換します。
+        /// 指定されたコンテナ内のワークアイテムをタイムライン表示用モデルのリストに変換します。
         /// </summary>
-        /// <param name="items">対象のワークアイテム（タスクおよびコンテナ）リスト。</param>
+        /// <param name="container">対象のワークアイテムを保持するルートコンテナ。</param>
         /// <param name="today">基準日（今日）。稲妻線の計算に使用。省略時は現在日時。</param>
         /// <returns>タイムライン行モデルのリスト。</returns>
-        public IEnumerable<TimelineRowModel> Execute(IEnumerable<ProjectWorkItem> items, DateTime? today = null)
+        public IEnumerable<TimelineRowModel> Execute(IWorkItemContainer container, DateTime? today = null)
         {
             var referenceDate = today ?? DateTime.Today;
-            var itemList = items?.ToList() ?? new List<ProjectWorkItem>();
             var results = new List<TimelineRowModel>();
 
-            if (!itemList.Any())
+            if (container == null)
                 return results;
 
-            // トップレベルアイテム（親がいない、またはリスト内に親が存在しないアイテム）から開始
-            var rootItems = itemList
-                .Where(t => !t.ParentId.HasValue || !itemList.Any(p => p.Id == t.ParentId.Value))
-                .OrderBy(t => t.PlannedStartDate ?? DateTime.MaxValue)
-                .ToList();
-
-            foreach (var item in rootItems)
+            foreach (var item in container.Children)
             {
-                AppendItemRecursive(item, itemList, 0, results, referenceDate);
+                AppendItemRecursive(item, 0, results, referenceDate);
             }
 
             return results;
@@ -53,33 +47,25 @@ namespace TimeLeaf.UseCases
 
         private void AppendItemRecursive(
             ProjectWorkItem item,
-            List<ProjectWorkItem> allItems,
             int depth,
             List<TimelineRowModel> results,
             DateTime today
         )
         {
-            var model = MapToRow(item, depth, today, allItems);
+            var model = MapToRow(item, depth, today);
             results.Add(model);
 
             // 子アイテムを取得
-            var children = allItems
-                .Where(t => t.ParentId == item.Id)
-                .OrderBy(t => t.PlannedStartDate ?? DateTime.MaxValue)
-                .ToList();
-
-            foreach (var child in children)
+            if (item is IWorkItemContainer container)
             {
-                AppendItemRecursive(child, allItems, depth + 1, results, today);
+                foreach (var child in container.Children)
+                {
+                    AppendItemRecursive(child, depth + 1, results, today);
+                }
             }
         }
 
-        private TimelineRowModel MapToRow(
-            ProjectWorkItem item,
-            int depth,
-            DateTime today,
-            List<ProjectWorkItem> allItems
-        )
+        private TimelineRowModel MapToRow(ProjectWorkItem item, int depth, DateTime today)
         {
             var model = new TimelineRowModel
             {
@@ -111,14 +97,8 @@ namespace TimeLeaf.UseCases
                 // ユーザー情報の取得
                 if (task.Assignee.HasValue)
                 {
-                    // タイムライン描画は同期的である必要があるため、キャッシュから取得を試みる
-                    // 未キャッシュの場合は IUserService の GetUserName 等の同期メソッドを活用する
                     var userName = _userService.GetUserName(task.Assignee.Value.ToString());
                     model.UserInitial = !string.IsNullOrEmpty(userName) ? userName[0].ToString().ToUpper() : "U";
-
-                    // 色情報の同期取得手段がない場合はデフォルトを使用するが、
-                    // 理想的には IUserService に GetUserByCache(Guid) 等があると良い。
-                    // 現状はプレースホルダーとしておくか、Serviceを拡張する。
                     model.UserColor = "#0984e3";
                 }
                 else
@@ -132,7 +112,7 @@ namespace TimeLeaf.UseCases
                 // コンテナの場合、もし計画日付が空なら子要素から集約する
                 if (!model.PlannedStart.HasValue || !model.PlannedEnd.HasValue)
                 {
-                    var children = allItems.Where(t => t.ParentId == item.Id).ToList();
+                    var children = container.Children.ToList();
                     if (children.Any())
                     {
                         model.PlannedStart ??= children.Min(c => c.PlannedStartDate);

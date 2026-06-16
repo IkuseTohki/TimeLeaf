@@ -32,73 +32,45 @@ namespace TimeLeaf.Tests.UseCases
         {
             // Arrange
             // テスト観点: タスクが親子階層順（親 -> その子 -> 次の親）に並ぶこと
-            var projectId = Guid.NewGuid();
+            var project = new Project(Guid.NewGuid());
             var parentId = Guid.NewGuid();
             var childId = Guid.NewGuid();
             var otherId = Guid.NewGuid();
 
-            var parent = new ProjectTask(
-                parentId,
-                "Parent",
-                "",
-                TaskStatus.NotStarted,
-                TaskPriority.Medium,
-                null,
-                null,
-                null,
-                null,
-                0,
-                0,
-                null,
-                null,
-                null
-            );
-            var child = new ProjectTask(
-                childId,
-                "Child",
-                "",
-                TaskStatus.NotStarted,
-                TaskPriority.Medium,
-                null,
-                null,
-                null,
-                null,
-                0,
-                0,
-                null,
-                null,
-                null
-            );
-            child.SetParentId(parentId);
-            var other = new ProjectTask(
-                otherId,
-                "Other",
-                "",
-                TaskStatus.NotStarted,
-                TaskPriority.Medium,
-                null,
-                null,
-                null,
-                null,
-                0,
-                0,
-                null,
-                null,
-                null
-            );
+            var parent = new ProjectTask { Id = parentId };
+            parent.UpdateName("Parent");
+            var child = new ProjectTask { Id = childId };
+            child.UpdateName("Child");
+            var other = new ProjectTask { Id = otherId };
+            other.UpdateName("Other");
 
-            var tasks = new List<ProjectTask> { other, parent, child };
+            project.AddTask(parent);
+            project.AddTask(child);
+            project.AddTask(other);
+
+            var container = new ProjectContainer(Guid.NewGuid(), "Container") { ProjectId = project.Id };
+            project.AddContainer(container);
+            container.AddChild(child);
+
+            // ルート順序の設定 [Parent, Container, Other]
+            project.ReorderWorkItems(new[] { parent.Id, container.Id, other.Id });
+
+            var rootContainer = new ProjectRootContainer(project);
 
             // Act
-            var rows = _useCase.Execute(tasks).ToList();
+            var rows = _useCase.Execute(rootContainer).ToList();
 
             // Assert
-            var parentIdx = rows.FindIndex(r => r.TaskId == parentId);
-            var childIdx = rows.FindIndex(r => r.TaskId == childId);
+            Assert.AreEqual(4, rows.Count);
+            Assert.AreEqual("Parent", rows[0].Name);
+            Assert.AreEqual("Container", rows[1].Name);
+            Assert.AreEqual("Child", rows[2].Name); // Container の子
+            Assert.AreEqual("Other", rows[3].Name);
 
-            Assert.IsTrue(parentIdx < childIdx, "Parent should come before Child");
-            Assert.AreEqual(0, rows[parentIdx].Depth);
-            Assert.AreEqual(1, rows[childIdx].Depth);
+            Assert.AreEqual(0, rows[0].Depth);
+            Assert.AreEqual(0, rows[1].Depth);
+            Assert.AreEqual(1, rows[2].Depth);
+            Assert.AreEqual(0, rows[3].Depth);
         }
 
         [TestMethod]
@@ -106,33 +78,19 @@ namespace TimeLeaf.Tests.UseCases
         {
             // Arrange
             // テスト観点: 稲妻線の偏差計算が正しいこと
-            // シナリオ:
-            // 予定期間: 6/1 ~ 6/10 (10日間)
-            // 今日: 6/6 (50%経過時点)
-            // 進捗: 工数ベース 80% (実績8 / 見積10) -> 先行
-
             var today = new DateTime(2026, 6, 6);
-            var taskId = Guid.NewGuid();
+            var project = new Project(Guid.NewGuid());
+            var task = new ProjectTask();
+            task.UpdateName("Task");
+            task.UpdateSchedule(new DateTime(2026, 6, 1), new DateTime(2026, 6, 10));
+            task.UpdateEstimatedCost(10.0);
+            task.UpdateActualCost(8.0); // 80% 進捗 (50% 経過時点)
 
-            var task = new ProjectTask(
-                taskId,
-                "Task",
-                "",
-                TaskStatus.InProgress,
-                TaskPriority.Medium,
-                new DateTime(2026, 6, 1),
-                new DateTime(2026, 6, 10),
-                null,
-                null,
-                10.0,
-                8.0,
-                null,
-                null,
-                null
-            );
+            project.AddTask(task);
+            var rootContainer = new ProjectRootContainer(project);
 
             // Act
-            var rows = _useCase.Execute(new[] { task }, today).ToList();
+            var rows = _useCase.Execute(rootContainer, today).ToList();
             var row = rows.First();
 
             // Assert
@@ -144,28 +102,19 @@ namespace TimeLeaf.Tests.UseCases
         {
             // Arrange
             // テスト観点: 担当者が設定されている場合、ユーザーサービスから名前を取得しイニシャルを設定すること
+            var project = new Project(Guid.NewGuid());
             var userId = Guid.NewGuid();
-            var task = new ProjectTask(
-                Guid.NewGuid(),
-                "Task",
-                "",
-                TaskStatus.NotStarted,
-                TaskPriority.Medium,
-                null,
-                null,
-                null,
-                null,
-                0,
-                0,
-                userId,
-                null,
-                null
-            );
+            var task = new ProjectTask();
+            task.UpdateName("Task");
+            task.AssignTo(userId);
+
+            project.AddTask(task);
+            var rootContainer = new ProjectRootContainer(project);
 
             _userServiceMock.Setup(s => s.GetUserName(userId.ToString())).Returns("Sato");
 
             // Act
-            var rows = _useCase.Execute(new[] { task }).ToList();
+            var rows = _useCase.Execute(rootContainer).ToList();
             var row = rows.First();
 
             // Assert
