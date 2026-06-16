@@ -30,6 +30,9 @@ namespace TimeLeaf.ViewModels.Workspace
         private ObservableCollection<TimelineRowModel> _rows = new();
 
         [ObservableProperty]
+        private ObservableCollection<Milestone> _milestones = new();
+
+        [ObservableProperty]
         private ObservableCollection<DateTime> _timelineDates = new();
 
         [ObservableProperty]
@@ -81,9 +84,16 @@ namespace TimeLeaf.ViewModels.Workspace
                 Rows.Add(row);
             }
 
+            Milestones.Clear();
+            foreach (var m in project.Milestones.OrderBy(m => m.Date))
+            {
+                Milestones.Add(m);
+            }
+
             // 表示範囲の計算
             var allDates = Rows.SelectMany(r => new[] { r.PlannedStart, r.PlannedEnd, r.ActualStart, r.ActualEnd })
                 .OfType<DateTime>()
+                .Concat(project.Milestones.Select(m => m.Date))
                 .ToList();
 
             DateTime startDate;

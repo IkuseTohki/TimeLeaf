@@ -83,23 +83,33 @@ namespace TimeLeaf.ViewModels.Converters
                 && rows.Any()
             )
             {
+                // マイルストーン行の高さ分（RowHeightと同じ32px）をオフセットとして加算する
+                var verticalOffset = TimelineLayoutConstants.RowHeight;
                 var todayX =
                     (today.Date - baseDate.Date).TotalDays * TimelineLayoutConstants.DayWidth
                     + (TimelineLayoutConstants.DayWidth / 2);
                 var figures = new PathFigureCollection();
-                var figure = new PathFigure { StartPoint = new Point(todayX, 0) };
+                var figure = new PathFigure { StartPoint = new Point(todayX, verticalOffset) };
                 var segments = new PathSegmentCollection();
 
                 for (int i = 0; i < rows.Count; i++)
                 {
                     var row = rows[i];
-                    var centerY = i * TimelineLayoutConstants.RowHeight + (TimelineLayoutConstants.RowHeight / 2);
+                    var centerY =
+                        i * TimelineLayoutConstants.RowHeight
+                        + (TimelineLayoutConstants.RowHeight / 2)
+                        + verticalOffset;
                     var offsetX = row.ProgressOffsetDays * TimelineLayoutConstants.DayWidth;
 
                     segments.Add(new LineSegment(new Point(todayX + offsetX, centerY), true));
                 }
 
-                segments.Add(new LineSegment(new Point(todayX, rows.Count * TimelineLayoutConstants.RowHeight), true));
+                segments.Add(
+                    new LineSegment(
+                        new Point(todayX, rows.Count * TimelineLayoutConstants.RowHeight + verticalOffset),
+                        true
+                    )
+                );
                 figure.Segments = segments;
                 figures.Add(figure);
 

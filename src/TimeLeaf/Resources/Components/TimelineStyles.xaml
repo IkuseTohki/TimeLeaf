@@ -200,4 +200,30 @@
         <Setter Property="Canvas.Top" Value="{StaticResource TimelineAvatarVerticalOffset}" />
     </Style>
 
+    <!-- Milestone Row Style -->
+    <Style x:Key="BorderTimelineMilestoneRowStyle" TargetType="Border">
+        <Setter Property="Height" Value="{StaticResource RowTimelineNormalHeight}" />
+        <Setter Property="Background" Value="{DynamicResource SurfaceLayer2Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
+        <Setter Property="BorderThickness" Value="0,0,0,1" />
+    </Style>
+
+    <!-- Milestone Marker Style (Diamond) -->
+    <Style x:Key="PathTimelineMilestoneMarkerStyle" TargetType="Path">
+        <Setter Property="Data" Value="M 6,0 L 12,6 L 6,12 L 0,6 Z" />
+        <Setter Property="Fill" Value="{DynamicResource BrandPrimaryBrush}" />
+        <Setter Property="Stretch" Value="Uniform" />
+        <Setter Property="Width" Value="12" />
+        <Setter Property="Height" Value="12" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <Style x:Key="TextBlockTimelineMilestoneLabelStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="{StaticResource FontSizeMeta}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Setter Property="Margin" Value="0,0,0,4" />
+        <Setter Property="TextAlignment" Value="Left" />
+    </Style>
+
 </ResourceDictionary>

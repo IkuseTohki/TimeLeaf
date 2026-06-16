@@ -1,4 +1,4 @@
-<UserControl x:Class="TimeLeaf.Views.Workspace.ProjectTimelineView"
+﻿<UserControl x:Class="TimeLeaf.Views.Workspace.ProjectTimelineView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
@@ -74,6 +74,15 @@
                             Background="{DynamicResource SurfaceBaseBrush}"
                             BorderBrush="{DynamicResource OutlineBaseBrush}"
                             BorderThickness="0,0,1,1" />
+
+                    <!-- Milestones Sidebar Label -->
+                    <Border Style="{StaticResource BorderTimelineMilestoneRowStyle}">
+                        <TextBlock Margin="16,0,0,0"
+                                   VerticalAlignment="Center"
+                                   FontWeight="Bold"
+                                   Style="{StaticResource TextBlockBodyStyle}"
+                                   Text="マイルストーン" />
+                    </Border>
 
                     <ItemsControl ItemsSource="{Binding Rows}">
                         <ItemsControl.ItemTemplate>
@@ -164,11 +173,52 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
 
-                            <ItemsControl ItemsSource="{Binding Rows}">
+                            <!-- Milestones Track -->
+                            <Border Height="{StaticResource RowTimelineNormalHeight}"
+                                    VerticalAlignment="Top"
+                                    Panel.ZIndex="10"
+                                    Background="{DynamicResource SurfaceLayer2Brush}"
+                                    BorderBrush="{DynamicResource OutlineBaseBrush}"
+                                    BorderThickness="0,0,0,1">
+                                <ItemsControl ItemsSource="{Binding Milestones}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <Canvas Background="Transparent" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemContainerStyle>
+                                        <Style TargetType="ContentPresenter">
+                                            <Setter Property="Canvas.Left">
+                                                <Setter.Value>
+                                                    <MultiBinding Converter="{StaticResource DateToXConverter}" ConverterParameter="0">
+                                                        <Binding Path="Date" />
+                                                        <Binding Path="DataContext.BaseDate" RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+                                                    </MultiBinding>
+                                                </Setter.Value>
+                                            </Setter>
+                                            <!-- RowHeight(32) の中央に配置するため調整 -->
+                                            <Setter Property="Canvas.Top" Value="4" />
+                                            <Setter Property="ToolTip" Value="{Binding Label}" />
+                                        </Style>
+                                    </ItemsControl.ItemContainerStyle>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel HorizontalAlignment="Left">
+                                                <Path HorizontalAlignment="Left" Style="{StaticResource PathTimelineMilestoneMarkerStyle}" />
+                                                <TextBlock HorizontalAlignment="Left"
+                                                           Style="{StaticResource TextBlockTimelineMilestoneLabelStyle}"
+                                                           Text="{Binding Label}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Border>
+
+                            <ItemsControl Margin="0,32,0,0" ItemsSource="{Binding Rows}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <Border Style="{StaticResource BorderTimelineChartItemStyle}">
-                                            <!-- Row Height is fixed to RowTimelineNormalHeight (60) by Style -->
+                                            <!-- Row Height is fixed to RowTimelineNormalHeight (32) by Style -->
                                             <Grid VerticalAlignment="Stretch">
                                                 <!-- Container Bar (Summary) -->
                                                 <Canvas Visibility="{Binding IsContainer, Converter={StaticResource NormalVisibility}}">
