@@ -97,10 +97,10 @@
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
     </Style>
 
-    <!-- 並び替えリストの項目スタイル（カード風） -->
+    <!-- 並び替えリストの項目スタイル（フラット・ホバーアクション用） -->
     <Style x:Key="ListBoxItemReorderStyle" TargetType="ListBoxItem">
         <Setter Property="Padding" Value="0" />
-        <Setter Property="Margin" Value="0,0,0,4" />
+        <Setter Property="Margin" Value="0" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -108,20 +108,18 @@
             <Setter.Value>
                 <ControlTemplate TargetType="ListBoxItem">
                     <Border x:Name="OuterBorder"
-                            Padding="8,6"
-                            Background="{DynamicResource SurfaceLayer1Brush}"
-                            BorderBrush="{DynamicResource OutlineBaseBrush}"
-                            BorderThickness="1"
+                            Padding="8,4"
+                            Background="Transparent"
+                            BorderThickness="0"
                             CornerRadius="{DynamicResource RadiusControl}">
-                        <ContentPresenter />
+                        <ContentPresenter x:Name="Content" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="OuterBorder" Property="Background" Value="{DynamicResource StateHoverBrush}" />
+                            <Setter TargetName="OuterBorder" Property="Background" Value="{DynamicResource SurfaceLayer1Brush}" />
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="OuterBorder" Property="BorderBrush" Value="{DynamicResource BrandPrimaryBrush}" />
-                            <Setter TargetName="OuterBorder" Property="Background" Value="{DynamicResource SidebarSelectedBackgroundBrush}" />
+                            <Setter TargetName="OuterBorder" Property="Background" Value="{DynamicResource EmphasisLowBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TimeLeaf.Models.Enums;
+using TimeLeaf.Models.Interfaces;
 
 namespace TimeLeaf.Models.Entities;
 
@@ -9,7 +10,7 @@ namespace TimeLeaf.Models.Entities;
 /// タスクを束ねる「入れ物」を表すエンティティ。
 /// マクロな計画や全体構造の構築に特化する。
 /// </summary>
-public class ProjectContainer : ProjectWorkItem
+public class ProjectContainer : ProjectWorkItem, IWorkItemContainer
 {
     private readonly List<ProjectWorkItem> _children = new();
 
@@ -17,6 +18,25 @@ public class ProjectContainer : ProjectWorkItem
     /// 子要素のリスト（読み取り専用）。
     /// </summary>
     public IReadOnlyList<ProjectWorkItem> Children => _children;
+
+    IEnumerable<ProjectWorkItem> IWorkItemContainer.Children => _children;
+
+    public void MoveChild(Guid childId, int newIndex)
+    {
+        var child = _children.FirstOrDefault(c => c.Id == childId);
+        if (child == null)
+            throw new ArgumentException("Child item not found.", nameof(childId));
+
+        if (newIndex < 0 || newIndex >= _children.Count)
+            throw new ArgumentOutOfRangeException(nameof(newIndex), "Index is out of range.");
+
+        int oldIndex = _children.IndexOf(child);
+        if (oldIndex == newIndex)
+            return;
+
+        _children.RemoveAt(oldIndex);
+        _children.Insert(newIndex, child);
+    }
 
     /// <summary>
     /// デフォルトコンストラクタ。

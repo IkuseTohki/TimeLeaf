@@ -314,4 +314,88 @@ public class ProjectTaskTests
         Assert.AreEqual(TaskPriority.High, target.Priority);
         Assert.AreEqual(assigneeId, target.Assignee);
     }
+
+    /// <summary>
+    /// テスト観点: 子タスクを追加した際、追加順序が維持されること。
+    /// </summary>
+    [TestMethod]
+    public void AddChild_ShouldMaintainOrder()
+    {
+        // Arrange
+        var parent = new ProjectTask();
+        var child1 = new ProjectTask();
+        child1.UpdateName("Child 1");
+        var child2 = new ProjectTask();
+        child2.UpdateName("Child 2");
+
+        // Act
+        parent.AddChild(child1);
+        parent.AddChild(child2);
+
+        // Assert
+        Assert.AreEqual(2, parent.Children.Count);
+        Assert.AreEqual(child1.Id, parent.Children[0].Id);
+        Assert.AreEqual(child2.Id, parent.Children[1].Id);
+    }
+
+    /// <summary>
+    /// テスト観点: 子タスクの順序を変更できること。
+    /// </summary>
+    [TestMethod]
+    public void MoveChild_ShouldReorderChildren()
+    {
+        // Arrange
+        var parent = new ProjectTask();
+        var child1 = new ProjectTask();
+        child1.UpdateName("Child 1");
+        var child2 = new ProjectTask();
+        child2.UpdateName("Child 2");
+        parent.AddChild(child1);
+        parent.AddChild(child2);
+
+        // Act
+        parent.MoveChild(child2.Id, 0); // child2 を先頭に移動
+
+        // Assert
+        Assert.AreEqual(child2.Id, parent.Children[0].Id);
+        Assert.AreEqual(child1.Id, parent.Children[1].Id);
+    }
+
+    /// <summary>
+    /// テスト観点: 同じインデックスへ移動しようとした場合、何もしないことを確認する。
+    /// </summary>
+    [TestMethod]
+    public void MoveChild_ShouldDoNothing_IfIndexIsSame()
+    {
+        // Arrange
+        var parent = new ProjectTask();
+        var child = new ProjectTask();
+        child.UpdateName("Child");
+        parent.AddChild(child);
+
+        // Act
+        parent.MoveChild(child.Id, 0);
+
+        // Assert
+        Assert.AreEqual(1, parent.Children.Count);
+        Assert.AreEqual(child.Id, parent.Children[0].Id);
+    }
+
+    /// <summary>
+    /// テスト観点: 無効なIDが渡された場合、例外がスローされること。
+    /// </summary>
+    [TestMethod]
+    public void MoveChild_ShouldThrow_IfIdIsInvalid()
+    {
+        // Arrange
+        var parent = new ProjectTask();
+
+        // Act & Assert
+        try
+        {
+            parent.MoveChild(Guid.NewGuid(), 0);
+            Assert.Fail("例外がスローされるべき");
+        }
+        catch (ArgumentException) { }
+    }
 }

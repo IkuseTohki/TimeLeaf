@@ -20,6 +20,7 @@
     <tlcv:DateToIsNonWorkdayConverter x:Key="DateToIsNonWorkdayConverter" />
     <tlcv:DateToDayHeaderTextConverter x:Key="DateToDayHeaderTextConverter" />
     <tlcv:MoveTaskArgsConverter x:Key="MoveTaskArgsConverter" />
+    <tlcv:ArrayMultiConverter x:Key="ArrayMultiConverter" />
     <lk:EqualityToBooleanConverter x:Key="EqualityToBooleanConverter" />
     <lk:ComparisonConverter x:Key="ComparisonConverter" />
     <lk:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />

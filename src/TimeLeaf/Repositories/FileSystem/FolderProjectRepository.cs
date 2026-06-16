@@ -388,7 +388,8 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
                             c.LagDays,
                             c.Description
                         ))
-                        .ToList()
+                        .ToList(),
+                    container.Children.Select(c => c.Id).ToList()
                 );
                 await TrySaveCategoryAsync(
                     container.Id,

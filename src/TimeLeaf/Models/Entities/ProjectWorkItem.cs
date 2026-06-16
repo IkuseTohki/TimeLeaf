@@ -19,6 +19,11 @@ public abstract class ProjectWorkItem
     public Guid Id { get; init; } = Guid.NewGuid();
 
     /// <summary>
+    /// アイテムの作成日時。
+    /// </summary>
+    public DateTime CreatedAt { get; init; } = DateTime.Now;
+
+    /// <summary>
     /// 所属するプロジェクトのID。
     /// </summary>
     public Guid ProjectId { get; set; }

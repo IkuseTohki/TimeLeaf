@@ -328,13 +328,13 @@ public partial class ProjectViewModel : ObservableObject
                     Milestones.Add(m);
                 }
             }
-
-            NotifyAllProperties();
         }
         finally
         {
             IsSyncing = false;
         }
+
+        NotifyAllProperties();
     }
 
     private void NotifyAllProperties()

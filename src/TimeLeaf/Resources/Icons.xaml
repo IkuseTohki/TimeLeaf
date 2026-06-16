@@ -8,4 +8,8 @@
     <Geometry x:Key="TreeSproutLeafGeometry">M 50,80 Q 60,50 80,40 Q 60,45 50,60 Q 40,45 20,40 Q 40,50 50,80 Z</Geometry>
     <Geometry x:Key="TreeSproutTrunkGeometry">M 48,80 H 52 V 95 H 48 Z</Geometry>
 
+    <!-- File System Icons -->
+    <Geometry x:Key="FolderIconGeometry">M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z</Geometry>
+    <Geometry x:Key="DocumentIconGeometry">M13,9V3.5L18.5,9M6,2C4.89,2 4,2.89 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2H6Z</Geometry>
+
 </ResourceDictionary>

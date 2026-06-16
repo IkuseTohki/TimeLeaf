@@ -2,6 +2,7 @@ using System;
 using System.Collections.ObjectModel;
 using Microsoft.Extensions.Logging;
 using TimeLeaf.Models.Entities;
+using TimeLeaf.Models.Interfaces;
 using TimeLeaf.ViewModels.Workspace;
 
 namespace TimeLeaf.ViewModels;
@@ -24,10 +25,7 @@ public interface IViewModelFactory
     AddTaskViewModel CreateAddTaskViewModel(System.Collections.Generic.IEnumerable<User>? teammates = null);
     AddMilestoneViewModel CreateAddMilestoneViewModel();
     AddContainerViewModel CreateAddContainerViewModel();
-    ReorderWorkItemsViewModel CreateReorderWorkItemsViewModel(
-        Project project,
-        System.Collections.Generic.IEnumerable<ProjectWorkItem> initialItems
-    );
+    ReorderProjectItemsViewModel CreateReorderProjectItemsViewModel(IWorkItemContainer rootContainer);
     ProjectDashboardViewModel CreateProjectDashboardViewModel(ProjectViewModel projectViewModel);
     ProjectTasksViewModel CreateProjectTasksViewModel(ProjectViewModel projectViewModel);
     ProjectFlowViewModel CreateProjectFlowViewModel(ProjectViewModel projectViewModel);

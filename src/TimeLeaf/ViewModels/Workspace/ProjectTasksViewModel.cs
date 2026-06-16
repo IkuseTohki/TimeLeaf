@@ -208,13 +208,9 @@ public partial class ProjectTasksViewModel : ObservableObject
                 // (本来は ViewModel 側で完結すべきだが、今回はシンプルにドメインから構築)
             }
 
-            // シンプルなアプローチ: 全アイテムを取得して並べ替える
-            var targetItems = _projectViewModel
-                .Model.Containers.Cast<ProjectWorkItem>()
-                .Concat(_projectViewModel.Model.Tasks.Where(t => t.ParentId == null).Cast<ProjectWorkItem>())
-                .ToList();
-
-            var reorderVm = _viewModelFactory.CreateReorderWorkItemsViewModel(_projectViewModel.Model, targetItems);
+            // プロジェクトのルートコンテナを作成して並べ替え ViewModel に渡す
+            var rootContainer = new ProjectRootContainer(_projectViewModel.Model);
+            var reorderVm = _viewModelFactory.CreateReorderProjectItemsViewModel(rootContainer);
             var result = await _dialogService.ShowDialogAsync(reorderVm);
 
             if (result)
@@ -263,27 +259,38 @@ public partial class ProjectTasksViewModel : ObservableObject
     {
         TaskContainers.Clear();
         var allTasks = Tasks.ToList();
+        var rootContainer = new ProjectRootContainer(_projectViewModel.Model);
 
-        // 1. プロジェクトが保持するコンテナエンティティを基点に表示リストを作成
-        foreach (var container in _projectViewModel.Model.Containers)
+        // 1. ルートレベルの定義順に従ってコンテナを表示リストに追加
+        foreach (var item in rootContainer.Children)
         {
-            // このコンテナに属するタスクを抽出
-            var children = allTasks.Where(t => t.ParentId == container.Id).ToList();
+            if (item is ProjectContainer container)
+            {
+                // コンテナ内の定義順に従って子タスクを取得
+                var children = container
+                    .Children.OfType<ProjectTask>()
+                    .Select(t => allTasks.FirstOrDefault(vm => vm.Id == t.Id))
+                    .Where(vm => vm != null)
+                    .Select(vm => vm!)
+                    .ToList();
 
-            TaskContainers.Add(
-                new TaskContainerViewModel(
-                    container,
-                    new ObservableCollection<ProjectTaskViewModel>(children),
-                    AddTaskToContainerCommand,
-                    DeleteContainerCommand
-                )
-            );
+                TaskContainers.Add(
+                    new TaskContainerViewModel(
+                        container,
+                        new ObservableCollection<ProjectTaskViewModel>(children),
+                        AddTaskToContainerCommand,
+                        DeleteContainerCommand
+                    )
+                );
+            }
         }
 
-        // 2. どのコンテナにも属さない「未分類タスク」を最後に追加
-        var containerIds = _projectViewModel.Model.Containers.Select(c => c.Id).ToHashSet();
-        var unclassified = allTasks
-            .Where(t => !t.ParentId.HasValue || !containerIds.Contains(t.ParentId.Value))
+        // 2. どのコンテナにも属さない「未分類タスク」を取得（これもルート順に従う）
+        var unclassified = rootContainer
+            .Children.OfType<ProjectTask>()
+            .Select(t => allTasks.FirstOrDefault(vm => vm.Id == t.Id))
+            .Where(vm => vm != null)
+            .Select(vm => vm!)
             .ToList();
 
         if (unclassified.Any())

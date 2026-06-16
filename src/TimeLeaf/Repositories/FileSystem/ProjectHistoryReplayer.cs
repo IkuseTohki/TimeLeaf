@@ -54,6 +54,7 @@ internal class ProjectHistoryReplayer
         var taskMap = new Dictionary<Guid, ProjectTask>();
         var containerMap = new Dictionary<Guid, ProjectContainer>();
         var workItemMap = new Dictionary<Guid, ProjectWorkItem>();
+        var containerOrders = new Dictionary<Guid, List<Guid>>();
         string? latestSortOrderJson = null;
 
         foreach (var file in files)
@@ -75,6 +76,7 @@ internal class ProjectHistoryReplayer
                 taskMap,
                 containerMap,
                 workItemMap,
+                containerOrders,
                 allCommentData,
                 file.Path,
                 file.EntityId,
@@ -94,6 +96,26 @@ internal class ProjectHistoryReplayer
 
         AttachComments(taskMap, allCommentData);
         ResolveHierarchy(workItemMap);
+
+        // コンテナ内の順序を適用
+        foreach (var entry in containerOrders)
+        {
+            if (containerMap.TryGetValue(entry.Key, out var container))
+            {
+                var order = entry.Value;
+                for (int i = 0; i < order.Count; i++)
+                {
+                    try
+                    {
+                        container.MoveChild(order[i], i);
+                    }
+                    catch (ArgumentException)
+                    {
+                        // 子要素が見つからない（削除済み等）場合はスキップ
+                    }
+                }
+            }
+        }
 
         if (files.Any())
         {
@@ -150,6 +172,7 @@ internal class ProjectHistoryReplayer
         Dictionary<Guid, ProjectTask> taskMap,
         Dictionary<Guid, ProjectContainer> containerMap,
         Dictionary<Guid, ProjectWorkItem> workItemMap,
+        Dictionary<Guid, List<Guid>> containerOrders,
         List<(CommentDto Dto, DateTime Timestamp)> allCommentData,
         string filePath,
         Guid entityId,
@@ -179,7 +202,7 @@ internal class ProjectHistoryReplayer
                 ApplyProjectMembers(project, json);
                 break;
             case StorageCategories.ContainerPlanning:
-                ApplyContainerPlanning(project, containerMap, workItemMap, json);
+                ApplyContainerPlanning(project, containerMap, workItemMap, containerOrders, json);
                 break;
             case StorageCategories.ContainerDescription:
                 ApplyContainerDescription(project, containerMap, workItemMap, json);
@@ -237,6 +260,7 @@ internal class ProjectHistoryReplayer
         Project project,
         Dictionary<Guid, ProjectContainer> containerMap,
         Dictionary<Guid, ProjectWorkItem> workItemMap,
+        Dictionary<Guid, List<Guid>> containerOrders,
         string json
     )
     {
@@ -258,6 +282,12 @@ internal class ProjectHistoryReplayer
                 c.Description
             ));
             container.LoadConstraints(constraints);
+        }
+
+        // 子要素の順序を記録（ResolveHierarchy の後に適用する）
+        if (dto.OrderedChildIds != null && dto.OrderedChildIds.Any())
+        {
+            containerOrders[dto.Id] = dto.OrderedChildIds;
         }
     }
 

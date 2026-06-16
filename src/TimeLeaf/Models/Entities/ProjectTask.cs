@@ -4,17 +4,25 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TimeLeaf.Models.Enums;
+using TimeLeaf.Models.Interfaces;
 
 namespace TimeLeaf.Models.Entities;
 
 /// <summary>
 /// タスクを表すエンティティ。
 /// </summary>
-public class ProjectTask : ProjectWorkItem
+public class ProjectTask : ProjectWorkItem, IWorkItemContainer
 {
     private readonly List<Comment> _comments = new();
     private readonly List<ProjectTask> _children = new();
     private readonly List<Guid> _dependencies = new();
+
+    IEnumerable<ProjectWorkItem> IWorkItemContainer.Children => _children;
+
+    void IWorkItemContainer.MoveChild(Guid childId, int newIndex)
+    {
+        MoveChild(childId, newIndex);
+    }
 
     /// <summary>
     /// タスクの進捗状態。
@@ -251,6 +259,26 @@ public class ProjectTask : ProjectWorkItem
         child.SetParentId(this.Id);
         _children.Add(child);
         AggregateChildren();
+    }
+
+    /// <summary>
+    /// 指定された子タスクを指定したインデックスへ移動します。
+    /// </summary>
+    public void MoveChild(Guid childId, int newIndex)
+    {
+        var child = _children.FirstOrDefault(c => c.Id == childId);
+        if (child == null)
+            throw new ArgumentException("Child task not found.", nameof(childId));
+
+        if (newIndex < 0 || newIndex >= _children.Count)
+            throw new ArgumentOutOfRangeException(nameof(newIndex), "Index is out of range.");
+
+        int oldIndex = _children.IndexOf(child);
+        if (oldIndex == newIndex)
+            return;
+
+        _children.RemoveAt(oldIndex);
+        _children.Insert(newIndex, child);
     }
 
     /// <summary>

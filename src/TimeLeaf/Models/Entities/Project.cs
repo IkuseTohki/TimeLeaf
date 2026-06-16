@@ -17,6 +17,7 @@ public class Project
     private readonly List<Guid> _assignedUserIds = new();
     private readonly List<Guid> _deletedTaskIds = new();
     private readonly List<Guid> _deletedContainerIds = new();
+    private readonly List<Guid> _rootWorkItemOrder = new();
 
     /// <summary>
     /// プロジェクトの作成者ID。
@@ -92,6 +93,11 @@ public class Project
     /// 論理削除されたコンテナのIDリスト（保存後にクリアされるべき作業用状態）。
     /// </summary>
     public IReadOnlyList<Guid> DeletedContainerIds => _deletedContainerIds;
+
+    /// <summary>
+    /// プロジェクト直下のタスク・コンテナの表示順序（IDリスト）。
+    /// </summary>
+    public IReadOnlyList<Guid> RootWorkItemOrder => _rootWorkItemOrder;
 
     /// <summary>
     /// デフォルトコンストラクタ。
@@ -398,26 +404,32 @@ public class Project
             return;
 
         var idList = orderedIds.ToList();
+
+        // ルートレベルの統合順序を更新
+        _rootWorkItemOrder.Clear();
+        _rootWorkItemOrder.AddRange(idList);
+
         var orderDict = idList.Select((id, index) => new { id, index }).ToDictionary(x => x.id, x => x.index);
 
-        // 内部リストを物理的に並べ替える
-        _tasks.Sort(
-            (a, b) =>
-            {
-                int orderA = orderDict.TryGetValue(a.Id, out int oa) ? oa : int.MaxValue;
-                int orderB = orderDict.TryGetValue(b.Id, out int ob) ? ob : int.MaxValue;
-                return orderA.CompareTo(orderB);
-            }
-        );
+        // 内部リストも並べ替えるが、リストに含まれていないアイテム（入れ子アイテム等）の順序関係を壊さないようにする
+        SortItemsByOrder(_tasks, orderDict);
+        SortItemsByOrder(_containers, orderDict);
+    }
 
-        _containers.Sort(
-            (a, b) =>
-            {
-                int orderA = orderDict.TryGetValue(a.Id, out int oa) ? oa : int.MaxValue;
-                int orderB = orderDict.TryGetValue(b.Id, out int ob) ? ob : int.MaxValue;
-                return orderA.CompareTo(orderB);
-            }
-        );
+    private void SortItemsByOrder<T>(List<T> items, Dictionary<Guid, int> orderDict)
+        where T : ProjectWorkItem
+    {
+        // 順序リストに含まれるアイテムと含まれないアイテムを分離
+        var inOrder = items.Where(i => orderDict.ContainsKey(i.Id)).ToList();
+        var notInOrder = items.Where(i => !orderDict.ContainsKey(i.Id)).ToList();
+
+        // 含まれるアイテムのみを定義された順序でソート
+        inOrder.Sort((a, b) => orderDict[a.Id].CompareTo(orderDict[b.Id]));
+
+        // 最終的なリストを再構築（順序指定あり -> 順序指定なし の順）
+        items.Clear();
+        items.AddRange(inOrder);
+        items.AddRange(notInOrder);
     }
 
     /// <summary>

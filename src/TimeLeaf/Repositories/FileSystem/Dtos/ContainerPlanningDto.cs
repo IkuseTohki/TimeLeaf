@@ -14,5 +14,6 @@ internal record ContainerPlanningDto(
     DateTime? PlannedEndDate,
     DateTime? Deadline,
     double RequiredDays,
-    List<TaskConstraintDto> Constraints
+    List<TaskConstraintDto> Constraints,
+    List<Guid> OrderedChildIds
 );

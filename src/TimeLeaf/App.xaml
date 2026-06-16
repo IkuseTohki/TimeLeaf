@@ -52,8 +52,8 @@
             <DataTemplate DataType="{x:Type viewModels:AddContainerViewModel}">
                 <views:AddContainerView />
             </DataTemplate>
-            <DataTemplate DataType="{x:Type viewModels:ReorderWorkItemsViewModel}">
-                <views:ReorderWorkItemsView />
+            <DataTemplate DataType="{x:Type viewModels:ReorderProjectItemsViewModel}">
+                <views:ReorderProjectItemsView />
             </DataTemplate>
             <DataTemplate DataType="{x:Type viewModels:ProfileEditViewModel}">
                 <views:ProfileEditView />

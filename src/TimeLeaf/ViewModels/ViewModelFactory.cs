@@ -4,6 +4,7 @@ using LeafKit.UI.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TimeLeaf.Models.Entities;
+using TimeLeaf.Models.Interfaces;
 using TimeLeaf.Repositories;
 using TimeLeaf.Services;
 using TimeLeaf.UseCases;
@@ -104,16 +105,9 @@ public class ViewModelFactory : IViewModelFactory
         return _serviceProvider.GetRequiredService<AddContainerViewModel>();
     }
 
-    public ReorderWorkItemsViewModel CreateReorderWorkItemsViewModel(
-        Project project,
-        System.Collections.Generic.IEnumerable<ProjectWorkItem> initialItems
-    )
+    public ReorderProjectItemsViewModel CreateReorderProjectItemsViewModel(IWorkItemContainer rootContainer)
     {
-        return new ReorderWorkItemsViewModel(
-            project,
-            initialItems,
-            _serviceProvider.GetRequiredService<IUpdateSortOrderUseCase>()
-        );
+        return new ReorderProjectItemsViewModel(rootContainer);
     }
 
     public ProjectDashboardViewModel CreateProjectDashboardViewModel(ProjectViewModel projectViewModel)
