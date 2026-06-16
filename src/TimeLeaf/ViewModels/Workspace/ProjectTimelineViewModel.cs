@@ -83,16 +83,15 @@ namespace TimeLeaf.ViewModels.Workspace
 
             // 表示範囲の計算
             var allDates = Rows.SelectMany(r => new[] { r.PlannedStart, r.PlannedEnd, r.ActualStart, r.ActualEnd })
-                .Where(d => d.HasValue)
-                .Select(d => d.Value)
+                .OfType<DateTime>()
                 .ToList();
 
             DateTime startDate;
             DateTime endDate;
 
-            if (allDates.Any())
+            if (allDates.Count > 0)
             {
-                startDate = allDates.Min().AddDays(-14); // スクロールバッファ含め少し広めに
+                startDate = allDates.Min().AddDays(-14);
                 endDate = allDates.Max().AddDays(14);
             }
             else
@@ -115,13 +114,13 @@ namespace TimeLeaf.ViewModels.Workspace
                 current = current.AddDays(1);
             }
 
-            TotalWidth = TimelineDates.Count * 60.0;
+            TotalWidth = TimelineDates.Count * TimelineLayoutConstants.DayWidth;
 
             // スクロール位置の計算 (今日 - 3日)
             var scrollDate = Today.AddDays(-3);
             if (scrollDate < BaseDate)
                 scrollDate = BaseDate;
-            ScrollOffset = (scrollDate.Date - BaseDate.Date).TotalDays * 60.0;
+            ScrollOffset = (scrollDate.Date - BaseDate.Date).TotalDays * TimelineLayoutConstants.DayWidth;
         }
 
         public void Dispose()

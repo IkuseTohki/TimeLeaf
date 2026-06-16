@@ -116,7 +116,7 @@
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Width="60"
+                                        <Border Width="{StaticResource TimelineDayWidth}"
                                                 Height="{StaticResource HeaderStandardNormalHeight}"
                                                 Background="{DynamicResource SurfaceBaseBrush}"
                                                 BorderBrush="{DynamicResource OutlineBaseBrush}"
@@ -248,7 +248,7 @@
                                 <!-- Today Line: Indicator for current time (positioned at the center of the day column) -->
                                 <Border Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Canvas}}" Style="{StaticResource BorderTimelineTodayLineStyle}">
                                     <Canvas.Left>
-                                        <MultiBinding Converter="{StaticResource DateToXConverter}" ConverterParameter="30">
+                                        <MultiBinding Converter="{StaticResource DateToXConverter}" ConverterParameter="26">
                                             <Binding Path="Today" />
                                             <Binding Path="BaseDate" />
                                         </MultiBinding>

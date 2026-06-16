@@ -26,7 +26,7 @@
 
     <!-- Grid Column Style -->
     <Style x:Key="BorderTimelineGridColumnStyle" TargetType="Border">
-        <Setter Property="Width" Value="60" />
+        <Setter Property="Width" Value="{StaticResource TimelineDayWidth}" />
         <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
         <Setter Property="BorderThickness" Value="0,0,1,0" />
         <Setter Property="Background" Value="Transparent" />
@@ -77,14 +77,14 @@
                Right="24"
                Top="0" />
 
-    <!-- Vertical positions for bars within the 60px row -->
-    <sys:Double x:Key="TimelineBarTopPlannedDual">20</sys:Double>
-    <sys:Double x:Key="TimelineBarTopActualDual">32</sys:Double>
-    <sys:Double x:Key="TimelineBarTopSingle">26</sys:Double>
-    <sys:Double x:Key="TimelineBarTopContainer">24</sys:Double>
+    <!-- Vertical positions for bars within the 32px row -->
+    <sys:Double x:Key="TimelineBarTopPlannedDual">6</sys:Double>
+    <sys:Double x:Key="TimelineBarTopActualDual">18</sys:Double>
+    <sys:Double x:Key="TimelineBarTopSingle">12</sys:Double>
+    <sys:Double x:Key="TimelineBarTopContainer">10</sys:Double>
 
-    <!-- Vertical offset for avatar to center it relative to the dual bars -->
-    <sys:Double x:Key="TimelineAvatarVerticalOffset">18</sys:Double>
+    <!-- Vertical offset for avatar to center it relative to the row -->
+    <sys:Double x:Key="TimelineAvatarVerticalOffset">4</sys:Double>
 
     <!-- Horizontal offset for avatar (Width: 24) -->
     <sys:Double x:Key="TimelineAvatarHorizontalOffset">-24</sys:Double>

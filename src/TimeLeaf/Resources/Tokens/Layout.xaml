@@ -43,7 +43,8 @@
     <!-- ====================================================================== -->
     <!-- Row/Header Heights (Atomic) -->
     <!-- ====================================================================== -->
-    <sys:Double x:Key="RowTimelineNormalHeight">60</sys:Double>
+    <sys:Double x:Key="RowTimelineNormalHeight">32</sys:Double>
+    <sys:Double x:Key="TimelineDayWidth">52</sys:Double>
     <sys:Double x:Key="HeaderStandardNormalHeight">40</sys:Double>
 
     <!-- ====================================================================== -->

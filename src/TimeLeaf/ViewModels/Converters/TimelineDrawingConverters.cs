@@ -14,14 +14,12 @@ namespace TimeLeaf.ViewModels.Converters
     // 日付を X 座標に変換
     public class DateToXConverter : IMultiValueConverter
     {
-        private const double DayWidth = 60.0;
-
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             if (values.Length >= 2 && values[0] is DateTime date && values[1] is DateTime baseDate)
             {
                 var offset = double.TryParse(parameter?.ToString(), out var result) ? result : 0.0;
-                return (date.Date - baseDate.Date).TotalDays * DayWidth + offset;
+                return (date.Date - baseDate.Date).TotalDays * TimelineLayoutConstants.DayWidth + offset;
             }
             return 0.0;
         }
@@ -33,8 +31,6 @@ namespace TimeLeaf.ViewModels.Converters
     // 期間を幅に変換
     public class DateRangeToWidthConverter : IValueConverter
     {
-        private const double DayWidth = 60.0;
-
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is TimelineRowModel row)
@@ -44,7 +40,11 @@ namespace TimeLeaf.ViewModels.Converters
 
                 if (start.HasValue && end.HasValue)
                 {
-                    return Math.Max(10.0, (end.Value.Date - start.Value.Date).TotalDays * DayWidth + DayWidth);
+                    return Math.Max(
+                        10.0,
+                        (end.Value.Date - start.Value.Date).TotalDays * TimelineLayoutConstants.DayWidth
+                            + TimelineLayoutConstants.DayWidth
+                    );
                 }
             }
             return 0.0;
@@ -73,9 +73,6 @@ namespace TimeLeaf.ViewModels.Converters
     // 全行データから稲妻線のジオメトリを生成
     public class RowsToLightningPathConverter : IMultiValueConverter
     {
-        private const double DayWidth = 60.0;
-        private const double RowHeight = 60.0;
-
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             if (
@@ -86,7 +83,9 @@ namespace TimeLeaf.ViewModels.Converters
                 && rows.Any()
             )
             {
-                var todayX = (today.Date - baseDate.Date).TotalDays * DayWidth + (DayWidth / 2);
+                var todayX =
+                    (today.Date - baseDate.Date).TotalDays * TimelineLayoutConstants.DayWidth
+                    + (TimelineLayoutConstants.DayWidth / 2);
                 var figures = new PathFigureCollection();
                 var figure = new PathFigure { StartPoint = new Point(todayX, 0) };
                 var segments = new PathSegmentCollection();
@@ -94,13 +93,13 @@ namespace TimeLeaf.ViewModels.Converters
                 for (int i = 0; i < rows.Count; i++)
                 {
                     var row = rows[i];
-                    var centerY = i * RowHeight + (RowHeight / 2);
-                    var offsetX = row.ProgressOffsetDays * DayWidth;
+                    var centerY = i * TimelineLayoutConstants.RowHeight + (TimelineLayoutConstants.RowHeight / 2);
+                    var offsetX = row.ProgressOffsetDays * TimelineLayoutConstants.DayWidth;
 
                     segments.Add(new LineSegment(new Point(todayX + offsetX, centerY), true));
                 }
 
-                segments.Add(new LineSegment(new Point(todayX, rows.Count * RowHeight), true));
+                segments.Add(new LineSegment(new Point(todayX, rows.Count * TimelineLayoutConstants.RowHeight), true));
                 figure.Segments = segments;
                 figures.Add(figure);
 
