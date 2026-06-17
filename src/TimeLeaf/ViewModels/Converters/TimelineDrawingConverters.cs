@@ -83,8 +83,8 @@ namespace TimeLeaf.ViewModels.Converters
                 && rows.Any()
             )
             {
-                // マイルストーン行の高さ分（RowHeightと同じ32px）をオフセットとして加算する
-                var verticalOffset = TimelineLayoutConstants.RowHeight;
+                // 新しいレイアウトではタスク行はエリアの最上部から開始するため、オフセットは0にする
+                var verticalOffset = 0.0;
                 var todayX =
                     (today.Date - baseDate.Date).TotalDays * TimelineLayoutConstants.DayWidth
                     + (TimelineLayoutConstants.DayWidth / 2);
