@@ -131,12 +131,13 @@
                                                 <TextBlock Grid.Row="0"
                                                            HorizontalAlignment="Center"
                                                            FontSize="{StaticResource FontSizeMeta}"
-                                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                                           Foreground="{DynamicResource TextPrimaryBrush}"
                                                            Text="{Binding Converter={StaticResource DateToHeaderFormatConverter}, ConverterParameter=DayOfWeek}" />
                                                 <TextBlock Grid.Row="1"
                                                            HorizontalAlignment="Center"
                                                            FontSize="{StaticResource FontSizeHeader}"
-                                                           FontWeight="Bold">
+                                                           FontWeight="Bold"
+                                                           Foreground="{DynamicResource TextPrimaryBrush}">
                                                     <TextBlock.Text>
                                                         <MultiBinding Converter="{StaticResource DateToDayHeaderTextConverter}">
                                                             <Binding Path="." />
