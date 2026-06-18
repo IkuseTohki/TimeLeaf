@@ -237,6 +237,64 @@ public class FolderProjectRepository : IProjectRepository, IDisposable
         }
     }
 
+    /// <summary>
+    /// 指定されたエンティティの変更履歴をディレクトリからスキャンして取得します。
+    /// </summary>
+    public async System.Threading.Tasks.Task<IEnumerable<ChangeRecord>> GetHistoryAsync(Guid projectId, Guid entityId)
+    {
+        _logger.LogDebug("Fetching history for entity {EntityId} in project {ProjectId}.", entityId, projectId);
+
+        var projectDirs = Directory.GetDirectories(_baseDirectory);
+        var targetDir = projectDirs.FirstOrDefault(d => Path.GetFileName(d).StartsWith(projectId.ToString()));
+
+        if (targetDir == null)
+        {
+            _logger.LogWarning("Project directory for {ProjectId} not found during history fetch.", projectId);
+            return Enumerable.Empty<ChangeRecord>();
+        }
+
+        var changesDir = Path.Combine(targetDir, "changes");
+        // プロジェクト自身なら changes 直下、タスク等ならサブフォルダ
+        var entityDir = entityId == projectId ? changesDir : Path.Combine(changesDir, entityId.ToString());
+
+        if (!Directory.Exists(entityDir))
+        {
+            _logger.LogDebug("Entity directory {EntityDir} not found. No history available.", entityDir);
+            return Enumerable.Empty<ChangeRecord>();
+        }
+
+        // 非同期でファイル一覧を取得（I/O負荷軽減のためスレッドプールで実行）
+        var files = await System.Threading.Tasks.Task.Run(() =>
+            Directory.GetFiles(entityDir, "*.json", SearchOption.TopDirectoryOnly)
+        );
+
+        var records = new List<ChangeRecord>();
+        foreach (var f in files)
+        {
+            var fileName = Path.GetFileName(f);
+            var meta = _fileNameGenerator.Parse(fileName);
+            Guid userId = Guid.TryParse(meta.UserId, out var id) ? id : Guid.Empty;
+
+            // 詳細表示のためにJSONコンテンツを読み込む
+            string? content = null;
+            try
+            {
+                content = await File.ReadAllTextAsync(f);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to read history file content: {FilePath}", f);
+            }
+
+            records.Add(new ChangeRecord(meta.Timestamp, userId, meta.Category, content));
+        }
+
+        records = records.OrderBy(r => r.Timestamp).ToList();
+
+        _logger.LogDebug("Found {HistoryCount} history records for entity {EntityId}.", records.Count, entityId);
+        return records;
+    }
+
     public async System.Threading.Tasks.Task SaveAsync(Project project, string userId)
     {
         _logger.LogInformation("Saving project: {ProjectName} ({ProjectId})", project.Name, project.Id);

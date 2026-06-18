@@ -161,6 +161,11 @@ public class CommentFlowTests
         var taskVM = projectVM.Tasks.First();
         var addCommentUseCase = new AddCommentUseCase(_saveUseCaseMock.Object, _identityServiceMock.Object);
 
+        var historyUseCaseMock = new Mock<IGetTaskHistoryUseCase>();
+        historyUseCaseMock
+            .Setup(x => x.ExecuteAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
+            .ReturnsAsync(Enumerable.Empty<ChangeRecord>());
+
         var detailVM = new TaskDetailViewModel(
             projectVM,
             taskVM,
@@ -171,7 +176,8 @@ public class CommentFlowTests
             _userServiceMock.Object,
             new Mock<IProjectService>().Object,
             new Mock<ILogger<TaskDetailViewModel>>().Object,
-            new Mock<IGetProjectMembersUseCase>().Object
+            new Mock<IGetProjectMembersUseCase>().Object,
+            historyUseCaseMock.Object
         );
 
         var commentContent = "New Test Comment";

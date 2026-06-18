@@ -326,8 +326,13 @@ public class MainViewModelTests
             .Setup(x => x.CreateProjectWorkspaceViewModel(projectViewModel, viewModel.Projects))
             .Returns(workspaceVm);
 
-        // TaskDetailViewModel のモック作成
-        var detailVm = new Mock<TaskDetailViewModel>(
+        // TaskDetailViewModel の生成
+        var historyUseCaseMock = new Mock<IGetTaskHistoryUseCase>();
+        historyUseCaseMock
+            .Setup(x => x.ExecuteAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
+            .ReturnsAsync(Enumerable.Empty<ChangeRecord>());
+
+        var detailVm = new TaskDetailViewModel(
             projectViewModel,
             taskViewModel,
             new Mock<IAddCommentUseCase>().Object,
@@ -337,8 +342,9 @@ public class MainViewModelTests
             new Mock<IUserService>().Object,
             new Mock<IProjectService>().Object,
             new Mock<ILogger<TaskDetailViewModel>>().Object,
-            new Mock<IGetProjectMembersUseCase>().Object
-        ).Object;
+            new Mock<IGetProjectMembersUseCase>().Object,
+            historyUseCaseMock.Object
+        );
         _viewModelFactoryMock
             .Setup(x => x.CreateTaskDetailViewModel(projectViewModel, taskViewModel))
             .Returns(detailVm);

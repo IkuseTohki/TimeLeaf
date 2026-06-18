@@ -1,4 +1,4 @@
-<UserControl x:Class="TimeLeaf.Views.Workspace.TaskDetailView"
+﻿<UserControl x:Class="TimeLeaf.Views.Workspace.TaskDetailView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:c="http://schemas.leafkit.com/wpf/ui/controls"
@@ -88,6 +88,8 @@
                     <!-- セパレーター -->
                     <RowDefinition Height="*" />
                     <!-- 3. ディスカッション (ここだけ残りのスペースを埋める) -->
+                    <RowDefinition Height="Auto" />
+                    <!-- 4. 変更履歴 -->
                 </Grid.RowDefinitions>
 
                 <!-- 1. タスクタイトル -->
@@ -178,6 +180,86 @@
                         </Grid>
                     </Border>
                 </Grid>
+
+                <!-- 4. CHANGE HISTORY (控えめな表示) -->
+                <StackPanel Grid.Row="4" Margin="0,20,0,10">
+                    <ToggleButton x:Name="HistoryToggle"
+                                  HorizontalAlignment="Left"
+                                  IsChecked="{Binding IsHistoryExpanded}"
+                                  Style="{StaticResource IconToggleButtonStyle}">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Width="12"
+                                  Height="12"
+                                  Data="M13.5,8H12V13L16.28,15.54L17,14.33L13.5,12.25V8M13,3A9,9 0 0,0 4,12H1L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.21 8.06,16.94L6.64,18.36C8.27,19.98 10.51,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3Z"
+                                  Fill="{DynamicResource TextSecondaryBrush}"
+                                  Stretch="Uniform" />
+                            <TextBlock Margin="6,0,4,0"
+                                       VerticalAlignment="Center"
+                                       FontSize="10"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       Text="変更履歴を表示" />
+                            <Path x:Name="ChevronIcon"
+                                  Width="8"
+                                  Height="8"
+                                  Margin="2,0,0,0"
+                                  VerticalAlignment="Center"
+                                  Fill="{DynamicResource TextSecondaryBrush}"
+                                  Stretch="Uniform">
+                                <Path.Style>
+                                    <Style TargetType="Path">
+                                        <Setter Property="Data" Value="{StaticResource ChevronRightIconGeometry}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsChecked, ElementName=HistoryToggle}" Value="True">
+                                                <Setter Property="Data" Value="{StaticResource ArrowDownIconGeometry}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Path.Style>
+                            </Path>
+                        </StackPanel>
+                    </ToggleButton>
+
+                    <Border Margin="24,4,0,0"
+                            Padding="0,4"
+                            Visibility="{Binding IsHistoryExpanded, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <ScrollViewer MaxHeight="90" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding History}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="0,2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="80" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock VerticalAlignment="Top"
+                                                       FontSize="10"
+                                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                                       Text="{Binding Timestamp, Mode=OneWay, StringFormat={}{0:MM/dd HH:mm}}" />
+                                            <StackPanel Grid.Column="1">
+                                                <TextBlock VerticalAlignment="Top"
+                                                           FontSize="10"
+                                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                                           TextWrapping="Wrap">
+                                                    <Run FontWeight="SemiBold" Text="{Binding UserName, Mode=OneWay}" />
+                                                    <Run Text=" が " />
+                                                    <Run Text="{Binding ActionDisplayName, Mode=OneWay}" />
+                                                </TextBlock>
+                                                <TextBlock Margin="0,2,0,0"
+                                                           VerticalAlignment="Top"
+                                                           FontSize="9"
+                                                           FontStyle="Italic"
+                                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                                           Text="{Binding DetailSummary, Mode=OneWay}"
+                                                           TextWrapping="Wrap"
+                                                           Visibility="{Binding HasDetailSummary, Converter={StaticResource NormalVisibility}}" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Border>
+                </StackPanel>
             </Grid>
 
             <!-- 右側: プロパティ サイドバー -->

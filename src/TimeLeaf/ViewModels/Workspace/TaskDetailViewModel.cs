@@ -9,6 +9,7 @@ using CommunityToolkit.Mvvm.Input;
 using LeafKit.UI.Services;
 using Microsoft.Extensions.Logging;
 using TimeLeaf.Models.Entities;
+using TimeLeaf.Repositories.FileSystem;
 using TimeLeaf.Services;
 using TimeLeaf.UseCases;
 
@@ -28,16 +29,33 @@ public partial class TaskDetailViewModel : ObservableObject, IDialogViewModel, I
     private readonly IUserService _userService;
     private readonly IProjectService _projectService;
     private readonly IGetProjectMembersUseCase _getProjectMembersUseCase;
+    private readonly IGetTaskHistoryUseCase _getTaskHistoryUseCase;
     private readonly ILogger<TaskDetailViewModel> _logger;
 
     private readonly ProjectTaskViewModel _workingTaskViewModel;
     private readonly ProjectTask _workingTask;
 
-    [ObservableProperty]
     private string _newCommentContent = string.Empty;
+    public string NewCommentContent
+    {
+        get => _newCommentContent;
+        set
+        {
+            if (SetProperty(ref _newCommentContent, value))
+            {
+                AddCommentCommand.NotifyCanExecuteChanged();
+            }
+        }
+    }
 
     [ObservableProperty]
     private ObservableCollection<User> _availableTeammates = new();
+
+    [ObservableProperty]
+    private ObservableCollection<TaskHistoryEntryViewModel> _history = new();
+
+    [ObservableProperty]
+    private bool _isHistoryExpanded;
 
     [ObservableProperty]
     private User? _selectedAssignee;
@@ -67,7 +85,8 @@ public partial class TaskDetailViewModel : ObservableObject, IDialogViewModel, I
         IUserService userService,
         IProjectService projectService,
         ILogger<TaskDetailViewModel> logger,
-        IGetProjectMembersUseCase getProjectMembersUseCase
+        IGetProjectMembersUseCase getProjectMembersUseCase,
+        IGetTaskHistoryUseCase getTaskHistoryUseCase
     )
     {
         _projectViewModel = projectViewModel;
@@ -80,6 +99,7 @@ public partial class TaskDetailViewModel : ObservableObject, IDialogViewModel, I
         _projectService = projectService;
         _logger = logger;
         _getProjectMembersUseCase = getProjectMembersUseCase;
+        _getTaskHistoryUseCase = getTaskHistoryUseCase;
 
         // 作業用コピーの作成
         _workingTask = _taskViewModel.Model.Clone();
@@ -90,6 +110,32 @@ public partial class TaskDetailViewModel : ObservableObject, IDialogViewModel, I
 
         // 外部変更の監視
         _projectService.ProjectUpdated += OnProjectServiceProjectUpdated;
+
+        // 履歴の読み込み
+        _ = LoadHistoryAsync();
+    }
+
+    /// <summary>
+    /// 変更履歴を読み込みます。
+    /// </summary>
+    public async Task LoadHistoryAsync()
+    {
+        try
+        {
+            var records = await _getTaskHistoryUseCase.ExecuteAsync(_projectViewModel.Model.Id, _taskViewModel.Id);
+
+            // コメントを除外し、降順（最新が上）でViewModel化
+            var viewModels = records
+                .Where(r => r.Category != StorageCategories.Comment)
+                .Select(r => new TaskHistoryEntryViewModel(r, _userService))
+                .Reverse();
+
+            History = new ObservableCollection<TaskHistoryEntryViewModel>(viewModels);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to load task history.");
+        }
     }
 
     public async Task LoadMembersAsync()
@@ -115,6 +161,9 @@ public partial class TaskDetailViewModel : ObservableObject, IDialogViewModel, I
         {
             // 他ユーザーによる変更（または自身の別操作による変更）を検知
             HasExternalChange = true;
+
+            // リアクティブに変更履歴を更新
+            _ = LoadHistoryAsync();
         }
     }
 
@@ -197,6 +246,7 @@ public partial class TaskDetailViewModel : ObservableObject, IDialogViewModel, I
             _taskViewModel.UpdateFromModel(_taskViewModel.Model);
 
             await _saveProjectUseCase.ExecuteAsync(_projectViewModel.Model);
+            await LoadHistoryAsync();
             IsDirty = false;
             HasExternalChange = false;
             _logger.LogInformation("Task changes saved successfully.");
@@ -264,26 +314,26 @@ public partial class TaskDetailViewModel : ObservableObject, IDialogViewModel, I
         {
             // コメントはマスターに対して直接追加し保存する（作業用コピーではなく）
             await _addCommentUseCase.ExecuteAsync(_projectViewModel.Model, _taskViewModel.Model, NewCommentContent);
+            await LoadHistoryAsync();
 
             // 作業用コピー側にも反映させて表示を更新
             _workingTask.AddComment(_taskViewModel.Model.Comments.Last());
             _workingTaskViewModel.UpdateFromModel(_workingTask);
 
             _projectViewModel.SyncFromModel();
-            NewCommentContent = string.Empty;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to add comment.");
         }
+        finally
+        {
+            NewCommentContent = string.Empty;
+            OnPropertyChanged(nameof(NewCommentContent));
+        }
     }
 
     private bool CanAddComment() => !string.IsNullOrWhiteSpace(NewCommentContent);
-
-    partial void OnNewCommentContentChanged(string value)
-    {
-        AddCommentCommand.NotifyCanExecuteChanged();
-    }
 
     public void Dispose()
     {

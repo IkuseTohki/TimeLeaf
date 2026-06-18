@@ -44,4 +44,12 @@ public interface IProjectRepository
     /// </summary>
     /// <param name="projectId">削除対象のプロジェクトID。</param>
     Task DeleteAsync(Guid projectId);
+
+    /// <summary>
+    /// 指定されたエンティティ（プロジェクトまたはタスク）の変更履歴を非同期で取得します。
+    /// </summary>
+    /// <param name="projectId">所属するプロジェクトのID。</param>
+    /// <param name="entityId">履歴を取得したいエンティティのID。</param>
+    /// <returns>変更記録のリスト。時系列昇順で返されます。</returns>
+    Task<IEnumerable<ChangeRecord>> GetHistoryAsync(Guid projectId, Guid entityId);
 }

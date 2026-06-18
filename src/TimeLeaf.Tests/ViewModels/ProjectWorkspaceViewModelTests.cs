@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using LeafKit.UI.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -223,6 +224,11 @@ public class ProjectWorkspaceViewModelTests
         );
         var task = new ProjectTask { Id = Guid.NewGuid() };
         var taskVm = new ProjectTaskViewModel(task, _userServiceMock.Object);
+        var historyUseCaseMock = new Mock<IGetTaskHistoryUseCase>();
+        historyUseCaseMock
+            .Setup(x => x.ExecuteAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
+            .ReturnsAsync(Enumerable.Empty<ChangeRecord>());
+
         var detailVm = new TaskDetailViewModel(
             _projectViewModel,
             taskVm,
@@ -233,7 +239,8 @@ public class ProjectWorkspaceViewModelTests
             _userServiceMock.Object,
             new Mock<IProjectService>().Object,
             new Mock<ILogger<TaskDetailViewModel>>().Object,
-            new Mock<IGetProjectMembersUseCase>().Object
+            new Mock<IGetProjectMembersUseCase>().Object,
+            historyUseCaseMock.Object
         );
 
         _viewModelFactoryMock.Setup(x => x.CreateTaskDetailViewModel(_projectViewModel, taskVm)).Returns(detailVm);

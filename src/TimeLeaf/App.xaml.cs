@@ -312,6 +312,7 @@ public partial class App : Application
         services.AddTransient<IJoinProjectUseCase, JoinProjectUseCase>();
         services.AddTransient<ICheckAssignmentUseCase, CheckAssignmentUseCase>();
         services.AddTransient<IGetProjectMembersUseCase, GetProjectMembersUseCase>();
+        services.AddTransient<IGetTaskHistoryUseCase, GetTaskHistoryUseCase>();
         services.AddTransient<GetTimelineRowsUseCase>();
         services.AddTransient<CalculateCriticalPathUseCase>();
         services.AddTransient<CalculateFlowLayoutUseCase>();

@@ -198,7 +198,8 @@ public class ViewModelFactory : IViewModelFactory
             _serviceProvider.GetRequiredService<IUserService>(),
             _serviceProvider.GetRequiredService<IProjectService>(),
             _serviceProvider.GetRequiredService<ILogger<TaskDetailViewModel>>(),
-            _serviceProvider.GetRequiredService<IGetProjectMembersUseCase>()
+            _serviceProvider.GetRequiredService<IGetProjectMembersUseCase>(),
+            _serviceProvider.GetRequiredService<IGetTaskHistoryUseCase>()
         );
     }
 
