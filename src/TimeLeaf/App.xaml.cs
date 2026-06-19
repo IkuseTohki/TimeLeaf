@@ -283,8 +283,23 @@ public partial class App : Application
         ));
 
         // アプリケーションサービスの登録
-        services.AddSingleton<IProjectService, ProjectService>();
+        services.AddSingleton<IProjectDiffService, ProjectDiffService>();
         services.AddSingleton<INotificationService, NotificationService>();
+        services.AddSingleton<IProjectService, ProjectService>(sp =>
+        {
+            var projectService = new ProjectService(
+                sp.GetRequiredService<IProjectRepository>(),
+                sp.GetRequiredService<IIdentityService>(),
+                sp.GetRequiredService<IProjectDiffService>(),
+                sp.GetRequiredService<ILogger<ProjectService>>()
+            );
+
+            // NotificationServiceとの連携を設定
+            var notificationService = sp.GetRequiredService<INotificationService>();
+            projectService.NotificationRequested += notification => notificationService.Notify(notification);
+
+            return projectService;
+        });
         services.AddSingleton<ISnackbarService, SnackbarService>();
         services.AddSingleton<IOSNotificationService, WindowsNotificationService>();
         services.AddSingleton<IViewModelFactory, ViewModelFactory>();

@@ -14,6 +14,7 @@ public class ProjectServiceTests
 {
     private Mock<IProjectRepository> _repositoryMock = null!;
     private Mock<IIdentityService> _identityServiceMock = null!;
+    private Mock<IProjectDiffService> _diffServiceMock = null!;
     private Mock<ILogger<ProjectService>> _loggerMock = null!;
     private ProjectService _projectService = null!;
 
@@ -22,9 +23,15 @@ public class ProjectServiceTests
     {
         _repositoryMock = new Mock<IProjectRepository>();
         _identityServiceMock = new Mock<IIdentityService>();
+        _diffServiceMock = new Mock<IProjectDiffService>();
         _loggerMock = new Mock<ILogger<ProjectService>>();
 
-        _projectService = new ProjectService(_repositoryMock.Object, _identityServiceMock.Object, _loggerMock.Object);
+        _projectService = new ProjectService(
+            _repositoryMock.Object,
+            _identityServiceMock.Object,
+            _diffServiceMock.Object,
+            _loggerMock.Object
+        );
     }
 
     [TestMethod]
@@ -149,9 +156,13 @@ public class ProjectServiceTests
         // Arrange
         /* テスト観点: リポジトリのProjectChangedイベントを受けた際、キャッシュが最新化されProjectUpdatedが発火することを確認する。 */
         var projectId = Guid.NewGuid();
+        var oldProject = new Project(Guid.Empty) { Id = projectId };
         var updatedProject = new Project(Guid.Empty) { Id = projectId };
         updatedProject.UpdateName("Updated Externally");
         _repositoryMock.Setup(r => r.LoadAsync(projectId)).ReturnsAsync(updatedProject);
+        _diffServiceMock
+            .Setup(d => d.CalculateDiff(It.IsAny<Project>(), It.IsAny<Project>(), It.IsAny<Guid>()))
+            .Returns(new ProjectDiff(new List<Guid>(), new List<Guid>()));
 
         var tcs = new TaskCompletionSource<Project>();
         _projectService.ProjectUpdated += (p) => tcs.SetResult(p);

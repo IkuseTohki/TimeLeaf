@@ -14,6 +14,11 @@ public interface IProjectService
     /// <summary>
     /// 現在ロードされているすべてのプロジェクトを取得します。
     /// </summary>
+    /// <summary>
+    /// 通知がリクエストされた際に発生します。
+    /// </summary>
+    event Action<Notification>? NotificationRequested;
+
     IEnumerable<Project> AllProjects { get; }
 
     /// <summary>

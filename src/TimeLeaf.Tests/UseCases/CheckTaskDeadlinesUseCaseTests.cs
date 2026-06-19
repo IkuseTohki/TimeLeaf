@@ -68,7 +68,7 @@ public class CheckTaskDeadlinesUseCaseTests
     /// テスト観点: 本日が期限のタスクは、期限切れと判定されない（通知されない）ことを確認する。
     /// </summary>
     [TestMethod]
-    public void Execute_WithTaskDueToday_ShouldNotSendNotification()
+    public void Execute_WithTaskDueToday_ShouldSendApproachingNotification()
     {
         // Arrange
         var project = new Project(Guid.Empty);
@@ -88,9 +88,8 @@ public class CheckTaskDeadlinesUseCaseTests
 
         // Assert
         _notificationServiceMock.Verify(
-            x => x.Notify(It.IsAny<Notification>()),
-            Times.Never,
-            "本日が期限のタスクは通知されるべきではありません。"
+            x => x.Notify(It.Is<Notification>(n => n.Title.Contains("期限間近") && n.Message.Contains("Today's Task"))),
+            Times.Once
         );
     }
 
@@ -104,7 +103,7 @@ public class CheckTaskDeadlinesUseCaseTests
         var project = new Project(Guid.Empty);
         var task1 = new ProjectTask();
         task1.UpdateName("Future Task");
-        task1.UpdateSchedule(null, _fixedToday.AddDays(1));
+        task1.UpdateSchedule(null, _fixedToday.AddDays(2));
 
         var task2 = new ProjectTask();
         task2.UpdateName("Done Task");
@@ -121,5 +120,50 @@ public class CheckTaskDeadlinesUseCaseTests
 
         // Assert
         _notificationServiceMock.Verify(x => x.Notify(It.IsAny<Notification>()), Times.Never);
+    }
+
+    /// <summary>
+    /// テスト観点: 期限が本日または翌日のタスクがある場合、「期限間近」の通知が発行されることを確認する。
+    /// </summary>
+    [TestMethod]
+    public void Execute_WithApproachingDeadlineTask_ShouldSendNotification()
+    {
+        // Arrange
+        var project = new Project(Guid.Empty);
+
+        var taskToday = new ProjectTask();
+        taskToday.UpdateName("Due Today Task");
+        taskToday.UpdateSchedule(null, _fixedToday);
+        taskToday.UpdateStatus(TaskStatus.NotStarted);
+
+        var taskTomorrow = new ProjectTask();
+        taskTomorrow.UpdateName("Due Tomorrow Task");
+        taskTomorrow.UpdateSchedule(null, _fixedToday.AddDays(1));
+        taskTomorrow.UpdateStatus(TaskStatus.InProgress);
+
+        project.AddTask(taskToday);
+        project.AddTask(taskTomorrow);
+
+        var useCase = new CheckTaskDeadlinesUseCase(_notificationServiceMock.Object, _dateTimeProviderMock.Object);
+
+        // Act
+        useCase.Execute(new[] { project });
+
+        // Assert
+        _notificationServiceMock.Verify(
+            x =>
+                x.Notify(
+                    It.Is<Notification>(n => n.Title.Contains("期限間近") && n.Message.Contains("Due Today Task"))
+                ),
+            Times.Once
+        );
+
+        _notificationServiceMock.Verify(
+            x =>
+                x.Notify(
+                    It.Is<Notification>(n => n.Title.Contains("期限間近") && n.Message.Contains("Due Tomorrow Task"))
+                ),
+            Times.Once
+        );
     }
 }
