@@ -20,14 +20,11 @@ public class NotificationService : INotificationService
 
     public void Notify(Notification notification)
     {
-        // 重複チェック: 同じIDを持つ未読通知、あるいは同じ関連エンティティに対する同じタイトルの未読通知が既に存在する場合は追加しない
+        // 重複チェック: アプリ起動中、既読・未読問わず同じID、あるいは同じ関連エンティティに対する同じタイトルの通知が既に存在する場合は追加しない
         if (
             _notifications.Any(n =>
-                !n.IsRead
-                && (
-                    n.Id == notification.Id
-                    || (n.Title == notification.Title && n.RelatedEntityId == notification.RelatedEntityId)
-                )
+                n.Id == notification.Id
+                || (n.Title == notification.Title && n.RelatedEntityId == notification.RelatedEntityId)
             )
         )
         {

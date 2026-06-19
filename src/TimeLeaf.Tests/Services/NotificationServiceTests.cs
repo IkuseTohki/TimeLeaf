@@ -76,10 +76,10 @@ public class NotificationServiceTests
     }
 
     /// <summary>
-    /// テスト観点: 既存の通知が「既読」である場合、同じ内容の通知が送られても重複とはみなさず追加されることを確認する。
+    /// テスト観点: 既存の通知が「既読」である場合、同じ内容の通知が送られたら重複とみなし追加されないことを確認する。
     /// </summary>
     [TestMethod]
-    public void Notify_ShouldAllowSameNotification_IfExistingIsRead()
+    public void Notify_DisallowSameNotification_IfExistingIsRead()
     {
         // Arrange
         var taskId = Guid.NewGuid().ToString();
@@ -94,8 +94,7 @@ public class NotificationServiceTests
         _service.Notify(n2);
 
         // Assert
-        Assert.AreEqual(1, _service.UnreadNotifications.Count, "新しい未読通知が1つあるべき");
-        Assert.IsTrue(_service.UnreadNotifications.Any(n => n.Message == "2回目"), "2回目の通知が追加されているべき");
+        Assert.AreEqual(0, _service.UnreadNotifications.Count, "新しい未読通知が1つあるべき");
     }
 
     /// <summary>
