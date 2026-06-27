@@ -16,8 +16,11 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0">
-            <TextBlock Style="{StaticResource TextBlockFatalErrorHeaderStyle}" Text="申し訳ありません。予期しないエラーが発生しました。" />
-            <TextBlock Style="{StaticResource TextBlockViewHeaderSubTitleStyle}" Text="以下の情報を開発者に共有していただくことで、問題の解決に役立てることができます。" />
+            <TextBlock Style="{StaticResource TextBlockFatalErrorHeaderStyle}"
+                       Text="申し訳ありません。予期しないエラーが発生しました。" />
+            <TextBlock Margin="{StaticResource ContentTopNarrowMargin}"
+                       Style="{StaticResource TextBlockViewHeaderSubTitleStyle}"
+                       Text="以下の情報を開発者に共有していただくことで、問題の解決に役立てることができます。" />
         </StackPanel>
 
         <Border Grid.Row="1"
@@ -25,7 +28,8 @@
                 BorderBrush="{DynamicResource OutlineBaseBrush}"
                 BorderThickness="1"
                 CornerRadius="8">
-            <TextBox Style="{StaticResource TextBoxErrorLogStyle}" Text="{Binding ErrorDetail, Mode=OneWay}" />
+            <TextBox Style="{StaticResource TextBoxErrorLogStyle}"
+                     Text="{Binding ErrorDetail, Mode=OneWay}" />
         </Border>
 
         <StackPanel Grid.Row="2"
@@ -35,7 +39,7 @@
             <Button Margin="0,0,12,0"
                     Command="{Binding CopyErrorDetailCommand}"
                     Content="エラー内容をコピー"
-                    Style="{StaticResource PrimaryButtonStyle}" />
+                    Style="{StaticResource ButtonPrimaryStyle}" />
             <Button Click="CloseButton_Click"
                     Content="閉じる"
                     IsCancel="True"

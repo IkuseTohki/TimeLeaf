@@ -21,6 +21,9 @@ public partial class HomeViewModel : ObservableObject
     private int _inProgressCount;
 
     [ObservableProperty]
+    private int _inReviewCount;
+
+    [ObservableProperty]
     private int _completedThisWeekCount;
 
     [ObservableProperty]
@@ -78,6 +81,7 @@ public partial class HomeViewModel : ObservableObject
 
         NotStartedCount = allTasks.Count(t => t.Status == TimeLeaf.Models.Enums.TaskStatus.NotStarted);
         InProgressCount = allTasks.Count(t => t.Status == TimeLeaf.Models.Enums.TaskStatus.InProgress);
+        InReviewCount = allTasks.Count(t => t.Status == TimeLeaf.Models.Enums.TaskStatus.InReview);
 
         // 今週完了したタスクの計算（月曜日開始と仮定）
         var now = DateTime.Now;

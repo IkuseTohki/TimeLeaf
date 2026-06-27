@@ -13,12 +13,13 @@
         Title="TimeLeaf"
         Width="1000"
         Height="680"
-        MinWidth="800"
+        MinWidth="820"
         MinHeight="540"
         mc:Ignorable="d">
 
     <i:Interaction.Behaviors>
-        <lb:WindowResidencyBehavior CanExit="{Binding CanExit}" IsWindowVisible="{Binding IsWindowVisible, Mode=TwoWay}" />
+        <lb:WindowResidencyBehavior CanExit="{Binding CanExit}"
+                                    IsWindowVisible="{Binding IsWindowVisible, Mode=TwoWay}" />
     </i:Interaction.Behaviors>
 
     <Window.Resources>
@@ -49,8 +50,10 @@
             <Grid>
                 <DockPanel LastChildFill="True">
                     <!-- ブランドロゴエリア -->
-                    <StackPanel DockPanel.Dock="Top" Style="{StaticResource StackPanelSidebarLogoStyle}">
-                        <Path Data="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z" Style="{StaticResource PathSidebarLogoStyle}" />
+                    <StackPanel DockPanel.Dock="Top"
+                                Style="{StaticResource StackPanelSidebarLogoStyle}">
+                        <Path Data="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z"
+                              Style="{StaticResource PathSidebarLogoStyle}" />
                         <TextBlock Style="{StaticResource TextBlockSidebarLogoStyle}"
                                    Text="TimeLeaf"
                                    Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BooleanToVisibilityConverter}}" />
@@ -61,28 +64,34 @@
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <StackPanel>
                             <!-- メインメニュー -->
-                            <Button Command="{Binding NavigateToHomeCommand}" Style="{DynamicResource ButtonSidebarStyle}">
+                            <Button Command="{Binding NavigateToHomeCommand}"
+                                    Style="{DynamicResource ButtonSidebarStyle}">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Style="{StaticResource TextBlockSidebarIconStyle}" Text="🏠" />
+                                    <TextBlock Style="{StaticResource TextBlockSidebarIconStyle}"
+                                               Text="🏠" />
                                     <TextBlock Margin="12,0,0,0"
                                                VerticalAlignment="Center"
                                                Text="Home"
                                                Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BooleanToVisibilityConverter}}" />
                                 </StackPanel>
                             </Button>
-                            <Button Command="{Binding NavigateToAllTasksCommand}" Style="{DynamicResource ButtonSidebarStyle}">
+                            <Button Command="{Binding NavigateToAllTasksCommand}"
+                                    Style="{DynamicResource ButtonSidebarStyle}">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Style="{StaticResource TextBlockSidebarIconStyle}" Text="📋" />
+                                    <TextBlock Style="{StaticResource TextBlockSidebarIconStyle}"
+                                               Text="📋" />
                                     <TextBlock Margin="12,0,0,0"
                                                VerticalAlignment="Center"
                                                Text="All Tasks"
                                                Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BooleanToVisibilityConverter}}" />
                                 </StackPanel>
                             </Button>
-                            <Button Command="{Binding NavigateToNotificationsCommand}" Style="{DynamicResource ButtonSidebarStyle}">
+                            <Button Command="{Binding NavigateToNotificationsCommand}"
+                                    Style="{DynamicResource ButtonSidebarStyle}">
                                 <Grid>
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Style="{StaticResource TextBlockSidebarIconStyle}" Text="🔔" />
+                                        <TextBlock Style="{StaticResource TextBlockSidebarIconStyle}"
+                                                   Text="🔔" />
                                         <TextBlock Margin="12,0,0,0"
                                                    VerticalAlignment="Center"
                                                    Text="Notifications"
@@ -98,14 +107,15 @@
                                                    VerticalAlignment="Center"
                                                    FontWeight="Bold"
                                                    Foreground="White"
-                                                   Style="{StaticResource MetaBaseStyle}"
+                                                   Style="{StaticResource TextBlockMetaBaseStyle}"
                                                    Text="{Binding UnreadNotificationCount}" />
                                     </Border>
                                 </Grid>
                             </Button>
 
                             <!-- プロジェクトセクション見出し -->
-                            <Grid Margin="16,16,12,8" VerticalAlignment="Center">
+                            <Grid Margin="16,16,12,8"
+                                  VerticalAlignment="Center">
                                 <TextBlock VerticalAlignment="Center"
                                            Style="{StaticResource TextBlockSidebarMenuHeaderStyle}"
                                            Text="PROJECTS"
@@ -129,7 +139,8 @@
                                                 CommandParameter="{Binding}"
                                                 Style="{DynamicResource ButtonSidebarStyle}">
                                             <StackPanel Orientation="Horizontal">
-                                                <TextBlock Style="{StaticResource TextBlockSidebarIconStyle}" Text="🌲" />
+                                                <TextBlock Style="{StaticResource TextBlockSidebarIconStyle}"
+                                                           Text="🌲" />
                                                 <TextBlock Margin="12,0,0,0"
                                                            VerticalAlignment="Center"
                                                            Text="{Binding Name}"

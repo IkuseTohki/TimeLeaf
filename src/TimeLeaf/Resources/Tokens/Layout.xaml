@@ -24,6 +24,8 @@
     <CornerRadius x:Key="Radius50">12</CornerRadius>
     <CornerRadius x:Key="Radius60">14</CornerRadius>
     <CornerRadius x:Key="Radius70">16</CornerRadius>
+    <CornerRadius x:Key="Radius80">18</CornerRadius>
+    <CornerRadius x:Key="Radius90">20</CornerRadius>
     <CornerRadius x:Key="RadiusMax">999</CornerRadius>
 
     <!-- ====================================================================== -->
@@ -67,121 +69,60 @@
     <CornerRadius x:Key="ControlCornerRadius">4</CornerRadius>
     <CornerRadius x:Key="ContainerCornerRadius">8</CornerRadius>
     <CornerRadius x:Key="CardCornerRadius">12</CornerRadius>
-    <CornerRadius x:Key="ButtonCornerRadius">4</CornerRadius>
     <CornerRadius x:Key="ComboBoxItemCornerRadius">8</CornerRadius>
     <CornerRadius x:Key="RadiusFull">16</CornerRadius>
 
     <!-- Margins (Thickness) -->
-    <Thickness x:Key="StandardMargin"
-               Bottom="8"
-               Left="8"
-               Right="8"
-               Top="8" />
-    <Thickness x:Key="ViewOuterMargin"
-               Bottom="24"
-               Left="24"
-               Right="24"
-               Top="16" />
-    <Thickness x:Key="SectionMarginBottom"
-               Bottom="20"
-               Left="0"
-               Right="0"
-               Top="0" />
-    <Thickness x:Key="FormItemMargin"
-               Bottom="16"
-               Left="0"
-               Right="0"
-               Top="0" />
-    <Thickness x:Key="FormLabelMargin"
-               Bottom="4"
-               Left="0"
-               Right="0"
-               Top="0" />
-    <Thickness x:Key="FormSectionMargin"
-               Bottom="24"
-               Left="0"
-               Right="0"
-               Top="0" />
-    <Thickness x:Key="FormFooterMargin"
-               Bottom="0"
-               Left="0"
-               Right="0"
-               Top="12" />
-    <Thickness x:Key="ButtonLeftMargin"
-               Bottom="0"
-               Left="8"
-               Right="0"
-               Top="0" />
-    <Thickness x:Key="IconRightMargin"
-               Bottom="0"
-               Left="0"
-               Right="8"
-               Top="0" />
-    <Thickness x:Key="ContentRightMargin"
-               Bottom="0"
-               Left="0"
-               Right="12"
-               Top="0" />
-    <Thickness x:Key="ContentBottomMargin"
-               Bottom="20"
-               Left="0"
-               Right="0"
-               Top="0" />
-    <Thickness x:Key="ContentLabelMargin"
-               Bottom="8"
-               Left="0"
-               Right="0"
-               Top="0" />
+    <Thickness x:Key="StandardMargin">8,8,8,8</Thickness>
+    <Thickness x:Key="ViewOuterMargin">24,16,24,24</Thickness>
+    <Thickness x:Key="SectionBottomMargin">0,0,0,20</Thickness>
+    <Thickness x:Key="ButtonLeftMargin">8,0,0,0</Thickness>
+    <Thickness x:Key="ContentLeftMargin">12,0,0,0</Thickness>
+    <Thickness x:Key="ContentTopMargin">0,20,0,0</Thickness>
+    <Thickness x:Key="ContentLeftNarrowMargin">8,0,0,0</Thickness>
+    <Thickness x:Key="ContentLeftMediumMargin">12,0,0,0</Thickness>
+    <Thickness x:Key="ContentLeftWideMargin">20,0,0,0</Thickness>
+    <Thickness x:Key="ContentTopNarrowMargin">0,4,0,0</Thickness>
+    <Thickness x:Key="ContentTopMediumMargin">0,8,0,0</Thickness>
+    <Thickness x:Key="ContentTopWideMargin">0,16,0,0</Thickness>
+    <Thickness x:Key="ContentLabelMargin">0,0,0,8</Thickness>
+
+    <!-- Form Margins (Thickness) -->
+    <Thickness x:Key="FormTitleMargin">0,0,0,20</Thickness>
+    <Thickness x:Key="FormLabelMargin">0,0,0,4</Thickness>
+    <Thickness x:Key="FormSectionMargin">0,0,0,24</Thickness>
+    <Thickness x:Key="FormItemMargin">0,0,0,16</Thickness>
+    <Thickness x:Key="FormFooterMargin">0,12,0,0</Thickness>
+
+    <!-- Icon Margins (Thickness) -->
+    <Thickness x:Key="IconLeftMargin">8,0,0,0</Thickness>
+    <Thickness x:Key="IconRightMargin">0,0,8,0</Thickness>
 
     <!-- Padding (Thickness) -->
-    <Thickness x:Key="StandardPadding"
-               Bottom="8"
-               Left="12"
-               Right="12"
-               Top="8" />
-    <Thickness x:Key="CardPadding"
-               Bottom="16"
-               Left="16"
-               Right="16"
-               Top="16" />
-    <Thickness x:Key="TaskCardPadding"
-               Bottom="12"
-               Left="20"
-               Right="20"
-               Top="12" />
-    <Thickness x:Key="TaskCardInfoMargin"
-               Bottom="0"
-               Left="0"
-               Right="0"
-               Top="4" />
-    <Thickness x:Key="TaskCardSelectedMargin"
-               Bottom="8"
-               Left="12"
-               Right="12"
-               Top="8" />
-    <Thickness x:Key="TaskCardSelectedPadding"
-               Bottom="16"
-               Left="16"
-               Right="16"
-               Top="16" />
+    <Thickness x:Key="StandardPadding">12,8,12,8</Thickness>
+    <Thickness x:Key="CardPadding">8,8,8,8</Thickness>
+    <Thickness x:Key="TaskCardPadding">20,12,20,12</Thickness>
+    <Thickness x:Key="TaskCardInfoMargin">0,4,0,0</Thickness>
+    <Thickness x:Key="TaskCardSelectedMargin">12,8,12,8</Thickness>
+    <Thickness x:Key="TaskCardSelectedPadding">16,16,16,16</Thickness>
 
     <!-- Semantic Sizes -->
     <sys:Double x:Key="ButtonHeightSmall">22</sys:Double>
     <sys:Double x:Key="ButtonHeightMedium">28</sys:Double>
     <sys:Double x:Key="ButtonHeightLarge">36</sys:Double>
-    <sys:Double x:Key="InputHeightMedium">32</sys:Double>
+    <sys:Double x:Key="ButtonWidthMedium">90</sys:Double>
 
     <sys:Double x:Key="DialogWidthSmall">320</sys:Double>
     <sys:Double x:Key="DialogWidthMedium">400</sys:Double>
     <sys:Double x:Key="DialogWidthLarge">480</sys:Double>
 
-    <sys:Double x:Key="MultilineInputHeightSmall">60</sys:Double>
-    <sys:Double x:Key="MultilineInputHeightMedium">80</sys:Double>
+    <sys:Double x:Key="TextBoxHeightMedium">32</sys:Double>
+    <sys:Double x:Key="MultilineTextBoxHeightSmall">60</sys:Double>
+    <sys:Double x:Key="MultilineTextBoxHeightMedium">80</sys:Double>
 
     <!-- Avatar Sizes -->
     <sys:Double x:Key="AvatarSizeSmall">24</sys:Double>
     <sys:Double x:Key="AvatarSizeMedium">32</sys:Double>
-    <sys:Double x:Key="AvatarSizeLarge">40</sys:Double>
 
     <!-- Opacity Scales -->
     <sys:Double x:Key="OpacityMuted">0.1</sys:Double>
@@ -189,5 +130,11 @@
     <sys:Double x:Key="OpacityMedium">0.6</sys:Double>
     <sys:Double x:Key="OpacityStrong">0.8</sys:Double>
     <sys:Double x:Key="OpacityFull">1.0</sys:Double>
+
+    <!-- Card Sizes -->
+    <sys:Double x:Key="CardWidthTiny">130</sys:Double>
+    <sys:Double x:Key="CardWidthSmall">150</sys:Double>
+    <sys:Double x:Key="CardWidthMedium">225</sys:Double>
+    <sys:Double x:Key="CardWidthLarge">300</sys:Double>
 
 </ResourceDictionary>

@@ -57,7 +57,6 @@ public partial class ProjectWorkspaceViewModel : ObservableObject, IDisposable
         {
             new NavigationItem("Dashboard", "Dashboard"),
             new NavigationItem("Tasks", "Tasks"),
-            new NavigationItem("Flow", "Flow"),
             new NavigationItem("Timeline", "Timeline"),
             new NavigationItem("Notifications", "Notifications"),
             new NavigationItem("Settings", "Settings"),

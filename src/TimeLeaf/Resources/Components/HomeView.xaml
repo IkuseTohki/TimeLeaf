@@ -1,4 +1,5 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="../Tokens/Layout.xaml" />
@@ -7,28 +8,22 @@
         <ResourceDictionary Source="../Controls/Containers.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <Style x:Key="UniformGridHomeStatsStyle" TargetType="UniformGrid">
-        <Setter Property="Margin" Value="0,0,0,24" />
-    </Style>
-
     <Style x:Key="TextBlockHomeStatsLabelStyle"
            BasedOn="{StaticResource TextBlockLabelBaseStyle}"
            TargetType="TextBlock">
         <Setter Property="FontWeight" Value="{StaticResource FontWeightNormal}" />
     </Style>
 
-    <Style x:Key="TextBlockHomeStatsValueStyle" TargetType="TextBlock">
+    <Style x:Key="TextBlockHomeStatsValueStyle"
+           TargetType="TextBlock">
         <Setter Property="Margin" Value="0,2,0,0" />
         <Setter Property="FontSize" Value="{StaticResource FontSizeDisplay}" />
         <Setter Property="FontWeight" Value="{StaticResource FontWeightEmphasis}" />
         <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
     </Style>
 
-    <Style x:Key="StackPanelHomeColumnStyle" TargetType="StackPanel">
-        <Setter Property="Margin" Value="0,0,24,0" />
-    </Style>
-
-    <Style x:Key="GridHomeDeadlineItemStyle" TargetType="Grid">
+    <Style x:Key="GridHomeDeadlineItemStyle"
+           TargetType="Grid">
         <Setter Property="Margin" Value="0,0,0,8" />
     </Style>
 
@@ -45,7 +40,8 @@
         <Setter Property="FontSize" Value="{StaticResource FontSizeCaption}" />
     </Style>
 
-    <Style x:Key="ProgressBarHomeProjectStyle" TargetType="ProgressBar">
+    <Style x:Key="ProgressBarHomeProjectStyle"
+           TargetType="ProgressBar">
         <Setter Property="Height" Value="4" />
         <Setter Property="Background" Value="{DynamicResource ProgressBarBlankBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource BrandPrimaryBrush}" />
@@ -66,7 +62,8 @@
         <Setter Property="Opacity" Value="{StaticResource OpacityStrong}" />
     </Style>
 
-    <Style x:Key="EllipseHomeMilestoneTimelineDotStyle" TargetType="Ellipse">
+    <Style x:Key="EllipseHomeMilestoneTimelineDotStyle"
+           TargetType="Ellipse">
         <Setter Property="Width" Value="6" />
         <Setter Property="Height" Value="6" />
         <Setter Property="HorizontalAlignment" Value="Center" />
@@ -74,7 +71,8 @@
         <Setter Property="Fill" Value="{DynamicResource BrandPrimaryBrush}" />
     </Style>
 
-    <Style x:Key="RectangleHomeMilestoneTimelineLineStyle" TargetType="Rectangle">
+    <Style x:Key="RectangleHomeMilestoneTimelineLineStyle"
+           TargetType="Rectangle">
         <Setter Property="Width" Value="1" />
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="Fill" Value="{DynamicResource BrandPrimaryBrush}" />
@@ -91,18 +89,12 @@
     </Style>
 
     <!-- Semantic Aliases for backward compatibility -->
-    <Style x:Key="HomeStatsGridStyle"
-           BasedOn="{StaticResource UniformGridHomeStatsStyle}"
-           TargetType="UniformGrid" />
     <Style x:Key="HomeStatsLabelStyle"
            BasedOn="{StaticResource TextBlockHomeStatsLabelStyle}"
            TargetType="TextBlock" />
     <Style x:Key="HomeStatsValueStyle"
            BasedOn="{StaticResource TextBlockHomeStatsValueStyle}"
            TargetType="TextBlock" />
-    <Style x:Key="HomeColumnStyle"
-           BasedOn="{StaticResource StackPanelHomeColumnStyle}"
-           TargetType="StackPanel" />
     <Style x:Key="HomeDeadlineItemStyle"
            BasedOn="{StaticResource GridHomeDeadlineItemStyle}"
            TargetType="Grid" />

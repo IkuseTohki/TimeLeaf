@@ -11,7 +11,8 @@
         <Border Background="{DynamicResource NotificationPaneBackgroundBrush}" />
 
         <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <ItemsControl Margin="20" ItemsSource="{Binding Risks}">
+            <ItemsControl Margin="20"
+                          ItemsSource="{Binding Risks}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Border Padding="0,12"
@@ -21,25 +22,27 @@
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock x:Name="IconText"
                                                Margin="0,0,8,0"
-                                               Style="{StaticResource LabelBaseStyle}" />
+                                               Style="{StaticResource TextBlockLabelBaseStyle}" />
                                     <TextBlock x:Name="HeaderText"
                                                FontWeight="Bold"
-                                               Style="{StaticResource LabelBaseStyle}" />
+                                               Style="{StaticResource TextBlockLabelBaseStyle}" />
                                 </StackPanel>
                                 <TextBlock Margin="0,4,0,0"
                                            Foreground="{DynamicResource TextPrimaryBrush}"
-                                           Style="{StaticResource LabelBaseStyle}"
+                                           Style="{StaticResource TextBlockLabelBaseStyle}"
                                            Text="{Binding Message}"
                                            TextWrapping="Wrap" />
                             </StackPanel>
                         </Border>
                         <DataTemplate.Triggers>
-                            <DataTrigger Binding="{Binding IsError}" Value="True">
+                            <DataTrigger Binding="{Binding IsError}"
+                                         Value="True">
                                 <Setter TargetName="IconText" Property="Text" Value="🚨" />
                                 <Setter TargetName="HeaderText" Property="Text" Value="異常" />
                                 <Setter TargetName="HeaderText" Property="Foreground" Value="{DynamicResource ErrorBrush}" />
                             </DataTrigger>
-                            <DataTrigger Binding="{Binding IsError}" Value="False">
+                            <DataTrigger Binding="{Binding IsError}"
+                                         Value="False">
                                 <Setter TargetName="IconText" Property="Text" Value="⚠️" />
                                 <Setter TargetName="HeaderText" Property="Text" Value="警告" />
                                 <Setter TargetName="HeaderText" Property="Foreground" Value="{DynamicResource WarningBrush}" />

@@ -1,4 +1,4 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:c="http://schemas.leafkit.com/wpf/ui/controls"
                     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
@@ -7,10 +7,9 @@
 
     <!-- 内部でのリソース解決のため各リソースをマージ -->
     <ResourceDictionary.MergedDictionaries>
-        <!-- 1. Tokens & Common Bases -->
+        <!-- 1. Tokens -->
         <ResourceDictionary Source="/Resources/Tokens/Layout.xaml" />
         <ResourceDictionary Source="/Resources/Tokens/Typography.xaml" />
-        <ResourceDictionary Source="/Resources/Common/SharedStyles.xaml" />
         <ResourceDictionary Source="/Resources/Converters.xaml" />
 
         <!-- 2. Base Controls -->
@@ -30,7 +29,8 @@
     </ResourceDictionary.MergedDictionaries>
 
     <!-- ユーザーアバター表示用共通テンプレート -->
-    <ControlTemplate x:Key="PersonAvatarTemplate" TargetType="ContentControl">
+    <ControlTemplate x:Key="PersonAvatarTemplate"
+                     TargetType="ContentControl">
         <Grid>
             <!-- 背景色（テーマカラー） -->
             <Border x:Name="ColorCircle"
@@ -38,7 +38,8 @@
                     CornerRadius="16" />
 
             <!-- アイコン画像（存在する場合） -->
-            <Border ClipToBounds="True" CornerRadius="16">
+            <Border ClipToBounds="True"
+                    CornerRadius="16">
                 <Image x:Name="AvatarImage"
                        Source="{Binding IconPath}"
                        Stretch="UniformToFill"
@@ -186,7 +187,8 @@
                   RowHeaderWidth="0"
                   SelectionMode="Single">
             <DataGrid.RowStyle>
-                <Style BasedOn="{StaticResource DataGridRowAllTasksStyle}" TargetType="DataGridRow" />
+                <Style BasedOn="{StaticResource DataGridRowAllTasksStyle}"
+                       TargetType="DataGridRow" />
             </DataGrid.RowStyle>
 
 
@@ -194,26 +196,30 @@
                 <DataGridTemplateColumn Width="Auto">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <CheckBox IsChecked="{Binding IsCompleted, Mode=OneWay}" Style="{StaticResource CheckBoxAllTasksFilterStyle}" />
+                            <CheckBox IsChecked="{Binding IsCompleted, Mode=OneWay}"
+                                      Style="{StaticResource CheckBoxAllTasksFilterStyle}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Width="*" Header="タスク名">
+                <DataGridTemplateColumn Width="*"
+                                        Header="タスク名">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock VerticalAlignment="Center"
                                        Style="{StaticResource TextBlockLabelBaseStyle}"
                                        Text="{Binding Name}">
                                 <TextBlock.InputBindings>
-                                    <MouseBinding Command="{Binding RequestDetailCommand}" MouseAction="LeftDoubleClick" />
+                                    <MouseBinding Command="{Binding RequestDetailCommand}"
+                                                  MouseAction="LeftDoubleClick" />
                                 </TextBlock.InputBindings>
                             </TextBlock>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Width="150" Header="プロジェクト">
+                <DataGridTemplateColumn Width="150"
+                                        Header="プロジェクト">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock VerticalAlignment="Center"
@@ -223,7 +229,8 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Width="120" Header="担当者">
+                <DataGridTemplateColumn Width="120"
+                                        Header="担当者">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock VerticalAlignment="Center"
@@ -233,22 +240,28 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Width="100" Header="期限">
+                <DataGridTemplateColumn Width="100"
+                                        Header="期限">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock VerticalAlignment="Center" Text="{Binding Deadline, StringFormat={}{0:MMM dd\, yyyy}}">
+                            <TextBlock VerticalAlignment="Center"
+                                       Text="{Binding Deadline, StringFormat={}{0:MMM dd\, yyyy}}">
                                 <TextBlock.Style>
-                                    <Style BasedOn="{StaticResource TextBlockAllTasksPropertyValueStyle}" TargetType="TextBlock">
+                                    <Style BasedOn="{StaticResource TextBlockAllTasksPropertyValueStyle}"
+                                           TargetType="TextBlock">
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Deadline, Converter={StaticResource DeadlineToBrushConverter}}" Value="Overdue">
+                                            <DataTrigger Binding="{Binding Deadline, Converter={StaticResource DeadlineToBrushConverter}}"
+                                                         Value="Overdue">
                                                 <Setter Property="Foreground" Value="{DynamicResource DeadlineOverdueBrush}" />
                                                 <Setter Property="FontWeight" Value="Bold" />
                                             </DataTrigger>
-                                            <DataTrigger Binding="{Binding Deadline, Converter={StaticResource DeadlineToBrushConverter}}" Value="Today">
+                                            <DataTrigger Binding="{Binding Deadline, Converter={StaticResource DeadlineToBrushConverter}}"
+                                                         Value="Today">
                                                 <Setter Property="Foreground" Value="{DynamicResource DeadlineTodayBrush}" />
                                                 <Setter Property="FontWeight" Value="Bold" />
                                             </DataTrigger>
-                                            <DataTrigger Binding="{Binding Deadline, Converter={StaticResource DeadlineToBrushConverter}}" Value="Near">
+                                            <DataTrigger Binding="{Binding Deadline, Converter={StaticResource DeadlineToBrushConverter}}"
+                                                         Value="Near">
                                                 <Setter Property="Foreground" Value="{DynamicResource DeadlineNearBrush}" />
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -259,10 +272,12 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Width="100" Header="優先度">
+                <DataGridTemplateColumn Width="100"
+                                        Header="優先度">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal" Style="{StaticResource FrameworkElementAllTasksFilterItemStyle}">
+                            <StackPanel Orientation="Horizontal"
+                                        Style="{StaticResource FrameworkElementAllTasksFilterItemStyle}">
                                 <Ellipse Width="8"
                                          Height="8"
                                          Margin="0,0,8,0"
@@ -271,10 +286,12 @@
                                         <Style TargetType="Ellipse">
                                             <Setter Property="Fill" Value="{DynamicResource PriorityLowBrush}" />
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Priority}" Value="{x:Static me:TaskPriority.High}">
+                                                <DataTrigger Binding="{Binding Priority}"
+                                                             Value="{x:Static me:TaskPriority.High}">
                                                     <Setter Property="Fill" Value="{DynamicResource PriorityHighBrush}" />
                                                 </DataTrigger>
-                                                <DataTrigger Binding="{Binding Priority}" Value="{x:Static me:TaskPriority.Medium}">
+                                                <DataTrigger Binding="{Binding Priority}"
+                                                             Value="{x:Static me:TaskPriority.Medium}">
                                                     <Setter Property="Fill" Value="{DynamicResource PriorityMediumBrush}" />
                                                 </DataTrigger>
                                             </Style.Triggers>
@@ -289,20 +306,26 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Width="100" Header="ステータス">
+                <DataGridTemplateColumn Width="100"
+                                        Header="ステータス">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock VerticalAlignment="Center" Text="{Binding Status, Converter={StaticResource EnumToDisplayNameConverter}}">
+                            <TextBlock VerticalAlignment="Center"
+                                       Text="{Binding Status, Converter={StaticResource EnumToDisplayNameConverter}}">
                                 <TextBlock.Style>
-                                    <Style BasedOn="{StaticResource TextBlockAllTasksPropertyValueStyle}" TargetType="TextBlock">
+                                    <Style BasedOn="{StaticResource TextBlockAllTasksPropertyValueStyle}"
+                                           TargetType="TextBlock">
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Status}" Value="{x:Static me:TaskStatus.InProgress}">
+                                            <DataTrigger Binding="{Binding Status}"
+                                                         Value="{x:Static me:TaskStatus.InProgress}">
                                                 <Setter Property="Foreground" Value="{DynamicResource StatusInProgressBrush}" />
                                             </DataTrigger>
-                                            <DataTrigger Binding="{Binding Status}" Value="{x:Static me:TaskStatus.Completed}">
+                                            <DataTrigger Binding="{Binding Status}"
+                                                         Value="{x:Static me:TaskStatus.Completed}">
                                                 <Setter Property="Foreground" Value="{DynamicResource StatusCompletedBrush}" />
                                             </DataTrigger>
-                                            <DataTrigger Binding="{Binding Status}" Value="{x:Static me:TaskStatus.InReview}">
+                                            <DataTrigger Binding="{Binding Status}"
+                                                         Value="{x:Static me:TaskStatus.InReview}">
                                                 <Setter Property="Foreground" Value="{DynamicResource StatusInReviewBrush}" />
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -330,18 +353,21 @@
                 <GroupStyle>
                     <GroupStyle.HeaderTemplate>
                         <DataTemplate>
-                            <StackPanel Margin="0,32,0,16" Orientation="Horizontal">
+                            <StackPanel Margin="0,16,0,16"
+                                        Orientation="Horizontal">
                                 <Border Style="{StaticResource BorderAllTasksTimelineGroupIconStyle}">
                                     <TextBlock HorizontalAlignment="Center"
                                                VerticalAlignment="Center"
                                                Style="{StaticResource TextBlockTitleBaseStyle}"
                                                Text="📅" />
                                 </Border>
-                                <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
+                                <StackPanel Margin="16,0,0,0"
+                                            VerticalAlignment="Center">
                                     <TextBlock Foreground="{DynamicResource BrandPrimaryBrush}"
                                                Style="{StaticResource TextBlockHeaderBaseStyle}"
                                                Text="{Binding Name}" />
-                                    <TextBlock Style="{StaticResource TextBlockMetaBaseStyle}" Text="Upcoming Milestones" />
+                                    <TextBlock Style="{StaticResource TextBlockMetaBaseStyle}"
+                                               Text="Upcoming Milestones" />
                                 </StackPanel>
                             </StackPanel>
                         </DataTemplate>
@@ -362,9 +388,11 @@
                         <!-- Dot -->
                         <Ellipse Style="{StaticResource EllipseAllTasksTimelineMarkerStyle}" />
 
-                        <Border Grid.Column="1" Style="{StaticResource BorderAllTasksTimelineCardStyle}">
+                        <Border Grid.Column="1"
+                                Style="{StaticResource BorderAllTasksTimelineCardStyle}">
                             <Border.InputBindings>
-                                <MouseBinding Command="{Binding RequestDetailCommand}" MouseAction="LeftDoubleClick" />
+                                <MouseBinding Command="{Binding RequestDetailCommand}"
+                                              MouseAction="LeftDoubleClick" />
                             </Border.InputBindings>
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -372,30 +400,72 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
 
+                                <!-- タスク情報 -->
                                 <StackPanel>
-                                    <StackPanel Margin="0,0,0,8" Orientation="Horizontal">
-                                        <TextBlock Style="{StaticResource TextBlockAllTasksTimelineTimeStyle}" Text="{Binding Deadline, StringFormat={}{0:HH:mm}}" />
+                                    <StackPanel Margin="0,0,0,8"
+                                                Orientation="Horizontal">
+                                        <!-- プロジェクト名 -->
                                         <Border Style="{StaticResource BorderAllTasksTimelineProjectLabelStyle}">
-                                            <TextBlock FontWeight="Bold"
-                                                       Foreground="{DynamicResource TextPrimaryBrush}"
-                                                       Style="{StaticResource TextBlockMetaBaseStyle}"
+                                            <TextBlock VerticalAlignment="Center"
+                                                       Style="{StaticResource TextBlockAllTasksTimelinePropertyStyle}"
                                                        Text="{Binding ProjectName}" />
                                         </Border>
+                                        <!-- 担当者 -->
+                                        <Border Margin="{StaticResource ContentLeftMargin}"
+                                                Style="{StaticResource BorderAllTasksTimelineProjectLabelStyle}">
+                                            <TextBlock VerticalAlignment="Center"
+                                                       Style="{StaticResource TextBlockAllTasksTimelinePropertyStyle}"
+                                                       Text="{Binding AssigneeName}" />
+                                        </Border>
+
+                                        <!-- ステータス -->
+                                        <Border Margin="{StaticResource ContentLeftMargin}"
+                                                Style="{StaticResource BorderAllTasksTimelineProjectLabelStyle}">
+                                            <TextBlock VerticalAlignment="Center"
+                                                       Text="{Binding Status, Converter={StaticResource EnumToDisplayNameConverter}}">
+                                                <TextBlock.Style>
+                                                    <Style BasedOn="{StaticResource TextBlockAllTasksPropertyValueStyle}"
+                                                           TargetType="TextBlock">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Status}"
+                                                                         Value="{x:Static me:TaskStatus.InProgress}">
+                                                                <Setter Property="Foreground" Value="{DynamicResource StatusInProgressBrush}" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Status}"
+                                                                         Value="{x:Static me:TaskStatus.Completed}">
+                                                                <Setter Property="Foreground" Value="{DynamicResource StatusCompletedBrush}" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Status}"
+                                                                         Value="{x:Static me:TaskStatus.InReview}">
+                                                                <Setter Property="Foreground" Value="{DynamicResource StatusInReviewBrush}" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </Border>
+
+
+
                                     </StackPanel>
+                                    <!-- タスク名 -->
                                     <TextBlock Foreground="{DynamicResource BrandPrimaryBrush}"
                                                Style="{StaticResource TextBlockHeaderBaseStyle}"
                                                Text="{Binding Name}" />
+                                    <!-- タスク概要 -->
                                     <TextBlock Margin="0,4,0,0"
                                                Style="{StaticResource TextBlockMetaBaseStyle}"
                                                Text="{Binding Description}" />
                                 </StackPanel>
 
+                                <!-- タスク詳細を開くボタン -->
                                 <Button Grid.Column="1"
                                         VerticalAlignment="Top"
                                         Command="{Binding DataContext.SelectTaskCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                         CommandParameter="{Binding}"
                                         Style="{StaticResource ButtonIconStyle}">
-                                    <Path Data="{StaticResource ChevronRightIconGeometry}" Style="{StaticResource SmallIconPathSecondaryStyle}" />
+                                    <Path Data="{StaticResource ChevronRightIconGeometry}"
+                                          Style="{StaticResource PathSecondaryIconSmallStyle}" />
                                 </Button>
                             </Grid>
                         </Border>
@@ -418,7 +488,8 @@
                     <DataTemplate>
                         <Border Style="{StaticResource BorderAllTasksProjectCardStyle}">
                             <StackPanel>
-                                <Grid Margin="0,0,0,24">
+                                <StackPanel Orientation="Horizontal">
+                                    <!-- アイコン -->
                                     <Border Style="{StaticResource BorderAllTasksProjectIconStyle}">
                                         <Path Width="24"
                                               Height="24"
@@ -426,21 +497,20 @@
                                               Fill="{DynamicResource BrandForegroundBrush}"
                                               Stretch="Uniform" />
                                     </Border>
-                                    <TextBlock HorizontalAlignment="Right"
-                                               FontWeight="Bold"
-                                               Style="{StaticResource TextBlockMetaBaseStyle}"
-                                               Text="ACTIVE" />
-                                </Grid>
-
-                                <TextBlock Foreground="{DynamicResource BrandPrimaryBrush}"
-                                           Style="{StaticResource TextBlockTitleBaseStyle}"
-                                           Text="{Binding Name}" />
-                                <TextBlock Margin="0,4,0,24"
-                                           Style="{StaticResource TextBlockMetaBaseStyle}"
-                                           Text="{Binding Description}" />
+                                    <StackPanel Margin="{StaticResource ContentLeftMargin}">
+                                        <!-- プロジェクト名 -->
+                                        <TextBlock Foreground="{DynamicResource BrandPrimaryBrush}"
+                                                   Style="{StaticResource TextBlockTitleBaseStyle}"
+                                                   Text="{Binding Name}" />
+                                        <!-- プロジェクト概要 -->
+                                        <TextBlock Margin="0,4,0,0"
+                                                   Style="{StaticResource TextBlockMetaBaseStyle}"
+                                                   Text="{Binding Description}" />
+                                    </StackPanel>
+                                </StackPanel>
 
                                 <!-- Progress -->
-                                <StackPanel Margin="0,0,0,24">
+                                <StackPanel Margin="0,20,0,20">
                                     <Grid>
                                         <TextBlock FontWeight="Bold"
                                                    Foreground="{DynamicResource BrandPrimaryBrush}"
@@ -452,45 +522,47 @@
                                                    Style="{StaticResource TextBlockMetaBaseStyle}"
                                                    Text="{Binding CompletionPercentage, StringFormat={}{0:0}%}" />
                                     </Grid>
-                                    <ProgressBar Maximum="100"
+                                    <ProgressBar Margin="{StaticResource ContentTopMediumMargin}"
+                                                 Maximum="100"
                                                  Style="{StaticResource ProgressBarAllTasksProjectStyle}"
                                                  Value="{Binding CompletionPercentage}" />
                                 </StackPanel>
 
                                 <!-- Recent Tasks -->
-                                <TextBlock Margin="0,0,0,12"
-                                           FontSize="10"
-                                           FontWeight="ExtraBold"
-                                           Foreground="{DynamicResource TextSecondaryBrush}"
-                                           Text="HIGH PRIORITY SEEDS" />
                                 <ItemsControl ItemsSource="{Binding Tasks}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <Border>
                                                 <Border.Style>
-                                                    <Style BasedOn="{StaticResource BorderAllTasksGridTaskCardStyle}" TargetType="Border">
+                                                    <Style BasedOn="{StaticResource BorderAllTasksGridTaskCardStyle}"
+                                                           TargetType="Border">
                                                         <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding Priority}" Value="{x:Static me:TaskPriority.High}">
+                                                            <DataTrigger Binding="{Binding Priority}"
+                                                                         Value="{x:Static me:TaskPriority.High}">
                                                                 <Setter Property="BorderBrush" Value="{DynamicResource PriorityHighBrush}" />
                                                             </DataTrigger>
-                                                            <DataTrigger Binding="{Binding Priority}" Value="{x:Static me:TaskPriority.Medium}">
+                                                            <DataTrigger Binding="{Binding Priority}"
+                                                                         Value="{x:Static me:TaskPriority.Medium}">
                                                                 <Setter Property="BorderBrush" Value="{DynamicResource PriorityMediumBrush}" />
                                                             </DataTrigger>
-                                                            <DataTrigger Binding="{Binding Priority}" Value="{x:Static me:TaskPriority.Low}">
+                                                            <DataTrigger Binding="{Binding Priority}"
+                                                                         Value="{x:Static me:TaskPriority.Low}">
                                                                 <Setter Property="BorderBrush" Value="{DynamicResource PriorityLowBrush}" />
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
                                                 </Border.Style>
                                                 <Border.InputBindings>
-                                                    <MouseBinding Command="{Binding RequestDetailCommand}" MouseAction="LeftDoubleClick" />
+                                                    <MouseBinding Command="{Binding RequestDetailCommand}"
+                                                                  MouseAction="LeftDoubleClick" />
                                                 </Border.InputBindings>
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="Auto" />
                                                         <ColumnDefinition Width="*" />
                                                     </Grid.ColumnDefinitions>
-                                                    <TextBlock Style="{StaticResource TextBlockAllTasksGridIconStyle}" Text="{Binding Status, Converter={StaticResource TaskStatusToIconConverter}}" />
+                                                    <TextBlock Style="{StaticResource TextBlockAllTasksGridIconStyle}"
+                                                               Text="{Binding Status, Converter={StaticResource TaskStatusToIconConverter}}" />
                                                     <TextBlock Grid.Column="1"
                                                                Style="{StaticResource TextBlockAllTasksGridTaskNameStyle}"
                                                                Text="{Binding Name}" />
@@ -512,7 +584,8 @@
     <!-- ============================================================ -->
 
     <!-- 「引き算のデザイン」用タスクアイテム・テンプレート -->
-    <ControlTemplate x:Key="SubtractiveTaskItemTemplate" TargetType="ListBoxItem">
+    <ControlTemplate x:Key="SubtractiveTaskItemTemplate"
+                     TargetType="ListBoxItem">
         <Grid x:Name="RootGrid"
               Margin="0"
               Background="Transparent">
@@ -585,7 +658,8 @@
                 <Setter TargetName="RootGrid" Property="Background" Value="{DynamicResource StateHoverBrush}" />
             </Trigger>
             <!-- リスクがある場合 -->
-            <DataTrigger Binding="{Binding HasRisk}" Value="True">
+            <DataTrigger Binding="{Binding HasRisk}"
+                         Value="True">
                 <Setter TargetName="RiskDot" Property="Visibility" Value="Visible" />
             </DataTrigger>
         </ControlTemplate.Triggers>

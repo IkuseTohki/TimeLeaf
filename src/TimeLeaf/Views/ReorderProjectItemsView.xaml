@@ -18,18 +18,20 @@
         </Grid.RowDefinitions>
 
         <!-- タイトル -->
-        <TextBlock Style="{StaticResource TextBlockFormTitleStyle}" Text="コンテナ・タスクの並び替え" />
+        <TextBlock Style="{StaticResource TextBlockFormTitleStyle}"
+                   Text="コンテナ・タスクの並び替え" />
 
         <!-- 説明文 -->
         <TextBlock Grid.Row="1"
-                   Margin="0,0,0,20"
-                   Style="{StaticResource MetaBaseStyle}"
+                   Margin="{StaticResource ContentTopNarrowMargin}"
+                   Style="{StaticResource TextBlockMetaBaseStyle}"
                    Text="コンテナ内でのタスク順序、またはコンテナ自身の順序を変更します。"
                    TextWrapping="Wrap" />
 
         <!-- アイテムリスト -->
         <ListBox Grid.Row="2"
-                 ItemsSource="{Binding Items}"
+                 Margin="{StaticResource ContentTopWideMargin}"
+                   ItemsSource="{Binding Items}"
                  Style="{StaticResource ListBoxReorderStyle}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
@@ -45,27 +47,19 @@
                                     VerticalAlignment="Center"
                                     Orientation="Horizontal">
                             <!-- アイコン（コンテナ/タスク） -->
-                            <Path Width="12"
-                                  Height="12"
-                                  Margin="0,0,8,0"
-                                  Data="{StaticResource FolderIconGeometry}"
-                                  Fill="{DynamicResource TextSecondaryBrush}"
-                                  Stretch="Uniform"
+                            <Path Data="{StaticResource FolderIconGeometry}"
+                                  Style="{StaticResource PathSecondaryIconFillSmallStyle}"
                                   Visibility="{Binding IsContainer, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                            <Path Width="10"
-                                  Height="10"
-                                  Margin="1,0,9,0"
+                            <Path Margin="1,0,1,0"
                                   Data="{StaticResource DocumentIconGeometry}"
-                                  Fill="{DynamicResource TextSecondaryBrush}"
-                                  Stretch="Uniform"
+                                  Style="{StaticResource PathSecondaryIconFillMiniStyle}"
                                   Visibility="{Binding IsContainer, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
 
                             <!-- アイテム名 -->
                             <TextBlock VerticalAlignment="Center"
-                                       FontWeight="SemiBold"
-                                       Foreground="{DynamicResource TextPrimaryBrush}"
+                                       Margin="{StaticResource ContentLeftNarrowMargin}"
                                        Text="{Binding Item.Name}"
-                                       TextTrimming="CharacterEllipsis" />
+                                       Style="{StaticResource TextBlockBaseListEllipsisPrimaryStyle}" />
                         </StackPanel>
 
                         <!-- 移動ボタン（右側、ホバー時のみ表示） -->
@@ -82,11 +76,8 @@
                                         <Binding Source="True" />
                                     </MultiBinding>
                                 </Button.CommandParameter>
-                                <Path Width="10"
-                                      Height="10"
-                                      Data="{StaticResource ArrowUpIconGeometry}"
-                                      Fill="{DynamicResource BrandPrimaryBrush}"
-                                      Stretch="Uniform" />
+                                <Path Data="{StaticResource ArrowUpIconGeometry}"
+                                      Style="{StaticResource PathBrandIconFillMiniStyle}" />
                             </Button>
                             <Button Margin="4,0,0,0"
                                     Command="{Binding DataContext.MoveItemCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
@@ -98,11 +89,8 @@
                                         <Binding Source="False" />
                                     </MultiBinding>
                                 </Button.CommandParameter>
-                                <Path Width="10"
-                                      Height="10"
-                                      Data="{StaticResource ArrowDownIconGeometry}"
-                                      Fill="{DynamicResource BrandPrimaryBrush}"
-                                      Stretch="Uniform" />
+                                <Path Data="{StaticResource ArrowDownIconGeometry}"
+                                      Style="{StaticResource PathBrandIconFillMiniStyle}" />
                             </Button>
                         </StackPanel>
                     </Grid>
@@ -111,11 +99,15 @@
         </ListBox>
 
         <!-- フッターボタン -->
-        <StackPanel Grid.Row="3" Style="{StaticResource StackPanelDialogFooterStyle}">
+        <StackPanel Grid.Row="3"
+                    Margin="{StaticResource FormFooterMargin}"
+                    HorizontalAlignment="Right"
+                    Orientation="Horizontal">
             <Button Command="{Binding ConfirmCommand}"
                     Content="保存"
                     Style="{StaticResource ButtonDialogActionStyle}" />
-            <Button Command="{Binding CancelCommand}"
+            <Button Margin="{StaticResource ButtonLeftMargin}"
+                    Command="{Binding CancelCommand}"
                     Content="キャンセル"
                     Style="{StaticResource ButtonDialogCancelStyle}" />
         </StackPanel>

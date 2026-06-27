@@ -27,24 +27,19 @@
 
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <!-- ヘッダーエリア -->
         <Grid Style="{StaticResource GridViewHeaderStyle}">
             <StackPanel VerticalAlignment="Bottom">
-                <TextBlock Style="{StaticResource TextBlockViewHeaderTitleStyle}" Text="全タスク一覧 (All Tasks)" />
-                <TextBlock Style="{StaticResource TextBlockViewHeaderSubTitleStyle}" Text="{Binding AllTasks.Count, StringFormat=\{0\} active tasks}" />
+                <TextBlock Style="{StaticResource TextBlockTitleBaseStyle}"
+                           Text="タスク一覧" />
+                <TextBlock Margin="{StaticResource ContentTopNarrowMargin}"
+                           Style="{StaticResource TextBlockViewHeaderSubTitleStyle}"
+                           Text="{Binding AllTasks.Count, StringFormat=\{0\} active tasks}" />
             </StackPanel>
-
-            <!-- 表示モード切替 -->
-            <c:LeafTabSelector Margin="0,0,24,0"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Bottom"
-                               DisplayMemberPath="Label"
-                               ItemsSource="{Binding ViewModeItems}"
-                               SelectedValue="{Binding CurrentViewMode}"
-                               SelectedValuePath="Value" />
 
             <!-- 検索・フィルター -->
             <StackPanel Style="{StaticResource StackPanelAllTasksHeaderActionContainerStyle}">
@@ -53,25 +48,46 @@
                                     Tag="🔍 Search tasks..."
                                     Text="{Binding SearchKeyword, UpdateSourceTrigger=PropertyChanged}" />
 
-                <CheckBox Content="Incomplete Only"
-                          IsChecked="{Binding ShowOnlyIncomplete}"
-                          Style="{StaticResource CheckBoxAllTasksFilterStyle}" />
+                <StackPanel>
+                    <CheckBox HorizontalAlignment="Left"
+                              Content="未完了タスクのみ"
+                              IsChecked="{Binding ShowOnlyIncomplete}"
+                              Style="{StaticResource CheckBoxAllTasksFilterStyle}" />
+                    <CheckBox Margin="0,2,0,0"
+                              HorizontalAlignment="Left"
+                              Content="自分のみ"
+                              IsChecked="{Binding ShowOnlyMyself}"
+                              Style="{StaticResource CheckBoxAllTasksFilterStyle}" />
+                </StackPanel>
             </StackPanel>
         </Grid>
 
+        <!-- 表示モード切替 -->
+        <c:LeafTabSelector Grid.Row="1"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Bottom"
+                           DisplayMemberPath="Label"
+                           ItemsSource="{Binding ViewModeItems}"
+                           SelectedValue="{Binding CurrentViewMode}"
+                           SelectedValuePath="Value" />
+
         <!-- メインコンテンツ -->
-        <ContentControl Grid.Row="1" Content="{Binding}">
+        <ContentControl Grid.Row="2"
+                        Content="{Binding}">
             <ContentControl.Style>
                 <Style TargetType="ContentControl">
                     <Setter Property="ContentTemplate" Value="{StaticResource AllTasksListTemplate}" />
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding CurrentViewMode}" Value="{x:Static me:AllTasksViewMode.List}">
+                        <DataTrigger Binding="{Binding CurrentViewMode}"
+                                     Value="{x:Static me:AllTasksViewMode.List}">
                             <Setter Property="ContentTemplate" Value="{StaticResource AllTasksListTemplate}" />
                         </DataTrigger>
-                        <DataTrigger Binding="{Binding CurrentViewMode}" Value="{x:Static me:AllTasksViewMode.Timeline}">
+                        <DataTrigger Binding="{Binding CurrentViewMode}"
+                                     Value="{x:Static me:AllTasksViewMode.Timeline}">
                             <Setter Property="ContentTemplate" Value="{StaticResource AllTasksTimelineTemplate}" />
                         </DataTrigger>
-                        <DataTrigger Binding="{Binding CurrentViewMode}" Value="{x:Static me:AllTasksViewMode.Grid}">
+                        <DataTrigger Binding="{Binding CurrentViewMode}"
+                                     Value="{x:Static me:AllTasksViewMode.Grid}">
                             <Setter Property="ContentTemplate" Value="{StaticResource AllTasksGridTemplate}" />
                         </DataTrigger>
                     </Style.Triggers>

@@ -8,15 +8,21 @@
              d:DataContext="{d:DesignInstance vm:AddContainerViewModel}"
              mc:Ignorable="d">
     <StackPanel Style="{StaticResource StackPanelDialogRootStyle}">
-        <TextBlock Style="{StaticResource TextBlockFormTitleStyle}" Text="グループ作成" />
+        <TextBlock Margin="{StaticResource FormTitleMargin}"
+                   Style="{StaticResource TextBlockFormTitleStyle}"
+                   Text="グループ作成" />
 
-        <Label Content="グループ名" Style="{StaticResource LabelFormFirstSectionHeaderStyle}" />
+        <Label Margin="{StaticResource FormLabelMargin}"
+               Content="グループ名"
+               Style="{StaticResource LabelSectionHeaderBaseStyle}" />
         <TextBox Margin="{StaticResource FormItemMargin}"
                  Style="{StaticResource ModernTextBoxStyle}"
                  Tag="例：UIデザイン関連"
                  Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
 
-        <Label Content="説明" Style="{StaticResource LabelFormSectionHeaderStyle}" />
+        <Label Margin="{StaticResource FormLabelMargin}"
+               Content="説明"
+               Style="{StaticResource LabelSectionHeaderBaseStyle}" />
         <TextBox Height="{StaticResource SizeHeight50}"
                  Margin="{StaticResource FormItemMargin}"
                  AcceptsReturn="True"
@@ -26,11 +32,14 @@
                  TextWrapping="Wrap" />
 
         <!-- フッターボタン -->
-        <StackPanel Style="{StaticResource StackPanelDialogFooterStyle}">
+        <StackPanel Margin="{StaticResource FormFooterMargin}"
+                    HorizontalAlignment="Right"
+                    Orientation="Horizontal">
             <Button Command="{Binding ConfirmCommand}"
                     Content="作成"
                     Style="{StaticResource ButtonDialogActionStyle}" />
-            <Button Command="{Binding CancelCommand}"
+            <Button Margin="{StaticResource ButtonLeftMargin}"
+                    Command="{Binding CancelCommand}"
                     Content="キャンセル"
                     Style="{StaticResource ButtonDialogCancelStyle}" />
         </StackPanel>

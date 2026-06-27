@@ -18,16 +18,22 @@ public class AllTasksViewModelTests
 {
     private Mock<IViewModelFactory> _viewModelFactoryMock = null!;
     private Mock<IUserService> _userServiceMock = null!;
+    private Mock<IIdentityService> _identityServiceMock = null!;
 
     [TestInitialize]
     public void Setup()
     {
         _viewModelFactoryMock = new Mock<IViewModelFactory>();
         _userServiceMock = new Mock<IUserService>();
+        _identityServiceMock = new Mock<IIdentityService>();
 
         _viewModelFactoryMock
             .Setup(x => x.CreateProjectTaskViewModel(It.IsAny<ProjectTask>()))
             .Returns((ProjectTask t) => new ProjectTaskViewModel(t, _userServiceMock.Object));
+
+        var myId = Guid.NewGuid();
+        var myIdentity = new User(myId, "初期名", "#FF0000", "");
+        _identityServiceMock.Setup(s => s.GetCurrentIdentityAsync()).ReturnsAsync(myIdentity);
     }
 
     private ProjectViewModel CreateProjectViewModel(Project p)
@@ -66,7 +72,7 @@ public class AllTasksViewModelTests
         };
 
         // Act
-        var viewModel = new AllTasksViewModel(projects);
+        var viewModel = new AllTasksViewModel(projects, _identityServiceMock.Object);
 
         // Assert
         Assert.AreEqual(2, viewModel.AllTasks.Count, "全タスク数が一致すること");
@@ -82,7 +88,7 @@ public class AllTasksViewModelTests
     {
         // Arrange
         var projects = new ObservableCollection<ProjectViewModel>();
-        var viewModel = new AllTasksViewModel(projects);
+        var viewModel = new AllTasksViewModel(projects, _identityServiceMock.Object);
 
         // Act
         var p = new Project(Guid.Empty) { Id = Guid.NewGuid() };
@@ -115,7 +121,7 @@ public class AllTasksViewModelTests
         p.AddTask(t2);
 
         var projects = new ObservableCollection<ProjectViewModel> { CreateProjectViewModel(p) };
-        var viewModel = new AllTasksViewModel(projects);
+        var viewModel = new AllTasksViewModel(projects, _identityServiceMock.Object);
 
         // Act
         viewModel.SearchKeyword = "apple";
@@ -144,7 +150,7 @@ public class AllTasksViewModelTests
         p.AddTask(t2);
 
         var projects = new ObservableCollection<ProjectViewModel> { CreateProjectViewModel(p) };
-        var viewModel = new AllTasksViewModel(projects);
+        var viewModel = new AllTasksViewModel(projects, _identityServiceMock.Object);
 
         // Act & Assert (初期値は True)
         Assert.IsTrue(viewModel.ShowOnlyIncomplete);
@@ -174,7 +180,7 @@ public class AllTasksViewModelTests
         p.AddTask(t);
 
         var projects = new ObservableCollection<ProjectViewModel> { CreateProjectViewModel(p) };
-        var viewModel = new AllTasksViewModel(projects);
+        var viewModel = new AllTasksViewModel(projects, _identityServiceMock.Object);
         Assert.AreEqual(1, viewModel.AllTasks.Count);
 
         // Act
@@ -198,7 +204,7 @@ public class AllTasksViewModelTests
         p.AddTask(t);
 
         var projects = new ObservableCollection<ProjectViewModel> { CreateProjectViewModel(p) };
-        var viewModel = new AllTasksViewModel(projects);
+        var viewModel = new AllTasksViewModel(projects, _identityServiceMock.Object);
         viewModel.SearchKeyword = "Updated";
         Assert.AreEqual(0, viewModel.AllTasks.Count);
 
@@ -217,7 +223,7 @@ public class AllTasksViewModelTests
     {
         // Arrange
         var projects = new ObservableCollection<ProjectViewModel>();
-        var viewModel = new AllTasksViewModel(projects);
+        var viewModel = new AllTasksViewModel(projects, _identityServiceMock.Object);
         Assert.AreEqual(AllTasksViewMode.List, viewModel.CurrentViewMode);
         Assert.AreEqual(
             0,
@@ -247,7 +253,7 @@ public class AllTasksViewModelTests
     {
         // Arrange
         var projects = new ObservableCollection<ProjectViewModel>();
-        var viewModel = new AllTasksViewModel(projects);
+        var viewModel = new AllTasksViewModel(projects, _identityServiceMock.Object);
         viewModel.CurrentViewMode = AllTasksViewMode.Timeline;
         Assert.IsTrue(viewModel.AllTasksView.GroupDescriptions.Count > 0);
 
@@ -270,7 +276,7 @@ public class AllTasksViewModelTests
     {
         // Arrange & Act
         var projects = new ObservableCollection<ProjectViewModel>();
-        var viewModel = new AllTasksViewModel(projects);
+        var viewModel = new AllTasksViewModel(projects, _identityServiceMock.Object);
 
         // Assert
         Assert.IsNotNull(viewModel.ViewModeItems);
@@ -296,7 +302,7 @@ public class AllTasksViewModelTests
 
         var pvm = CreateProjectViewModel(p);
         var projects = new ObservableCollection<ProjectViewModel> { pvm };
-        var viewModel = new AllTasksViewModel(projects);
+        var viewModel = new AllTasksViewModel(projects, _identityServiceMock.Object);
 
         var taskVm = pvm.Tasks[0];
 

@@ -1,4 +1,4 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
@@ -14,7 +14,8 @@
     <!-- GroupBox Styles -->
     <!-- ====================================================================== -->
 
-    <Style x:Key="GroupBoxSettingsStyle" TargetType="GroupBox">
+    <Style x:Key="GroupBoxSettingsStyle"
+           TargetType="GroupBox">
         <Setter Property="Margin" Value="{StaticResource FormSectionMargin}" />
         <Setter Property="Padding" Value="12" />
         <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
@@ -36,7 +37,6 @@
            TargetType="TextBlock">
         <Setter Property="FontSize" Value="{StaticResource FontSizeTitle}" />
         <Setter Property="FontWeight" Value="{StaticResource FontWeightEmphasis}" />
-        <Setter Property="Margin" Value="0,0,0,20" />
     </Style>
 
     <Style x:Key="TextBlockFormLabelStyle"
@@ -52,13 +52,6 @@
     </Style>
 
     <!-- Workspace Specific Headers -->
-    <Style x:Key="TextBlockWorkspaceDashboardSectionHeaderStyle"
-           BasedOn="{StaticResource TextBlockHeaderBaseStyle}"
-           TargetType="TextBlock">
-        <Setter Property="Margin" Value="0,0,0,12" />
-        <Setter Property="FontSize" Value="15" />
-    </Style>
-
     <Style x:Key="TextBlockWorkspaceTaskPanelSectionHeaderStyle"
            BasedOn="{StaticResource TextBlockLabelBaseStyle}"
            TargetType="TextBlock">
@@ -75,26 +68,11 @@
     </Style>
 
     <!-- ====================================================================== -->
-    <!-- Label Styles -->
-    <!-- ====================================================================== -->
-
-    <Style x:Key="LabelFormSectionHeaderStyle"
-           BasedOn="{StaticResource LabelSectionHeaderBaseStyle}"
-           TargetType="Label">
-        <Setter Property="Margin" Value="{StaticResource FormLabelMargin}" />
-    </Style>
-
-    <Style x:Key="LabelFormFirstSectionHeaderStyle"
-           BasedOn="{StaticResource LabelSectionHeaderBaseStyle}"
-           TargetType="Label">
-        <Setter Property="Margin" Value="{StaticResource FormLabelMargin}" />
-    </Style>
-
-    <!-- ====================================================================== -->
     <!-- Border Styles -->
     <!-- ====================================================================== -->
 
-    <Style x:Key="BorderColorPreviewStyle" TargetType="Border">
+    <Style x:Key="BorderColorPreviewStyle"
+           TargetType="Border">
         <Setter Property="Width" Value="32" />
         <Setter Property="Height" Value="32" />
         <Setter Property="CornerRadius" Value="{StaticResource RadiusMax}" />
@@ -102,39 +80,37 @@
         <Setter Property="BorderThickness" Value="1" />
     </Style>
 
+    <!-- ユーザー管理:ユーザー一覧 -->
+    <Style x:Key="BorderSimpleListStyle"
+           TargetType="Border">
+        <Setter Property="Padding" Value="12" />
+        <Setter Property="BorderBrush" Value="{DynamicResource OutlineBaseBrush}" />
+        <Setter Property="BorderThickness" Value="0,0,0,1" />
+    </Style>
+
     <!-- ====================================================================== -->
     <!-- Container Styles (StackPanel, Grid) -->
     <!-- ====================================================================== -->
 
-    <Style x:Key="StackPanelSettingsContainerStyle" TargetType="StackPanel">
+    <Style x:Key="StackPanelSettingsContainerStyle"
+           TargetType="StackPanel">
         <Setter Property="MaxWidth" Value="500" />
         <Setter Property="HorizontalAlignment" Value="Left" />
     </Style>
 
-    <Style x:Key="GridDialogRootStyle" TargetType="Grid">
+    <Style x:Key="GridDialogRootStyle"
+           TargetType="Grid">
         <Setter Property="Margin" Value="16,0" />
     </Style>
 
-    <Style x:Key="StackPanelDialogRootStyle" TargetType="StackPanel">
+    <Style x:Key="StackPanelDialogRootStyle"
+           TargetType="StackPanel">
         <Setter Property="Margin" Value="16,0" />
-    </Style>
-
-    <Style x:Key="StackPanelDialogFooterStyle" TargetType="StackPanel">
-        <Setter Property="Margin" Value="{StaticResource FormFooterMargin}" />
-        <Setter Property="HorizontalAlignment" Value="Right" />
-        <Setter Property="Orientation" Value="Horizontal" />
     </Style>
 
     <!-- Setup Specific -->
-    <Style x:Key="StackPanelSetupContainerStyle" TargetType="StackPanel">
-        <Setter Property="Margin" Value="20" />
-    </Style>
-
-    <Style x:Key="GridSetupInputAreaStyle" TargetType="Grid">
-        <Setter Property="Margin" Value="0,0,0,16" />
-    </Style>
-
-    <Style x:Key="StackPanelSetupFooterStyle" TargetType="StackPanel">
+    <Style x:Key="StackPanelSetupFooterStyle"
+           TargetType="StackPanel">
         <Setter Property="HorizontalAlignment" Value="Right" />
         <Setter Property="Orientation" Value="Horizontal" />
     </Style>
@@ -146,14 +122,13 @@
     <Style x:Key="ButtonDialogActionStyle"
            BasedOn="{StaticResource ButtonPrimaryStyle}"
            TargetType="Button">
-        <Setter Property="Width" Value="90" />
+        <Setter Property="Width" Value="{StaticResource ButtonWidthMedium}" />
     </Style>
 
     <Style x:Key="ButtonDialogCancelStyle"
            BasedOn="{StaticResource ButtonSecondaryStyle}"
            TargetType="Button">
-        <Setter Property="Width" Value="90" />
-        <Setter Property="Margin" Value="{StaticResource ButtonLeftMargin}" />
+        <Setter Property="Width" Value="{StaticResource ButtonWidthMedium}" />
     </Style>
 
     <!-- ====================================================================== -->
@@ -175,29 +150,22 @@
     <!-- Window Styles -->
     <!-- ====================================================================== -->
 
-    <Style x:Key="WindowSetupStyle" TargetType="Window">
+    <Style x:Key="WindowSetupStyle"
+           TargetType="Window">
         <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />
         <Setter Property="ResizeMode" Value="NoResize" />
     </Style>
 
     <!-- Setup View Specific -->
-    <Style x:Key="TextBlockSetupHeaderStyle"
-           BasedOn="{StaticResource TextBlockTitleBaseStyle}"
-           TargetType="TextBlock">
-        <Setter Property="Margin" Value="0,0,0,16" />
-    </Style>
-
     <Style x:Key="TextBlockSetupDescriptionStyle"
            BasedOn="{StaticResource TextBlockLabelBaseStyle}"
            TargetType="TextBlock">
-        <Setter Property="Margin" Value="0,0,0,12" />
         <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
 
     <Style x:Key="TextBlockSetupSubDescriptionStyle"
            BasedOn="{StaticResource TextBlockMetaBaseStyle}"
            TargetType="TextBlock">
-        <Setter Property="Margin" Value="0,0,0,24" />
         <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
 
@@ -205,7 +173,6 @@
            BasedOn="{StaticResource TextBlockMetaBaseStyle}"
            TargetType="TextBlock">
         <Setter Property="Foreground" Value="{DynamicResource ErrorBrush}" />
-        <Setter Property="Margin" Value="0,8,0,0" />
     </Style>
 
 </ResourceDictionary>

@@ -71,7 +71,7 @@
                             Padding="8,2"
                             Command="{Binding ReloadLatestCommand}"
                             Content="最新を読み込む"
-                            Style="{StaticResource SecondaryButtonStyle}" />
+                            Style="{StaticResource ButtonSecondaryStyle}" />
                 </Grid>
             </Border>
 
@@ -115,7 +115,8 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <TextBlock Style="{StaticResource TextBlockWorkspaceTaskPanelSectionHeaderStyle}" Text="DISCUSSION" />
+                    <TextBlock Style="{StaticResource TextBlockWorkspaceTaskPanelSectionHeaderStyle}"
+                               Text="DISCUSSION" />
 
                     <!-- コメント履歴 -->
                     <ScrollViewer Grid.Row="1"
@@ -129,14 +130,18 @@
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
-                                        <Border Background="{Binding AuthorColor}" Style="{StaticResource BorderWorkspaceTaskCommentAvatarStyle}">
+                                        <Border VerticalAlignment="Top"
+                                                Background="{Binding AuthorColor}"
+                                                Style="{StaticResource BorderUserAvatarIconSmallStyle}">
                                             <TextBlock Foreground="White"
                                                        Style="{StaticResource TextBlockUserAvatarInitialStyle}"
                                                        Text="{Binding AuthorInitial}" />
                                         </Border>
-                                        <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                                        <StackPanel Grid.Column="1"
+                                                    Margin="8,0,0,0">
                                             <Grid Margin="0,0,0,2">
-                                                <TextBlock Style="{StaticResource TaskCommentAuthorStyle}" Text="{Binding AuthorName}" />
+                                                <TextBlock Style="{StaticResource TaskCommentAuthorStyle}"
+                                                           Text="{Binding AuthorName}" />
                                                 <TextBlock HorizontalAlignment="Right"
                                                            Style="{StaticResource TextBlockWorkspaceTaskPanelMetaLabelStyle}"
                                                            Text="{Binding CreatedAt, StringFormat={}{0:MM/dd HH:mm}}" />
@@ -144,7 +149,7 @@
                                             <Border Style="{StaticResource TaskCommentContentStyle}">
                                                 <TextBlock Foreground="{DynamicResource TextPrimaryBrush}"
                                                            LineHeight="15"
-                                                           Style="{StaticResource MetaBaseStyle}"
+                                                           Style="{StaticResource TextBlockMetaBaseStyle}"
                                                            Text="{Binding Content}"
                                                            TextWrapping="Wrap" />
                                             </Border>
@@ -157,7 +162,8 @@
                     </ScrollViewer>
 
                     <!-- コメント入力 -->
-                    <Border Grid.Row="2" Style="{StaticResource TaskCommentInputAreaStyle}">
+                    <Border Grid.Row="2"
+                            Style="{StaticResource TaskCommentInputAreaStyle}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
@@ -182,7 +188,8 @@
                 </Grid>
 
                 <!-- 4. CHANGE HISTORY (控えめな表示) -->
-                <StackPanel Grid.Row="4" Margin="0,20,0,10">
+                <StackPanel Grid.Row="4"
+                            Margin="0,20,0,10">
                     <ToggleButton x:Name="HistoryToggle"
                                   HorizontalAlignment="Left"
                                   IsChecked="{Binding IsHistoryExpanded}"
@@ -209,7 +216,8 @@
                                     <Style TargetType="Path">
                                         <Setter Property="Data" Value="{StaticResource ChevronRightIconGeometry}" />
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsChecked, ElementName=HistoryToggle}" Value="True">
+                                            <DataTrigger Binding="{Binding IsChecked, ElementName=HistoryToggle}"
+                                                         Value="True">
                                                 <Setter Property="Data" Value="{StaticResource ArrowDownIconGeometry}" />
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -222,7 +230,8 @@
                     <Border Margin="24,4,0,0"
                             Padding="0,4"
                             Visibility="{Binding IsHistoryExpanded, Converter={StaticResource BooleanToVisibilityConverter}}">
-                        <ScrollViewer MaxHeight="90" VerticalScrollBarVisibility="Auto">
+                        <ScrollViewer MaxHeight="90"
+                                      VerticalScrollBarVisibility="Auto">
                             <ItemsControl ItemsSource="{Binding History}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
@@ -240,7 +249,8 @@
                                                            FontSize="10"
                                                            Foreground="{DynamicResource TextSecondaryBrush}"
                                                            TextWrapping="Wrap">
-                                                    <Run FontWeight="SemiBold" Text="{Binding UserName, Mode=OneWay}" />
+                                                    <Run FontWeight="SemiBold"
+                                                         Text="{Binding UserName, Mode=OneWay}" />
                                                     <Run Text=" が " />
                                                     <Run Text="{Binding ActionDisplayName, Mode=OneWay}" />
                                                 </TextBlock>
@@ -268,11 +278,13 @@
                     Style="{StaticResource BorderWorkspaceTaskDetailSidebarStyle}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Grid.IsSharedSizeScope="True">
-                        <TextBlock Style="{StaticResource TextBlockWorkspaceTaskPanelSectionHeaderStyle}" Text="プロパティ" />
+                        <TextBlock Style="{StaticResource TextBlockWorkspaceTaskPanelSectionHeaderStyle}"
+                                   Text="プロパティ" />
 
                         <Grid Margin="0,0,0,5">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" SharedSizeGroup="MetaLabel" />
+                                <ColumnDefinition Width="Auto"
+                                                  SharedSizeGroup="MetaLabel" />
                                 <ColumnDefinition Width="10" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
@@ -288,7 +300,8 @@
 
                         <Grid Margin="0,0,0,10">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" SharedSizeGroup="MetaLabel" />
+                                <ColumnDefinition Width="Auto"
+                                                  SharedSizeGroup="MetaLabel" />
                                 <ColumnDefinition Width="10" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
@@ -304,7 +317,8 @@
 
                         <Grid Margin="0,0,0,10">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" SharedSizeGroup="MetaLabel" />
+                                <ColumnDefinition Width="Auto"
+                                                  SharedSizeGroup="MetaLabel" />
                                 <ColumnDefinition Width="20" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
@@ -321,13 +335,16 @@
                                                       SelectedTemplate="{StaticResource TeammateSelectedCompactTemplate}" />
                         </Grid>
 
-                        <Separator Margin="0,0,0,16" Background="{DynamicResource OutlineBaseBrush}" />
+                        <Separator Margin="0,0,0,16"
+                                   Background="{DynamicResource OutlineBaseBrush}" />
 
-                        <TextBlock Style="{StaticResource TextBlockWorkspaceTaskPanelSectionHeaderStyle}" Text="スケジュール" />
+                        <TextBlock Style="{StaticResource TextBlockWorkspaceTaskPanelSectionHeaderStyle}"
+                                   Text="スケジュール" />
 
                         <Grid Margin="0,0,0,10">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" SharedSizeGroup="MetaLabel" />
+                                <ColumnDefinition Width="Auto"
+                                                  SharedSizeGroup="MetaLabel" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <TextBlock VerticalAlignment="Center"
@@ -341,7 +358,8 @@
 
                         <Grid Margin="0,0,0,10">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" SharedSizeGroup="MetaLabel" />
+                                <ColumnDefinition Width="Auto"
+                                                  SharedSizeGroup="MetaLabel" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <TextBlock VerticalAlignment="Center"
@@ -354,7 +372,8 @@
                         </Grid>
                         <Grid Margin="0,0,0,10">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" SharedSizeGroup="MetaLabel" />
+                                <ColumnDefinition Width="Auto"
+                                                  SharedSizeGroup="MetaLabel" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <TextBlock VerticalAlignment="Center"
@@ -367,7 +386,8 @@
                         </Grid>
                         <Grid Margin="0,0,0,10">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" SharedSizeGroup="MetaLabel" />
+                                <ColumnDefinition Width="Auto"
+                                                  SharedSizeGroup="MetaLabel" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <TextBlock VerticalAlignment="Center"
@@ -379,10 +399,13 @@
                                               SelectedDate="{Binding Task.ActualEndDate}" />
                         </Grid>
 
-                        <Separator Margin="0,0,0,16" Background="{DynamicResource OutlineBaseBrush}" />
+                        <Separator Margin="0,0,0,16"
+                                   Background="{DynamicResource OutlineBaseBrush}" />
 
-                        <TextBlock Style="{StaticResource TextBlockWorkspaceTaskPanelSectionHeaderStyle}" Text="工数 (h)" />
-                        <controls:TaskCostEditor ActualCost="{Binding Task.ActualCost, Mode=TwoWay}" EstimatedCost="{Binding Task.EstimatedCost, Mode=TwoWay}" />
+                        <TextBlock Style="{StaticResource TextBlockWorkspaceTaskPanelSectionHeaderStyle}"
+                                   Text="工数 (h)" />
+                        <controls:TaskCostEditor ActualCost="{Binding Task.ActualCost, Mode=TwoWay}"
+                                                 EstimatedCost="{Binding Task.EstimatedCost, Mode=TwoWay}" />
                     </StackPanel>
                 </ScrollViewer>
             </Border>
@@ -395,23 +418,25 @@
                 BorderBrush="{DynamicResource OutlineBaseBrush}"
                 BorderThickness="0,1,0,0">
             <Grid>
-                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                <StackPanel HorizontalAlignment="Right"
+                            Orientation="Horizontal">
                     <Button Margin="0,0,8,0"
                             Command="{Binding DeleteCommand}"
                             Style="{StaticResource ButtonIconStyle}">
-                        <Path Data="{StaticResource DeleteIconGeometry}" Style="{StaticResource IconPathBrandStyle}" />
+                        <Path Data="{StaticResource DeleteIconGeometry}"
+                              Style="{StaticResource PathBrandIconStyle}" />
                     </Button>
                     <Button MinWidth="80"
                             Margin="0,0,8,0"
                             Padding="16,6"
                             Command="{Binding SaveCommand}"
                             Content="保存"
-                            Style="{StaticResource PrimaryButtonStyle}" />
+                            Style="{StaticResource ButtonPrimaryStyle}" />
                     <Button MinWidth="80"
                             Padding="16,6"
                             Command="{Binding CloseCommand}"
                             Content="閉じる"
-                            Style="{StaticResource SecondaryButtonStyle}" />
+                            Style="{StaticResource ButtonSecondaryStyle}" />
                 </StackPanel>
             </Grid>
         </Border>

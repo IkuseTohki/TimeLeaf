@@ -1,4 +1,4 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
@@ -9,50 +9,12 @@
     </ResourceDictionary.MergedDictionaries>
 
     <!-- ====================================================================== -->
-    <!-- Border Styles -->
-    <!-- ====================================================================== -->
-
-    <!-- ユーザーアバター（アイコン）の基本スタイル -->
-    <Style x:Key="BorderUserAvatarIconStyle" TargetType="Border">
-        <Setter Property="Width" Value="{StaticResource AvatarSizeMedium}" />
-        <Setter Property="Height" Value="{StaticResource AvatarSizeMedium}" />
-        <Setter Property="Margin" Value="12,0,0,0" />
-        <Setter Property="Background" Value="{DynamicResource BrandPrimaryHoverBrush}" />
-        <Setter Property="CornerRadius" Value="{StaticResource Radius70}" />
-    </Style>
-
-    <!-- 小型ユーザーアイコン（担当者）のスタイル -->
-    <Style x:Key="BorderUserAvatarIconSmallStyle"
-           BasedOn="{StaticResource BorderUserAvatarIconStyle}"
-           TargetType="Border">
-        <Setter Property="Width" Value="{StaticResource AvatarSizeSmall}" />
-        <Setter Property="Height" Value="{StaticResource AvatarSizeSmall}" />
-        <Setter Property="Margin" Value="0" />
-        <Setter Property="Background" Value="{DynamicResource StateHoverBrush}" />
-        <Setter Property="CornerRadius" Value="{StaticResource Radius50}" />
-    </Style>
-
-    <!-- タスクパネル：コメントアバターのスタイル -->
-    <Style x:Key="BorderWorkspaceTaskCommentAvatarStyle"
-           BasedOn="{StaticResource BorderUserAvatarIconSmallStyle}"
-           TargetType="Border">
-        <Setter Property="VerticalAlignment" Value="Top" />
-    </Style>
-
-    <!-- ユーザーメニュー内のアバター枠 -->
-    <Style x:Key="BorderUserMenuAvatarStyle" TargetType="Border">
-        <Setter Property="Width" Value="{StaticResource AvatarSizeSmall}" />
-        <Setter Property="Height" Value="{StaticResource AvatarSizeSmall}" />
-        <Setter Property="Background" Value="{DynamicResource BrandPrimaryBrush}" />
-        <Setter Property="CornerRadius" Value="{StaticResource Radius50}" />
-    </Style>
-
-    <!-- ====================================================================== -->
     <!-- TextBlock Styles -->
     <!-- ====================================================================== -->
 
     <!-- ユーザーアバター内のイニシャルテキストスタイル -->
-    <Style x:Key="TextBlockUserAvatarInitialStyle" TargetType="TextBlock">
+    <Style x:Key="TextBlockUserAvatarInitialStyle"
+           TargetType="TextBlock">
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="FontWeight" Value="{StaticResource FontWeightEmphasis}" />
@@ -61,7 +23,8 @@
     </Style>
 
     <!-- ユーザーメニュー内のイニシャルテキストスタイル -->
-    <Style x:Key="TextBlockUserMenuInitialStyle" TargetType="TextBlock">
+    <Style x:Key="TextBlockUserMenuInitialStyle"
+           TargetType="TextBlock">
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="FontSize" Value="{StaticResource FontSizeCaption}" />
@@ -70,7 +33,8 @@
     </Style>
 
     <!-- ユーザーメニュー内の表示名テキストスタイル -->
-    <Style x:Key="TextBlockUserMenuNameStyle" TargetType="TextBlock">
+    <Style x:Key="TextBlockUserMenuNameStyle"
+           TargetType="TextBlock">
         <Setter Property="Margin" Value="6,0,0,0" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
@@ -82,7 +46,8 @@
     <!-- Path Styles -->
     <!-- ====================================================================== -->
 
-    <Style x:Key="PathUserMenuArrowStyle" TargetType="Path">
+    <Style x:Key="PathUserMenuArrowStyle"
+           TargetType="Path">
         <Setter Property="Margin" Value="6,0,0,0" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="Data" Value="{DynamicResource ArrowDownIconGeometry}" />
@@ -97,7 +62,8 @@
             </Setter.Value>
         </Setter>
         <Style.Triggers>
-            <DataTrigger Binding="{Binding IsUserMenuOpen}" Value="True">
+            <DataTrigger Binding="{Binding IsUserMenuOpen}"
+                         Value="True">
                 <DataTrigger.EnterActions>
                     <BeginStoryboard>
                         <Storyboard>
@@ -125,7 +91,8 @@
     <!-- ====================================================================== -->
 
     <!-- 右上ユーザーメニューボタン（ナチュラルスタイル） -->
-    <Style x:Key="ButtonUserMenuNaturalStyle" TargetType="Button">
+    <Style x:Key="ButtonUserMenuNaturalStyle"
+           TargetType="Button">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Padding" Value="6,3" />

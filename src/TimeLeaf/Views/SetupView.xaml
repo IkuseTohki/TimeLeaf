@@ -11,16 +11,24 @@
         WindowStartupLocation="CenterScreen"
         mc:Ignorable="d">
 
-    <StackPanel Style="{StaticResource StackPanelSetupContainerStyle}">
+    <StackPanel Margin="20"
+                Style="{StaticResource StackPanelSetupContainerStyle}">
         <!-- Header -->
-        <TextBlock Style="{StaticResource TextBlockSetupHeaderStyle}" Text="TimeLeafへようこそ" />
+        <TextBlock Style="{StaticResource TextBlockTitleBaseStyle}"
+                   Text="TimeLeafへようこそ" />
 
-        <TextBlock Style="{StaticResource TextBlockSetupDescriptionStyle}" Text="プロジェクトデータを保存・同期するフォルダを選択してください。" />
+        <TextBlock Margin="{StaticResource ContentTopWideMargin}"
+                   Style="{StaticResource TextBlockSetupDescriptionStyle}"
+                   Text="プロジェクトデータを保存・同期するフォルダを選択してください。" />
 
-        <TextBlock Style="{StaticResource TextBlockSetupSubDescriptionStyle}" Text="共有フォルダ（OneDriveやDropboxなど）を指定すると、チームメンバーとデータを共有できます。" />
+        <TextBlock Margin="{StaticResource ContentTopMediumMargin}"
+                   Style="{StaticResource TextBlockSetupSubDescriptionStyle}"
+                   Text="共有フォルダ（OneDriveやDropboxなど）を指定すると、チームメンバーとデータを共有できます。" />
 
         <!-- Input Area -->
-        <Label Content="データ保存場所 (ルートフォルダ):" Style="{StaticResource LabelSectionHeaderBaseStyle}" />
+        <Label Margin="{StaticResource ContentTopWideMargin}"
+               Content="データ保存場所 (ルートフォルダ):"
+               Style="{StaticResource LabelSectionHeaderBaseStyle}" />
 
         <Grid Style="{StaticResource GridSetupInputAreaStyle}">
             <Grid.ColumnDefinitions>
@@ -36,19 +44,22 @@
                     Style="{StaticResource ButtonRoundStyle}" />
         </Grid>
 
-        <TextBlock Style="{StaticResource TextBlockSetupErrorStyle}" Text="{Binding ErrorMessage}" />
+        <TextBlock Margin="{StaticResource ContentTopWideMargin}"
+                   Style="{StaticResource TextBlockSetupErrorStyle}"
+                   Text="{Binding ErrorMessage}" />
 
         <!-- Footer -->
-        <StackPanel Style="{StaticResource StackPanelSetupFooterStyle}">
-            <Button Margin="0,0,10,0"
-                    Command="{Binding CancelCommand}"
-                    Content="キャンセル"
-                    IsCancel="true"
-                    Style="{StaticResource ButtonSecondaryStyle}" />
+        <StackPanel Margin="{StaticResource ContentTopMediumMargin}"
+                    Style="{StaticResource StackPanelSetupFooterStyle}">
             <Button Command="{Binding SaveAndStartCommand}"
                     Content="設定して開始"
                     IsDefault="true"
-                    Style="{StaticResource ButtonPrimaryStyle}" />
+                    Style="{StaticResource ButtonDialogActionStyle}" />
+            <Button Margin="{StaticResource ButtonLeftMargin}"
+                    Command="{Binding CancelCommand}"
+                    Content="キャンセル"
+                    IsCancel="true"
+                    Style="{StaticResource ButtonDialogCancelStyle}" />
         </StackPanel>
     </StackPanel>
 

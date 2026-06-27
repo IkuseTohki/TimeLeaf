@@ -8,16 +8,22 @@
              d:DataContext="{d:DesignInstance vm:AddProjectViewModel}"
              mc:Ignorable="d">
     <StackPanel Style="{StaticResource StackPanelDialogRootStyle}">
-        <TextBlock Style="{StaticResource TextBlockFormTitleStyle}" Text="プロジェクト作成" />
+        <TextBlock Margin="{StaticResource FormTitleMargin}"
+                   Style="{StaticResource TextBlockFormTitleStyle}"
+                   Text="プロジェクト作成" />
 
-        <Label Content="プロジェクト名" Style="{StaticResource LabelFormFirstSectionHeaderStyle}" />
+        <Label Margin="{StaticResource FormLabelMargin}"
+               Content="プロジェクト名"
+               Style="{StaticResource LabelSectionHeaderBaseStyle}" />
         <TextBox Margin="{StaticResource FormItemMargin}"
                  Style="{StaticResource ModernTextBoxStyle}"
                  Tag="例：新機能のプロトタイプ作成"
                  Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
 
-        <Label Content="概要" Style="{StaticResource LabelFormSectionHeaderStyle}" />
-        <TextBox Height="{StaticResource MultilineInputHeightSmall}"
+        <Label Margin="{StaticResource FormLabelMargin}"
+               Content="概要"
+               Style="{StaticResource LabelSectionHeaderBaseStyle}" />
+        <TextBox Height="{StaticResource MultilineTextBoxHeightSmall}"
                  Margin="{StaticResource FormItemMargin}"
                  AcceptsReturn="True"
                  Style="{StaticResource ModernTextBoxStyle}"
@@ -26,11 +32,14 @@
                  TextWrapping="Wrap" />
 
         <!-- フッターボタン -->
-        <StackPanel Style="{StaticResource StackPanelDialogFooterStyle}">
+        <StackPanel Margin="{StaticResource FormFooterMargin}"
+                    HorizontalAlignment="Right"
+                    Orientation="Horizontal">
             <Button Command="{Binding ConfirmCommand}"
                     Content="作成"
                     Style="{StaticResource ButtonDialogActionStyle}" />
-            <Button Command="{Binding CancelCommand}"
+            <Button Margin="{StaticResource ButtonLeftMargin}"
+                    Command="{Binding CancelCommand}"
                     Content="キャンセル"
                     Style="{StaticResource ButtonDialogCancelStyle}" />
         </StackPanel>

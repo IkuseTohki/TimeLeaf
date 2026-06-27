@@ -17,16 +17,19 @@
                 BorderThickness="1"
                 CornerRadius="8">
             <Border.InputBindings>
-                <MouseBinding Command="{Binding RequestDetailCommand}" MouseAction="LeftDoubleClick" />
+                <MouseBinding Command="{Binding RequestDetailCommand}"
+                              MouseAction="LeftDoubleClick" />
             </Border.InputBindings>
             <Border.Style>
                 <Style TargetType="Border">
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                        <DataTrigger Binding="{Binding IsSelected}"
+                                     Value="True">
                             <Setter Property="BorderBrush" Value="{DynamicResource BrandPrimaryBrush}" />
                             <Setter Property="BorderThickness" Value="2" />
                         </DataTrigger>
-                        <DataTrigger Binding="{Binding HasRisk}" Value="True">
+                        <DataTrigger Binding="{Binding HasRisk}"
+                                     Value="True">
                             <Setter Property="BorderBrush" Value="{DynamicResource ErrorBrush}" />
                             <Setter Property="BorderThickness" Value="2" />
                         </DataTrigger>
@@ -41,12 +44,12 @@
             </Border.Effect>
             <StackPanel>
                 <TextBlock FontWeight="Bold"
-                           Style="{StaticResource LabelBaseStyle}"
+                           Style="{StaticResource TextBlockLabelBaseStyle}"
                            Text="{Binding Name}"
                            TextTrimming="CharacterEllipsis" />
                 <TextBlock Margin="0,4,0,0"
                            Foreground="{DynamicResource TextSecondaryBrush}"
-                           Style="{StaticResource MetaBaseStyle}"
+                           Style="{StaticResource TextBlockMetaBaseStyle}"
                            Text="{Binding Status}" />
             </StackPanel>
         </Border>

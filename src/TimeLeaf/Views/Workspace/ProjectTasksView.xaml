@@ -1,4 +1,4 @@
-<UserControl x:Class="TimeLeaf.Views.Workspace.ProjectTasksView"
+﻿<UserControl x:Class="TimeLeaf.Views.Workspace.ProjectTasksView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -20,40 +20,39 @@
                 <ResourceDictionary Source="/Resources/Controls/Buttons.xaml" />
                 <ResourceDictionary Source="/Resources/Controls/Containers.xaml" />
                 <ResourceDictionary Source="/Resources/Components/WorkspaceView.xaml" />
+                <ResourceDictionary Source="/Resources/Converters.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="320" MinWidth="250" />
-            <ColumnDefinition Width="1" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-
         <!-- 左側：コンテナ・タスクリスト -->
-        <ScrollViewer Grid.Column="0" Style="{DynamicResource ScrollViewerWorkspaceStyle}">
-            <StackPanel Margin="20">
+        <ScrollViewer>
+            <StackPanel Margin="30,20">
                 <ItemsControl ItemsSource="{Binding TaskContainers}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="{x:Type wvm:TaskContainerViewModel}">
-                            <Border x:Name="ContainerBorder" Style="{StaticResource BorderWorkspaceDashboardCardStyle}">
+                            <Border x:Name="ContainerBorder"
+                                    Style="{StaticResource SurfaceCardStyle}">
                                 <Grid>
                                     <StackPanel>
                                         <!-- Container Header -->
-                                        <Border x:Name="HeaderBorder" Style="{StaticResource BorderWorkspaceTaskPanelHeaderStyle}">
+                                        <Border x:Name="HeaderBorder"
+                                                Style="{StaticResource BorderWorkspaceTaskPanelHeaderStyle}">
                                             <Grid>
                                                 <StackPanel Orientation="Horizontal">
                                                     <TextBlock VerticalAlignment="Center"
                                                                Style="{StaticResource TextBlockMetaBaseStyle}"
                                                                Text="📂 " />
-                                                    <TextBlock Style="{DynamicResource TextBlockWorkspaceTaskGroupTitleStyle}" Text="{Binding DisplayName}" />
+                                                    <TextBlock Style="{DynamicResource TextBlockWorkspaceTaskGroupTitleStyle}"
+                                                               Text="{Binding DisplayName}" />
                                                 </StackPanel>
                                                 <StackPanel HorizontalAlignment="Right"
                                                             VerticalAlignment="Center"
                                                             Orientation="Horizontal">
                                                     <TextBlock Style="{DynamicResource TextBlockMetaBaseStyle}">
                                                         <TextBlock.Text>
-                                                            <MultiBinding Converter="{StaticResource StringFormatMultiConverter}" StringFormat="{}{0}/{1} Done">
+                                                            <MultiBinding Converter="{StaticResource StringFormatMultiConverter}"
+                                                                          StringFormat="{}{0}/{1} Done">
                                                                 <Binding Path="DoneTasksCount" />
                                                                 <Binding Path="TotalTasksCount" />
                                                             </MultiBinding>
@@ -61,7 +60,7 @@
                                                     </TextBlock>
 
                                                     <Button x:Name="DeleteContainerBtn"
-                                                            Margin="8,0,0,0"
+                                                            Margin="{StaticResource ContentLeftNarrowMargin}"
                                                             HorizontalAlignment="Right"
                                                             Command="{Binding DeleteContainerCommand}"
                                                             CommandParameter="{Binding}"
@@ -70,7 +69,8 @@
                                                             Style="{StaticResource ButtonIconStyle}"
                                                             ToolTip="コンテナを削除"
                                                             Visibility="Collapsed">
-                                                        <Path Data="{StaticResource DeleteIconGeometry}" Style="{StaticResource SmallIconPathBrandStyle}" />
+                                                        <Path Data="{StaticResource DeleteIconGeometry}"
+                                                              Style="{StaticResource PathBrandIconSmallStyle}" />
                                                     </Button>
                                                 </StackPanel>
                                             </Grid>
@@ -92,18 +92,21 @@
                                                         </Grid.InputBindings>
                                                         <Grid.ContextMenu>
                                                             <ContextMenu x:Name="TaskContextMenu">
-                                                                <MenuItem Header="コンテナへ移動" ItemsSource="{Binding PlacementTarget.Tag.AvailableContainers, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                                                <MenuItem Header="コンテナへ移動"
+                                                                          ItemsSource="{Binding PlacementTarget.Tag.AvailableContainers, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
                                                                     <MenuItem.Icon>
                                                                         <TextBlock Text="📂" />
                                                                     </MenuItem.Icon>
                                                                     <MenuItem.ItemContainerStyle>
-                                                                        <Style BasedOn="{StaticResource {x:Type MenuItem}}" TargetType="MenuItem">
+                                                                        <Style BasedOn="{StaticResource {x:Type MenuItem}}"
+                                                                               TargetType="MenuItem">
                                                                             <Setter Property="Header" Value="{Binding Name}" />
                                                                             <Setter Property="Command" Value="{Binding PlacementTarget.Tag.MoveTaskCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
                                                                             <Setter Property="CommandParameter">
                                                                                 <Setter.Value>
                                                                                     <MultiBinding Converter="{StaticResource MoveTaskArgsConverter}">
-                                                                                        <Binding Path="PlacementTarget.DataContext" RelativeSource="{RelativeSource AncestorType=ContextMenu}" />
+                                                                                        <Binding Path="PlacementTarget.DataContext"
+                                                                                                 RelativeSource="{RelativeSource AncestorType=ContextMenu}" />
                                                                                         <Binding Path="Id" />
                                                                                     </MultiBinding>
                                                                                 </Setter.Value>
@@ -112,24 +115,29 @@
                                                                     </MenuItem.ItemContainerStyle>
                                                                 </MenuItem>
                                                                 <Separator />
-                                                                <MenuItem Command="{Binding PlacementTarget.Tag.MoveTaskCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" Header="未分類へ移動">
+                                                                <MenuItem Command="{Binding PlacementTarget.Tag.MoveTaskCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                          Header="未分類へ移動">
                                                                     <MenuItem.Icon>
                                                                         <TextBlock Text="🍃" />
                                                                     </MenuItem.Icon>
                                                                     <MenuItem.CommandParameter>
                                                                         <MultiBinding Converter="{StaticResource MoveTaskArgsConverter}">
-                                                                            <Binding Path="PlacementTarget.DataContext" RelativeSource="{RelativeSource AncestorType=ContextMenu}" />
+                                                                            <Binding Path="PlacementTarget.DataContext"
+                                                                                     RelativeSource="{RelativeSource AncestorType=ContextMenu}" />
                                                                             <Binding Source="{x:Null}" />
                                                                         </MultiBinding>
                                                                     </MenuItem.CommandParameter>
                                                                 </MenuItem>
                                                                 <Separator />
-                                                                <MenuItem Command="{Binding PlacementTarget.Tag.DeleteTaskCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" Header="削除">
+                                                                <MenuItem Command="{Binding PlacementTarget.Tag.DeleteTaskCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                          Header="削除">
                                                                     <MenuItem.Icon>
-                                                                        <TextBlock Foreground="{DynamicResource TextPrimaryBrush}" Text="🗑️" />
+                                                                        <TextBlock Foreground="{DynamicResource TextPrimaryBrush}"
+                                                                                   Text="🗑️" />
                                                                     </MenuItem.Icon>
                                                                     <MenuItem.CommandParameter>
-                                                                        <Binding Path="PlacementTarget.DataContext" RelativeSource="{RelativeSource AncestorType=ContextMenu}" />
+                                                                        <Binding Path="PlacementTarget.DataContext"
+                                                                                 RelativeSource="{RelativeSource AncestorType=ContextMenu}" />
                                                                     </MenuItem.CommandParameter>
                                                                 </MenuItem>
                                                             </ContextMenu>
@@ -140,19 +148,63 @@
                                                                 BorderBrush="{DynamicResource OutlineBaseBrush}"
                                                                 BorderThickness="0,0,0,1">
                                                             <StackPanel>
-                                                                <TextBlock x:Name="TaskNameText"
-                                                                           FontSize="12"
-                                                                           Foreground="{DynamicResource TextPrimaryBrush}"
-                                                                           Text="{Binding Name}" />
+                                                                <Grid>
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="2*" />
+                                                                        <ColumnDefinition Width="1*" />
+                                                                        <ColumnDefinition Width="1*" />
+                                                                        <ColumnDefinition Width="1*" />
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <!-- Task Name -->
+                                                                    <TextBlock x:Name="TaskNameText"
+                                                                               VerticalAlignment="Center"
+                                                                               FontSize="12"
+                                                                               Foreground="{DynamicResource TextPrimaryBrush}"
+                                                                               Text="{Binding Name}" />
+                                                                    <!-- Assignee -->
+                                                                    <TextBlock Grid.Column="1"
+                                                                               VerticalAlignment="Center"
+                                                                               Style="{StaticResource TextBlockMetaBaseStyle}">
+                                                                        <Run Text="担当: " />
+                                                                        <Run Text="{Binding AssigneeName}" />
+                                                                    </TextBlock>
+                                                                    <!-- Deadline -->
+                                                                    <TextBlock Grid.Column="2"
+                                                                               VerticalAlignment="Center"
+                                                                               Style="{DynamicResource TextBlockMetaBaseStyle}">
+                                                                        <Run Text="期限: " />
+                                                                        <Run Text="{Binding Deadline, StringFormat=MM/dd}" />
+                                                                    </TextBlock>
+                                                                    <!-- Progress -->
+                                                                    <StackPanel Grid.Column="3"
+                                                                                VerticalAlignment="Center">
+                                                                        <Grid>
+                                                                            <TextBlock FontWeight="Bold"
+                                                                                       Foreground="{DynamicResource BrandPrimaryBrush}"
+                                                                                       Style="{StaticResource TextBlockMetaBaseStyle}"
+                                                                                       Text="Growth Phase" />
+                                                                            <TextBlock HorizontalAlignment="Right"
+                                                                                       FontWeight="Bold"
+                                                                                       Foreground="{DynamicResource BrandPrimaryBrush}"
+                                                                                       Style="{StaticResource TextBlockMetaBaseStyle}"
+                                                                                       Text="{Binding CompletionPercentage, StringFormat={}{0:0}%}" />
+                                                                        </Grid>
+                                                                        <ProgressBar Margin="{StaticResource ContentTopNarrowMargin}"
+                                                                                     Maximum="100"
+                                                                                     Style="{StaticResource ProgressBarAllTasksProjectStyle}"
+                                                                                     Value="{Binding CompletionPercentage}" />
+                                                                    </StackPanel>
+                                                                </Grid>
                                                                 <StackPanel x:Name="InfoPanel"
                                                                             Margin="{StaticResource TaskCardInfoMargin}"
                                                                             Orientation="Horizontal"
                                                                             Visibility="Collapsed">
                                                                     <TextBlock Style="{DynamicResource TextBlockMetaBaseStyle}">
-                                                                        <Run Text="担当: " />
-                                                                        <Run Text="{Binding AssigneeName}" />
-                                                                        <Run Text=" | 期限: " />
-                                                                        <Run Text="{Binding Deadline, StringFormat=MM/dd}" />
+                                                                        <Run Text="ステータス: " />
+                                                                        <Run Text="{Binding Status, Converter={StaticResource EnumToDisplayNameConverter}}" />
+                                                                        <Run Text=" | " />
+                                                                        <Run Text="実績工数: " />
+                                                                        <Run Text="{Binding ActualCost}" />
                                                                     </TextBlock>
                                                                 </StackPanel>
                                                             </StackPanel>
@@ -162,7 +214,8 @@
                                                         <Trigger Property="IsMouseOver" Value="True">
                                                             <Setter TargetName="RootGrid" Property="Background" Value="{DynamicResource StateHoverBrush}" />
                                                         </Trigger>
-                                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                        <DataTrigger Binding="{Binding IsSelected}"
+                                                                     Value="True">
                                                             <Setter TargetName="TaskBorder" Property="Background" Value="{DynamicResource SurfaceLayer1Brush}" />
                                                             <Setter TargetName="TaskBorder" Property="Margin" Value="12,8" />
                                                             <Setter TargetName="TaskBorder" Property="Padding" Value="16" />
@@ -223,7 +276,8 @@
                 </ItemsControl>
 
                 <!-- Ghost Container (Add Group) -->
-                <Button Command="{Binding AddContainerCommand}" Style="{StaticResource ButtonWorkspaceAddGroupStyle}" />
+                <Button Command="{Binding AddContainerCommand}"
+                        Style="{StaticResource ButtonWorkspaceAddGroupStyle}" />
 
                 <!-- 順序調整ボタン -->
                 <Button Command="{Binding ReorderItemsCommand}"
@@ -232,11 +286,12 @@
             </StackPanel>
         </ScrollViewer>
 
+        <!--
         <GridSplitter Grid.Column="1"
                       HorizontalAlignment="Stretch"
                       Background="{DynamicResource OutlineBaseBrush}" />
-
-        <!-- 右側：グラフィカル・フロー図 -->
+        -->
+        <!-- 右側：グラフィカル・フロー図
         <Grid Grid.Column="2" Background="{DynamicResource FlowBackgroundBrush}">
             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                 <Grid>
@@ -282,5 +337,6 @@
                 </Grid>
             </ScrollViewer>
         </Grid>
+        -->
     </Grid>
 </UserControl>

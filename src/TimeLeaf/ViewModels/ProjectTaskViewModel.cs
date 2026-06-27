@@ -213,6 +213,15 @@ public partial class ProjectTaskViewModel : ObservableObject, IDisposable
         }
     }
 
+    /// <summary>
+    /// タスクの進捗率 (0-100)。
+    /// </summary>
+    public double CompletionPercentage
+    {
+        get => EstimatedCost == 0 ? 0 : (double)ActualCost / EstimatedCost * 100;
+        set { }
+    }
+
     [ObservableProperty]
     private string _assigneeInitial = "?";
 

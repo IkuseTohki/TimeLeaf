@@ -1,4 +1,4 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
@@ -8,14 +8,21 @@
         <ResourceDictionary Source="../Controls/Text.xaml" />
         <ResourceDictionary Source="../Controls/Buttons.xaml" />
         <ResourceDictionary Source="../Controls/Containers.xaml" />
-        <ResourceDictionary Source="../Common/SharedStyles.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <Style x:Key="UniformGridAllTasksProjectContainerStyle" TargetType="UniformGrid">
+    <Style x:Key="UniformGridAllTasksProjectContainerStyle"
+           TargetType="UniformGrid">
         <Setter Property="Columns" Value="2" />
     </Style>
 
-    <Style x:Key="BorderAllTasksTimelineGroupIconStyle" TargetType="Border">
+    <DropShadowEffect x:Key="AllTasksShadowEffect"
+                      BlurRadius="10"
+                      Direction="-90"
+                      Opacity="{StaticResource OpacityMuted}"
+                      ShadowDepth="2" />
+
+    <Style x:Key="BorderAllTasksTimelineGroupIconStyle"
+           TargetType="Border">
         <Setter Property="Width" Value="48" />
         <Setter Property="Height" Value="48" />
         <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />
@@ -23,7 +30,8 @@
         <Setter Property="Effect" Value="{StaticResource AllTasksShadowEffect}" />
     </Style>
 
-    <Style x:Key="RectangleAllTasksTimelineVerticalLineStyle" TargetType="Rectangle">
+    <Style x:Key="RectangleAllTasksTimelineVerticalLineStyle"
+           TargetType="Rectangle">
         <Setter Property="Width" Value="2" />
         <Setter Property="Margin" Value="23,20,0,-20" />
         <Setter Property="HorizontalAlignment" Value="Left" />
@@ -31,7 +39,8 @@
         <Setter Property="Opacity" Value="{StaticResource OpacityMuted}" />
     </Style>
 
-    <Style x:Key="EllipseAllTasksTimelineMarkerStyle" TargetType="Ellipse">
+    <Style x:Key="EllipseAllTasksTimelineMarkerStyle"
+           TargetType="Ellipse">
         <Setter Property="Width" Value="12" />
         <Setter Property="Height" Value="12" />
         <Setter Property="Margin" Value="18,14,0,0" />
@@ -42,20 +51,22 @@
         <Setter Property="StrokeThickness" Value="2" />
     </Style>
 
-    <Style x:Key="GridAllTasksTimelineItemStyle" TargetType="Grid">
+    <Style x:Key="GridAllTasksTimelineItemStyle"
+           TargetType="Grid">
         <Setter Property="Margin" Value="24,0,0,20" />
     </Style>
 
-    <Style x:Key="BorderAllTasksTimelineCardStyle" TargetType="Border">
+    <Style x:Key="BorderAllTasksTimelineCardStyle"
+           TargetType="Border">
         <Setter Property="Margin" Value="32,0,0,0" />
-        <Setter Property="Padding" Value="20" />
+        <Setter Property="Padding" Value="20,10" />
         <Setter Property="Background" Value="{DynamicResource SurfaceLayer1Brush}" />
         <Setter Property="CornerRadius" Value="{DynamicResource CardCornerRadius}" />
         <Setter Property="Effect" Value="{StaticResource AllTasksShadowEffect}" />
     </Style>
 
-    <Style x:Key="BorderAllTasksTimelineProjectLabelStyle" TargetType="Border">
-        <Setter Property="Margin" Value="12,0" />
+    <Style x:Key="BorderAllTasksTimelineProjectLabelStyle"
+           TargetType="Border">
         <Setter Property="Padding" Value="8,1" />
         <Setter Property="Background" Value="{DynamicResource ButtonSecondaryBackgroundBrush}" />
         <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
@@ -69,8 +80,16 @@
         <Setter Property="Opacity" Value="{StaticResource OpacityMedium}" />
     </Style>
 
-    <Style x:Key="BorderAllTasksProjectCardStyle" TargetType="Border">
-        <Setter Property="Width" Value="340" />
+    <Style x:Key="TextBlockAllTasksTimelinePropertyStyle"
+           BasedOn="{StaticResource TextBlockMetaBaseStyle}"
+           TargetType="TextBlock">
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    </Style>
+
+    <Style x:Key="BorderAllTasksProjectCardStyle"
+           TargetType="Border">
+        <Setter Property="Width" Value="335" />
         <Setter Property="Margin" Value="0,0,24,24" />
         <Setter Property="Padding" Value="24" />
         <Setter Property="Background" Value="{DynamicResource AllTasksProjectCardBackgroundBrush}" />
@@ -78,7 +97,8 @@
         <Setter Property="Effect" Value="{StaticResource AllTasksShadowEffect}" />
     </Style>
 
-    <Style x:Key="BorderAllTasksProjectIconStyle" TargetType="Border">
+    <Style x:Key="BorderAllTasksProjectIconStyle"
+           TargetType="Border">
         <Setter Property="Width" Value="48" />
         <Setter Property="Height" Value="48" />
         <Setter Property="Background" Value="{DynamicResource BrandPrimaryHoverBrush}" />
@@ -86,14 +106,15 @@
         <Setter Property="HorizontalAlignment" Value="Left" />
     </Style>
 
-    <Style x:Key="ProgressBarAllTasksProjectStyle" TargetType="ProgressBar">
+    <Style x:Key="ProgressBarAllTasksProjectStyle"
+           TargetType="ProgressBar">
         <Setter Property="Height" Value="4" />
-        <Setter Property="Margin" Value="0,8,0,0" />
         <Setter Property="Background" Value="{DynamicResource ProgressBarBlankBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource BrandPrimaryBrush}" />
     </Style>
 
-    <Style x:Key="BorderAllTasksStatusIconStyle" TargetType="Border">
+    <Style x:Key="BorderAllTasksStatusIconStyle"
+           TargetType="Border">
         <Setter Property="Width" Value="32" />
         <Setter Property="Height" Value="32" />
         <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}" />
@@ -127,7 +148,8 @@
         <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
     </Style>
 
-    <Style x:Key="FrameworkElementAllTasksFilterItemStyle" TargetType="FrameworkElement">
+    <Style x:Key="FrameworkElementAllTasksFilterItemStyle"
+           TargetType="FrameworkElement">
         <Setter Property="Margin" Value="0,0,16,0" />
         <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
@@ -140,21 +162,24 @@
         <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
 
-    <Style x:Key="TextBlockAllTasksGridIconStyle" TargetType="TextBlock">
+    <Style x:Key="TextBlockAllTasksGridIconStyle"
+           TargetType="TextBlock">
         <Setter Property="Margin" Value="0,0,12,0" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="FontSize" Value="14" />
         <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
     </Style>
 
-    <Style x:Key="TextBlockAllTasksGridTaskNameStyle" TargetType="TextBlock">
+    <Style x:Key="TextBlockAllTasksGridTaskNameStyle"
+           TargetType="TextBlock">
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="FontSize" Value="12" />
         <Setter Property="FontWeight" Value="{StaticResource FontWeightHeader}" />
         <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
     </Style>
 
-    <Style x:Key="BorderAllTasksGridTaskCardStyle" TargetType="Border">
+    <Style x:Key="BorderAllTasksGridTaskCardStyle"
+           TargetType="Border">
         <Setter Property="Margin" Value="0,0,0,8" />
         <Setter Property="Padding" Value="12" />
         <Setter Property="Background" Value="{DynamicResource SurfaceLayer1Brush}" />
@@ -166,21 +191,23 @@
            BasedOn="{StaticResource ButtonRoundStyle}"
            TargetType="Button">
         <Setter Property="MinHeight" Value="{StaticResource ButtonHeightSmall}" />
-        <Setter Property="Margin" Value="16,0,0,0" />
         <Setter Property="Padding" Value="8,2" />
     </Style>
 
-    <Style x:Key="FrameworkElementAllTasksTaskItemMainColumnStyle" TargetType="FrameworkElement">
+    <Style x:Key="FrameworkElementAllTasksTaskItemMainColumnStyle"
+           TargetType="FrameworkElement">
         <Setter Property="Margin" Value="20,0,0,0" />
         <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
 
-    <Style x:Key="FrameworkElementAllTasksTaskItemSubColumnStyle" TargetType="FrameworkElement">
+    <Style x:Key="FrameworkElementAllTasksTaskItemSubColumnStyle"
+           TargetType="FrameworkElement">
         <Setter Property="Margin" Value="16,0,0,0" />
         <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
 
-    <Style x:Key="StackPanelAllTasksHeaderActionContainerStyle" TargetType="StackPanel">
+    <Style x:Key="StackPanelAllTasksHeaderActionContainerStyle"
+           TargetType="StackPanel">
         <Setter Property="HorizontalAlignment" Value="Right" />
         <Setter Property="VerticalAlignment" Value="Bottom" />
         <Setter Property="Orientation" Value="Horizontal" />

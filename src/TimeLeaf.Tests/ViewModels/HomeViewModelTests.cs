@@ -69,10 +69,17 @@ public class HomeViewModelTests
         t2.UpdateStatus(TaskStatus.NotStarted);
         p2.AddTask(t2);
 
+        var p3 = new Project(Guid.Empty);
+        p3.UpdateName("P3");
+        var t3 = new ProjectTask();
+        t3.UpdateStatus(TaskStatus.InReview);
+        p3.AddTask(t3);
+
         var projects = new ObservableCollection<ProjectViewModel>
         {
             CreateProjectViewModel(p1),
             CreateProjectViewModel(p2),
+            CreateProjectViewModel(p3),
         };
 
         // Act
@@ -81,6 +88,7 @@ public class HomeViewModelTests
         // Assert
         Assert.AreEqual(1, viewModel.NotStartedCount);
         Assert.AreEqual(1, viewModel.InProgressCount);
+        Assert.AreEqual(1, viewModel.InReviewCount);
     }
 
     [TestMethod]

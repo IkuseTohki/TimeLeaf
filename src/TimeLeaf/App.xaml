@@ -24,18 +24,17 @@
                 <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/ComponentStyles.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/LeafKit.UI;component/Resources/FormStyles.xaml" />
 
-                <!-- [8-13] App Styles -->
+                <!-- [8-12] App Styles -->
                 <ResourceDictionary Source="/Resources/Converters.xaml" />
-                <ResourceDictionary Source="/Resources/Common/SharedStyles.xaml" />
                 <ResourceDictionary Source="/Resources/Controls/Text.xaml" />
                 <ResourceDictionary Source="/Resources/Controls/Buttons.xaml" />
                 <ResourceDictionary Source="/Resources/Controls/Inputs.xaml" />
                 <ResourceDictionary Source="/Resources/Controls/Containers.xaml" />
 
-                <!-- [14] ACTIVE THEME SLOT (Crucial: Overrides everything above) -->
+                <!-- [13] ACTIVE THEME SLOT (Crucial: Overrides everything above) -->
                 <ResourceDictionary Source="/Resources/Themes/Forest.xaml" />
 
-                <!-- [15] App DataTemplates -->
+                <!-- [14] App DataTemplates -->
                 <ResourceDictionary Source="/Resources/DataTemplates.xaml" />
             </ResourceDictionary.MergedDictionaries>
 

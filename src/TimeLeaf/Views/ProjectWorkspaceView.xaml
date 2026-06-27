@@ -1,4 +1,4 @@
-<UserControl x:Class="TimeLeaf.Views.ProjectWorkspaceView"
+﻿<UserControl x:Class="TimeLeaf.Views.ProjectWorkspaceView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:c="http://schemas.leafkit.com/wpf/ui/controls"
@@ -43,13 +43,14 @@
         <!-- ヘッダー (ProjectWorkspaceView 特有のヘッダー) -->
         <Grid Style="{StaticResource GridViewHeaderStyle}">
             <StackPanel VerticalAlignment="Bottom">
-                <TextBlock Style="{StaticResource ProjectWorkspaceTitleStyle}">
+                <TextBlock Style="{StaticResource TextBlockTitleBaseStyle}">
                     <Run Text="{Binding ProjectName, Mode=OneWay}" />
-                    <Run Style="{StaticResource ProjectStatusTextStyle}" Text=" 進行中" />
+                    <Run Style="{StaticResource RunWorkspaceStatusStyle}"
+                         Text=" 進行中" />
                 </TextBlock>
-                <TextBlock Margin="0,4,0,4"
+                <TextBlock Margin="{StaticResource ContentTopNarrowMargin}"
                            Style="{StaticResource TextBlockViewHeaderSubTitleStyle}"
-                           Text="個別プロジェクトのワークスペースを表示中" />
+                           Text="個別プロジェクトのワークスペース" />
             </StackPanel>
 
             <!-- 操作ボタン / 参加バナー -->
@@ -60,7 +61,7 @@
                 <!-- 参加バナー (非参加時) -->
                 <Button Command="{Binding ProjectViewModel.JoinProjectCommand}"
                         Content="このプロジェクトに参加する"
-                        Style="{StaticResource PrimaryButtonStyle}"
+                        Style="{StaticResource ButtonPrimaryStyle}"
                         Visibility="{Binding IsUserAssigned, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Inverse}" />
 
                 <!-- タブナビゲーション (統一されたコンポーネント) -->
@@ -74,6 +75,7 @@
         </Grid>
 
         <!-- サブビュー表示領域 -->
-        <ContentControl Grid.Row="1" Content="{Binding CurrentSubViewModel}" />
+        <ContentControl Grid.Row="1"
+                        Content="{Binding CurrentSubViewModel}" />
     </Grid>
 </UserControl>

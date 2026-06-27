@@ -34,6 +34,9 @@
     <sys:Double x:Key="FontSizeBody">12</sys:Double>
     <sys:Double x:Key="FontSizeCaption">11</sys:Double>
     <sys:Double x:Key="FontSizeMeta">10</sys:Double>
+    <sys:Double x:Key="FontSizeSmallLabel">12</sys:Double>
+    <sys:Double x:Key="FontSizeMediumLabel">15</sys:Double>
+    <sys:Double x:Key="FontSizeLargeLabel">18</sys:Double>
 
     <FontWeight x:Key="FontWeightEmphasis">Bold</FontWeight>
     <FontWeight x:Key="FontWeightHeader">SemiBold</FontWeight>

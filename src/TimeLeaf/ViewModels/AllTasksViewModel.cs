@@ -8,6 +8,7 @@ using System.Windows.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TimeLeaf.Models.Enums;
+using TimeLeaf.Services;
 
 namespace TimeLeaf.ViewModels;
 
@@ -17,6 +18,8 @@ namespace TimeLeaf.ViewModels;
 public partial class AllTasksViewModel : ObservableObject, IDisposable
 {
     private readonly ObservableCollection<ProjectViewModel> _projects;
+
+    private readonly IIdentityService _identityService;
 
     [ObservableProperty]
     private AllTasksViewMode _currentViewMode = AllTasksViewMode.List;
@@ -53,6 +56,9 @@ public partial class AllTasksViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     private bool _showOnlyIncomplete = true;
 
+    [ObservableProperty]
+    private bool _showOnlyMyself = false;
+
     /// <summary>
     /// 特定のプロジェクト（およびオプションでタスク）への遷移が要求されたときに発生します。
     /// </summary>
@@ -62,10 +68,12 @@ public partial class AllTasksViewModel : ObservableObject, IDisposable
     /// コンストラクタ。
     /// </summary>
     /// <param name="projects">全プロジェクトのリスト。</param>
-    public AllTasksViewModel(ObservableCollection<ProjectViewModel> projects)
+    public AllTasksViewModel(ObservableCollection<ProjectViewModel> projects, IIdentityService identityService)
     {
         _projects = projects ?? throw new ArgumentNullException(nameof(projects));
         AllTasksView = CollectionViewSource.GetDefaultView(AllTasks);
+
+        _identityService = identityService;
 
         // 初期集約と全タスクへの監視設定
         foreach (var project in _projects)
@@ -77,7 +85,7 @@ public partial class AllTasksViewModel : ObservableObject, IDisposable
             }
         }
 
-        RebuildTasks();
+        RebuildTasks(_identityService.CurrentUserId);
 
         // プロジェクトリストの変更を監視
         _projects.CollectionChanged += OnProjectsCollectionChanged;
@@ -152,7 +160,7 @@ public partial class AllTasksViewModel : ObservableObject, IDisposable
                 }
             }
         }
-        RebuildTasks();
+        RebuildTasks(_identityService.CurrentUserId);
     }
 
     private void OnTasksCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -177,7 +185,7 @@ public partial class AllTasksViewModel : ObservableObject, IDisposable
                 }
             }
         }
-        RebuildTasks();
+        RebuildTasks(_identityService.CurrentUserId);
     }
 
     private void OnTaskPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -192,18 +200,20 @@ public partial class AllTasksViewModel : ObservableObject, IDisposable
         };
         if (affectedProperties.Contains(e.PropertyName))
         {
-            RebuildTasks();
+            RebuildTasks(_identityService.CurrentUserId);
         }
     }
 
-    partial void OnSearchKeywordChanged(string value) => RebuildTasks();
+    partial void OnSearchKeywordChanged(string value) => RebuildTasks(_identityService.CurrentUserId);
 
-    partial void OnShowOnlyIncompleteChanged(bool value) => RebuildTasks();
+    partial void OnShowOnlyIncompleteChanged(bool value) => RebuildTasks(_identityService.CurrentUserId);
+
+    partial void OnShowOnlyMyselfChanged(bool value) => RebuildTasks(_identityService.CurrentUserId);
 
     /// <summary>
     /// フィルタリングとソートを適用してタスクリストを再構築します。
     /// </summary>
-    private void RebuildTasks()
+    private void RebuildTasks(Guid currentUserId)
     {
         var query = _projects.SelectMany(p => p.Tasks).AsEnumerable();
 
@@ -220,6 +230,12 @@ public partial class AllTasksViewModel : ObservableObject, IDisposable
         if (ShowOnlyIncomplete)
         {
             query = query.Where(t => t.Status != TimeLeaf.Models.Enums.TaskStatus.Completed);
+        }
+
+        // フィルタリング: 自身のみ
+        if (ShowOnlyMyself)
+        {
+            query = query.Where(t => t.Assignee == currentUserId);
         }
 
         // ソート: 1.期限(昇順) 2.優先度(降順) 3.プロジェクト名(昇順)

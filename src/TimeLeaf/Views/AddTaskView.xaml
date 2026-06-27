@@ -10,17 +10,22 @@
              Width="{StaticResource DialogWidthLarge}"
              d:DataContext="{d:DesignInstance vm:AddTaskViewModel}"
              mc:Ignorable="d">
-    <UserControl.Resources />
     <StackPanel Style="{StaticResource StackPanelDialogRootStyle}">
-        <TextBlock Style="{StaticResource TextBlockFormTitleStyle}" Text="タスク作成" />
+        <TextBlock Margin="{StaticResource FormTitleMargin}"
+                   Style="{StaticResource TextBlockFormTitleStyle}"
+                   Text="タスク作成" />
 
-        <Label Content="タスク名" Style="{StaticResource LabelFormFirstSectionHeaderStyle}" />
+        <Label Margin="{StaticResource FormLabelMargin}"
+               Content="タスク名"
+               Style="{StaticResource LabelSectionHeaderBaseStyle}" />
         <TextBox Margin="{StaticResource FormItemMargin}"
                  Style="{StaticResource ModernTextBoxStyle}"
                  Tag="例：UIプロトタイプの作成"
                  Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
 
-        <Label Content="詳細" Style="{StaticResource LabelFormSectionHeaderStyle}" />
+        <Label Margin="{StaticResource FormLabelMargin}"
+               Content="詳細"
+               Style="{StaticResource LabelSectionHeaderBaseStyle}" />
         <TextBox Height="{StaticResource SizeHeight50}"
                  Margin="{StaticResource FormItemMargin}"
                  AcceptsReturn="True"
@@ -41,38 +46,52 @@
             </Grid.ColumnDefinitions>
 
             <!-- ステータス -->
-            <StackPanel Grid.Row="0" Grid.Column="0">
-                <Label Content="ステータス" Style="{StaticResource LabelFormSectionHeaderStyle}" />
+            <StackPanel Grid.Row="0"
+                        Grid.Column="0">
+                <Label Margin="{StaticResource FormLabelMargin}"
+                       Content="ステータス"
+                       Style="{StaticResource LabelSectionHeaderBaseStyle}" />
                 <lk:InteractiveChipsPicker Margin="{StaticResource FormItemMargin}"
                                            ItemsSource="{Binding TaskStatusValues}"
                                            Orientation="Horizontal"
                                            SelectedItem="{Binding Status, Mode=TwoWay}" />
             </StackPanel>
 
-            <StackPanel Grid.Row="0" Grid.Column="2">
-                <Label Content="優先度" Style="{StaticResource LabelFormSectionHeaderStyle}" />
+            <StackPanel Grid.Row="0"
+                        Grid.Column="2">
+                <Label Margin="{StaticResource FormLabelMargin}"
+                       Content="優先度"
+                       Style="{StaticResource LabelSectionHeaderBaseStyle}" />
                 <lk:InteractiveChipsPicker Margin="{StaticResource FormItemMargin}"
                                            ItemsSource="{Binding TaskPriorityValues}"
                                            Orientation="Horizontal"
                                            SelectedItem="{Binding Priority, Mode=TwoWay}" />
             </StackPanel>
 
-            <StackPanel Grid.Row="1" Grid.Column="0">
-                <Label Content="予定開始日" Style="{StaticResource LabelFormSectionHeaderStyle}" />
+            <StackPanel Grid.Row="1"
+                        Grid.Column="0">
+                <Label Margin="{StaticResource FormLabelMargin}"
+                       Content="予定開始日"
+                       Style="{StaticResource LabelSectionHeaderBaseStyle}" />
                 <c:LeafDatePicker Margin="{StaticResource FormItemMargin}"
                                   Placeholder="Select start date..."
                                   SelectedDate="{Binding PlannedStartDate}" />
             </StackPanel>
 
-            <StackPanel Grid.Row="1" Grid.Column="2">
-                <Label Content="期限" Style="{StaticResource LabelFormSectionHeaderStyle}" />
+            <StackPanel Grid.Row="1"
+                        Grid.Column="2">
+                <Label Margin="{StaticResource FormLabelMargin}"
+                       Content="期限"
+                       Style="{StaticResource LabelSectionHeaderBaseStyle}" />
                 <c:LeafDatePicker Margin="{StaticResource FormItemMargin}"
                                   Placeholder="Select due date..."
                                   SelectedDate="{Binding DueDate}" />
             </StackPanel>
         </Grid>
 
-        <Label Content="担当者" Style="{StaticResource LabelFormSectionHeaderStyle}" />
+        <Label Margin="{StaticResource FormLabelMargin}"
+               Content="担当者"
+               Style="{StaticResource LabelSectionHeaderBaseStyle}" />
         <c:LeafSearchableSelector Margin="{StaticResource FormItemMargin}"
                                   DisplayMemberPath="DisplayName"
                                   ItemContainerStyle="{StaticResource TeammateItemContainerCompactStyle}"
@@ -82,18 +101,23 @@
                                   SelectedItem="{Binding Assignee}"
                                   SelectedTemplate="{StaticResource TeammateSelectedCompactTemplate}" />
 
-        <Label Content="見積工数 (h)" Style="{StaticResource LabelFormSectionHeaderStyle}" />
+        <Label Margin="{StaticResource FormLabelMargin}"
+               Content="見積工数 (h)"
+               Style="{StaticResource LabelSectionHeaderBaseStyle}" />
         <TextBox Margin="{StaticResource FormItemMargin}"
                  Style="{StaticResource ModernTextBoxStyle}"
                  Tag="例：1.5"
                  Text="{Binding EstimatedWorkHours, UpdateSourceTrigger=PropertyChanged}" />
 
         <!-- フッターボタン -->
-        <StackPanel Style="{StaticResource StackPanelDialogFooterStyle}">
+        <StackPanel Margin="{StaticResource FormFooterMargin}"
+                    HorizontalAlignment="Right"
+                    Orientation="Horizontal">
             <Button Command="{Binding ConfirmCommand}"
                     Content="作成"
                     Style="{StaticResource ButtonDialogActionStyle}" />
-            <Button Command="{Binding CancelCommand}"
+            <Button Margin="{StaticResource ButtonLeftMargin}"
+                    Command="{Binding CancelCommand}"
                     Content="キャンセル"
                     Style="{StaticResource ButtonDialogCancelStyle}" />
         </StackPanel>

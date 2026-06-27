@@ -14,7 +14,8 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <!-- Navigation Button Style -->
-            <Style x:Key="RadioButtonSettingsNavStyle" TargetType="RadioButton">
+            <Style x:Key="RadioButtonSettingsNavStyle"
+                   TargetType="RadioButton">
                 <Setter Property="Height" Value="48" />
                 <Setter Property="Margin" Value="0,0,0,8" />
                 <Setter Property="Padding" Value="16,0" />
@@ -67,7 +68,8 @@
             </Style>
 
             <!-- Holiday Item Style -->
-            <Style x:Key="BorderHolidayItemStyle" TargetType="Border">
+            <Style x:Key="BorderHolidayItemStyle"
+                   TargetType="Border">
                 <Setter Property="Margin" Value="0,0,8,8" />
                 <Setter Property="Padding" Value="12,6" />
                 <Setter Property="Background" Value="{DynamicResource BrandSecondaryBrush}" />
@@ -78,7 +80,8 @@
             </Style>
 
             <!-- Override excessive margins from LeafKit.UI or Dialogs.xaml -->
-            <Style x:Key="GridDialogRootStyleOverride" TargetType="Grid">
+            <Style x:Key="GridDialogRootStyleOverride"
+                   TargetType="Grid">
                 <Setter Property="Margin" Value="0" />
             </Style>
         </ResourceDictionary>
@@ -138,17 +141,19 @@
             </Border>
 
             <!-- Content Area -->
-            <Grid Grid.Column="1" Background="{DynamicResource WorkspaceBackgroundBrush}">
+            <Grid Grid.Column="1"
+                  Background="{DynamicResource WorkspaceBackgroundBrush}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <Grid Margin="32">
                         <!-- Storage Settings -->
                         <StackPanel Visibility="{Binding SelectedCategory, Converter={StaticResource ComparisonConverter}, ConverterParameter={x:Static vm:SettingsCategory.Storage}}">
-                            <TextBlock Margin="0,0,0,24"
+                            <TextBlock Margin="{StaticResource FormTitleMargin}"
                                        Style="{StaticResource TextBlockFormTitleStyle}"
                                        Text="データ保存場所" />
                             <Border Style="{StaticResource BorderSettingsSectionCardStyle}">
                                 <StackPanel>
-                                    <TextBlock Style="{StaticResource TextBlockFormLabelStyle}" Text="現在の保存先フォルダ:" />
+                                    <TextBlock Style="{StaticResource TextBlockFormLabelStyle}"
+                                               Text="現在の保存先フォルダ:" />
                                     <TextBlock Margin="0,8,0,16"
                                                FontSize="13"
                                                Foreground="{DynamicResource TextSecondaryBrush}"
@@ -160,17 +165,19 @@
                                             Style="{StaticResource ButtonSecondaryStyle}" />
                                 </StackPanel>
                             </Border>
-                            <TextBlock Style="{StaticResource TextBlockSettingsAnnotationStyle}" Text="※変更するとアプリケーションは終了します。次回起動時に再設定を行ってください。" />
+                            <TextBlock Style="{StaticResource TextBlockSettingsAnnotationStyle}"
+                                       Text="※変更するとアプリケーションは終了します。次回起動時に再設定を行ってください。" />
                         </StackPanel>
 
                         <!-- Appearance Settings -->
                         <StackPanel Visibility="{Binding SelectedCategory, Converter={StaticResource ComparisonConverter}, ConverterParameter={x:Static vm:SettingsCategory.Appearance}}">
-                            <TextBlock Margin="0,0,0,24"
+                            <TextBlock Margin="{StaticResource FormTitleMargin}"
                                        Style="{StaticResource TextBlockFormTitleStyle}"
                                        Text="外観" />
                             <Border Style="{StaticResource BorderSettingsSectionCardStyle}">
                                 <StackPanel>
-                                    <TextBlock Style="{StaticResource TextBlockFormLabelStyle}" Text="テーマの選択:" />
+                                    <TextBlock Style="{StaticResource TextBlockFormLabelStyle}"
+                                               Text="テーマの選択:" />
                                     <ComboBox Width="200"
                                               Margin="0,8,0,0"
                                               HorizontalAlignment="Left"
@@ -183,19 +190,22 @@
                                     </ComboBox>
                                 </StackPanel>
                             </Border>
-                            <TextBlock Style="{StaticResource TextBlockSettingsAnnotationStyle}" Text="※Forestは目に優しい緑を基調としたテーマです。" />
+                            <TextBlock Style="{StaticResource TextBlockSettingsAnnotationStyle}"
+                                       Text="※Forestは目に優しい緑を基調としたテーマです。" />
                         </StackPanel>
 
                         <!-- Calendar Settings -->
                         <StackPanel Visibility="{Binding SelectedCategory, Converter={StaticResource ComparisonConverter}, ConverterParameter={x:Static vm:SettingsCategory.Calendar}}">
-                            <TextBlock Margin="0,0,0,24"
+                            <TextBlock Margin="{StaticResource FormTitleMargin}"
                                        Style="{StaticResource TextBlockFormTitleStyle}"
                                        Text="カレンダーと稼働日" />
 
                             <Border Style="{StaticResource BorderSettingsSectionCardStyle}">
                                 <StackPanel>
-                                    <TextBlock Style="{StaticResource TextBlockFormLabelStyle}" Text="稼働曜日の設定" />
-                                    <UniformGrid Margin="0,12,0,0" Columns="4">
+                                    <TextBlock Style="{StaticResource TextBlockFormLabelStyle}"
+                                               Text="稼働曜日の設定" />
+                                    <UniformGrid Margin="0,12,0,0"
+                                                 Columns="4">
                                         <CheckBox Content="月曜日"
                                                   IsChecked="{Binding IsMondayWorkday}"
                                                   Style="{StaticResource FormCheckBoxStyle}" />
@@ -223,7 +233,8 @@
 
                             <Border Style="{StaticResource BorderSettingsSectionCardStyle}">
                                 <StackPanel>
-                                    <TextBlock Style="{StaticResource TextBlockFormLabelStyle}" Text="休日・祝日の管理" />
+                                    <TextBlock Style="{StaticResource TextBlockFormLabelStyle}"
+                                               Text="休日・祝日の管理" />
                                     <Grid Margin="0,12,0,16">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
@@ -266,12 +277,13 @@
                                     </ItemsControl>
                                 </StackPanel>
                             </Border>
-                            <TextBlock Style="{StaticResource TextBlockSettingsAnnotationStyle}" Text="※非稼働日はタイムライン上でハイライトされ、期間計算から除外されます。" />
+                            <TextBlock Style="{StaticResource TextBlockSettingsAnnotationStyle}"
+                                       Text="※非稼働日はタイムライン上でハイライトされ、期間計算から除外されます。" />
                         </StackPanel>
 
                         <!-- Notification Settings -->
                         <StackPanel Visibility="{Binding SelectedCategory, Converter={StaticResource ComparisonConverter}, ConverterParameter={x:Static vm:SettingsCategory.Notifications}}">
-                            <TextBlock Margin="0,0,0,24"
+                            <TextBlock Margin="{StaticResource FormTitleMargin}"
                                        Style="{StaticResource TextBlockFormTitleStyle}"
                                        Text="通知" />
                             <Border Style="{StaticResource BorderSettingsSectionCardStyle}">
@@ -289,7 +301,7 @@
 
                         <!-- Behavior Settings -->
                         <StackPanel Visibility="{Binding SelectedCategory, Converter={StaticResource ComparisonConverter}, ConverterParameter={x:Static vm:SettingsCategory.Behavior}}">
-                            <TextBlock Margin="0,0,0,24"
+                            <TextBlock Margin="{StaticResource FormTitleMargin}"
                                        Style="{StaticResource TextBlockFormTitleStyle}"
                                        Text="動作" />
                             <Border Style="{StaticResource BorderSettingsSectionCardStyle}">
@@ -299,7 +311,8 @@
                                               Style="{StaticResource FormCheckBoxStyle}" />
                                 </StackPanel>
                             </Border>
-                            <TextBlock Style="{StaticResource TextBlockSettingsAnnotationStyle}" Text="※常駐モードでは、アプリを閉じても情報の同期や通知を継続します。" />
+                            <TextBlock Style="{StaticResource TextBlockSettingsAnnotationStyle}"
+                                       Text="※常駐モードでは、アプリを閉じても情報の同期や通知を継続します。" />
                         </StackPanel>
                     </Grid>
                 </ScrollViewer>
@@ -312,13 +325,14 @@
                 Background="{DynamicResource SurfaceBaseBrush}"
                 BorderBrush="{DynamicResource OutlineBaseBrush}"
                 BorderThickness="0,1,0,0">
-            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+            <StackPanel HorizontalAlignment="Right"
+                        Orientation="Horizontal">
                 <Button Width="120"
                         Command="{Binding SaveCommand}"
                         Content="設定を保存"
                         Style="{StaticResource ButtonDialogActionStyle}" />
                 <Button Width="100"
-                        Margin="12,0,0,0"
+                        Margin="{StaticResource ButtonLeftMargin}"
                         Command="{Binding CancelCommand}"
                         Content="キャンセル"
                         Style="{StaticResource ButtonDialogCancelStyle}" />

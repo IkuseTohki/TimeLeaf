@@ -16,16 +16,16 @@
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0"
+                   Margin="{StaticResource FormTitleMargin}"
                    Style="{StaticResource TextBlockFormTitleStyle}"
                    Text="ユーザー管理" />
 
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer Grid.Row="1"
+                      VerticalScrollBarVisibility="Auto">
             <ItemsControl ItemsSource="{Binding Users}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Border Padding="12"
-                                BorderBrush="{DynamicResource OutlineBaseBrush}"
-                                BorderThickness="0,0,0,1">
+                        <Border Style="{StaticResource BorderSimpleListStyle}">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
@@ -35,20 +35,8 @@
 
                                 <!-- アバター -->
                                 <Border Grid.Column="0"
-                                        Width="40"
-                                        Height="40"
-                                        CornerRadius="20">
-                                    <Border.Style>
-                                        <Style TargetType="Border">
-                                            <Setter Property="Background" Value="{Binding ThemeColor}" />
-                                        </Style>
-                                    </Border.Style>
-                                    <TextBlock HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"
-                                               FontSize="24"
-                                               FontWeight="Bold"
-                                               Foreground="White"
-                                               Text="{Binding UserInitial}" />
+                                        Style="{StaticResource BorderUserAvatarIconStyle}">
+                                    <ContentControl Template="{StaticResource PersonAvatarTemplate}" />
                                 </Border>
 
                                 <!-- ユーザー名 -->
@@ -87,7 +75,10 @@
         </ScrollViewer>
 
         <!-- フッターボタン -->
-        <StackPanel Grid.Row="2" Style="{StaticResource StackPanelDialogFooterStyle}">
+        <StackPanel Grid.Row="2"
+                    Margin="{StaticResource FormFooterMargin}"
+                    HorizontalAlignment="Right"
+                    Orientation="Horizontal">
             <Button Command="{Binding CloseCommand}"
                     Content="閉じる"
                     Style="{StaticResource ButtonDialogCancelStyle}" />

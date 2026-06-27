@@ -1,4 +1,4 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
@@ -15,45 +15,68 @@
     <!-- ====================================================================== -->
 
     <!-- Surfaces -->
-    <SolidColorBrush x:Key="WorkspaceBackgroundBrush" Color="#F0F4EF" />
-    <SolidColorBrush x:Key="TextBaseBrush" Color="{StaticResource Slate900}" />
+    <SolidColorBrush x:Key="WorkspaceBackgroundBrush"
+                     Color="#F0F4EF" />
+    <SolidColorBrush x:Key="TextBaseBrush"
+                     Color="{StaticResource Slate900}" />
     <LinearGradientBrush x:Key="NotificationPaneBackgroundBrush" StartPoint="1,0.5" EndPoint="0,0.5">
         <GradientStop Offset="0.6" Color="#F2FFFFFF" />
         <GradientStop Offset="1.0" Color="#00FFFFFF" />
     </LinearGradientBrush>
 
     <!-- Sidebar -->
-    <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="{StaticResource Green950}" />
-    <SolidColorBrush x:Key="SidebarSelectedBackgroundBrush" Color="{StaticResource Green1000}" />
-    <SolidColorBrush x:Key="SidebarTextBrush" Color="{StaticResource Slate100}" />
-    <SolidColorBrush x:Key="SidebarHoverOverlayBrush" Color="#1AFFFFFF" />
-    <SolidColorBrush x:Key="SidebarPressedOverlayBrush" Color="#33FFFFFF" />
+    <SolidColorBrush x:Key="SidebarBackgroundBrush"
+                     Color="{StaticResource Green950}" />
+    <SolidColorBrush x:Key="SidebarSelectedBackgroundBrush"
+                     Color="{StaticResource Green1000}" />
+    <SolidColorBrush x:Key="SidebarTextBrush"
+                     Color="{StaticResource Slate100}" />
+    <SolidColorBrush x:Key="SidebarHoverOverlayBrush"
+                     Color="#1AFFFFFF" />
+    <SolidColorBrush x:Key="SidebarPressedOverlayBrush"
+                     Color="#33FFFFFF" />
 
     <!-- Task Specific Brushes -->
-    <SolidColorBrush x:Key="PriorityHighBrush" Color="#B03A2E" />
-    <SolidColorBrush x:Key="PriorityMediumBrush" Color="#2D5A27" />
-    <SolidColorBrush x:Key="PriorityLowBrush" Color="#737A71" />
+    <SolidColorBrush x:Key="PriorityHighBrush"
+                     Color="#B03A2E" />
+    <SolidColorBrush x:Key="PriorityMediumBrush"
+                     Color="#2D5A27" />
+    <SolidColorBrush x:Key="PriorityLowBrush"
+                     Color="#737A71" />
 
-    <SolidColorBrush x:Key="StatusCompletedBrush" Color="#737A71" />
-    <SolidColorBrush x:Key="StatusInReviewBrush" Color="#6A5ACD" />
-    <SolidColorBrush x:Key="StatusInProgressBrush" Color="#2D5A27" />
+    <SolidColorBrush x:Key="StatusCompletedBrush"
+                     Color="#737A71" />
+    <SolidColorBrush x:Key="StatusInReviewBrush"
+                     Color="#6A5ACD" />
+    <SolidColorBrush x:Key="StatusInProgressBrush"
+                     Color="#2D5A27" />
 
-    <SolidColorBrush x:Key="DeadlineOverdueBrush" Color="#B03A2E" />
-    <SolidColorBrush x:Key="DeadlineTodayBrush" Color="#D35400" />
-    <SolidColorBrush x:Key="DeadlineNearBrush" Color="#E67E22" />
+    <SolidColorBrush x:Key="DeadlineOverdueBrush"
+                     Color="#B03A2E" />
+    <SolidColorBrush x:Key="DeadlineTodayBrush"
+                     Color="#D35400" />
+    <SolidColorBrush x:Key="DeadlineNearBrush"
+                     Color="#E67E22" />
 
-    <SolidColorBrush x:Key="ProgressBarBlankBrush" Color="#E8F0E6" />
+    <SolidColorBrush x:Key="ProgressBarBlankBrush"
+                     Color="#E8F0E6" />
 
-    <SolidColorBrush x:Key="FlowBackgroundBrush" Color="#FAFAFA" />
-    <SolidColorBrush x:Key="AllTasksProjectCardBackgroundBrush" Color="#E0EDD5" />
+    <SolidColorBrush x:Key="FlowBackgroundBrush"
+                     Color="#FAFAFA" />
+    <SolidColorBrush x:Key="AllTasksProjectCardBackgroundBrush"
+                     Color="#E0EDD5" />
 
     <!-- Notifications -->
-    <SolidColorBrush x:Key="BadgeBackgroundBrush" Color="#C0392B" />
+    <SolidColorBrush x:Key="BadgeBackgroundBrush"
+                     Color="#C0392B" />
 
     <!-- Feedback -->
-    <SolidColorBrush x:Key="ErrorBrush" Color="#B03A2E" />
-    <SolidColorBrush x:Key="WarningBrush" Color="#D35400" />
-    <SolidColorBrush x:Key="SuccessBrush" Color="#2D5A27" />
+    <SolidColorBrush x:Key="ErrorBrush"
+                     Color="#B03A2E" />
+    <SolidColorBrush x:Key="WarningBrush"
+                     Color="#D35400" />
+    <SolidColorBrush x:Key="SuccessBrush"
+                     Color="#2D5A27" />
 
     <!-- ====================================================================== -->
     <!-- Theme-dependent Shapes (Organic feel) -->
@@ -62,5 +85,6 @@
     <CornerRadius x:Key="RadiusContainer">32</CornerRadius>
     <CornerRadius x:Key="RadiusCard">16</CornerRadius>
     <CornerRadius x:Key="RadiusTab">20</CornerRadius>
+    <CornerRadius x:Key="ButtonCornerRadius">12</CornerRadius>
 
 </ResourceDictionary>

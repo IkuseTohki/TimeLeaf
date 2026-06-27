@@ -47,7 +47,7 @@ public class ViewModelFactory : IViewModelFactory
 
     public AllTasksViewModel CreateAllTasksViewModel(ObservableCollection<ProjectViewModel> projects)
     {
-        return new AllTasksViewModel(projects);
+        return new AllTasksViewModel(projects, _identityService);
     }
 
     public ProjectWorkspaceViewModel CreateProjectWorkspaceViewModel(

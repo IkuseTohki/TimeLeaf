@@ -13,19 +13,23 @@
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
 
         <!-- Inverse Boolean To Visibility Converter -->
-        <Style x:Key="InverseVisibility" TargetType="FrameworkElement">
+        <Style x:Key="InverseVisibility"
+               TargetType="FrameworkElement">
             <Setter Property="Visibility" Value="Collapsed" />
             <Style.Triggers>
-                <DataTrigger Binding="{Binding IsArchived}" Value="False">
+                <DataTrigger Binding="{Binding IsArchived}"
+                             Value="False">
                     <Setter Property="Visibility" Value="Visible" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
 
-        <Style x:Key="NormalVisibility" TargetType="FrameworkElement">
+        <Style x:Key="NormalVisibility"
+               TargetType="FrameworkElement">
             <Setter Property="Visibility" Value="Collapsed" />
             <Style.Triggers>
-                <DataTrigger Binding="{Binding IsArchived}" Value="True">
+                <DataTrigger Binding="{Binding IsArchived}"
+                             Value="True">
                     <Setter Property="Visibility" Value="Visible" />
                 </DataTrigger>
             </Style.Triggers>
@@ -38,10 +42,12 @@
         </Grid.RowDefinitions>
 
         <!-- Content -->
-        <StackPanel Grid.Row="0" Style="{StaticResource StackPanelSettingsContainerStyle}">
+        <StackPanel Grid.Row="0"
+                    Style="{StaticResource StackPanelSettingsContainerStyle}">
 
             <!-- Lifecycle Management -->
-            <GroupBox Header="ライフサイクル管理" Style="{StaticResource GroupBoxSettingsStyle}">
+            <GroupBox Header="ライフサイクル管理"
+                      Style="{StaticResource GroupBoxSettingsStyle}">
                 <StackPanel>
                     <TextBlock Margin="0,0,0,16"
                                Foreground="{DynamicResource TextSecondaryBrush}"
@@ -51,7 +57,7 @@
                     <StackPanel Style="{StaticResource InverseVisibility}">
                         <Button Command="{Binding ArchiveCommand}"
                                 Content="プロジェクトをアーカイブする"
-                                Style="{StaticResource SecondaryButtonStyle}" />
+                                Style="{StaticResource ButtonSecondaryStyle}" />
                         <TextBlock Margin="0,4,0,0"
                                    Style="{StaticResource TextBlockSettingsAnnotationStyle}"
                                    Text="※ アーカイブするとプロジェクトは読み取り専用になり、通常のリストから非表示になります。" />
@@ -65,13 +71,14 @@
                                    Text="このプロジェクトはアーカイブされています。" />
                         <Button Command="{Binding UnarchiveCommand}"
                                 Content="アーカイブを解除する"
-                                Style="{StaticResource PrimaryButtonStyle}" />
+                                Style="{StaticResource ButtonPrimaryStyle}" />
                     </StackPanel>
                 </StackPanel>
             </GroupBox>
 
             <!-- Danger Zone -->
-            <GroupBox Header="Danger Zone" Style="{StaticResource GroupBoxDangerStyle}">
+            <GroupBox Header="Danger Zone"
+                      Style="{StaticResource GroupBoxDangerStyle}">
                 <StackPanel>
                     <TextBlock Margin="0,0,0,8"
                                FontWeight="Bold"

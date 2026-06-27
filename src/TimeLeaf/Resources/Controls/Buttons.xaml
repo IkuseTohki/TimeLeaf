@@ -1,4 +1,4 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
@@ -59,7 +59,8 @@
     </Style>
 
     <!-- アイコンボタン：背景透過、角丸 -->
-    <Style x:Key="ButtonIconStyle" TargetType="Button">
+    <Style x:Key="ButtonIconStyle"
+           TargetType="Button">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Padding" Value="4" />
@@ -67,7 +68,8 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border Background="{TemplateBinding Background}" CornerRadius="{DynamicResource RadiusControl}">
+                    <Border Background="{TemplateBinding Background}"
+                            CornerRadius="{DynamicResource RadiusControl}">
                         <ContentPresenter />
                     </Border>
                     <ControlTemplate.Triggers>
@@ -81,7 +83,8 @@
     </Style>
 
     <!-- 小さなアイコンボタン用のスタイル -->
-    <Style x:Key="ButtonIconSmallStyle" TargetType="Button">
+    <Style x:Key="ButtonIconSmallStyle"
+           TargetType="Button">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Padding" Value="2" />
@@ -94,7 +97,8 @@
                     <Border x:Name="Border"
                             Background="{TemplateBinding Background}"
                             CornerRadius="{DynamicResource RadiusControl}">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center" />
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">

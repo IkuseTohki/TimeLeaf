@@ -20,7 +20,8 @@
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid Background="{DynamicResource FlowBackgroundBrush}">
-        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                      VerticalScrollBarVisibility="Auto">
             <Canvas Name="FlowCanvas"
                     Width="2000"
                     Height="2000">
@@ -28,7 +29,8 @@
                 <ItemsControl ItemsSource="{Binding TaskEdges}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <Canvas Background="Transparent" IsItemsHost="True" />
+                            <Canvas Background="Transparent"
+                                    IsItemsHost="True" />
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
@@ -46,7 +48,8 @@
                 <ItemsControl ItemsSource="{Binding TaskNodes}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <Canvas Background="Transparent" IsItemsHost="True" />
+                            <Canvas Background="Transparent"
+                                    IsItemsHost="True" />
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemContainerStyle>
@@ -59,7 +62,8 @@
                         <DataTemplate>
                             <local:TaskFlowNodeControl DataContext="{Binding}">
                                 <i:Interaction.Behaviors>
-                                    <li:DragPositionBehavior X="{Binding X, Mode=TwoWay}" Y="{Binding Y, Mode=TwoWay}" />
+                                    <li:DragPositionBehavior X="{Binding X, Mode=TwoWay}"
+                                                             Y="{Binding Y, Mode=TwoWay}" />
                                 </i:Interaction.Behaviors>
                             </local:TaskFlowNodeControl>
                         </DataTemplate>

@@ -309,7 +309,7 @@ public class MainViewModelTests
         projectViewModel.Tasks.Add(taskViewModel);
 
         // AllTasksViewModel の実体作成（イベントを飛ばすため）
-        var allTasksVm = new AllTasksViewModel(viewModel.Projects);
+        var allTasksVm = new AllTasksViewModel(viewModel.Projects, _identityServiceMock.Object);
         _viewModelFactoryMock.Setup(x => x.CreateAllTasksViewModel(viewModel.Projects)).Returns(allTasksVm);
 
         // WorkspaceViewModel の実体作成
