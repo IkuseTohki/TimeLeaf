@@ -50,14 +50,14 @@
                         Command="{Binding ToggleUserMenuCommand}"
                         Style="{StaticResource ButtonUserMenuNaturalStyle}">
                     <StackPanel Orientation="Horizontal">
-                        <!-- アバター (イニシャル) -->
-                        <Border Style="{StaticResource BorderUserMenuAvatarStyle}">
-                            <TextBlock Style="{StaticResource TextBlockUserMenuInitialStyle}"
-                                       Text="{Binding UserMenu.UserInitial}" />
+                        <!-- アバター -->
+                        <Border Style="{StaticResource BorderUserAvatarIconSmallStyle}">
+                            <ContentControl DataContext="{Binding UserMenu}"
+                                            Template="{StaticResource PersonAvatarTemplate}" />
                         </Border>
                         <!-- ユーザー名 -->
                         <TextBlock Style="{StaticResource TextBlockUserMenuNameStyle}"
-                                   Text="{Binding UserMenu.UserName}" />
+                                   Text="{Binding UserMenu.DisplayName}" />
                         <!-- 矢印アイコン -->
                         <Path Style="{StaticResource PathUserMenuArrowStyle}" />
                     </StackPanel>

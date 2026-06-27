@@ -18,10 +18,16 @@ public partial class UserMenuViewModel : ObservableObject
     private readonly IViewModelFactory _viewModelFactory;
 
     [ObservableProperty]
-    private string _userName = "...";
+    private string _displayName = "...";
 
     [ObservableProperty]
     private string _userInitial = "?";
+
+    [ObservableProperty]
+    private string _themeColor = "#72796E";
+
+    [ObservableProperty]
+    private string? _iconPath;
 
     public UserMenuViewModel(
         IIdentityService identityService,
@@ -58,8 +64,10 @@ public partial class UserMenuViewModel : ObservableObject
 
     private void UpdateIdentity(Models.Entities.User user)
     {
-        UserName = user.DisplayName;
-        UserInitial = string.IsNullOrEmpty(UserName) ? "?" : UserName.Substring(0, 1);
+        DisplayName = user.DisplayName;
+        UserInitial = string.IsNullOrEmpty(DisplayName) ? "?" : DisplayName.Substring(0, 1);
+        ThemeColor = user.ThemeColor;
+        IconPath = user.IconPath;
     }
 
     public event System.Action? CloseRequested;

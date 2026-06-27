@@ -53,7 +53,7 @@ public class UserMenuViewModelTests
         await Task.Delay(100); // Wait for LoadIdentityAsync
 
         // Assert
-        Assert.AreEqual("佐藤 太郎", viewModel.UserName);
+        Assert.AreEqual("佐藤 太郎", viewModel.DisplayName);
         Assert.AreEqual("佐", viewModel.UserInitial);
     }
 
@@ -77,7 +77,7 @@ public class UserMenuViewModelTests
         _userServiceMock.Raise(x => x.UserChanged += null, updatedUser);
 
         // Assert
-        Assert.AreEqual("田中 花子", viewModel.UserName);
+        Assert.AreEqual("田中 花子", viewModel.DisplayName);
         Assert.AreEqual("田", viewModel.UserInitial);
     }
 
@@ -98,7 +98,7 @@ public class UserMenuViewModelTests
         await Task.Delay(100);
 
         // Assert
-        Assert.AreEqual("", viewModel.UserName);
+        Assert.AreEqual("", viewModel.DisplayName);
         Assert.AreEqual("?", viewModel.UserInitial);
     }
 }
