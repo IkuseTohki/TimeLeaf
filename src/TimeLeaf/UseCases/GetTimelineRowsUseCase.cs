@@ -97,14 +97,26 @@ namespace TimeLeaf.UseCases
                 // ユーザー情報の取得
                 if (task.Assignee.HasValue)
                 {
-                    var userName = _userService.GetUserName(task.Assignee.Value.ToString());
-                    model.UserInitial = !string.IsNullOrEmpty(userName) ? userName[0].ToString().ToUpper() : "U";
-                    model.UserColor = "#0984e3";
+                    var user = _userService.GetCachedUser(task.Assignee.Value);
+                    if (user != null)
+                    {
+                        model.DisplayName = user.DisplayName;
+                        model.ThemeColor = user.ThemeColor;
+                        model.IconPath = user.IconPath;
+                    }
+                    else
+                    {
+                        var userName = _userService.GetUserName(task.Assignee.Value.ToString());
+                        model.DisplayName = !string.IsNullOrEmpty(userName) ? userName : "Unknown";
+                        model.ThemeColor = "#0984e3";
+                        model.IconPath = null;
+                    }
                 }
                 else
                 {
-                    model.UserInitial = string.Empty;
-                    model.UserColor = "Transparent";
+                    model.DisplayName = string.Empty;
+                    model.ThemeColor = "Transparent";
+                    model.IconPath = null;
                 }
             }
             else if (item is ProjectContainer container)

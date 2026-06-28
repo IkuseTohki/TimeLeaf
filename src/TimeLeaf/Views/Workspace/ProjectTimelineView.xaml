@@ -329,7 +329,7 @@
                                                 Visibility="{Binding IsContainer, Converter={StaticResource InverseVisibility}}">
                                             <Border x:Name="PlannedBar"
                                                     Width="{Binding Converter={StaticResource DateRangeToWidthConverter}, ConverterParameter=Planned}"
-                                                    Background="{Binding UserColor, Converter={StaticResource StringToBrushConverter}}"
+                                                    Background="{Binding ThemeColor, Converter={StaticResource StringToBrushConverter}}"
                                                     Style="{StaticResource BorderTimelinePlanStyle}">
                                                 <Canvas.Left>
                                                     <MultiBinding Converter="{StaticResource DateToXConverter}">
@@ -342,7 +342,7 @@
 
                                             <Border x:Name="ActualBar"
                                                     Width="{Binding Converter={StaticResource DateRangeToWidthConverter}, ConverterParameter=Actual}"
-                                                    Background="{Binding UserColor, Converter={StaticResource StringToBrushConverter}}"
+                                                    Background="{Binding ThemeColor, Converter={StaticResource StringToBrushConverter}}"
                                                     Style="{StaticResource BorderTimelineActualStyle}">
                                                 <Canvas.Left>
                                                     <MultiBinding Converter="{StaticResource DateToXConverter}">
@@ -365,8 +365,10 @@
                                                 </Border>
                                             </Border>
 
-                                            <Border Background="{Binding UserColor, Converter={StaticResource StringToBrushConverter}}"
-                                                    Style="{StaticResource BorderTimelineAvatarStyle}">
+                                            <ContentControl Canvas.Top="{StaticResource TimelineAvatarVerticalOffset}"
+                                                            Width="{StaticResource AvatarSizeSmall}"
+                                                            Height="{StaticResource AvatarSizeSmall}"
+                                                            Template="{StaticResource PersonAvatarTemplate}">
                                                 <Canvas.Left>
                                                     <MultiBinding Converter="{StaticResource DateToXConverter}"
                                                                   ConverterParameter="{StaticResource TimelineAvatarHorizontalOffset}">
@@ -375,12 +377,7 @@
                                                                  RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
                                                     </MultiBinding>
                                                 </Canvas.Left>
-                                                <TextBlock HorizontalAlignment="Center"
-                                                           VerticalAlignment="Center"
-                                                           FontSize="{StaticResource FontSizeMeta}"
-                                                           Foreground="{DynamicResource BrandForegroundBrush}"
-                                                           Text="{Binding UserInitial}" />
-                                            </Border>
+                                            </ContentControl>
                                         </Canvas>
                                     </Grid>
                                 </Border>

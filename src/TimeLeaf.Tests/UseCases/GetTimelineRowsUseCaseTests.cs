@@ -118,8 +118,8 @@ namespace TimeLeaf.Tests.UseCases
             var row = rows.First();
 
             // Assert
-            Assert.AreEqual("S", row.UserInitial);
-            Assert.AreEqual("#0984e3", row.UserColor);
+            Assert.AreEqual("Sato", row.DisplayName);
+            Assert.AreEqual("#0984e3", row.ThemeColor);
         }
     }
 }

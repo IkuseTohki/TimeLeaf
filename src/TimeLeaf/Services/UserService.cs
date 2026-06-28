@@ -86,6 +86,12 @@ public class UserService : IUserService, IDisposable
         }
     }
 
+    public User? GetCachedUser(Guid userId)
+    {
+        _cache.TryGetValue(userId, out var user);
+        return user;
+    }
+
     public string GetUserName(string userIdString)
     {
         if (string.IsNullOrEmpty(userIdString))

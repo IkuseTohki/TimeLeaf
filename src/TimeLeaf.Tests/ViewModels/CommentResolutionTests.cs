@@ -54,7 +54,7 @@ public class CommentResolutionTests
         var commentVm = viewModel.Comments.First();
         Assert.AreEqual(
             displayName,
-            commentVm.AuthorName,
+            commentVm.DisplayName,
             "コメントの表示名がリポジトリから取得した名前に更新されていること"
         );
     }
@@ -86,7 +86,7 @@ public class CommentResolutionTests
         var commentVm = viewModel.Comments.First();
         Assert.AreEqual(
             "Unknown User",
-            commentVm.AuthorName,
+            commentVm.DisplayName,
             "ユーザーが見つからない場合はデフォルトの表示名であること"
         );
     }
@@ -113,7 +113,7 @@ public class CommentResolutionTests
 
         using var viewModel = new ProjectTaskViewModel(task, _userServiceMock.Object);
         await Task.Delay(100);
-        Assert.AreEqual("Unknown User", viewModel.Comments.First().AuthorName);
+        Assert.AreEqual("Unknown User", viewModel.Comments.First().DisplayName);
 
         // Act: ユーザーが作成/更新されたイベントを発火
         var updatedUser = new User(userId, "後から来たユーザー", "#00FF00", "");
@@ -122,9 +122,9 @@ public class CommentResolutionTests
         // Assert: 即座に（またはイベント伝播後に）反映される
         Assert.AreEqual(
             "後から来たユーザー",
-            viewModel.Comments.First().AuthorName,
+            viewModel.Comments.First().DisplayName,
             "イベント購読により表示名が更新されること"
         );
-        Assert.AreEqual("#00FF00", viewModel.Comments.First().AuthorColor);
+        Assert.AreEqual("#00FF00", viewModel.Comments.First().ThemeColor);
     }
 }

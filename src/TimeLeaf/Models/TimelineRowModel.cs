@@ -24,8 +24,9 @@ namespace TimeLeaf.Models
         public int ProgressPercentage { get; set; }
 
         // 担当者情報
-        public string UserColor { get; set; } = "#CCCCCC";
-        public string UserInitial { get; set; } = string.Empty;
+        public string ThemeColor { get; set; } = "Transparent";
+        public string DisplayName { get; set; } = string.Empty;
+        public string? IconPath { get; set; }
 
         // 稲妻線用: 今日時点での進捗偏差 (日単位)
         // プラスは先行、マイナスは遅延

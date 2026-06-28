@@ -15,13 +15,16 @@ public partial class CommentViewModel : ObservableObject, IDisposable
     private readonly IUserService _userService;
 
     [ObservableProperty]
-    private string _authorName = "Unknown User";
+    private string _displayName = "Unknown User";
 
     [ObservableProperty]
     private string _authorInitial = "?";
 
     [ObservableProperty]
-    private string _authorColor = "#9D9D9D";
+    private string _themeColor = "#9D9D9D";
+
+    [ObservableProperty]
+    private string? _iconPath;
 
     /// <summary>
     /// コメント本文。
@@ -60,7 +63,7 @@ public partial class CommentViewModel : ObservableObject, IDisposable
         var user = await _userService.GetUserAsync(_comment.AuthorId);
         if (user != null)
         {
-            UpdateAuthorInfo(user.DisplayName, user.ThemeColor);
+            UpdateAuthorInfo(user.DisplayName, user.ThemeColor, user.IconPath);
         }
     }
 
@@ -68,7 +71,7 @@ public partial class CommentViewModel : ObservableObject, IDisposable
     {
         if (user != null && user.Id == _comment.AuthorId)
         {
-            UpdateAuthorInfo(user.DisplayName, user.ThemeColor);
+            UpdateAuthorInfo(user.DisplayName, user.ThemeColor, user.IconPath);
         }
     }
 
@@ -77,10 +80,12 @@ public partial class CommentViewModel : ObservableObject, IDisposable
     /// </summary>
     /// <param name="name">表示名。</param>
     /// <param name="color">テーマカラー。</param>
-    private void UpdateAuthorInfo(string name, string color)
+    /// <param name="iconPath">アイコンパス。</param>
+    private void UpdateAuthorInfo(string name, string color, string? iconPath)
     {
-        AuthorName = name;
-        AuthorColor = color;
+        DisplayName = name;
+        ThemeColor = color;
+        IconPath = iconPath;
         AuthorInitial = (name.Length >= 1 ? name.Substring(0, 1) : name).ToUpper();
     }
 

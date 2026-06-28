@@ -38,6 +38,13 @@ public interface IUserService
     Task DeleteUserAsync(Guid userId);
 
     /// <summary>
+    /// ユーザーIDからキャッシュ済みのユーザー情報を同期的に取得します。
+    /// </summary>
+    /// <param name="userId">ユーザーID。</param>
+    /// <returns>キャッシュされているユーザー情報。未キャッシュの場合は null。</returns>
+    User? GetCachedUser(Guid userId);
+
+    /// <summary>
     /// ユーザーIDから表示名を同期的に取得します（キャッシュヒット時のみ名前、未キャッシュ時はIDを返却）。
     /// </summary>
     /// <param name="userIdString">GUID形式のユーザーID文字列。</param>
