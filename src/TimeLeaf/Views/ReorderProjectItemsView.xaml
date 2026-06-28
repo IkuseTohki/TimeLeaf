@@ -31,7 +31,7 @@
         <!-- アイテムリスト -->
         <ListBox Grid.Row="2"
                  Margin="{StaticResource ContentTopWideMargin}"
-                   ItemsSource="{Binding Items}"
+                 ItemsSource="{Binding Items}"
                  Style="{StaticResource ListBoxReorderStyle}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
@@ -56,10 +56,10 @@
                                   Visibility="{Binding IsContainer, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
 
                             <!-- アイテム名 -->
-                            <TextBlock VerticalAlignment="Center"
-                                       Margin="{StaticResource ContentLeftNarrowMargin}"
-                                       Text="{Binding Item.Name}"
-                                       Style="{StaticResource TextBlockBaseListEllipsisPrimaryStyle}" />
+                            <TextBlock Margin="{StaticResource ContentLeftNarrowMargin}"
+                                       VerticalAlignment="Center"
+                                       Style="{StaticResource TextBlockBaseListEllipsisPrimaryStyle}"
+                                       Text="{Binding Item.Name}" />
                         </StackPanel>
 
                         <!-- 移動ボタン（右側、ホバー時のみ表示） -->
