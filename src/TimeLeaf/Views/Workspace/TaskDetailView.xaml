@@ -131,7 +131,7 @@
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
                                         <Border VerticalAlignment="Top"
-                                            Style="{StaticResource BorderUserAvatarIconSmallStyle}">
+                                                Style="{StaticResource BorderUserAvatarIconSmallStyle}">
                                             <ContentControl Template="{StaticResource PersonAvatarTemplate}" />
                                         </Border>
                                         <StackPanel Grid.Column="1"

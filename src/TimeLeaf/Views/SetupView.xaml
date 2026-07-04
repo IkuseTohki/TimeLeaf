@@ -11,8 +11,7 @@
         WindowStartupLocation="CenterScreen"
         mc:Ignorable="d">
 
-    <StackPanel Margin="20"
-                Style="{StaticResource StackPanelSetupContainerStyle}">
+    <StackPanel Style="{StaticResource StackPanelDialogRootStyle}">
         <!-- Header -->
         <TextBlock Style="{StaticResource TextBlockTitleBaseStyle}"
                    Text="TimeLeafへようこそ" />
@@ -30,7 +29,7 @@
                Content="データ保存場所 (ルートフォルダ):"
                Style="{StaticResource LabelSectionHeaderBaseStyle}" />
 
-        <Grid Style="{StaticResource GridSetupInputAreaStyle}">
+        <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
