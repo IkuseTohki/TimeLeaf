@@ -51,7 +51,7 @@
         <StackPanel Margin="{StaticResource ContentTopMediumMargin}"
                     Style="{StaticResource StackPanelSetupFooterStyle}">
             <Button Command="{Binding SaveAndStartCommand}"
-                    Content="設定して開始"
+                    Content="開始"
                     IsDefault="true"
                     Style="{StaticResource ButtonDialogActionStyle}" />
             <Button Margin="{StaticResource ButtonLeftMargin}"
