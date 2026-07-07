@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -22,7 +24,7 @@ public record MoveTaskArgs(ProjectTaskViewModel Task, Guid? NewParentId);
 /// <summary>
 /// プロジェクトのタスク一覧と操作を担当するViewModel。
 /// </summary>
-public partial class ProjectTasksViewModel : ObservableObject
+public partial class ProjectTasksViewModel : ObservableObject, IDisposable
 {
     private readonly ProjectViewModel _projectViewModel;
     private readonly IAddTaskUseCase _addTaskUseCase;
@@ -31,6 +33,7 @@ public partial class ProjectTasksViewModel : ObservableObject
     private readonly IDeleteTaskUseCase _deleteTaskUseCase;
     private readonly IDeleteContainerUseCase _deleteContainerUseCase;
     private readonly IGetProjectMembersUseCase _getProjectMembersUseCase;
+    private readonly ISaveProjectUseCase _saveProjectUseCase;
     private readonly IViewModelFactory _viewModelFactory;
     private readonly LeafKit.UI.Services.IDialogService _dialogService;
     private readonly ILogger<ProjectTasksViewModel> _logger;
@@ -78,6 +81,7 @@ public partial class ProjectTasksViewModel : ObservableObject
         IDeleteTaskUseCase deleteTaskUseCase,
         IDeleteContainerUseCase deleteContainerUseCase,
         IGetProjectMembersUseCase getProjectMembersUseCase,
+        ISaveProjectUseCase saveProjectUseCase,
         IViewModelFactory viewModelFactory,
         LeafKit.UI.Services.IDialogService dialogService,
         DetectProjectRisksUseCase detectRisksUseCase,
@@ -93,6 +97,7 @@ public partial class ProjectTasksViewModel : ObservableObject
         _deleteTaskUseCase = deleteTaskUseCase;
         _deleteContainerUseCase = deleteContainerUseCase;
         _getProjectMembersUseCase = getProjectMembersUseCase;
+        _saveProjectUseCase = saveProjectUseCase;
         _viewModelFactory = viewModelFactory;
         _dialogService = dialogService;
         _detectRisksUseCase = detectRisksUseCase;
@@ -103,6 +108,8 @@ public partial class ProjectTasksViewModel : ObservableObject
         InitializeNodePositions();
         SyncEdges();
         RebuildContainers();
+
+        _projectViewModel.PropertyChanged += OnProjectViewModelPropertyChanged;
     }
 
     [RelayCommand]
@@ -116,13 +123,7 @@ public partial class ProjectTasksViewModel : ObservableObject
             _logger.LogInformation("Moving task {TaskId} to parent {ParentId}", args.Task.Id, args.NewParentId);
 
             await _moveTaskUseCase.ExecuteAsync(_projectViewModel.Model, args.Task.Id, args.NewParentId);
-
-            // UIの状態を同期
             _projectViewModel.SyncFromModel();
-            RebuildContainers();
-
-            // リスクのスキャンも再実行（階層変更による制約への影響を考慮）
-            await ScanRisksAsync();
         }
         catch (Exception ex)
         {
@@ -142,13 +143,7 @@ public partial class ProjectTasksViewModel : ObservableObject
             _logger.LogInformation("Deleting task {TaskId}: {TaskName}", task.Id, task.Name);
 
             await _deleteTaskUseCase.ExecuteAsync(_projectViewModel.Model, task.Id);
-
-            // UIの状態を同期
             _projectViewModel.SyncFromModel();
-            RebuildContainers();
-
-            // リスクのスキャンも再実行
-            await ScanRisksAsync();
         }
         catch (Exception ex)
         {
@@ -177,13 +172,7 @@ public partial class ProjectTasksViewModel : ObservableObject
                 );
 
                 await _deleteContainerUseCase.ExecuteAsync(_projectViewModel.Model, container.Id);
-
-                // UIの状態を同期
                 _projectViewModel.SyncFromModel();
-                RebuildContainers();
-
-                // リスクのスキャンも再実行
-                await ScanRisksAsync();
             }
         }
         catch (Exception ex)
@@ -215,8 +204,8 @@ public partial class ProjectTasksViewModel : ObservableObject
 
             if (result)
             {
+                await _saveProjectUseCase.ExecuteAsync(_projectViewModel.Model);
                 _projectViewModel.SyncFromModel();
-                RebuildContainers();
             }
         }
         catch (Exception ex)
@@ -243,16 +232,34 @@ public partial class ProjectTasksViewModel : ObservableObject
                     addContainerVm.Description,
                     parentId
                 );
-
                 _projectViewModel.SyncFromModel();
-                RebuildContainers();
-                await ScanRisksAsync();
             }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to add container.");
         }
+    }
+
+    private void RefreshUI()
+    {
+        InitializeNodePositions();
+        SyncEdges();
+        RebuildContainers();
+    }
+
+    private void OnProjectViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ProjectViewModel.Tasks) || e.PropertyName == nameof(ProjectViewModel.UpdatedAt))
+        {
+            RefreshUI();
+            _ = ScanRisksAsync();
+        }
+    }
+
+    public void Dispose()
+    {
+        _projectViewModel.PropertyChanged -= OnProjectViewModelPropertyChanged;
     }
 
     private void RebuildContainers()
@@ -434,10 +441,7 @@ public partial class ProjectTasksViewModel : ObservableObject
                     0, // actualCost
                     assigneeId
                 );
-
                 _projectViewModel.SyncFromModel();
-                RebuildContainers();
-                await ScanRisksAsync();
             }
         }
         catch (Exception ex)

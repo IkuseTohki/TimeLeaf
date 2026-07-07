@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using TimeLeaf.Models.Entities;
 using TimeLeaf.Models.Enums;
@@ -38,7 +39,6 @@ public class AddTaskUseCase : IAddTaskUseCase
         task.UpdateDescription(description);
         task.UpdateStatus(status);
         task.UpdatePriority(priority);
-        task.SetParentId(parentId);
         task.UpdateSchedule(scheduledStartDate, deadline);
         task.UpdateActualDates(actualStartDate, actualEndDate);
         task.UpdateEstimatedCost(estimatedCost);
@@ -46,6 +46,24 @@ public class AddTaskUseCase : IAddTaskUseCase
         task.AssignTo(assignee);
 
         project.AddTask(task);
+
+        // parentId が指定されている場合はコンテナの Children リストにも登録する。
+        // SetParentId だけでは task.ParentId が設定されるが、
+        // コンテナ側の Children リストには追加されないため、
+        // RebuildContainers が正しく機能しない。
+        if (parentId.HasValue)
+        {
+            var container = project.Containers.FirstOrDefault(c => c.Id == parentId.Value);
+            if (container != null)
+            {
+                container.AddChild(task); // 内部で SetParentId も呼ばれる
+            }
+            else
+            {
+                // コンテナが見つからない場合は ParentId のみ設定
+                task.SetParentId(parentId);
+            }
+        }
 
         await _saveUseCase.ExecuteAsync(project);
     }
