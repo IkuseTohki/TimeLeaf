@@ -250,6 +250,7 @@ public partial class TaskDetailViewModel : ObservableObject, IDialogViewModel, I
             IsDirty = false;
             HasExternalChange = false;
             _logger.LogInformation("Task changes saved successfully.");
+            _dialogService.ShowMessage("保存しました。", "確認");
         }
         catch (Exception ex)
         {
