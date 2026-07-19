@@ -343,7 +343,8 @@ public class MainViewModelTests
             new Mock<IProjectService>().Object,
             new Mock<ILogger<TaskDetailViewModel>>().Object,
             new Mock<IGetProjectMembersUseCase>().Object,
-            historyUseCaseMock.Object
+            historyUseCaseMock.Object,
+            _identityServiceMock.Object
         );
         _viewModelFactoryMock
             .Setup(x => x.CreateTaskDetailViewModel(projectViewModel, taskViewModel))

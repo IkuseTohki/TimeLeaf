@@ -29,6 +29,7 @@ public class TaskDetailViewModelTests
     private Mock<IViewModelFactory> _viewModelFactoryMock = null!;
     private Mock<IGetProjectMembersUseCase> _getProjectMembersUseCaseMock = null!;
     private Mock<IGetTaskHistoryUseCase> _getTaskHistoryUseCaseMock = null!;
+    private Mock<IIdentityService> _identityServiceMock = null!;
 
     private TaskDetailViewModel _viewModel = null!;
     private ProjectViewModel _projectViewModel = null!;
@@ -48,6 +49,7 @@ public class TaskDetailViewModelTests
         _getTaskHistoryUseCaseMock = new Mock<IGetTaskHistoryUseCase>();
         _loggerMock = new Mock<ILogger<TaskDetailViewModel>>();
         _joinProjectUseCaseMock = new Mock<IJoinProjectUseCase>();
+        _identityServiceMock = new Mock<IIdentityService>();
 
         _getTaskHistoryUseCaseMock = new Mock<IGetTaskHistoryUseCase>();
         _loggerMock = new Mock<ILogger<TaskDetailViewModel>>();
@@ -98,7 +100,8 @@ public class TaskDetailViewModelTests
             _projectServiceMock.Object,
             _loggerMock.Object,
             _getProjectMembersUseCaseMock.Object,
-            _getTaskHistoryUseCaseMock.Object
+            _getTaskHistoryUseCaseMock.Object,
+            _identityServiceMock.Object
         );
     }
 
@@ -137,14 +140,67 @@ public class TaskDetailViewModelTests
     }
 
     [TestMethod]
-    public void ProjectUpdated_ShouldSetHasExternalChange()
+    public void ProjectUpdated_WithExternalNameChange_ShouldSetHasExternalChange()
     {
-        // Act
-        // 外部変更イベントを発火
-        _projectServiceMock.Raise(x => x.ProjectUpdated += null, _projectViewModel.Model);
+        // テスト観点: 他ユーザーがタスク名を変更した場合、HasExternalChange が true になることを確認する。
+        // 実際の動作では ProjectService がストレージから新しい Project オブジェクトを読み込み、
+        // そのオブジェクトを ProjectUpdated イベントで通知する。ここではその挙動を再現する。
+
+        // Arrange: タスク名が変更された「ストレージ再ロード済み」のプロジェクトを別オブジェクトとして用意する
+        var updatedTask = _taskViewModel.Model.Clone();
+        updatedTask.UpdateName("External Changed Name");
+
+        var updatedProject = new Project(
+            _projectViewModel.Model.Id,
+            _projectViewModel.Model.Name,
+            _projectViewModel.Model.Description,
+            _projectViewModel.Model.Status,
+            _projectViewModel.Model.CreatedAt,
+            _projectViewModel.Model.UpdatedAt,
+            _projectViewModel.Model.CreatedBy,
+            new List<ProjectTask> { updatedTask },
+            _projectViewModel.Model.Containers.ToList(),
+            _projectViewModel.Model.Milestones.ToList(),
+            _projectViewModel.Model.AssignedUserIds.ToList()
+        );
+
+        // Act: 外部変更イベントを再ロードされた別オブジェクトで発火（ProjectService の実際の動作を再現）
+        _projectServiceMock.Raise(x => x.ProjectUpdated += null, updatedProject);
 
         // Assert
-        Assert.IsTrue(_viewModel.HasExternalChange, "外部変更を検知したら HasExternalChange が true になること");
+        Assert.IsTrue(
+            _viewModel.HasExternalChange,
+            "他ユーザーがタスク名を変更した場合 HasExternalChange が true になること"
+        );
+    }
+
+    [TestMethod]
+    public void ProjectUpdated_WithNoActualChange_ShouldNotSetHasExternalChange()
+    {
+        // テスト観点: プロジェクト更新イベントが来ても、実質的な差分がない場合は HasExternalChange が true にならないことを確認する。
+
+        // Arrange: 変更なしの「ストレージ再ロード済み」プロジェクトを別オブジェクトとして用意する
+        var unchangedTask = _taskViewModel.Model.Clone();
+
+        var unchangedProject = new Project(
+            _projectViewModel.Model.Id,
+            _projectViewModel.Model.Name,
+            _projectViewModel.Model.Description,
+            _projectViewModel.Model.Status,
+            _projectViewModel.Model.CreatedAt,
+            _projectViewModel.Model.UpdatedAt,
+            _projectViewModel.Model.CreatedBy,
+            new List<ProjectTask> { unchangedTask },
+            _projectViewModel.Model.Containers.ToList(),
+            _projectViewModel.Model.Milestones.ToList(),
+            _projectViewModel.Model.AssignedUserIds.ToList()
+        );
+
+        // Act: 変更なしで外部変更イベントを発火
+        _projectServiceMock.Raise(x => x.ProjectUpdated += null, unchangedProject);
+
+        // Assert
+        Assert.IsFalse(_viewModel.HasExternalChange, "実質的な変更がない場合 HasExternalChange が true にならないこと");
     }
 
     [TestMethod]
@@ -346,7 +402,8 @@ public class TaskDetailViewModelTests
             _projectServiceMock.Object,
             _loggerMock.Object,
             _getProjectMembersUseCaseMock.Object,
-            _getTaskHistoryUseCaseMock.Object
+            _getTaskHistoryUseCaseMock.Object,
+            _identityServiceMock.Object
         );
 
         // Act

@@ -177,7 +177,8 @@ public class CommentFlowTests
             new Mock<IProjectService>().Object,
             new Mock<ILogger<TaskDetailViewModel>>().Object,
             new Mock<IGetProjectMembersUseCase>().Object,
-            historyUseCaseMock.Object
+            historyUseCaseMock.Object,
+            _identityServiceMock.Object
         );
 
         var commentContent = "New Test Comment";

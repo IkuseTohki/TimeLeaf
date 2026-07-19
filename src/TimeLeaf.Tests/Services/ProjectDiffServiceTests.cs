@@ -96,4 +96,53 @@ public class ProjectDiffServiceTests
         // Assert
         Assert.IsTrue(diff.NewCommentTaskIds.Contains(task.Id), "新しいコメントが追加されたことが検知されていません。");
     }
+
+    [TestMethod]
+    public void CalculateDiff_ShouldIgnoreOwnComments()
+    {
+        // テスト観点: 同期後に増えたコメントの作成者が自分自身（myUserId）の場合、検知対象から除外すること。
+
+        // Arrange
+        var myUserId = Guid.NewGuid();
+
+        var oldProject = new Project(Guid.NewGuid());
+        var task = new ProjectTask();
+        task.UpdateName("Task1");
+        oldProject.AddTask(task);
+
+        var newProject = new Project(
+            oldProject.Id,
+            oldProject.Name,
+            oldProject.Description,
+            oldProject.Status,
+            oldProject.CreatedAt,
+            oldProject.UpdatedAt,
+            oldProject.CreatedBy,
+            oldProject.Tasks.Select(t => t.Clone()).ToList(),
+            oldProject.Containers.ToList(),
+            oldProject.Milestones.ToList(),
+            oldProject.AssignedUserIds.ToList()
+        );
+
+        var newComment = new Comment(
+            Guid.NewGuid(),
+            newProject.Tasks.First().Id,
+            myUserId, // 投稿者を自分自身にする
+            DateTime.Now,
+            "My own comment",
+            null
+        );
+        newProject.Tasks.First().AddComment(newComment);
+
+        var service = new ProjectDiffService();
+
+        // Act
+        var diff = service.CalculateDiff(oldProject, newProject, myUserId);
+
+        // Assert
+        Assert.IsFalse(
+            diff.NewCommentTaskIds.Contains(task.Id),
+            "自分自身の投稿したコメントが誤って検知されています。"
+        );
+    }
 }

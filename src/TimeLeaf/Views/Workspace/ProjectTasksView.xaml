@@ -41,6 +41,32 @@
                                                 Style="{StaticResource BorderWorkspaceTaskPanelHeaderStyle}">
                                             <Grid>
                                                 <StackPanel Orientation="Horizontal">
+                                                    <ToggleButton Margin="0,0,6,0"
+                                                                  VerticalAlignment="Center"
+                                                                  Cursor="Hand"
+                                                                  Focusable="False"
+                                                                  IsChecked="{Binding IsExpanded, Mode=TwoWay}">
+                                                        <ToggleButton.Template>
+                                                            <ControlTemplate TargetType="ToggleButton">
+                                                                <Border Padding="4"
+                                                                        Background="Transparent">
+                                                                    <TextBlock x:Name="ArrowText"
+                                                                               VerticalAlignment="Center"
+                                                                               FontSize="10"
+                                                                               Foreground="{DynamicResource TextMutedBrush}"
+                                                                               Text="▼" />
+                                                                </Border>
+                                                                <ControlTemplate.Triggers>
+                                                                    <Trigger Property="IsChecked" Value="False">
+                                                                        <Setter TargetName="ArrowText" Property="Text" Value="▶" />
+                                                                    </Trigger>
+                                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                                        <Setter TargetName="ArrowText" Property="Foreground" Value="{DynamicResource BrandPrimaryBrush}" />
+                                                                    </Trigger>
+                                                                </ControlTemplate.Triggers>
+                                                            </ControlTemplate>
+                                                        </ToggleButton.Template>
+                                                    </ToggleButton>
                                                     <TextBlock VerticalAlignment="Center"
                                                                Style="{StaticResource TextBlockMetaBaseStyle}"
                                                                Text="📂 " />
@@ -80,7 +106,8 @@
                                         <!-- Sub Task List -->
                                         <ListBox ItemContainerStyle="{StaticResource ListBoxItemWorkspaceTaskSubStyle}"
                                                  ItemsSource="{Binding SubTasks}"
-                                                 Style="{StaticResource ListBoxWorkspaceTaskSubStyle}">
+                                                 Style="{StaticResource ListBoxWorkspaceTaskSubStyle}"
+                                                 Visibility="{Binding IsExpanded, Converter={StaticResource BooleanToVisibilityConverter}}">
                                             <i:Interaction.Behaviors>
                                                 <behaviors:RedirectMouseWheelBehavior Target="{Binding ElementName=TasksScrollViewer}" />
                                             </i:Interaction.Behaviors>
@@ -248,7 +275,8 @@
                                         <Button x:Name="AddTaskBtn"
                                                 Command="{Binding AddTaskCommand}"
                                                 CommandParameter="{Binding}"
-                                                Style="{StaticResource ButtonWorkspaceTaskAddStyle}" />
+                                                Style="{StaticResource ButtonWorkspaceTaskAddStyle}"
+                                                Visibility="{Binding IsExpanded, Converter={StaticResource BooleanToVisibilityConverter}}" />
                                     </StackPanel>
                                 </Grid>
                             </Border>

@@ -200,7 +200,8 @@ public class ViewModelFactory : IViewModelFactory
             _serviceProvider.GetRequiredService<IProjectService>(),
             _serviceProvider.GetRequiredService<ILogger<TaskDetailViewModel>>(),
             _serviceProvider.GetRequiredService<IGetProjectMembersUseCase>(),
-            _serviceProvider.GetRequiredService<IGetTaskHistoryUseCase>()
+            _serviceProvider.GetRequiredService<IGetTaskHistoryUseCase>(),
+            _identityService
         );
     }
 

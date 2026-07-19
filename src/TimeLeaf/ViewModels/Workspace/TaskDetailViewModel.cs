@@ -31,6 +31,7 @@ public partial class TaskDetailViewModel : ObservableObject, IDialogViewModel, I
     private readonly IGetProjectMembersUseCase _getProjectMembersUseCase;
     private readonly IGetTaskHistoryUseCase _getTaskHistoryUseCase;
     private readonly ILogger<TaskDetailViewModel> _logger;
+    private readonly IIdentityService _identityService;
 
     private readonly ProjectTaskViewModel _workingTaskViewModel;
     private readonly ProjectTask _workingTask;
@@ -86,7 +87,8 @@ public partial class TaskDetailViewModel : ObservableObject, IDialogViewModel, I
         IProjectService projectService,
         ILogger<TaskDetailViewModel> logger,
         IGetProjectMembersUseCase getProjectMembersUseCase,
-        IGetTaskHistoryUseCase getTaskHistoryUseCase
+        IGetTaskHistoryUseCase getTaskHistoryUseCase,
+        IIdentityService identityService
     )
     {
         _projectViewModel = projectViewModel;
@@ -100,6 +102,7 @@ public partial class TaskDetailViewModel : ObservableObject, IDialogViewModel, I
         _logger = logger;
         _getProjectMembersUseCase = getProjectMembersUseCase;
         _getTaskHistoryUseCase = getTaskHistoryUseCase;
+        _identityService = identityService;
 
         // 作業用コピーの作成
         _workingTask = _taskViewModel.Model.Clone();
@@ -159,8 +162,35 @@ public partial class TaskDetailViewModel : ObservableObject, IDialogViewModel, I
     {
         if (project.Id == _projectViewModel.Model.Id)
         {
-            // 他ユーザーによる変更（または自身の別操作による変更）を検知
-            HasExternalChange = true;
+            var latestTask = project.Tasks.FirstOrDefault(t => t.Id == _taskViewModel.Id);
+            if (latestTask != null)
+            {
+                // 自分自身以外のユーザーによって投稿された、自分がまだ知らない新しいコメントがあるか
+                var hasNewExternalComments = latestTask.Comments.Any(c =>
+                    c.AuthorId != _identityService.CurrentUserId
+                    && !_taskViewModel.Model.Comments.Any(oc => oc.Id == c.Id)
+                );
+
+                // 外部から変更されたプロパティがあるか
+                bool hasExternalPropertyChanges =
+                    latestTask.Name != _taskViewModel.Model.Name
+                    || latestTask.Description != _taskViewModel.Model.Description
+                    || latestTask.Status != _taskViewModel.Model.Status
+                    || latestTask.Priority != _taskViewModel.Model.Priority
+                    || latestTask.PlannedStartDate != _taskViewModel.Model.PlannedStartDate
+                    || latestTask.Deadline != _taskViewModel.Model.Deadline
+                    || latestTask.ActualStartDate != _taskViewModel.Model.ActualStartDate
+                    || latestTask.ActualEndDate != _taskViewModel.Model.ActualEndDate
+                    || latestTask.EstimatedCost != _taskViewModel.Model.EstimatedCost
+                    || latestTask.ActualCost != _taskViewModel.Model.ActualCost
+                    || latestTask.Assignee != _taskViewModel.Model.Assignee;
+
+                if (hasNewExternalComments || hasExternalPropertyChanges)
+                {
+                    // 他ユーザーによる変更（または自身の別操作による変更）を検知
+                    HasExternalChange = true;
+                }
+            }
 
             // リアクティブに変更履歴を更新
             _ = LoadHistoryAsync();

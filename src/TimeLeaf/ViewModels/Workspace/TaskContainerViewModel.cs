@@ -16,6 +16,12 @@ public partial class TaskContainerViewModel : ObservableObject
     private readonly ProjectContainer? _container;
 
     /// <summary>
+    /// コンテナが展開されているかどうか。
+    /// </summary>
+    [ObservableProperty]
+    private bool _isExpanded = true;
+
+    /// <summary>
     /// 所属する子タスクのリスト。
     /// </summary>
     public ObservableCollection<ProjectTaskViewModel> SubTasks { get; }

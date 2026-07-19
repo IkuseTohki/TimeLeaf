@@ -23,8 +23,12 @@ public class ProjectDiffService : IProjectDiffService
             }
 
             // コメントチェック
-            var oldCommentCount = oldTask?.Comments.Count ?? 0;
-            if (newTask.Comments.Count > oldCommentCount)
+            var oldCommentIds = oldTask?.Comments.Select(c => c.Id).ToHashSet() ?? new HashSet<Guid>();
+            var newCommentsFromOthers = newTask.Comments.Where(c =>
+                !oldCommentIds.Contains(c.Id) && c.AuthorId != currentUserId
+            );
+
+            if (newCommentsFromOthers.Any())
             {
                 newCommentTaskIds.Add(newTask.Id);
             }
